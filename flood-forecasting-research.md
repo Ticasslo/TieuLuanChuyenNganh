@@ -1,10 +1,12 @@
-# Đề tài: Dự báo lũ lụt/sạt lở miền Trung Việt Nam bằng Mamba (State Space Model)
+# Đề tài: Dự báo lưu lượng dòng chảy phục vụ cảnh báo lũ miền Trung Việt Nam bằng Mamba (State Space Model)
 
 > Tài liệu kế hoạch nghiên cứu cho tiểu luận chuyên ngành → khóa luận tốt nghiệp.
 
+⚠️ **Sửa lại 19/8/2026 — phát hiện tên cũ sai:** bản cũ ghi "lũ lụt/sạt lở" và tên đề tài có chữ "lũ lụt" — SAI, vì output model chỉ là **lưu lượng dòng chảy (Q, m³/s)**, không phải lũ lụt/vùng ngập/sạt lở trực tiếp (không đủ dữ liệu địa hình/mặt cắt để quy đổi Q → mực nước/vùng ngập thật — xem bảng thuật ngữ ngay dưới, dòng "Mực nước", và `CLAUDE.md` mục "Vài quyết định kỹ thuật đã chốt"). "Sạt lở" chưa từng thuộc phạm vi đề tài ở bất kỳ đâu khác trong file này — đã bỏ. "Lũ lụt" giữ lại đúng vai trò là **mục đích ứng dụng** (nguy cơ lũ suy ra từ ngưỡng return period trên Q), không phải đại lượng model trực tiếp dự báo — phát hiện từ câu hỏi thật của GVHD (Lê Minh Tân) khi review tên đề tài.
+
 **Tên đề tài cụ thể (tự đặt):**
-- 🎓 Tiểu luận: *"Ứng dụng mô hình Mamba (State Space Model) trong dự báo lưu lượng dòng chảy lũ lụt lưu vực sông Vu Gia – Thu Bồn"*
-- 🎓🎓 Khóa luận: *"Dự báo lũ lụt đa lưu vực miền Trung Việt Nam bằng kiến trúc Mamba tích hợp đồ thị mạng lưới sông (Graph-enhanced Mamba)"*
+- 🎓 Tiểu luận: *"Ứng dụng mô hình Mamba (State Space Model) trong dự báo lưu lượng dòng chảy lưu vực sông Vu Gia – Thu Bồn"*
+- 🎓🎓 Khóa luận (chốt lại phạm vi 23/8/2026): *"Dự báo lưu lượng dòng chảy lưu vực Vu Gia–Thu Bồn bằng kiến trúc Mamba tích hợp đồ thị mạng lưới sông, có phân tích khả giải thích (Graph-enhanced Mamba + XAI)"* — thu hẹp lại chỉ 1 lưu vực (bỏ "đa lưu vực miền Trung" ban đầu), thêm module XAI. Lý do đầy đủ: xem `CLAUDE.md` mục "Vài quyết định kỹ thuật đã chốt".
 
 ---
 
@@ -12,12 +14,12 @@
 
 | | 🎓 TIỂU LUẬN CHUYÊN NGÀNH (làm ngay) | 🎓🎓 KHÓA LUẬN TỐT NGHIỆP (làm sau) |
 |---|---|---|
-| **Kiến trúc** | Mamba **thuần** | Mamba **+ Graph** (nâng cấp lõi, vẫn 1 model) |
-| **Vùng** | 1 lưu vực — Vu Gia–Thu Bồn | Nhiều lưu vực, có thể mở rộng toàn VN |
-| **Dữ liệu** | GloFAS (historical + forecast) + code/checkpoint RiverMamba | Thêm: `ldd` GloFAS (dựng Graph), IBTrACS (bão), DEM (địa hình) |
-| **Kiến trúc hệ thống** | 1 hệ thống dự báo, cập nhật 1 lần/ngày | Vẫn 1 hệ thống, chỉ đổi lõi bên trong |
-| **So sánh** | vs LSTM/GRU/Transformer baseline (target GloFAS) + vs thực tế (GRDC trạm Nông Sơn, bắt buộc — Mục 2.5) | vs paper GNN-Transformer 2026 đã có |
-| **Đầu ra** | Báo cáo tiểu luận + demo VPS | Khóa luận + có thể công bố SOICT |
+| **Kiến trúc** | Mamba **thuần** | Mamba **+ Graph** (G-Mamba, nâng cấp lõi, vẫn 1 model) **+ module XAI** (feature attribution, gắn thêm sau khi model dự báo xong — không phải LLM) |
+| **Vùng** | 1 lưu vực — Vu Gia–Thu Bồn | **Vẫn Vu Gia–Thu Bồn** (đã thu hẹp 23/8/2026 — bỏ dự định "đa lưu vực miền Trung" ban đầu vì rủi ro tìm dữ liệu Q thật, xem `CLAUDE.md`) |
+| **Dữ liệu** | GloFAS (historical + forecast) + code/checkpoint RiverMamba | Thêm: `ldd` GloFAS (dựng Graph nội bộ VGTB: nhánh Vu Gia + Thu Bồn + kênh Quảng Huệ) |
+| **Kiến trúc hệ thống** | 1 hệ thống dự báo, cập nhật 1 lần/ngày | Vẫn 1 hệ thống, chỉ đổi lõi bên trong + thêm lớp phân tích XAI sau dự báo |
+| **So sánh** | vs LSTM/GRU/Transformer baseline (target GloFAS) + vs thực tế (GRDC trạm Nông Sơn, bắt buộc — Mục 2.5) | vs paper GNN-Transformer 2026 đã có (cùng đúng VGTB, họ dự báo mực nước bằng GNN+Transformer, mình dự báo Q bằng GNN+Mamba) |
+| **Đầu ra** | Báo cáo tiểu luận + demo VPS | Khóa luận + demo có giải thích XAI + có thể công bố SOICT |
 
 Nguyên tắc xuyên suốt file: mọi nội dung không có nhãn 🎓🎓 là việc cần làm ngay cho tiểu luận. Nhãn 🎓🎓 Khóa luận đánh dấu phần để dành cho sau, chưa cần làm ở giai đoạn hiện tại.
 
@@ -72,8 +74,8 @@ Mục này dành cho người đọc lần đầu, chưa quen với đề tài. 
 | Mục | Nội dung |
 |---|---|
 | Kiến trúc AI | Mamba / State Space Model (SSM). Ở khóa luận, kiến trúc này được nâng cấp thành Mamba+Graph (🎓🎓). |
-| Bài toán | Dự báo lưu lượng sông (discharge) và nguy cơ lũ lụt. |
-| Vùng nghiên cứu | Miền Trung Việt Nam. Tiểu luận tập trung vào 1 lưu vực cụ thể là Vu Gia–Thu Bồn (Quảng Nam-Đà Nẵng, khoảng 10.350 km²), nơi hai con sông Vu Gia và Thu Bồn hợp lưu tại Đại Lộc thành một hệ thống chung. Đây chỉ là một trong nhiều lưu vực của miền Trung (còn có Trà Khúc, Kôn, Ba, Thạch Hãn, Hương...), nên phạm vi tiểu luận chưa phủ hết miền Trung. Điều này không phải vì GloFAS thiếu dữ liệu — GloFAS phủ toàn cầu, đã có sẵn dữ liệu cho toàn bộ Việt Nam, chỉ cần đổi bounding box là lấy được vùng khác. Việc chọn 1 lưu vực đơn thuần là quyết định về phạm vi (scope) để tiểu luận chắc chắn hoàn thành đúng hạn; khi khóa luận mở rộng thêm, vẫn dùng lại đúng nguồn GloFAS này và chỉ cần đổi bounding box (xem checklist ở Mục 11). |
+| Bài toán | Dự báo lưu lượng sông (discharge, Q) — nguy cơ lũ chỉ suy ra gián tiếp qua ngưỡng return period trên Q, không phải model tự dự báo lũ lụt/vùng ngập trực tiếp. |
+| Vùng nghiên cứu | Miền Trung Việt Nam. Tiểu luận tập trung vào 1 lưu vực cụ thể là Vu Gia–Thu Bồn (Quảng Nam-Đà Nẵng, khoảng 10.350 km²), nơi hai con sông Vu Gia và Thu Bồn hợp lưu tại Đại Lộc thành một hệ thống chung. Đây chỉ là một trong nhiều lưu vực của miền Trung (còn có Trà Khúc, Kôn, Ba, Thạch Hãn, Hương...), nên phạm vi tiểu luận chưa phủ hết miền Trung. Điều này không phải vì GloFAS thiếu dữ liệu — GloFAS phủ toàn cầu, đã có sẵn dữ liệu cho toàn bộ Việt Nam, chỉ cần đổi bounding box là lấy được vùng khác. Việc chọn 1 lưu vực đơn thuần là quyết định về phạm vi (scope) để tiểu luận chắc chắn hoàn thành đúng hạn. ⚠️ Cập nhật 23/8/2026: khóa luận **cũng giữ nguyên bounding box này**, không mở rộng sang lưu vực khác (xem cuối Mục 2.4 và Mục 10) — phần "đổi bounding box" trước đây dự tính cho khóa luận không còn áp dụng. |
 | Ý nghĩa thực tế | Tính đến 4/12/2025, thiên tai trong năm 2025 đã làm 419 người chết/mất tích và gây thiệt hại khoảng 3,97 tỷ USD trên toàn quốc (nguồn: VietNamNet). Riêng đợt lũ miền Trung tháng 10-12/2025 làm 219 người chết/mất tích, thiệt hại 1,61 tỷ USD (nguồn: Wikipedia "2025 Central Vietnam floods", đã đối chiếu khớp với nhiều nguồn tin quốc tế khác). |
 | Điểm tổng đánh giá | 10/10 — cao nhất trong số 32 đề tài đã khảo sát. |
 
@@ -111,7 +113,7 @@ Tập điểm "AIFAS" này được lọc theo trình tự sau: xuất phát t�
 
 Checkpoint được dùng làm điểm khởi đầu cho Phương án B (Mục 2.4) là bản đã fine-tune trên GRDC, không phải bản pretrain-only. Đây là cách làm chuẩn trong transfer learning: luôn bắt đầu từ trọng số tinh chỉnh nhất hiện có, trừ khi có bằng chứng cụ thể cho thấy nó sẽ gây hại — và hiện chưa có bằng chứng như vậy.
 
-GRDC có tổng cộng 27 trạm tại Việt Nam, xác nhận trực tiếp trên `portal.grdc.bafg.de` bằng cách lọc Country = Viet Nam. Trong số đó, chỉ đúng 1 trạm nằm trong lưu vực Vu Gia-Thu Bồn: trạm `2371300 NONG SON`, trên sông Song Tranh (một nhánh của Thu Bồn), tọa độ 15,7167°N / 108,0167°E. 26 trạm còn lại (thuộc các lưu vực Trà Khúc, Vệ, Hương, Đà Rằng, Lam, Hiếu, Kontum, Đắk Lắk, Mekong Delta...) không dùng cho tiểu luận, nhưng được giữ lại cho khóa luận khi mở rộng ra nhiều lưu vực (Mục 10).
+GRDC có tổng cộng 27 trạm tại Việt Nam, xác nhận trực tiếp trên `portal.grdc.bafg.de` bằng cách lọc Country = Viet Nam. Trong số đó, chỉ đúng 1 trạm nằm trong lưu vực Vu Gia-Thu Bồn: trạm `2371300 NONG SON`, trên sông Song Tranh (một nhánh của Thu Bồn), tọa độ 15,7167°N / 108,0167°E. 26 trạm còn lại (thuộc các lưu vực Trà Khúc, Vệ, Hương, Đà Rằng, Lam, Hiếu, Kontum, Đắk Lắk, Mekong Delta...) không dùng cho tiểu luận. ⚠️ Trước đây dự định giữ lại cho khóa luận khi mở rộng đa lưu vực, nhưng khóa luận đã **chốt lại chỉ trong Vu Gia-Thu Bồn** (23/8/2026, xem `CLAUDE.md`) — 26 trạm này hiện không còn nằm trong kế hoạch dùng, trừ khi phạm vi đổi lại sau này.
 
 Một câu hỏi tự nhiên là làm sao chỉ 1 trạm thật lại có thể cải thiện được cả một lưới hàng triệu điểm chưa từng có trạm đo. Lý do là model dùng chung một bộ trọng số cho mọi điểm trên lưới, không phải một bảng tra cứu riêng cho từng điểm. Khi trọng số được sửa dựa trên sai lệch tại 1 trạm thật — ví dụ nhận ra rằng "mưa lớn 3 ngày liên tiếp ở địa hình dốc khiến GloFAS đoán thấp hơn thực tế khoảng 30%" — model học được một quy luật chung, và quy luật đó áp dụng lại cho mọi điểm khác có đặc điểm đầu vào tương tự (địa hình, khí hậu), kể cả những điểm chưa từng có trạm đo. Đây chính là lý do chỉ 3.366 trên hàng triệu điểm có đáp án thật vẫn cải thiện được toàn bộ lưới.
 
@@ -150,7 +152,7 @@ Tuy vậy, đây không phải lý do để bỏ qua bước 3. Chính paper Riv
 
 Về lâu dài, giải pháp tốt hơn là nộp đơn mua dữ liệu Nông Sơn hiện tại qua KTTV Việt Nam (Mục 5, #10) — cách này giải quyết đúng gốc rễ vấn đề. Việc này không vội, vì tiểu luận dự kiến hoàn thành khoảng 11-12/2026, nhưng nên nộp đơn sớm: dùng GRDC cũ tạm thời trong lúc chờ, và khi có dữ liệu mới thì chuyển sang dùng làm chính, còn dữ liệu GRDC cũ vẫn giữ giá trị tham khảo hoặc kiểm tra chéo GloFAS ở thời kỳ trước đập.
 
-Về phạm vi, đề tài quyết định giữ nguyên 1 lưu vực Vu Gia-Thu Bồn cho tiểu luận, không mở rộng ra toàn miền Trung dù có nhiều trạm GRDC hơn ở những nơi khác. Lý do gồm ba điểm: khớp đúng với câu chuyện thực tế (đợt lũ miền Trung 2025), có thể so sánh được với paper GNN-Transformer 2026 (vốn cũng chỉ làm trên lưu vực này), và làm sâu 1 lưu vực có giá trị hơn dàn trải trên nhiều lưu vực một cách sơ sài. Việc mở rộng vùng sẽ là công việc của khóa luận (Mục 10).
+Về phạm vi, đề tài quyết định giữ nguyên 1 lưu vực Vu Gia-Thu Bồn cho tiểu luận, không mở rộng ra toàn miền Trung dù có nhiều trạm GRDC hơn ở những nơi khác. Lý do gồm ba điểm: khớp đúng với câu chuyện thực tế (đợt lũ miền Trung 2025), có thể so sánh được với paper GNN-Transformer 2026 (vốn cũng chỉ làm trên lưu vực này), và làm sâu 1 lưu vực có giá trị hơn dàn trải trên nhiều lưu vực một cách sơ sài. ⚠️ Cập nhật 23/8/2026: khóa luận **cũng chốt lại giữ nguyên phạm vi này**, không mở rộng đa lưu vực như dự định ban đầu — cùng lý do trên, cộng thêm rủi ro tìm dữ liệu Q thật đã thấy rõ khi tìm nguồn cho riêng VGTB (`LienHeXinDuLieuVGTB.md`). Xem Mục 10.
 
 ### 2.5 Vì sao bước 3 (GRDC thật) là bắt buộc, không thể chỉ dùng bước 2 (GloFAS)
 
@@ -187,7 +189,7 @@ Lý do GloFAS là baseline quan trọng nhất nằm ở bản chất của nó.
 
 ### 2.7 Baseline nâng cao và research gap (🎓🎓 khóa luận)
 
-Paper GNN-Transformer 2026 (Nguyen et al., *River* journal, DOI 10.1002/rvr2.70046), tựa đề *"Hybrid GNN and temporal encoder models for flood forecasting in the Vu Gia–Thu Bon River Basin"*, dùng dữ liệu thật từ 9 trạm quan trắc mực nước trong lưu vực (Ái Nghĩa, Cầu Lâu, Giao Thủy, Hiệp Đức, Hội An, Hội Khách, Nông Sơn, Tam Kỳ, Thành Mỹ), với hơn 19.831 bản ghi mỗi trạm theo giờ (11/2017–12/2024), gồm mực nước, lượng mưa, và dữ liệu khí tượng — không dùng lưu lượng. Model GNN-Transformer trong paper này giảm 20–30% RMSE/MAPE/sMAPE so với LSTM/Transformer thuần. Vì paper chỉ làm trên Vu Gia-Thu Bồn, nếu khóa luận sau này mở rộng ra nhiều lưu vực, việc so sánh trực tiếp chỉ hợp lệ cho riêng kết quả của lưu vực này — cần tránh nói chung chung kiểu "G-Mamba thắng GNN-Transformer 2026".
+Paper GNN-Transformer 2026 (Nguyen et al., *River* journal, DOI 10.1002/rvr2.70046), tựa đề *"Hybrid GNN and temporal encoder models for flood forecasting in the Vu Gia–Thu Bon River Basin"*, dùng dữ liệu thật từ 9 trạm quan trắc mực nước trong lưu vực (Ái Nghĩa, Cầu Lâu, Giao Thủy, Hiệp Đức, Hội An, Hội Khách, Nông Sơn, Tam Kỳ, Thành Mỹ), với hơn 19.831 bản ghi mỗi trạm theo giờ (11/2017–12/2024), gồm mực nước, lượng mưa, và dữ liệu khí tượng — không dùng lưu lượng. Model GNN-Transformer trong paper này giảm 20–30% RMSE/MAPE/sMAPE so với LSTM/Transformer thuần. Vì paper chỉ làm trên Vu Gia-Thu Bồn, và khóa luận cũng đã chốt lại chỉ trong đúng lưu vực này (23/8/2026, không mở rộng đa lưu vực như dự định ban đầu) — phép so sánh trực tiếp giờ hợp lệ trọn vẹn, không cần thêm điều kiện "chỉ hợp lệ cho riêng lưu vực này" như trước.
 
 Nguồn dữ liệu của paper này không phải GRDC, mà lấy trực tiếp từ Ban Chỉ huy Phòng chống thiên tai tỉnh Quảng Nam (Quang Nam Provincial Steering Committee for Natural Disaster Prevention and Control), không qua cổng GRDC. Paper tự ghi rõ dữ liệu không công khai: *"The data... are available on request from the corresponding author. The data are not publicly available due to privacy or ethical restrictions."*
 
@@ -227,9 +229,9 @@ Cũng cần làm rõ rằng RiverMamba gốc không dùng graph/GNN thật. Các
 
 Về nguồn dữ liệu dựng Graph, nên dùng `ldd` của chính GloFAS thay vì HydroBASINS hay Hydroviet. GloFAS/LISFLOOD tự có sẵn biến `ldd` (local drainage direction) — bản đồ hướng dòng chảy nội bộ mà chính LISFLOOD dùng để nối các ô lưới khi mô phỏng nước chảy, tải cùng nguồn với GloFAS tại JRC Data Catalogue. Đây là lựa chọn khớp nhất để dựng Graph vì bốn lý do: khớp chính xác 100% với đúng lưới GloFAS mà model đang dùng, không cần bước "snap"/khớp tọa độ giữa hai định dạng dữ liệu khác nhau; trong khi đó HydroBASINS (dạng polygon lưu vực) và HydroRIVERS/Hydroviet (dạng đường sông vector) đều khác định dạng với lưới GloFAS, dùng được nhưng phức tạp hơn và dễ lệch nếu khớp sai; cách dùng chính ô lưới làm node, nối theo flow-direction, là cách làm chuẩn cho model dạng lưới, có tiền lệ nghiên cứu thật (HydroGAT: node là raster cell, edge theo flow-direction); và HydroBASINS/HydroRIVERS vẫn giữ vai trò phụ — xác định ranh giới lưu vực (đã dùng ở tiểu luận, Mục 5 #3) hoặc đối chiếu/kiểm tra lại graph dựng từ `ldd`.
 
-Khi implement Graph, nên kết hợp cả fine-tune và train from-scratch theo từng phần, thay vì chọn hẳn một trong hai. Đây là khuyến nghị dựa trên thực hành ML chuẩn, vì hiện chưa có paper nào làm đúng y hệt trường hợp này để trích dẫn trực tiếp. Cụ thể, phần Mamba nên giữ trọng số làm điểm khởi đầu (warm-start), không train lại từ 0 — bắt đầu từ checkpoint bước 1 (bản fine-tune GRDC toàn cầu, chưa qua bước 2/3 riêng cho Vu Gia-Thu Bồn), không dùng checkpoint sau bước 3 của tiểu luận, vì checkpoint đó đã "học lệch" quá riêng cho 1 lưu vực, không phù hợp làm điểm khởi đầu cho một model cần chạy trên nhiều vùng — bước 2/3 của tiểu luận coi như một "nhánh cụt", chỉ phục vụ tiểu luận có kết quả, khóa luận không kế thừa trực tiếp từ đó. Ngược lại, phần Graph hoàn toàn mới, checkpoint chưa từng thấy, nên phải khởi tạo ngẫu nhiên và bắt buộc train from scratch. Toàn bộ model (Mamba cũ cộng Graph mới) sẽ được train cùng lúc, end-to-end, trên dữ liệu nhiều lưu vực Việt Nam. Lý do không thể chỉ "tiếp tục fine-tune" như Phương án B là vì khi chèn Graph vào, đầu vào của các khối Mamba thay đổi (nhận thêm thông tin đã qua Graph), khác hẳn lúc pretrain khi Mamba chỉ thấy chuỗi space-filling curve thuần túy — nên phần Graph mới bắt buộc phải tự học từ đầu.
+Khi implement Graph, nên kết hợp cả fine-tune và train from-scratch theo từng phần, thay vì chọn hẳn một trong hai. Đây là khuyến nghị dựa trên thực hành ML chuẩn, vì hiện chưa có paper nào làm đúng y hệt trường hợp này để trích dẫn trực tiếp. Cụ thể, phần Mamba nên giữ trọng số làm điểm khởi đầu (warm-start), không train lại từ 0 — bắt đầu từ checkpoint bước 1 (bản fine-tune GRDC toàn cầu, chưa qua bước 2/3 riêng cho Vu Gia-Thu Bồn), không dùng checkpoint sau bước 3 của tiểu luận, vì checkpoint đó đã "học lệch" quá riêng cho 1 lưu vực, không phù hợp làm điểm khởi đầu cho một model cần chạy trên nhiều vùng — bước 2/3 của tiểu luận coi như một "nhánh cụt", chỉ phục vụ tiểu luận có kết quả, khóa luận không kế thừa trực tiếp từ đó. Ngược lại, phần Graph hoàn toàn mới, checkpoint chưa từng thấy, nên phải khởi tạo ngẫu nhiên và bắt buộc train from scratch. Toàn bộ model (Mamba cũ cộng Graph mới) sẽ được train cùng lúc, end-to-end, trên dữ liệu **Vu Gia-Thu Bồn** (cập nhật 23/8/2026 — khóa luận đã chốt lại chỉ 1 lưu vực, không phải "nhiều lưu vực Việt Nam" như bản kế hoạch cũ). Lý do không thể chỉ "tiếp tục fine-tune" như Phương án B là vì khi chèn Graph vào, đầu vào của các khối Mamba thay đổi (nhận thêm thông tin đã qua Graph), khác hẳn lúc pretrain khi Mamba chỉ thấy chuỗi space-filling curve thuần túy — nên phần Graph mới bắt buộc phải tự học từ đầu.
 
-Có một phương pháp bổ sung, không bắt buộc nhưng được khuyến khích, đúng theo cách Ougahi và cộng sự (2026) đã làm: sau khi train chung, làm thêm một bước "fine-tune riêng từng lưu vực" (regionalization). Bước này gồm hai phần. Đầu tiên là train chung (pooled): train Mamba+Graph một lần trên tất cả lưu vực Việt Nam cùng lúc, với graph gồm nhiều cụm node riêng theo từng lưu vực (không nối giữa các lưu vực với nhau), để model học được đặc trưng thủy văn chung. Sau đó là fine-tune riêng từng lưu vực: fine-tune nhẹ (ít epoch, learning rate nhỏ) riêng cho từng lưu vực, để chỉnh thêm cho đặc điểm riêng (loại đất, độ dốc, vận hành hồ chứa khác nhau) mà bước train chung có thể bỏ sót. Cách làm này có cơ sở khoa học rõ ràng: chính Ougahi và cộng sự đạt NSE=0,85 và KGE=0,80 khi train trên vùng nhiều dữ liệu rồi fine-tune riêng cho từng vùng ít dữ liệu.
+⚠️ **Đoạn dưới đây (phương pháp regionalization theo Ougahi và cộng sự) KHÔNG còn áp dụng** sau khi khóa luận chốt lại chỉ 1 lưu vực (23/8/2026) — giữ lại để tham khảo phòng khi phạm vi đổi lại đa lưu vực sau này. Phương pháp: sau khi train chung, làm thêm một bước "fine-tune riêng từng lưu vực" (regionalization). Bước này gồm hai phần. Đầu tiên là train chung (pooled): train Mamba+Graph một lần trên tất cả lưu vực Việt Nam cùng lúc, với graph gồm nhiều cụm node riêng theo từng lưu vực (không nối giữa các lưu vực với nhau), để model học được đặc trưng thủy văn chung. Sau đó là fine-tune riêng từng lưu vực: fine-tune nhẹ (ít epoch, learning rate nhỏ) riêng cho từng lưu vực, để chỉnh thêm cho đặc điểm riêng (loại đất, độ dốc, vận hành hồ chứa khác nhau) mà bước train chung có thể bỏ sót. Cách làm này có cơ sở khoa học rõ ràng: chính Ougahi và cộng sự đạt NSE=0,85 và KGE=0,80 khi train trên vùng nhiều dữ liệu rồi fine-tune riêng cho từng vùng ít dữ liệu.
 
 Việc thêm cột input mới, ví dụ IBTrACS hay DEM (Mục 5 #5–#6), cũng có thể thực hiện, theo cùng nguyên tắc "warm-start một phần, train mới một phần" như với Graph, chứ không phải chỉ fine-tune đơn thuần. Checkpoint của RiverMamba có lớp input cố định theo đúng số cột đã train (input động cộng 99 biến tĩnh, xem Mục 4), nên không thể nạp checkpoint rồi nhét thêm cột mới vào thẳng. Cách làm đúng là mở rộng lớp input để nhận thêm cột mới: phần trọng số ứng với cột cũ giữ nguyên từ checkpoint, còn phần ứng với cột mới được khởi tạo ngẫu nhiên (bắt buộc train mới), rồi fine-tune lại ít nhất ở lớp input và vài lớp đầu, hoặc cả model nếu cần. Đây là một hướng độc lập với Graph, và có thể làm cả hai cùng lúc nếu muốn.
 
@@ -371,17 +373,24 @@ Về HydroRIVERS, cần làm rõ một điểm dễ hiểu nhầm: paper có m�
 └─────────────────────────────────────────────────────────┘
 ```
 
-**🎓🎓 Giai đoạn khóa luận — chỉ đổi lõi, kiến trúc tổng thể giữ nguyên:**
+**🎓🎓 Giai đoạn khóa luận — chỉ đổi lõi + thêm lớp phân tích sau dự báo, kiến trúc tổng thể giữ nguyên:**
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │ HỆ THỐNG DỰ BÁO (nâng cấp)                                │
 │ Lõi model: Mamba + Graph (G-Mamba) — VẪN LÀ 1 MODEL       │
-│ Graph dựng từ ldd (local drainage direction) của GloFAS   │
+│ Graph dựng từ ldd (local drainage direction) của GloFAS,   │
+│ giới hạn trong VGTB (nhánh Vu Gia + Thu Bồn + kênh          │
+│ Quảng Huệ) — không mở rộng lưu vực khác (chốt 23/8/2026)   │
 │ — khớp đúng lưới model, giúp model "nhìn" được quan hệ    │
 │ thượng nguồn/hạ nguồn giữa các điểm cùng lúc với           │
 │ chuỗi thời gian                                            │
 │ Input: cems-glofas-forecast (như cũ)                      │
+│                                                             │
+│ + Lớp XAI (Integrated Gradients/Captum) chạy SAU khi       │
+│ G-Mamba ra dự báo — tính % đóng góp từng yếu tố đầu vào    │
+│ (mưa trạm nào, ẩm đất...) vào đỉnh lũ, không sửa model,     │
+│ không dùng LLM — chỉ điền số vào template câu có sẵn        │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -402,7 +411,7 @@ Về HydroRIVERS, cần làm rõ một điểm dễ hiểu nhầm: paper có m�
 | 9 | Sentinel-1 SAR + Copernicus Global Flood Monitoring (GFM) | 🎓 Tiểu luận (bonus, khuyến khích — paper gốc có tiền lệ trực tiếp: phụ lục riêng làm 8 case study lũ thật có bản đồ trực quan — Tây Âu 2021, Đông/Trung Âu 2024, Tây Ban Nha, Đức, Kenya-Tanzania, California, Trung Quốc) | Bản đồ vùng ngập thực tế từ ảnh vệ tinh radar, gần thời gian thực — dùng đối chiếu trực quan cảnh báo của model với ảnh vệ tinh thật tại đợt lũ miền Trung 2025 (đúng theo cách paper trình bày case study), không cần trạm đo | ✅ Free — xem trên trình duyệt (Copernicus Browser) không cần đăng ký, nhưng tải qua API cần tài khoản Copernicus miễn phí (giống tài khoản EWDS) | global-flood.emergency.copernicus.eu |
 | 10 | Trạm thủy văn **Nông Sơn + Thành Mỹ** (ưu tiên cao nhất, dữ liệu dài hạn đã kiểm chứng) + **Câu Lâu** (xin thêm, khả năng cao có Q nhưng chưa rõ từ năm nào) + Ái Nghĩa (xin thêm, không có Q) — dữ liệu hiện tại, chính thức KTTV VN | 🎓 Tiểu luận (khuyến khích mạnh — #12 là bản free thay thế tạm cho Nông Sơn, cách duy nhất có ground truth thật không dính vấn đề đập, Mục 2.5) | Số liệu quan trắc thật, cập nhật gần đây. Sau khi đọc ảnh chụp thật bảng Phụ lục I (289/QĐ-TTg) và đối chiếu paper Nguyen et al. 2024 (khảo sát thực địa, xem ghi chú bên dưới): Nông Sơn (Thu Bồn) và Thành Mỹ (thượng Vu Gia) chắc chắn có lưu lượng (Q) dài hạn, phủ đủ 2 nhánh hợp lưu. Câu Lâu nhiều khả năng cũng có Q (cột "Ghi chú" trong văn bản chỉ đánh dấu phù sa R là yếu tố mới, không phải Q) nhưng chưa rõ dữ liệu bắt đầu từ năm nào, nên đáng xin thêm và cần hỏi KTTV xác nhận độ dài dữ liệu. Hiệp Đức thì có Q là yếu tố mới đang thêm (2021-2030), khả năng cao chưa có lịch sử dài. Ái Nghĩa không có Q — chỉ mực nước/mưa — vẫn xin thêm được (gần vùng lũ thật, có giá trị case study) nhưng không nên kỳ vọng có lưu lượng. Việc này không vội vì dự kiến hoàn thành tiểu luận khoảng 11-12/2026, nhưng nên nộp đơn ngay | ⚠️ Chưa xác nhận lại được con số ~280.000 VNĐ/trạm/năm. Trang thủ tục thật chỉ ghi "thông báo mức phí đối với trường hợp phải trả phí" (báo phí sau khi nộp hồ sơ, không nêu số cụ thể) — con số 280k trước đây lấy từ Thông tư 197/2016/TT-BTC (văn bản phí riêng), có thể vẫn đúng nhưng chưa tái xác nhận được từ chính trang thủ tục. Cá nhân/sinh viên nộp đơn được, xử lý ~1 ngày làm việc + 1 ngày sau khi thanh toán | `dichvucong.monre.gov.vn/pages/ChiTietDichVuTrucTuyen.aspx?dv=352` (mẫu đơn Phụ lục 4, Nghị định 38/2016/NĐ-CP) — đã tự vào kiểm tra, hoạt động đúng, khớp nội dung. Link cũ `dichvucong.gov.vn/...ma_thu_tuc=1.001149` và `dichvucong.mae.gov.vn` đều đã lỗi, không dùng nữa — domain đúng là `dichvucong.monre.gov.vn` |
 | 11 | LISFLOOD static maps for GloFAS — biến `ldd` (local drainage direction) | 🎓🎓 Khóa luận | Nguồn chính để dựng Graph (node=ô lưới, edge=hướng dòng chảy) — khớp chính xác lưới GloFAS, tốt hơn dùng HydroBASINS/HydroRIVERS vì không cần bước khớp tọa độ giữa 2 định dạng khác nhau | ✅ Free | data.jrc.ec.europa.eu/dataset/68050d73-9c06-499c-a441-dc5053cb0c86 |
-| 12 | **GRDC (Global Runoff Data Centre)** — trạm `2371300 NONG SON`, sông Song Tranh (nhánh Thu Bồn), 15,7167°N/108,0167°E | 🎓 Tiểu luận (bắt buộc cho bước 3, Mục 2.5) | Bản miễn phí của cùng vị trí Nông Sơn, nhưng chỉ có 1978–1990 (thiếu 56,3% ngày), trước đập Sông Tranh 2 (hoàn thành 8/2011) — dùng làm nguồn chính cho bước 3 trong lúc chờ #10, hoặc làm kiểm tra chéo độ chính xác GloFAS thời kỳ trước đập. Tổng VN có 27 trạm GRDC, 26 trạm còn lại ở lưu vực khác (Trà Khúc, Vệ, Hương, Đà Rằng, Lam, Hiếu, Kontum, Đắk Lắk, Mekong Delta...), giữ cho khóa luận | ✅ Free (điều khoản: chỉ dùng nghiên cứu, không thương mại, không phân phối lại) | portal.grdc.bafg.de → "Download by Station" → lọc Country = Viet Nam |
+| 12 | **GRDC (Global Runoff Data Centre)** — trạm `2371300 NONG SON`, sông Song Tranh (nhánh Thu Bồn), 15,7167°N/108,0167°E | 🎓 Tiểu luận (bắt buộc cho bước 3, Mục 2.5) | Bản miễn phí của cùng vị trí Nông Sơn, nhưng chỉ có 1978–1990 (thiếu 56,3% ngày), trước đập Sông Tranh 2 (hoàn thành 8/2011) — dùng làm nguồn chính cho bước 3 trong lúc chờ #10, hoặc làm kiểm tra chéo độ chính xác GloFAS thời kỳ trước đập. Tổng VN có 27 trạm GRDC, 26 trạm còn lại ở lưu vực khác (Trà Khúc, Vệ, Hương, Đà Rằng, Lam, Hiếu, Kontum, Đắk Lắk, Mekong Delta...) — không dùng cho khóa luận nữa (đã chốt lại phạm vi chỉ VGTB, 23/8/2026) | ✅ Free (điều khoản: chỉ dùng nghiên cứu, không thương mại, không phân phối lại) | portal.grdc.bafg.de → "Download by Station" → lọc Country = Viet Nam |
 | 13 | `cems-glofas-reforecast` | 🎓 Tiểu luận (cần cho baseline "GloFAS Reforecast", Mục 2.6) | Dự báo tổ hợp lịch sử (ECMWF-ENS, 11 thành viên), phát hành 2 lần/tuần, nhìn xa 46 ngày, phủ 2003-2022 — dùng làm baseline khi đánh giá so với GRDC thật (bước 3), khác với #1 (Historical, dùng làm target train). ⚠️ Chưa xác nhận cách hòa giải cấu trúc 46 ngày/2 lần-tuần với đánh giá hàng ngày 1-7 ngày như paper làm — cần tự kiểm tra cấu trúc dữ liệu thật khi tải | ✅ Free, cùng tài khoản EWDS | `ewds.climate.copernicus.eu/datasets/cems-glofas-reforecast` |
 
 ⚠️ **Lưu ý:** link CDS cũ (`cds.climate.copernicus.eu`) đã ngừng host dữ liệu CEMS — chỉ dùng link EWDS ở trên.
@@ -462,7 +471,7 @@ Ngành thủy văn không chỉ dùng RMSE/MAE thông thường mà có bộ ch�
 
 Ở tiểu luận (🎓), nên dùng cả 4 chỉ số regression cộng thêm F1-score để so sánh Mamba với LSTM/GRU/Transformer baseline trên 1 lưu vực — nếu thiếu F1-score sẽ không đánh giá được đúng trọng tâm "dự báo lũ", mà chỉ đo được mức "khớp số liệu chung chung".
 
-Ở khóa luận (🎓🎓), có thêm một lưu ý phương pháp luận: NSE/KGE nhạy với đặc tính dòng chảy hơn là hiệu năng thật của model, nên khi so sánh nhiều lưu vực sông khác nhau, nên dùng thêm RMSE chuẩn hóa (NRMSE) hoặc percent bias để so sánh công bằng hơn giữa các vùng.
+⚠️ Ghi chú sau đây chỉ áp dụng nếu phạm vi khóa luận đổi lại thành đa lưu vực — hiện khóa luận đã chốt lại chỉ 1 lưu vực VGTB (23/8/2026, xem Mục 2.4/2.7/3.1), nên không cần so sánh giữa các vùng: nếu so sánh nhiều lưu vực sông khác nhau, cần lưu ý NSE/KGE nhạy với đặc tính dòng chảy hơn là hiệu năng thật của model, nên dùng thêm RMSE chuẩn hóa (NRMSE) hoặc percent bias để so sánh công bằng hơn giữa các vùng.
 
 ---
 
@@ -507,7 +516,7 @@ Có nhiều lựa chọn miễn phí, và kết hợp lại là đủ dùng, kh�
 
 Tổng cộng, 3 nguồn free (Colab + Kaggle + Lightning) cộng lại cho khoảng 45–60 giờ GPU/tuần trở lên, đủ dư cho việc fine-tune 1 lưu vực nhỏ mà không cần đụng tới phương án trả phí.
 
-Riêng cho khóa luận, các con số ở trên chỉ tính cho việc fine-tune 1 lưu vực nhỏ. Khóa luận train Mamba+Graph trên nhiều lưu vực toàn Việt Nam (Mục 3), với quy mô data và model lớn hơn hẳn, nên free tier 16GB có thể không còn đủ VRAM hoặc đủ giờ mỗi tuần. Cần đánh giá lại nhu cầu compute khi khóa luận đã rõ phạm vi cụ thể; nếu free không đủ, có thể cân nhắc thuê GPU trả phí (Vast.ai/RunPod, khoảng $0,03–0,24/giờ).
+Riêng cho khóa luận, các con số ở trên vẫn tính cho việc fine-tune 1 lưu vực nhỏ (Vu Gia-Thu Bồn — đã chốt lại không mở rộng đa lưu vực, 23/8/2026). Khóa luận train Mamba+Graph (Mục 3) có thêm chi phí tính toán Graph + module XAI so với tiểu luận, nhưng vẫn cùng quy mô 1 lưu vực nên free tier 16GB nhiều khả năng vẫn đủ; nếu không đủ, có thể cân nhắc thuê GPU trả phí (Vast.ai/RunPod, khoảng $0,03–0,24/giờ).
 
 ---
 
@@ -524,7 +533,7 @@ Về mặt thời gian, cần lưu ý rằng SOICT 2026 có hạn nộp abstract
 | Giai đoạn | Phạm vi chi tiết |
 |---|---|
 | 🎓 **Tiểu luận (làm ngay)** | Train Mamba thuần trên GloFAS cho 1 lưu vực (Vu Gia–Thu Bồn), so sánh NSE/KGE với LSTM/GRU/Transformer baseline (bước 2) + fine-tune bắt buộc thêm bằng GRDC thật tại trạm Nông Sơn để có 1 kết quả so với thực tế (bước 3, Mục 2.5), deploy hệ thống dự báo trên VPS Oracle |
-| 🎓🎓 **Khóa luận (làm sau)** | Nâng cấp lõi thành Mamba+Graph (mô hình hóa mạng lưới sông, vẫn 1 model); mở rộng nhiều lưu vực toàn VN (transfer learning, vẫn dùng train/test split — có thể tận dụng thêm 26 trạm GRDC Việt Nam ngoài Vu Gia-Thu Bồn, Mục 2.3/Mục 5 #12, dù không bắt buộc); thêm dữ liệu bão (IBTrACS) + địa hình (DEM); so sánh trực tiếp với paper GNN-Transformer 2026; mục tiêu công bố SOICT |
+| 🎓🎓 **Khóa luận (làm sau, chốt lại phạm vi 23/8/2026)** | Nâng cấp lõi thành Mamba+Graph (mô hình hóa mạng lưới sông **trong nội bộ Vu Gia-Thu Bồn** — nhánh Vu Gia + Thu Bồn + kênh Quảng Huệ, vẫn 1 model); **KHÔNG mở rộng đa lưu vực miền Trung** như dự định ban đầu (lý do: rủi ro tìm dữ liệu Q thật, xem `CLAUDE.md`); thêm module XAI (feature attribution qua Captum, chạy sau khi model dự báo xong) — không dùng LLM; thêm dữ liệu bão (IBTrACS) + địa hình (DEM) nếu cần cho Graph; so sánh trực tiếp với paper GNN-Transformer 2026 (cùng đúng VGTB); mục tiêu công bố SOICT |
 
 ---
 
@@ -567,9 +576,10 @@ Về mặt thời gian, cần lưu ý rằng SOICT 2026 có hạn nộp abstract
 
 - [ ] Đọc paper GNN-Transformer 2026 (Vu Gia-Thu Bồn) — baseline nâng cao
 - [ ] Đọc paper G-Mamba và "Accelerating flood warnings by 10 hours" để chuẩn bị nâng cấp lõi model
-- [ ] Dựng đồ thị mạng lưới sông từ `ldd` (local drainage direction) của GloFAS — node = ô lưới, edge = hướng dòng chảy; HydroBASINS (#3) dùng phụ trợ đối chiếu — tích hợp vào lõi Mamba (không tạo model/lớp riêng)
-- [ ] Nếu mở rộng toàn VN: trích xuất lại GloFAS cho toàn bộ VN (đổi bounding box, không cần tải dataset mới), vẫn đánh giá bằng train/test split
-- [ ] Thêm dữ liệu IBTrACS (bão) + DEM (địa hình) — trước khi tải DEM riêng, đối chiếu danh sách 96 biến LISFLOOD Static Features thật (JRC) xem đã có elevation/slope chưa (Mục 3.1, Mục 5 #6) — tránh tải trùng dữ liệu đã có sẵn
+- [ ] Dựng đồ thị mạng lưới sông từ `ldd` (local drainage direction) của GloFAS, **giới hạn trong Vu Gia-Thu Bồn** (nhánh Vu Gia + Thu Bồn + kênh Quảng Huệ) — node = ô lưới, edge = hướng dòng chảy; HydroBASINS (#3) dùng phụ trợ đối chiếu — tích hợp vào lõi Mamba (không tạo model/lớp riêng)
+- [ ] ~~Nếu mở rộng toàn VN...~~ — đã bỏ, khóa luận chốt lại chỉ VGTB (23/8/2026), không mở rộng bounding box
+- [ ] Thêm dữ liệu IBTrACS (bão) + DEM (địa hình) nếu cần cho Graph — trước khi tải DEM riêng, đối chiếu danh sách 96 biến LISFLOOD Static Features thật (JRC) xem đã có elevation/slope chưa (Mục 3.1, Mục 5 #6) — tránh tải trùng dữ liệu đã có sẵn
+- [ ] Gắn module XAI (Integrated Gradients/SHAP qua thư viện Captum) sau khi G-Mamba dự báo xong — tính % đóng góp từng yếu tố đầu vào vào đỉnh lũ dự báo; dùng template câu đơn giản điền số liệu, KHÔNG fine-tune LLM (quyết định 23/8/2026, xem `CLAUDE.md`)
 - [ ] Chuẩn bị bài công bố SOICT nếu kết quả tốt
 
 ---
