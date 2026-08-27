@@ -580,13 +580,14 @@ Về mặt thời gian, cần lưu ý rằng SOICT 2026 có hạn nộp abstract
 - [ ] ~~Nếu mở rộng toàn VN...~~ — đã bỏ, khóa luận chốt lại chỉ VGTB (23/8/2026), không mở rộng bounding box
 - [ ] Thêm dữ liệu IBTrACS (bão) + DEM (địa hình) nếu cần cho Graph — trước khi tải DEM riêng, đối chiếu danh sách 96 biến LISFLOOD Static Features thật (JRC) xem đã có elevation/slope chưa (Mục 3.1, Mục 5 #6) — tránh tải trùng dữ liệu đã có sẵn
 - [ ] Gắn module XAI (Integrated Gradients/SHAP qua thư viện Captum) sau khi G-Mamba dự báo xong — tính % đóng góp từng yếu tố đầu vào vào đỉnh lũ dự báo; dùng template câu đơn giản điền số liệu, KHÔNG fine-tune LLM (quyết định 23/8/2026, xem `CLAUDE.md`)
+- [ ] *(Bonus, không bắt buộc, chỉ làm nếu dư thời gian sau XAI)* Module "what-if" tương tác (đề xuất 26/8/2026) — cho người dùng tự chỉnh input (mưa thượng nguồn, thời điểm xả đập...) rồi xem Q dự báo đổi ngay lập tức, dùng lại model G-Mamba đã train, không train thêm — chỉ là lớp UI chạy lại inference. "Wow" hơn XAI lúc demo trực tiếp, nhưng không tạo được kết quả định lượng để viết vào báo cáo như XAI
 - [ ] Chuẩn bị bài công bố SOICT nếu kết quả tốt
 
 ---
 
 ## Tài liệu tham khảo chính
 
-- RiverMamba (NeurIPS 2025) — https://arxiv.org/abs/2505.22535
+- RiverMamba: A State Space Model for Global River Discharge and Flood Forecasting — Mohamad Hakam Shams Eddin, Yikui Zhang, Stefan Kollet, Jürgen Gall (University of Bonn / Forschungszentrum Jülich / Lamarr Institute). **NeurIPS 2025 (Poster), San Diego** — đã xác nhận accepted qua 2 nguồn chính thức độc lập (23/8/2026): [neurips.cc/virtual/2025/poster/118456](https://neurips.cc/virtual/2025/poster/118456) và [OpenReview id=MZwGG87Jev](https://openreview.net/forum?id=MZwGG87Jev). arXiv: [2505.22535](https://arxiv.org/abs/2505.22535) (DOI arXiv: `10.48550/arXiv.2505.22535` — đây là DOI của arXiv, chưa xác nhận được trang `proceedings.neurips.cc` riêng dạng hash-DOI cho bài này, tự tra thêm nếu cần trích dẫn chính thức hơn). Code: https://github.com/HakamShams/RiverMamba_code
 - G-Mamba (Graph-enhanced Mamba) — 🎓🎓 khóa luận — https://www.sciencedirect.com/science/article/abs/pii/S0925231226006776
 - Accelerating flood warnings by 10 hours — 🎓🎓 khóa luận — https://www.nature.com/articles/s44304-025-00083-6
 - Paper GNN-Transformer 2026 (Vu Gia-Thu Bồn) — 🎓🎓 khóa luận — https://onlinelibrary.wiley.com/doi/10.1002/rvr2.70046
