@@ -291,8 +291,8 @@ RiverMamba có cấu trúc encoder-decoder rõ ràng, không phải một khối
 | Decoder (Forecast layers) | 7 khối (L=7) | Mỗi khối lo đúng 1 ngày dự báo |
 | Hidden dimension (encoder) | K=192 | |
 | Hidden dimension (decoder) | 192+64=256 | Cộng thêm 64 chiều từ HRES |
-| D_state (khối Mamba) | 16 | |
-| D_conv (khối Mamba) | 4 | |
+| D_state (khối Mamba) | **1** | ⚠️ Sửa lại (30/8/2026): số 16 trước đây là suy đoán từ mặc định Mamba thông thường — đã đọc trực tiếp `config.py` thật trong repo (`RiverMamba.md` Mục 3b), giá trị thật là `en_d_state=[1,1,1]` — nhỏ bất ngờ so với Mamba khác |
+| D_conv (khối Mamba) | 3 | ⚠️ Sửa lại (30/8/2026): giá trị thật từ code là `en_d_conv=[3,3,3]`, không phải 4 |
 | Dropout lúc pretrain | 0,2 | |
 | Dropout lúc fine-tune GRDC | 0,4 | Tăng vì dữ liệu ít hơn, chống overfit |
 | Đầu ra (regression heads) | 7 MLP riêng biệt | Mỗi đầu ra đúng 1 số Δ discharge/ngày |
@@ -501,7 +501,7 @@ Khi đăng ký tài khoản Oracle, cần đặt tên tenancy cẩn thận vì k
 
 ### 8.2 Compute để train/fine-tune model (VPS Oracle không làm được việc này)
 
-RiverMamba gốc được test trên GPU A100/RTX 3090 (24GB VRAM), nhưng đó là để train ở quy mô toàn cầu (6,2 triệu điểm lưới, khoảng 10TB dữ liệu). Việc fine-tune chỉ cho 1 lưu vực nhỏ như Vu Gia–Thu Bồn sẽ nhẹ hơn rất nhiều, và nhiều khả năng chạy vừa trên một GPU miễn phí 16GB.
+RiverMamba gốc được test trên GPU A100/RTX 3090 (24GB VRAM), nhưng đó là để train ở quy mô toàn cầu (khoảng 21 triệu pixel đất liền, lọc còn ~1,53 triệu điểm sông; khoảng 10TB dữ liệu — số điểm xác minh lại từ paper 13/9/2026, con số "6,2 triệu điểm lưới" ghi trước đó không có nguồn). Việc fine-tune chỉ cho 1 lưu vực nhỏ như Vu Gia–Thu Bồn sẽ nhẹ hơn rất nhiều, và nhiều khả năng chạy vừa trên một GPU miễn phí 16GB.
 
 Lý do bắt buộc cần GPU, không thể chạy bằng CPU, là vì thư viện Mamba chuẩn (`state-spaces/mamba`) dùng các CUDA kernel riêng (`selective_scan_cuda`, `causal_conv1d_cuda`) để đạt được tốc độ tuyến tính. Việc train chỉ bằng CPU là không khả thi, nên VPS Oracle (kiến trúc ARM, không có GPU) chỉ dùng để host, không thể dùng để train.
 
@@ -587,7 +587,7 @@ Về mặt thời gian, cần lưu ý rằng SOICT 2026 có hạn nộp abstract
 
 ## Tài liệu tham khảo chính
 
-- RiverMamba: A State Space Model for Global River Discharge and Flood Forecasting — Mohamad Hakam Shams Eddin, Yikui Zhang, Stefan Kollet, Jürgen Gall (University of Bonn / Forschungszentrum Jülich / Lamarr Institute). **NeurIPS 2025 (Poster), San Diego** — đã xác nhận accepted qua 2 nguồn chính thức độc lập (23/8/2026): [neurips.cc/virtual/2025/poster/118456](https://neurips.cc/virtual/2025/poster/118456) và [OpenReview id=MZwGG87Jev](https://openreview.net/forum?id=MZwGG87Jev). arXiv: [2505.22535](https://arxiv.org/abs/2505.22535) (DOI arXiv: `10.48550/arXiv.2505.22535` — đây là DOI của arXiv, chưa xác nhận được trang `proceedings.neurips.cc` riêng dạng hash-DOI cho bài này, tự tra thêm nếu cần trích dẫn chính thức hơn). Code: https://github.com/HakamShams/RiverMamba_code
+- RiverMamba: A State Space Model for Global River Discharge and Flood Forecasting — Mohamad Hakam Shams Eddin, Yikui Zhang, Stefan Kollet, Jürgen Gall (University of Bonn / Forschungszentrum Jülich / Lamarr Institute). **NeurIPS 2025 (Poster), San Diego** — đã xác nhận accepted qua 2 nguồn chính thức độc lập (23/8/2026): [neurips.cc/virtual/2025/poster/118456](https://neurips.cc/virtual/2025/poster/118456) và [OpenReview id=MZwGG87Jev](https://openreview.net/forum?id=MZwGG87Jev). arXiv: [2505.22535](https://arxiv.org/abs/2505.22535) (DOI arXiv: `10.48550/arXiv.2505.22535`). **DOI proceedings chính thức NeurIPS: `10.52202/085713-4446`** (xác nhận 30/8/2026 qua `proceedings.neurips.cc/paper_files/paper/2025/vol38-main-conference` — sửa lại nhận định trước "chưa xác nhận DOI proceedings riêng", nhận định đó SAI, trang proceedings lúc tra trước có thể chưa lên). Ưu tiên trích DOI proceedings này khi cần trích dẫn chính thức, không dùng DOI arXiv nữa. Code: https://github.com/HakamShams/RiverMamba_code
 - G-Mamba (Graph-enhanced Mamba) — 🎓🎓 khóa luận — https://www.sciencedirect.com/science/article/abs/pii/S0925231226006776
 - Accelerating flood warnings by 10 hours — 🎓🎓 khóa luận — https://www.nature.com/articles/s44304-025-00083-6
 - Paper GNN-Transformer 2026 (Vu Gia-Thu Bồn) — 🎓🎓 khóa luận — https://onlinelibrary.wiley.com/doi/10.1002/rvr2.70046

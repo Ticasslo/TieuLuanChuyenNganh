@@ -220,3 +220,6 @@ __marimo__/
 # Claude Code local settings
 .claude/
 CLAUDE.md
+
+# CodeGraph index (local, rebuild bằng codegraph sync)
+.codegraph/
