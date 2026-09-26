@@ -31,7 +31,9 @@
 | 12 | #135 | Sun & Sun — TSFM zero-shot | Machine Learning: Earth 2026 | CAMELS-US | Bài benchmark mô hình nền tảng |
 | 13 | #38 | Ouyang và cs. — Raster CNN-LSTM | WRR 2026 (Q1) | CAMELS-US | Mô phỏng; trọng tâm là biểu diễn thuộc tính tĩnh |
 
-**Bài cơ sở đã chốt (26/9/2026): #104** — bài gốc là dự báo, cải tiến tạo kiến trúc không gian–thời gian (Mamba mã hóa thời gian từng trạm + GNN theo mạng sông), câu hỏi nghiên cứu rõ (có bộ mã hóa thời gian tốt thì đồ thị có giúp không), có dữ liệu mạng sông để làm XAI theo không gian và demo bản đồ. Phạm vi tiểu luận đề xuất ở `CHECKPDF.md` Mục 8.
+**Bài cơ sở:** đã gửi GVHD ngày 26/9/2026 đề xuất **#121 BiasCast** làm bài cơ sở (ưu tiên độ vững của bài cơ sở trước hội đồng: số liệu tái lập được, chia tập theo thời gian, dự báo thời tiết thật, mô hình mốc LSTM dự báo); **#104** là phương án thay thế nếu GVHD không đồng ý. Chờ GVHD duyệt. Phạm vi tiểu luận theo #121: `TongQuan/KienTrucPipeline_BiasCast.md` Mục 8–9.
+
+**#104 (phương án thay thế)** — bài gốc là dự báo, cải tiến tạo kiến trúc không gian–thời gian (Mamba mã hóa thời gian từng trạm + GNN theo mạng sông), câu hỏi nghiên cứu rõ (có bộ mã hóa thời gian tốt thì đồ thị có giúp không), có dữ liệu mạng sông để làm XAI theo không gian và demo bản đồ. Phạm vi tiểu luận đề xuất ở `CHECKPDF.md` Mục 8.
 
 **Khung chạy baseline:** #6 (kèm dữ liệu CAMELS đã xử lý), Hy2DL (#67) hoặc NeuralHydrology. Lớp Mamba có sẵn trong NeuralHydrology đưa tensor sai thứ trục vào `mamba_ssm`, cần chuyển trục trước khi dùng (`CHECKCODE.md` Mục 13).
 

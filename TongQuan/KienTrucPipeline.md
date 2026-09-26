@@ -1,6 +1,6 @@
 # Kiến trúc và pipeline của đề tài — phương án bài cơ sở Kirschstein & Sun
 
-> Tài liệu mô tả các giai đoạn thực hiện đề tài khi dùng Kirschstein & Sun (ICML 2024) làm bài cơ sở, trên bộ dữ liệu LamaH-CE theo giờ. Phương án song song dùng BiasCast (HESS 2026): `TongQuan/KienTrucPipeline_BiasCast.md`; so sánh hai bài: `BaiCoSo/SOSANH.md`; việc chọn bài cơ sở chưa chốt. Nội dung gồm: mỗi giai đoạn nhận gì, làm gì, cho ra gì, chạy ở đâu; kiến trúc mô hình dạng mô-đun; chỉ số đánh giá; các việc chưa chốt. Giới thiệu bài cơ sở: `TongQuan/GioiThieuBaiCoSo.md`. Chi tiết tải dữ liệu: `LamaHCE/LamaHCE.md`. Phạm vi đề xuất: `BaiCoSo/CHECKPDF.md` Mục 8.2. Các mục ghi "chưa chốt" chờ quyết định, chưa được điền.
+> Tài liệu mô tả các giai đoạn thực hiện đề tài khi dùng Kirschstein & Sun (ICML 2024) làm bài cơ sở, trên bộ dữ liệu LamaH-CE theo giờ. Phương án song song dùng BiasCast (HESS 2026): `TongQuan/KienTrucPipeline_BiasCast.md`; so sánh hai bài: `BaiCoSo/SOSANH.md`; BiasCast đã được gửi GVHD làm đề xuất chính (26/9/2026); tài liệu này là phương án thay thế nếu GVHD không đồng ý. Nội dung gồm: mỗi giai đoạn nhận gì, làm gì, cho ra gì, chạy ở đâu; kiến trúc mô hình dạng mô-đun; chỉ số đánh giá; các việc chưa chốt. Giới thiệu bài cơ sở: `TongQuan/GioiThieuBaiCoSo.md`. Chi tiết tải dữ liệu: `LamaHCE/LamaHCE.md`. Phạm vi đề xuất: `BaiCoSo/CHECKPDF.md` Mục 8.2. Các mục ghi "chưa chốt" chờ quyết định, chưa được điền.
 
 ## 1. Tổng quan các giai đoạn
 

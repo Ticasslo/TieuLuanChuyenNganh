@@ -5,7 +5,8 @@
 ## Tóm tắt
 
 - **Xếp hạng:** 1. **#104** (Kirschstein & Sun, ICML 2024) · 2. **#121 BiasCast** (Konold và cs., HESS 2026) · 3. **OpenHydroNet** (#109 Nearing và cs., Nature 2024; #56 Gauch và cs., HESS 2025) · 4. **#67** (Acuña Espinoza và cs., HESS 2025) · 5. **#22** (Wang và cs., WRR 2025) · 6. #103 · 7. #71/#54 · 8. #53 · 9. #42 · 10. #6 · 11. #36 · 12. #135 · 13. #38. Các bài #122, #123, #124 không có mã nguồn, chỉ dùng để trích dẫn; MTPre chưa xuất bản (đánh giá ở Mục 5.10). OpenHydroNet đánh giá ở Mục 5.11, BiasCast ở Mục 5.12.
-- **Bài cơ sở đã chốt (26/9/2026): #104** — bài gốc là bài toán dự báo, mô hình chưa có thành phần học chuỗi thời gian (chỗ cải tiến bằng Mamba rõ ràng), cho phép xây dựng kiến trúc không gian–thời gian (Mamba + GNN), có dữ liệu mạng sông để làm XAI theo không gian và demo bản đồ.
+- **Bài cơ sở:** đã gửi GVHD ngày 26/9/2026 đề xuất **#121 BiasCast** làm bài cơ sở (ưu tiên độ vững của bài cơ sở trước hội đồng: số liệu tái lập được, chia tập theo thời gian, dự báo thời tiết thật, mô hình mốc LSTM dự báo); **#104** là phương án thay thế nếu GVHD không đồng ý. Chờ GVHD duyệt (Mục 8.6; so sánh chi tiết `SOSANH.md`). Xếp hạng trên theo tiêu chí ban đầu (phù hợp Mamba chuỗi dài và đồ thị).
+- **#104 (phương án thay thế)** — bài gốc là bài toán dự báo, mô hình chưa có thành phần học chuỗi thời gian (chỗ cải tiến bằng Mamba rõ ràng), cho phép xây dựng kiến trúc không gian–thời gian (Mamba + GNN), có dữ liệu mạng sông để làm XAI theo không gian và demo bản đồ.
 
 ---
 
@@ -369,7 +370,7 @@ Bài cơ sở có cửa sổ ngắn nhất (24 giờ, tức 1 ngày) và là bà
 
 ## 8. Nhận định và đề xuất cho tiểu luận
 
-**8.1. Bài cơ sở đã chốt: #104** (26/9/2026). Lý do:
+**8.1. Phương án #104 (thay thế nếu GVHD không đồng ý #121).** Lý do chọn khi dùng #104:
 1. Bài gốc là dự báo lưu lượng theo giờ, khớp tên đề tài nhất.
 2. Cải tiến tạo ra kiến trúc không gian–thời gian: Mamba mã hóa chuỗi thời gian từng trạm, GNN truyền thông tin dọc mạng sông.
 3. Câu hỏi nghiên cứu rõ: bài gốc kết luận đồ thị không hơn MLP nhưng mô hình không có thành phần học chuỗi thời gian — khi có bộ mã hóa thời gian tốt và cửa sổ dài hơn, đồ thị có giúp dự báo không.
@@ -444,7 +445,7 @@ Bảng so sánh đầy đủ (mẫu minh họa, kích thước đầu vào/đầ
 
 Nhận định: khi bỏ hai tiêu chí mức phù hợp với Mamba và đồ thị, #121 hơn #104 về bài toán và độ tin cậy phương pháp; #104 hơn về nơi công bố và số trích dẫn. Đã đọc fork NeuralHydrology, 24 cấu hình và tệp kết quả của #121 (`CHECKCODE.md` Mục 15): không có lỗi làm sai số liệu công bố. Việc còn phải xác nhận: yêu cầu của GVHD về số trích dẫn tối thiểu cho bài cơ sở.
 
-**8.6. Đề xuất chọn bài cơ sở theo ưu tiên của người dùng (26/9/2026, chờ người dùng quyết định).** Ưu tiên: chất lượng và độ vững của bài cơ sở trước hội đồng; kiến trúc sẽ thử nhiều biến thể; đồ thị có thể để cho khóa luận.
+**8.6. Đề xuất chọn bài cơ sở theo ưu tiên của người dùng (26/9/2026; đã gửi GVHD đề xuất #121, chờ duyệt).** Ưu tiên: chất lượng và độ vững của bài cơ sở trước hội đồng; kiến trúc sẽ thử nhiều biến thể; đồ thị có thể để cho khóa luận.
 
 | Câu hỏi hội đồng có thể đặt | Nếu chọn #104 | Nếu chọn #121 |
 |---|---|---|
