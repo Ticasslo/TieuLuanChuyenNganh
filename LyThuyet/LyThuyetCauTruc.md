@@ -2,6 +2,8 @@
 
 > File cá nhân để học/ôn lại cơ chế hoạt động của từng kiến trúc deep learning liên quan tới đề tài (LSTM, Transformer, Mamba...). Mỗi phần đi từ công thức chuẩn → giải nghĩa từng ký hiệu → ví dụ số cụ thể (dùng bối cảnh dự báo lưu lượng sông cho dễ hình dung, số liệu là minh họa để hiểu cơ chế, không phải số từ model đã train thật).
 
+> *Phạm vi áp dụng:* đề tài dùng 4 bộ dữ liệu benchmark theo lưu vực (`Dataset.md`). Mục 4.7 (Bidirectional), 4.9 (Space-filling curve) và 4.10 là cơ chế riêng của RiverMamba cho **dữ liệu lưới không gian** — có giá trị tham khảo; phần lõi Mamba (4.1–4.6) và LOAN (4.8) vẫn áp dụng trực tiếp.
+
 ---
 
 ## Phần 1 — LSTM (Long Short-Term Memory)
@@ -41,7 +43,7 @@ C_t = forget_gate × C_(t-1)  +  input_gate × candidate     ← cập nhật tr
 h_t = output_gate × tanh(C_t)                                ← công bố output bước này
 ```
 
-### 1.4 Ví dụ đầy đủ — dự báo lưu lượng Nông Sơn từ mưa, 3 ngày
+### 1.4 Ví dụ đầy đủ — dự báo lưu lượng tại 1 trạm từ mưa, 3 ngày
 
 **Khởi đầu:** `C_0 = 0`, `h_0 = 0` (trí nhớ trống, chưa biết gì).
 
@@ -337,7 +339,7 @@ Tổng ước lượng cho model thật: `(6 ma trận × số head × số lớ
 | Độ phức tạp tính toán | Tuyến tính theo độ dài chuỗi, nhưng phải tuần tự (không song song hóa được) | O(n²) theo độ dài chuỗi, nhưng tính song song được toàn bộ |
 | Ví dụ minh họa trong file | 3 ngày (1,2,3) — ngày 3 mưa ít vẫn dự báo cao vì `C_t` giữ lại phần lớn trí nhớ "ngày 2 mưa to" qua cổng quên | 2 ngày (A mưa ít, B mưa to = hôm nay) — B tự tính ra tỷ lệ % chú ý tới A và tới chính mình, rồi trộn V theo đúng % đó |
 
-⚠️ *Lưu ý: 2 ví dụ dùng cấu trúc khác nhau (3 ngày vs 2 ngày, vị trí ngày mưa to khác nhau) — không phải cùng 1 bộ số liệu chạy qua 2 kiến trúc để so trực tiếp, chỉ minh họa riêng từng cơ chế.*
+*Lưu ý: 2 ví dụ dùng cấu trúc khác nhau (3 ngày vs 2 ngày, vị trí ngày mưa to khác nhau) — không phải cùng 1 bộ số liệu chạy qua 2 kiến trúc để so trực tiếp, chỉ minh họa riêng từng cơ chế.*
 
 ### 2.13 Đã tự kiểm tra lại (12/8/2026)
 
@@ -387,7 +389,7 @@ z_t = sigmoid(W_z · [h_(t-1), x_t])
 h_t = (1 - z_t) × h_(t-1)  +  z_t × h̃_t
 ```
 
-### 3.4 Ví dụ số đầy đủ — mưa 3 ngày Nông Sơn (5mm, 80mm, 2mm)
+### 3.4 Ví dụ số đầy đủ — mưa 3 ngày tại 1 trạm (5mm, 80mm, 2mm)
 
 **Khởi đầu:** `h_0 = 0`
 
@@ -445,7 +447,7 @@ Về công thức thì đúng chỉ là 1 bước trước, nhưng vì `h_(t-1)`
 
 ## Phần 4 — Mamba (State Space Model)
 
-> Đã hoàn chỉnh 4.1-4.9 (động lực, SSM, rời rạc hóa, Selective SSM, Selective Scan, Bidirectional Mamba, LOAN, Space-filling curve serialization) — đầy đủ lý thuyết kiến trúc Mamba/RiverMamba cần cho tiểu luận.
+> Phần 4 gồm: động lực (4.1–4.2), SSM (4.3), rời rạc hóa (4.4), Selective SSM (4.5), Selective Scan (4.6), Bidirectional Mamba (4.7), LOAN (4.8), Space-filling curve serialization (4.9) và ví dụ tổng hợp một lớp Hindcast (4.10).
 
 ### 4.1 Vấn đề Mamba giải quyết — 3 mục tiêu cùng lúc
 
@@ -460,7 +462,7 @@ Về công thức thì đúng chỉ là 1 bước trước, nhưng vì `h_(t-1)`
 
 ### 4.2 Tính toán ít hơn Transformer thì có kém chính xác hơn không
 
-**Trả lời ngắn: KHÔNG rõ rệt** — đã verify thật ở file `02_literature_review.md`, Mục 1 (khảo sát Mamba — *khác Phần 1 của chính file này, Phần 1 ở đây là LSTM*): 2 bài (452 và 67 trích dẫn) đều kết luận Mamba và Transformer **cạnh tranh ngang nhau** về độ chính xác, dù Mamba tính ít hơn hẳn (O(n) vs O(n²)).
+**Trả lời ngắn: KHÔNG rõ rệt** — đã verify thật ở file `02_literature_review.md`, Mục 1 (khảo sát Mamba — *khác Phần 1 của chính file này, Phần 1 ở đây là LSTM*): 2 bài (463 và 68 trích dẫn, số tra 19/8/2026) đều kết luận Mamba và Transformer **cạnh tranh ngang nhau** về độ chính xác, dù Mamba tính ít hơn hẳn (O(n) vs O(n²)).
 
 **Vì sao "tính ít hơn" ≠ "kém chính xác hơn":** Độ phức tạp (Big-O) đo **lượng phép tính**, không đo **độ thông minh của thuật toán**. Thuật toán rẻ hơn hoàn toàn có thể đạt kết quả ngang bằng nếu nó chọn việc để làm thông minh hơn, thay vì tính kiểu "vét cạn".
 
@@ -508,7 +510,7 @@ Tra thêm literature xác nhận đúng cả 2 chiều, cần nói thẳng cả 
 
 State Space Model không phải phát minh riêng cho AI — là công cụ có sẵn từ **lý thuyết điều khiển tín hiệu** (kỹ thuật điện, tự động hóa), mô tả 1 hệ thống vật lý thay đổi theo thời gian. Mamba mượn lại đúng công cụ này.
 
-#### 4.3.1b ⚠️ Quy ước ký hiệu — Phần 4 dùng LẪN 2 kiểu viết cho CÙNG 1 khái niệm, đọc kỹ trước khi tiếp
+#### 4.3.1b Quy ước ký hiệu — Phần 4 dùng 2 kiểu viết cho cùng 1 khái niệm
 
 Toàn bộ Phần 4 (Mamba) dùng lẫn lộn 2 cách viết trạng thái — **cả 2 đều chỉ cùng 1 thứ**, không phải 2 khái niệm khác nhau:
 
@@ -522,13 +524,13 @@ Toàn bộ Phần 4 (Mamba) dùng lẫn lộn 2 cách viết trạng thái — *
 
 #### 4.3.2 Ý tưởng cốt lõi — ví dụ bồn nước
 
-⚠️ **Lưu ý trước khi đọc tiếp:** ví dụ bồn nước dưới đây chỉ dùng để hiểu **công thức toán** — không phải cách Mamba hoạt động thật trong AI. Xem khác biệt quan trọng ở mục 4.3.2b ngay sau đây.
+**Lưu ý trước khi đọc tiếp:** ví dụ bồn nước dưới đây chỉ dùng để hiểu **công thức toán** — không phải cách Mamba hoạt động thật trong AI. Xem khác biệt quan trọng ở mục 4.3.2b ngay sau đây.
 
 - **Trạng thái (state)** = mực nước trong bồn ngay lúc này.
 - **Input** = tốc độ bơm nước vào mỗi giây.
 - **Quy luật:** mực nước thay đổi dựa trên **mực nước hiện tại** (bồn càng đầy càng tự rút nhanh qua khe hở) **cộng thêm** ảnh hưởng của việc đang bơm vào.
 
-#### 4.3.2b ⚠️ Khác biệt quan trọng nhất — bồn nước thật (đo được) vs Mamba/AI thật (không đo được)
+#### 4.3.2b Khác biệt quan trọng nhất — bồn nước thật (đo được) vs Mamba/AI thật (không đo được)
 
 Trong ví dụ bồn nước, `h(t)` = mực nước — **đo lại được thật** bằng thước đo, độc lập mỗi ngày, không cần dữ liệu hôm qua.
 
@@ -717,7 +719,7 @@ h(2) = Ā_1×h(1)+B̄_1×x_1 = 0,928×0+0,0036×5 = 0,018
 y(2) = C_2×h(2) = 1,6×0,018 = 0,0288
 ```
 
-⚠️ **Lưu ý thật:** input mưa thô (mm) chưa chuẩn hóa nên số có thể lớn nhanh khi mưa to — thực tế Mamba xử lý dữ liệu đã qua embedding/chuẩn hóa trước, không dùng thẳng số mm thô như ví dụ minh họa.
+**Lưu ý:** input mưa thô (mm) chưa chuẩn hóa nên số có thể lớn nhanh khi mưa to — thực tế Mamba xử lý dữ liệu đã qua embedding/chuẩn hóa trước, không dùng thẳng số mm thô như ví dụ minh họa.
 
 #### 4.5.5 Vì sao `B_t=w_B×x_t` KHÁC hẳn `B` cố định trong SSM gốc — không phải đổi tên suông
 
@@ -818,7 +820,7 @@ Kiểm chứng: h_3=0,504×h_0+2,46=0,504×0+2,46=2,46 ✓
 
 `h_0=0` (đúng quy ước, cố định, xem 4.6.0) khiến phép nhân CUỐI CÙNG (`a_gộp×h_0`) ra 0 — nhưng `a_gộp` **vẫn được dùng ngay trong lúc tính `b_gộp`** (phần không hề bị triệt tiêu, chính là kết quả cuối `h_t` khi `h_0=0`).
 
-**Kiểm chứng bằng đúng số ở 4.6.3:** `b_gộp(1,2,3) = a_gộp(2,3) × b_1 + b_gộp(2,3) = 0,56×1+1,9 = 2,46`. Số `0,56` (chính là `a_gộp(2,3)`) **nằm ngay trong phép tính ra `2,46`** — nếu dùng sai `a` (VD lỡ dùng `a=1` thay vì `0,56`) sẽ ra `1×1+1,9=2,9`, **SAI**. Vậy `a_gộp` không hề vô dụng — nó vẫn quyết định đúng `b_gộp`, chỉ là phần nhân trực tiếp với `h_0` mới bằng 0 do đúng ví dụ này bắt đầu từ ngày 1 (`h_0=0`).
+**Kiểm chứng bằng đúng số ở 4.6.3:** `b_gộp(1,2,3) = a_gộp(2,3) × b_1 + b_gộp(2,3) = 0,56×1+1,9 = 2,46`. Số `0,56` (chính là `a_gộp(2,3)`) **nằm ngay trong phép tính ra `2,46`** — nếu dùng sai `a` (VD lỡ dùng `a=1` thay vì `0,56`) sẽ ra `1×1+1,9=2,9` — sai. Vậy `a_gộp` không hề vô dụng — nó vẫn quyết định đúng `b_gộp`, chỉ là phần nhân trực tiếp với `h_0` mới bằng 0 do đúng ví dụ này bắt đầu từ ngày 1 (`h_0=0`).
 
 #### 4.6.3c So sánh với LSTM/GRU — vì sao CHÚNG không dùng được mẹo gộp này (đã tra xác nhận, không chỉ suy luận riêng)
 
@@ -929,7 +931,7 @@ Nhưng RiverMamba còn xử lý theo **KHÔNG GIAN** (hàng triệu điểm sôn
 
 #### 4.7.1b Ví dụ cụ thể — lưới 4×4 điểm sông, thấy rõ vấn đề "bị đẩy xa nhau"
 
-Giả lập 1 mảnh nhỏ bản đồ (VD 1 góc Vu Gia-Thu Bồn), 16 điểm sông xếp lưới:
+Giả lập 1 mảnh nhỏ bản đồ, 16 điểm sông xếp lưới:
 ```
 (1,1) (1,2) (1,3) (1,4)
 (2,1) (2,2) (2,3) (2,4)
@@ -981,7 +983,7 @@ h_1^f=0,8×0+0,5×2=1,0        h_2^f=0,8×1,0+0,5×5=3,3
 h_3^f=0,8×3,3+0,5×1=3,14     h_4^f=0,8×3,14+0,5×4=4,512
 y_forward = Cf×h^f:  0,9 / 2,97 / 2,826 / 4,0608
 ```
-⚠️ `y_forward_1=0,9` **CHỈ dựa vào `x_1`** — vì `h_0^f=0`, vị trí 1 "mù" hoàn toàn với vị trí 2,3,4.
+`y_forward_1=0,9` **CHỈ dựa vào `x_1`** — vì `h_0^f=0`, vị trí 1 "mù" hoàn toàn với vị trí 2,3,4.
 
 **Quét NGƯỢC (4→3→2→1), `h_5^b=0`** (vị trí 4 không có gì "phía sau" nó):
 ```
@@ -989,7 +991,7 @@ h_4^b=0,7×0+0,4×4=1,6        h_3^b=0,7×1,6+0,4×1=1,52
 h_2^b=0,7×1,52+0,4×5=3,064   h_1^b=0,7×3,064+0,4×2=2,9448
 y_backward = Cb×h^b:  3,23928 / 3,3704 / 1,672 / 1,76   (theo thứ tự vị trí 1,2,3,4)
 ```
-⚠️ `y_backward_1=3,239` — con số này được tính từ chuỗi BẮT ĐẦU ở vị trí 4 (dùng `x_4`), truyền qua `x_3`, `x_2`, rồi mới tới vị trí 1 → `h_1^b` đã "gom" thông tin từ CẢ `x_2,x_3,x_4`.
+`y_backward_1=3,239` — con số này được tính từ chuỗi BẮT ĐẦU ở vị trí 4 (dùng `x_4`), truyền qua `x_3`, `x_2`, rồi mới tới vị trí 1 → `h_1^b` đã "gom" thông tin từ CẢ `x_2,x_3,x_4`.
 
 **Cổng `z_t=w_z×x_t` (`w_z=0,3`), `SiLU(z)=z×sigmoid(z)`:**
 ```
@@ -1035,7 +1037,7 @@ Dữ liệu đầu vào có thang đo rất khác nhau (mưa 0-200mm, độ cao 
 
 #### 4.8.2 Vấn đề — chuẩn hóa thường XÓA MẤT đặc điểm riêng của từng điểm sông
 
-Tưởng tượng 2 điểm sông: **Điểm A** — vùng núi dốc (Vu Gia thượng nguồn), lưu vực nhỏ, nước lên/rút rất nhanh. **Điểm B** — vùng đồng bằng (gần cửa sông), lưu vực rất lớn, nước lên/rút chậm, kéo dài. Cùng 1 lượng mưa, phản ứng dòng chảy 2 điểm này khác hẳn ngoài đời.
+Tưởng tượng 2 điểm sông: **Điểm A** — vùng núi dốc (thượng nguồn), lưu vực nhỏ, nước lên/rút rất nhanh. **Điểm B** — vùng đồng bằng (gần cửa sông), lưu vực rất lớn, nước lên/rút chậm, kéo dài. Cùng 1 lượng mưa, phản ứng dòng chảy 2 điểm này khác hẳn ngoài đời.
 
 **Nhưng chuẩn hóa thường (`(X-μ)/σ`, tính riêng từng điểm/ngày) không hề biết điểm đó là A hay B** — chỉ nhìn vào chính dãy số của ngày đó rồi trừ-chia. Nếu A và B tình cờ có cùng lượng mưa hôm đó, sau chuẩn hóa dữ liệu của chúng **trông giống hệt nhau** — mất sạch thông tin "đây là điểm nào, địa hình ra sao", dù đó là thông tin quan trọng để dự báo đúng.
 
@@ -1107,7 +1109,7 @@ Công thức LOAN và ma trận `W` — **CHỈ CÓ 1 BỘ DUY NHẤT, DÙNG CHU
 
 #### 4.8.9 Vì sao CỘNG (không nhân) — suy luận riêng, KHÔNG phải trích paper
 
-⚠️ Paper không giải thích trực tiếp — suy luận từ cấu trúc công thức: cộng thêm (thay vì nhân) nghĩa là mỗi điểm có 1 "độ lệch nền" (baseline offset) riêng, không phụ thuộc độ lớn giá trị đã chuẩn hóa — giống vai trò bias trong hồi quy tuyến tính. Nếu nhân, độ lệch sẽ tỷ lệ với giá trị gốc — không hợp lý bằng cộng khi muốn biểu diễn "đặc điểm địa hình luôn dịch lưu lượng lên/xuống 1 lượng cố định", bất kể giá trị đo đang cao hay thấp.
+*Lưu ý:* paper không giải thích trực tiếp — suy luận từ cấu trúc công thức: cộng thêm (thay vì nhân) nghĩa là mỗi điểm có 1 "độ lệch nền" (baseline offset) riêng, không phụ thuộc độ lớn giá trị đã chuẩn hóa — giống vai trò bias trong hồi quy tuyến tính. Nếu nhân, độ lệch sẽ tỷ lệ với giá trị gốc — không hợp lý bằng cộng khi muốn biểu diễn "đặc điểm địa hình luôn dịch lưu lượng lên/xuống 1 lượng cố định", bất kể giá trị đo đang cao hay thấp.
 
 #### 4.8.10 So với LayerNorm/BatchNorm đã biết
 
@@ -1128,7 +1130,7 @@ Công thức LOAN và ma trận `W` — **CHỈ CÓ 1 BỘ DUY NHẤT, DÙNG CHU
 | LOAN chỉ ở Forecast | 0,9136 | 0,2593 |
 | LOAN ở CẢ 2 (bản paper chọn) | **0,9205** (cao nhất) | **0,2875** (cao nhất) |
 
-⚠️ **Phát hiện thật, không giấu:** dùng LOAN CHỈ ở Hindcast thực ra **tệ hơn** không dùng LOAN gì cả (0,8862 vs 0,9183) — chỉ khi dùng ở CẢ 2 khối mới tốt hơn baseline. Paper không giải thích sâu vì sao, chỉ kết luận dùng cả 2 "balances the metrics".
+**Nhận xét:** dùng LOAN CHỈ ở Hindcast thực ra **tệ hơn** không dùng LOAN gì cả (0,8862 vs 0,9183) — chỉ khi dùng ở CẢ 2 khối mới tốt hơn baseline. Paper không giải thích sâu vì sao, chỉ kết luận dùng cả 2 "balances the metrics".
 
 #### 4.8.12 Đã tự kiểm tra lại + nguồn (14/8/2026)
 
@@ -1219,7 +1221,7 @@ Trả lời trực tiếp câu hỏi "hcn chia thành hình vuông hay sao": **K
 
 **Điểm dừng đệ quy:** chia nhỏ dần tới khi vùng còn lại "trivial" (đủ nhỏ, VD 1 hàng/1 cột) — vẽ thẳng đường đơn giản, không chia tiếp.
 
-⚠️ **Không tự bịa dãy số Gilbert 4×4 cụ thể** — thuật toán đệ quy trên phức tạp, tính tay dễ sai; muốn có dãy số thật cần chạy code tham khảo (`github.com/jakubcerveny/gilbert`).
+**Không tính tay dãy số Gilbert 4×4 cụ thể** — thuật toán đệ quy trên phức tạp, tính tay dễ sai; muốn có dãy số thật cần chạy code tham khảo (`github.com/jakubcerveny/gilbert`).
 
 #### 4.9.9 4 curve CHÍNH THỨC dùng trong RiverMamba + ý nghĩa "xoay"
 
@@ -1256,7 +1258,7 @@ Sau khi Mamba xử lý ra `y_1,...,y_16`, cần hàm **ngược** `Φ⁻¹:ℕ�
 
 #### 4.9.12 Minh họa thêm — Zigzag curve (CHỈ để hiểu rõ hơn, KHÔNG phải 1 trong 4 curve chính thức)
 
-⚠️ Zigzag KHÔNG nằm trong danh sách 4 curve RiverMamba thực sự dùng (4.9.9) — paper có nhắc tới việc thử nghiệm Zigzag trong ablation, nhưng KHÔNG chọn dùng chính thức. Dùng ở đây chỉ để minh họa 1 tính chất, an toàn tính tay (khác Gilbert, không rủi ro tính sai).
+*Lưu ý:* Zigzag không nằm trong danh sách 4 curve RiverMamba thực sự dùng (4.9.9) — paper có nhắc tới việc thử nghiệm Zigzag trong ablation, nhưng KHÔNG chọn dùng chính thức. Dùng ở đây chỉ để minh họa 1 tính chất, an toàn tính tay (khác Gilbert, không rủi ro tính sai).
 
 **Zigzag ngang** (quét trái→phải hàng 1, rồi PHẢI→TRÁI hàng 2, lặp lại):
 ```
@@ -1322,7 +1324,7 @@ Ngày1-A=(1,1)=[10,4,7]   Ngày1-B=(1,2)=[5,15,20]
 Ngày2-A=(1,1)=[8,6,5]    Ngày2-B=(1,2)=[12,10,15]
 X_static_A=[0,2]  X_static_B=[0,7]  (không đổi theo ngày — VD độ dốc địa hình chuẩn hóa)
 ```
-⚠️ **Thiếu:** input thật phải qua **Embedding** (số vật lý thô → K=192 chiều, qua các lớp chiếu tuyến tính riêng cho từng loại biến) trước — ví dụ này bỏ qua bước đó, coi như đã có sẵn 3 kênh kể trên.
+**Phần lược bỏ:** input thật phải qua **Embedding** (số vật lý thô → K=192 chiều, qua các lớp chiếu tuyến tính riêng cho từng loại biến) trước — ví dụ này bỏ qua bước đó, coi như đã có sẵn 3 kênh kể trên.
 
 #### 4.10.3 Bước 2 — Serialization (4.9)
 
@@ -1333,7 +1335,7 @@ Toàn bộ cơ chế Mamba xây dựng từ Phần 4.3 tới giờ đều dựa 
 Φ(1,1,2)=3 → Vị trí 3 = Ngày2-A
 Φ(1,2,2)=4 → Vị trí 4 = Ngày2-B
 ```
-⚠️ **Thiếu:** công thức `Φ` cụ thể là tự viết minh họa, paper không cho công thức toán tường minh này.
+**Phần lược bỏ:** công thức `Φ` cụ thể là tự viết minh họa, paper không cho công thức toán tường minh này.
 
 #### 4.10.4 Bước 3 — LOAN₁ (4.8)
 
@@ -1391,7 +1393,7 @@ y_kênh_độẩm = [0,008 ; 0,485 ; -0,198 ; 0,716]
 Ngày1-A=[0,519;-0,093;0,008]    Ngày1-B=[-0,199;0,013;0,485]
 Ngày2-A=[0,628;-0,019;-0,198]   Ngày2-B=[0,024;-0,090;0,716]
 ```
-⚠️ **Thiếu:** output trên chưa qua `Linear_in` (đầu khối Mamba), `conv1d+SiLU` (trộn cục bộ vài bước liền kề trước SSM), và `Linear_out` (cuối khối Mamba) — 3 lớp bọc quanh SSM mà khối Mamba thật có (đã nêu ở 4.7.2), ví dụ này chỉ tính đúng phần lõi SSM+Scan+Bidirectional.
+**Phần lược bỏ:** output trên chưa qua `Linear_in` (đầu khối Mamba), `conv1d+SiLU` (trộn cục bộ vài bước liền kề trước SSM), và `Linear_out` (cuối khối Mamba) — 3 lớp bọc quanh SSM mà khối Mamba thật có (đã nêu ở 4.7.2), ví dụ này chỉ tính đúng phần lõi SSM+Scan+Bidirectional.
 
 #### 4.10.6 Bước 5 — LOAN₂ (4.8)
 
@@ -1410,17 +1412,17 @@ RiverMamba đưa vào nhiều ngày lịch sử nhưng chỉ cần ra 1 dự bá
 ```
 Ngày_gộp-A (kênh mưa, trọng số 0,5/0,5 tự chọn minh họa) = 0,5×0,519+0,5×0,628 = 0,574
 ```
-⚠️ **Thiếu:** paper chỉ nói *"a linear layer"*, không cho công thức/trọng số cụ thể — số `0,5/0,5` trên là tự chọn minh họa nguyên lý, không phải cách tính thật.
+**Phần lược bỏ:** paper chỉ nói *"a linear layer"*, không cho công thức/trọng số cụ thể — số `0,5/0,5` trên là tự chọn minh họa nguyên lý, không phải cách tính thật.
 
 #### 4.10.8 Bước 7 — Lặp lại Bước 2-6 thêm 2 lần (Lớp 2, Lớp 3) — chỉ mô tả
 
 Toàn bộ chuỗi Serialization→LOAN₁→Mamba→LOAN₂→Downsample chạy lại 2 lần nữa, đổi curve theo chu kỳ đã học (4.9.9): Lớp 2 dùng Sweep dọc (lý do: Sweep ngang và Sweep dọc mắc lỗi ở 2 cặp điểm KHÁC nhau — 4.9.6 — đổi hướng giúp "vá" cặp mà lớp trước bỏ sót), Lớp 3 dùng Gilbert (không có cú nhảy nào, tốt nhất trong các curve). Sau Lớp 3, `T` đã giảm hết còn `T=1`.
-⚠️ **Thiếu:** không tính số cụ thể cho Lớp 2, Lớp 3 — Gilbert không tự bịa số được (4.9.8); chưa rõ trọng số Mamba có share giữa 3 lớp hay không (paper không nói rõ).
+**Phần lược bỏ:** không tính số cụ thể cho Lớp 2, Lớp 3 — Gilbert không tự bịa số được (4.9.8); chưa rõ trọng số Mamba có share giữa 3 lớp hay không (paper không nói rõ).
 
 #### 4.10.9 Bước 8 — MLP → dự báo m³/s (mô tả, không tính đủ số)
 
 Vector tóm tắt cuối cùng (sau `T=1`, sau cả 3 lớp) qua 1 lớp tuyến tính cuối (`Dự_báo=a×h+b`, đúng nguyên tắc đã học ở LSTM 1.5) — ra đúng 1 số dự báo lưu lượng (m³/s) cho từng điểm sông.
-⚠️ **Thiếu:** khối Forecast (dùng thêm HRES), Embedding đầu vào, và Loss function (biến đổi `log1p` có dấu + trọng số return-period/lead-time, đã biết ở `CLAUDE.md` Mục cuối) — không nằm trong phạm vi ví dụ 4.10.
+**Phần lược bỏ:** khối Forecast (dùng thêm HRES), Embedding đầu vào, và Loss function (biến đổi `log1p` có dấu + trọng số return-period/lead-time, xem `RiverMamba.md` Mục 11) — không nằm trong phạm vi ví dụ 4.10.
 
 #### 4.10.10 Bảng tổng hợp phạm vi — đã làm ĐỦ gì, còn thiếu gì (không giấu)
 

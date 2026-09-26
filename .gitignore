@@ -223,3 +223,7 @@ CLAUDE.md
 
 # CodeGraph index (local, rebuild bằng codegraph sync)
 .codegraph/
+
+# Tai lieu tham khao tai ve (ban quyen / dung luong lon) — khong dua len git
+PDF/
+Code/

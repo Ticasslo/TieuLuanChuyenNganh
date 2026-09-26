@@ -29,7 +29,7 @@
 | Độ phân giải | **Ngày + giờ** | **Ngày** (bản gốc) · **giờ** ở bản mở rộng 516 lưu vực (Gauch et al., 2021) | **Ngày** cho lưu lượng và vận hành đập · **giờ** chỉ cho chất lượng nước | **Chỉ giờ** |
 | Biến đầu vào | **15** biến khí tượng (ERA5-Land) | **5** biến × 3 bộ forcing | Không có forcing khí tượng đóng gói | **7** đặc trưng |
 | Thuộc tính lưu vực | **>60** thuộc tính | 6 nhóm thuộc tính | Không có | Có (gộp trong 7 đặc trưng) |
-| Topology mạng lưới sông | ✅ **Có sẵn** (`HIERARCHY`, `NEXTUPID`, `NEXTDOWNID`) | ❌ Không (lưu vực độc lập) | ⚠️ Có quan hệ thực tế nhưng không có tệp topology | ✅ Dựng được từ DEM + hướng dòng chảy (mã nguồn HydroGAT) |
+| Topology mạng lưới sông | ✅ **Có sẵn** (`HIERARCHY`, `NEXTUPID`, `NEXTDOWNID`) | ❌ Không (lưu vực độc lập) | Có quan hệ thực tế nhưng không có tệp topology | ✅ Dựng được từ DEM + hướng dòng chảy (mã nguồn HydroGAT) |
 | **Số công trình huấn luyện mô hình** | **4** | **11** | **1** | **3** |
 | Có công trình Mamba/SSM | ❌ | ✅ (S4D-FT, S4D/S5D, HydroDiffusion; Mamba trong Zhang et al. và Demiray & Demir) | ✅ (ResBi-Mamba Plus) | ✅ (Mamba của Demiray & Demir, bản preprint) |
 | Có công trình mô hình đồ thị | ✅ 2 công trình, **kết luận trái ngược** | ❌ | ❌ | ✅ (HydroGAT) |
@@ -146,7 +146,7 @@ Kiểu B phù hợp để xây dựng đồ thị vì các lưu vực trung gian
 
 - **671 lưu vực** trên Hoa Kỳ lục địa (25–50°N, 66–125°W)
 - Diện tích **4 – 25.000 km²**, trung vị **336 km²**
-- Tiêu chí chọn: lưu vực **ít chịu tác động của con người**. Điều kiện này khác với các lưu vực có hồ chứa điều tiết như Vu Gia–Thu Bồn
+- Tiêu chí chọn: lưu vực **ít chịu tác động của con người**. Điều kiện này khác với các lưu vực có hồ chứa điều tiết
 
 ### 3.3 Thời gian
 
@@ -290,7 +290,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 
 **Ưu điểm:** là bộ dữ liệu duy nhất trong 4 bộ có đủ công trình Mamba, Transformer, mô hình đồ thị và XAI để đối chiếu (công trình Mamba + XAI hiện là preprint); có mã nguồn công khai cho cả dữ liệu lẫn mô hình đồ thị (HydroGAT); độ phân giải giờ; tải trực tiếp từ GitHub (repo khoảng 7,6 GB).
 
-**Hạn chế:** chuỗi thời gian ngắn (7 năm); ít đặc trưng (7); chỉ gồm một bang với địa hình tương đối đồng nhất, khác nhiều so với miền Trung Việt Nam.
+**Hạn chế:** chuỗi thời gian ngắn (7 năm); ít đặc trưng (7); chỉ gồm một bang với địa hình tương đối đồng nhất.
 
 ---
 
@@ -441,7 +441,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | DOI | [10.1016/j.jhydrol.2026.135727](https://doi.org/10.1016/j.jhydrol.2026.135727) |
 | Dữ liệu | 516 lưu vực CAMELS-US, theo giờ (khớp với bản CAMELS-US theo giờ của Gauch et al., 2021, xem Mục 3.3) |
 | Mô hình | LSTM, PatchTST, Mamba |
-| Kết quả | **PatchTST > LSTM > Mamba** |
+| Kết quả | **PatchTST > LSTM > Mamba** — "Mamba" ở bài này là S-Mamba tự viết, quét theo **biến** chứ không theo thời gian (RESEARCHING #35) → không đại diện cho Mamba theo thời gian |
 | Ý nghĩa với đề tài | Mamba thuần có thể kém hơn Transformer (PatchTST) và LSTM. PatchTST nên có mặt trong nhóm baseline |
 
 #### 6.2.5 Zero-shot forecasting of streamflow using time series foundation models: are we there yet?
@@ -513,7 +513,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | Dữ liệu | CAMELS-US và Caravan làm **dữ liệu huấn luyện nguồn**, chuyển giao sang lưu vực Mangla (Pakistan) thiếu dữ liệu |
 | Mô hình | LSTM với transfer learning |
 | Kết quả | Với 80% độ dài dữ liệu huấn luyện, NSE validation đạt **0,89** (nguồn CAMELS-US) và **0,87** (nguồn Caravan), cao hơn mô hình chỉ huấn luyện tại chỗ. Lợi thế giảm dần khi dữ liệu địa phương tăng |
-| Ý nghĩa với đề tài | Bối cảnh tương tự Vu Gia–Thu Bồn: huấn luyện trên bộ dữ liệu lớn rồi chuyển giao sang lưu vực thiếu dữ liệu |
+| Ý nghĩa với đề tài | Minh chứng cho transfer learning: huấn luyện trên bộ dữ liệu lớn rồi chuyển giao sang lưu vực thiếu dữ liệu |
 
 #### 6.2.11 Comparative Analysis of LSTM and Random Forest Algorithms for Streamflow Prediction: A Case Study of Diverse River Basins in the United States
 
@@ -653,6 +653,8 @@ Cả SSM và GNN đều yếu ở loại sự kiện quan trọng nhất với c
 
 Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN với Mamba** cho dự báo lưu lượng dòng chảy.
 
+*Bổ sung 25/9/2026:* có tồn tại kiến trúc kết hợp GNN + Mamba ở bài toán **tổng quát** — G-Mamba (Xiaojian Chen, Qiusheng Tang, *"Graph-enhanced Mamba: Efficient spatiotemporal sequence modeling with selective state space and graph neural networks"*, Neurocomputing vol 680, 2026, DOI [10.1016/j.neucom.2026.133280](https://doi.org/10.1016/j.neucom.2026.133280)): tiêm ngữ cảnh láng giềng từ đồ thị (tĩnh + động) vào bước cập nhật trạng thái của selective SSM, thử trên benchmark giao thông, điện, khí tượng, tỷ giá, nhiệt độ máy biến áp — **không có dữ liệu dòng chảy** (đã đọc trang abstract + phần mở đầu). Vì vậy nhận định trên vẫn đúng với riêng bài toán dòng chảy; G-Mamba dùng làm tham khảo kiến trúc.
+
 ### 7.5 Gợi ý phương pháp rút ra
 
 | Gợi ý | Nguồn |
@@ -670,7 +672,7 @@ Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN
 
 - **Hạng Q** có dấu \* được ghi theo tra cứu sơ bộ, **cần đối chiếu lại trên SCImago** trước khi dùng chính thức. Hạng CORE của ICML (A\*) và ACM SIGSPATIAL (A) đã được tra cứu.
 - **Số trích dẫn** lấy từ Google Scholar hoặc OpenAlex tại thời điểm 13/9/2026. Hai nguồn có thể cho số khác nhau và số liệu thay đổi theo thời gian. Ô "—" là chưa tra cứu.
-- **Một số số liệu chưa đối chiếu với toàn văn bài báo:** các giá trị NSE 0,742/0,756/0,763 (Jing et al., ESWA); thứ tự PatchTST > LSTM > Mamba (Zhang et al.; riêng số 516 lưu vực khớp với bản CAMELS-US theo giờ của Gauch et al., 2021); cấu hình thí nghiệm chi tiết của ResBi-Mamba Plus; mô hình cụ thể đạt NSE 0,74 / KGE 0,79 trong benchmark gốc của WaterBench-Iowa.
+- **Đối chiếu số liệu với toàn văn:** NSE 0,742/0,756/0,763 (Jing et al., ESWA) đúng với bài, trong đó 0,742/0,756 trên 531 lưu vực và 0,763 (S5Dv2) trên 671 lưu vực; chạy 5 hạt giống trong repo cho NSE trung vị S4D 0,750, S5D 0,751, LSTM 0,742 (`CHECKPDF.md` Mục 5.6, Phụ lục A.6). Chưa đối chiếu: thứ tự PatchTST > LSTM > Mamba (Zhang et al.; số 516 lưu vực khớp bản CAMELS-US theo giờ của Gauch et al., 2021); cấu hình thí nghiệm chi tiết của ResBi-Mamba Plus; mô hình cụ thể đạt NSE 0,74 / KGE 0,79 trong benchmark gốc của WaterBench-Iowa.
 - Công trình 6.4.3 không ghi tên "WaterBench" trong abstract. Việc xếp vào WaterBench-Iowa dựa trên việc công trình dùng đúng 125 lưu vực tại Iowa và có cùng nhóm tác giả với bộ dữ liệu.
 - Các công trình **preprint** (6.2.2, 6.2.6, 6.2.7, 6.4.2) chưa qua bình duyệt, chỉ nên trích dẫn như công trình liên quan.
 - Danh sách công trình phản ánh kết quả tra cứu tới ngày 13/9/2026, **không khẳng định đã bao quát toàn bộ**.
@@ -690,6 +692,8 @@ Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN
 | Lưu lượng theo giờ | WaterBench-Iowa, LamaH-CE, CAMELS-US (bản mở rộng 516 lưu vực) |
 
 ### 9.2 Các phương án
+
+> *Cập nhật 25/9/2026:* người dùng đã chốt **dùng cả 4 bộ dữ liệu**. Ba phương án dưới đây được viết khi còn chọn tập con — giữ lại làm phân tích tham khảo; vai trò cụ thể của từng bộ trong 4 bộ chưa chốt (xem `flood-forecasting-research.md` Mục 3).
 
 **Phương án A: WaterBench-Iowa làm bộ dữ liệu chính.** Có đủ mốc đối chiếu (LSTM/GRU/Seq2Seq, Transformer, Mamba, mô hình đồ thị), có mã nguồn HydroGAT để phát triển hướng kết hợp đồ thị và Mamba, dữ liệu theo giờ, tải trực tiếp từ GitHub. Hạn chế: chuỗi 7 năm, 7 đặc trưng, một khu vực; HydroGAT không công bố dữ liệu đã xử lý (phải tự dựng từ Stage IV, DEM, USGS), thiết lập khác benchmark gốc, và bản đầy đủ được huấn luyện trên GPU A100.
 
