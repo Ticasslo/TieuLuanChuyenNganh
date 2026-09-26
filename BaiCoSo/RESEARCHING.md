@@ -1046,7 +1046,7 @@ Q1
 7. Code free
 Có — github.com/gauchm/missing-inputs + Zenodo doi:10.5281/zenodo.17362593
 
-[Đọc code 26/9/2026: Repo chỉ gồm notebook vẽ hình + bản vá cho neuralhydrology; trọng số/dự báo trên Zenodo]
+[Đọc code 26/9/2026: repo của bài chỉ gồm notebook vẽ hình + bản vá cho neuralhydrology; trọng số/dự báo trên Zenodo. Cơ chế masked mean được dùng trong Mean-Embedding-Forecast-LSTM của OpenHydroNet `github.com/google-research/flood-forecasting` — xem CHECKPDF Mục 5.11]
 
 #57 — Improving adaptive runoff forecasts in data-scarce watersheds through personalized federated learning (FedHydroDSW)
 Mục
@@ -2020,7 +2020,7 @@ Q1
 7. Code free
 Có một phần — code phân tích github.com/google-research-datasets/global_streamflow_model_paper + mô hình/kết quả Zenodo doi:10.5281/zenodo.10397664 + thư viện neuralhydrology
 
-[Đọc code 26/9/2026: Repo chỉ tái tạo hình/thống kê từ dự báo đã lưu (Zenodo 10397664) — KHÔNG có code mô hình để huấn luyện]
+[Đọc code 26/9/2026: repo của bài chỉ tái tạo hình/thống kê từ dự báo đã lưu (Zenodo 10397664). Mã mô hình để huấn luyện có trong OpenHydroNet `github.com/google-research/flood-forecasting` (Apache 2.0, Handoff-Forecast-LSTM, cấu hình `handoff-forecast-lstm-config.yml`) — xem CHECKPDF Mục 5.11]
 
 #110 — Investigating Deep Learning Knowledge Transfer in Streamflow Prediction From Global to Local Catchment
 Mục
@@ -2236,19 +2236,19 @@ Nội dung
 1. Năm
 2026
 2. Cited by
-0 (Crossref)
+3 (Google Scholar, bản HESS Discussions 2025, người dùng tra 26/9/2026); 0 (Crossref)
 3. Kiến trúc model
 LSTM (Sequential Forecast LSTM, Encoder–Decoder LSTM, học chuyển giao) học sai lệch của dự báo khí tượng ECMWF-HRES để dự báo lưu lượng cực đại ngày trước 24 giờ; NSE trung vị 0,63 → 0,71 khi thêm lưu lượng quan trắc
 4. Tạp chí & ngành
 HESS 30:5067, DOI 10.5194/hess-30-5067-2026 — Thủy văn, không phải CNTT/AI
 5. Xếp hạng Q
-Q1 (HESS)
+Q1 — Scimago 2025: Earth and Planetary Sciences (miscellaneous) Q1, Water Science and Technology Q1; SJR 2,035; H-index 194 (tra 26/9/2026)
 6. Dataset
-🟡 Không phải CAMELS — LamaH-CE mở rộng, 451 lưu vực, 2003–2017 (train 2003–2009, val 2010–2013, test 2014–2017) + dự báo ECMWF-HRES (chưa xác nhận free)
+🟡 Không phải CAMELS — LamaH-CE mở rộng, 451 lưu vực, 2003–2017 (train 2003–2009, val 2010–2013, test 2014–2017) + dự báo ECMWF-HRES (công khai trong Extended LamaH-CE, CC BY-NC 4.0)
 7. Code free
-Có một phần — dùng thư viện NeuralHydrology, trang bài không thấy link repo riêng
+Có — mã phân tích github.com/conestone/biascast (Zenodo 17293199, CC BY 4.0) + fork NeuralHydrology github.com/conestone/neuralhydrology; cấu hình, trọng số, kết quả test: Zenodo 17292895; dữ liệu Extended LamaH-CE (có dự báo ECMWF HRES, E-OBS, MSWEP, GLEAM): Zenodo 17119635, 0,95 GB, CC BY-NC 4.0
 
-[Nguồn: người dùng tra Google Scholar 26/9/2026; kiểm bằng Crossref/OpenAlex/trang bài]
+[Nguồn: người dùng tra Google Scholar 26/9/2026; kiểm bằng Crossref/OpenAlex/trang bài. Đọc lại 26/9/2026: mục Code and data availability của bài + Zenodo + repo — xem CHECKPDF Mục 5.12]
 
 #122 — A heterogeneous multi-graph spatio-temporal network for runoff forecasting (Zhou, Yan, Zhang, Chang, Yang)
 Mục

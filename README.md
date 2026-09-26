@@ -13,6 +13,12 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `BaiCoSo/RESEARCHDONE.md` | Tổng hợp các bài quan trọng và xếp hạng ứng viên bài cơ sở |
 | `BaiCoSo/CHECKPDF.md` | Báo cáo đọc toàn văn các ứng viên bài cơ sở, tiêu chí, xếp hạng và đề xuất |
 | `BaiCoSo/CHECKCODE.md` | Báo cáo đọc mã nguồn các ứng viên bài cơ sở |
+| `BaiCoSo/SOSANH.md` | So sánh chi tiết hai ứng viên Kirschstein & Sun (ICML 2024) và BiasCast (HESS 2026): dữ liệu, đầu vào, đầu ra, mô hình, huấn luyện, kết quả |
+| `TongQuan/ChonBaiCoSo.md` | Đề xuất bài cơ sở gửi GVHD: BiasCast (chính), Kirschstein & Sun (thay thế) |
+| `TongQuan/GioiThieuBaiCoSo_BiasCast.md` | Giới thiệu bài cơ sở BiasCast (HESS 2026) |
+| `TongQuan/GioiThieuBaiCoSo.md` | Giới thiệu bài cơ sở Kirschstein & Sun (ICML 2024), phương án thay thế |
+| `TongQuan/KienTrucPipeline.md` | Kiến trúc và pipeline của đề tài: các giai đoạn, mô-đun mô hình, chỉ số đánh giá, việc chưa chốt |
+| `TongQuan/KienTrucPipeline_BiasCast.md` | Kiến trúc và pipeline theo phương án bài cơ sở BiasCast (HESS 2026) |
 | `LamaHCE/` | Ghi chú và mã tải, xử lý bộ dữ liệu LamaH-CE cho bài cơ sở (chạy trên Kaggle) |
 | `LyThuyet/LyThuyetCauTruc.md` | Ghi chú lý thuyết LSTM, Transformer, GRU, Mamba kèm ví dụ số |
 | `LyThuyet/RiverMamba.md` | Ghi chú đọc mã nguồn RiverMamba (tài liệu tham khảo) |

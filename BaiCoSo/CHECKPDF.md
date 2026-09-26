@@ -4,7 +4,7 @@
 
 ## Tóm tắt
 
-- **Xếp hạng:** 1. **#104** (Kirschstein & Sun, ICML 2024) · 2. **#67** (Acuña Espinoza và cs., HESS 2025) · 3. **#22** (Wang và cs., WRR 2025) · 4. #103 · 5. #71/#54 · 6. #53 · 7. #42 · 8. #6 · 9. #36 · 10. #135 · 11. #38. Các bài #122, #123, #124 không có mã nguồn, chỉ dùng để trích dẫn; MTPre chưa xuất bản (đánh giá ở Mục 5.10).
+- **Xếp hạng:** 1. **#104** (Kirschstein & Sun, ICML 2024) · 2. **#121 BiasCast** (Konold và cs., HESS 2026) · 3. **OpenHydroNet** (#109 Nearing và cs., Nature 2024; #56 Gauch và cs., HESS 2025) · 4. **#67** (Acuña Espinoza và cs., HESS 2025) · 5. **#22** (Wang và cs., WRR 2025) · 6. #103 · 7. #71/#54 · 8. #53 · 9. #42 · 10. #6 · 11. #36 · 12. #135 · 13. #38. Các bài #122, #123, #124 không có mã nguồn, chỉ dùng để trích dẫn; MTPre chưa xuất bản (đánh giá ở Mục 5.10). OpenHydroNet đánh giá ở Mục 5.11, BiasCast ở Mục 5.12.
 - **Bài cơ sở đã chốt (26/9/2026): #104** — bài gốc là bài toán dự báo, mô hình chưa có thành phần học chuỗi thời gian (chỗ cải tiến bằng Mamba rõ ràng), cho phép xây dựng kiến trúc không gian–thời gian (Mamba + GNN), có dữ liệu mạng sông để làm XAI theo không gian và demo bản đồ.
 
 ---
@@ -90,15 +90,18 @@ Chưa tải: Supplement của #6, #38, #54; bảng bổ sung S1–S5 của #135;
 
 **Huấn luyện và đánh giá.** Adam, lr 1e-4, 100 epoch, batch 64, L2 1e-5; hàm mất mát MSE nhân "điểm liên quan" (ưu tiên cửa sổ biến động mạnh); chọn trạng thái có loss validation nhỏ nhất; mỗi cấu hình 1 hạt giống × 3 cách chia năm. Chỉ số: NSE có trọng số theo "relevancy score", tính trên lưu lượng đã khử chuẩn hóa rồi lấy trung bình qua các trạm; bài ghi dạng phần trăm (NSE × 100, ví dụ 85,37% tương ứng NSE 0,8537) và báo cáo trung bình ± độ lệch chuẩn qua 3 cách chia. Chú thích 3 của bài cho biết NSE không trọng số cho kết quả định tính tương tự nhưng giá trị cao hơn. Bài mô tả NSE nằm trong [0, 1], trong khi NSE có thể âm. Vị trí trong bài: chia tập ở Mục 3.1 (tr. 3); bài toán, relevancy score, hàm mất mát và "Testing Metric" ở Mục 3.2 (tr. 3–4); siêu tham số ở Mục 4.1 và Bảng 1 (tr. 5); kết quả ở Mục 4.2 và Bảng 2 (tr. 6); ảnh hưởng cửa sổ và lead time ở Phụ lục A.4, Bảng A.8 (tr. 13).
 
-**Kết quả.** NSE có trọng số của mọi tổ hợp nằm trong 80,2%–85,6% (Bảng 2); không tổ hợp đồ thị nào vượt MLP 2 lớp (85,37% ± 1,64%) quá độ lệch chuẩn — cao nhất là GCNII, trọng số học được, hai chiều đạt 85,56% ± 1,41%, cao hơn MLP về số nhưng nằm trong độ lệch chuẩn; bỏ hết cạnh không làm giảm hiệu năng quá độ lệch chuẩn; trọng số cạnh học được không tương quan với trọng số vật lý. Trạm kém nhất có các đỉnh đột ngột, hẹp mà mô hình bỏ lỡ.
+**Kết quả.** NSE có trọng số của mọi tổ hợp nằm trong 80,2%–85,6% (Bảng 2); không tổ hợp đồ thị nào vượt MLP 2 lớp (85,37% ± 1,64%) quá độ lệch chuẩn — cao nhất là GCNII, trọng số học được, hai chiều đạt 85,56% ± 1,41%, cao hơn MLP về số nhưng nằm trong độ lệch chuẩn; bỏ hết cạnh không làm giảm hiệu năng quá độ lệch chuẩn; trọng số cạnh học được không tương quan với trọng số vật lý. Trạm kém nhất có các đỉnh đột ngột, hẹp mà mô hình bỏ lỡ. Bảng A.8 (GCNII, trọng số học được, hai chiều; cửa sổ 12–72 giờ × lead 1–12 giờ): cửa sổ dài hơn cải thiện rõ ở lead dài — lead 12 giờ tăng từ 63,16% (cửa sổ 12 giờ) lên 75,52% (72 giờ), lead 6 giờ từ 82,35% lên 87,59%; tác giả nêu cửa sổ lớn hơn bị giới hạn bởi chi phí tính toán vì bộ mã hóa affine phải tăng số chiều (Mục 4.1) — đây là động cơ trực tiếp cho bộ mã hóa thời gian dạng SSM.
 
 **Kết quả kiểm chứng mã nguồn và chạy thử.**
 - **Lỗi công thức NSE:** hàm `evaluate_nse` lấy trung bình lưu lượng ở đơn vị gốc (m³/s) trừ cho nhãn đã chuẩn hóa. Mẫu số NSE bị thổi phồng xấp xỉ μ² lần ở trạm có lưu lượng trung bình lớn, đẩy NSE sát 1 (28% trạm có NSE > 0,99 trong tệp kết quả tác giả nộp). Giá trị NSE tuyệt đối của bài vì thế không dùng được. Do mẫu số của mỗi trạm như nhau với mọi mô hình, **thứ tự giữa các mô hình trên cùng trạm được giữ nguyên**; thứ tự sau khi lấy trung bình qua các trạm có thể đổi, nên kết luận "đồ thị không hơn MLP" cần tính lại để xác nhận.
+- **Nhiễu giữa các lần huấn luyện cỡ toàn bộ chênh lệch của Bảng 2:** hai cấu hình ResGAT giống hệt nhau về chức năng theo mã ("all" và "binary") cho NSE trung bình theo fold lệch tới 6,67 điểm %, trong khi Bảng 2 chỉ trải 80,2%–85,6%; mỗi cấu hình chạy 1 lần nên các chênh lệch trong Bảng 2 không phân biệt được với nhiễu (chi tiết `CHECKCODE.md` Mục 1). Mức thổi phồng NSE tăng theo lưu lượng trung bình của trạm, nên chênh lệch giữa mô hình ở các trạm sông lớn — nơi đồ thị được kỳ vọng giúp nhiều nhất — bị nén gần về 0 khi lấy trung bình.
 - Validation chọn ngẫu nhiên trên các cửa sổ chồng lấn nên không độc lập với tập huấn luyện.
 - Bộ nạp dữ liệu cắt cửa sổ **bên trong từng năm**: cửa sổ không vượt ranh giới năm, mỗi năm mất W + L mẫu; cửa sổ dài từ 1 năm trở lên không chạy được với cấu trúc hiện tại.
-- **Các sai khác mã–bài khác** (chi tiết `CHECKCODE.md` Mục 1): trọng số relevancy tính trung bình đạo hàm trên cả batch thay vì từng trạm; ResGAT bỏ qua trọng số cạnh vật lý do không khai báo `edge_dim` (các dòng ResGAT có trọng số ở Bảng 2(c) thực chất gần như đồ thị nhị phân); nạp checkpoint với `strict=False`; lọc trạm chặt hơn mô tả; validation lấy ngẫu nhiên 1/5 các cửa sổ chồng lấn.
+- **Các sai khác mã–bài khác** (chi tiết `CHECKCODE.md` Mục 1): baseline MLP được bài mô tả là "19-layer MLP" ở Mục 4.2 nhưng chú thích Bảng 2 ghi "wide 2-layer MLP"; mã `train_mlp.py` dùng 2 lớp × 512 chiều, hạt giống 42; trọng số relevancy tính trung bình đạo hàm trên cả batch thay vì từng trạm; ResGAT bỏ qua trọng số cạnh vật lý do không khai báo `edge_dim` (các dòng ResGAT có trọng số ở Bảng 2(c) thực chất gần như đồ thị nhị phân); nạp checkpoint với `strict=False`; lọc trạm chặt hơn mô tả; validation lấy ngẫu nhiên 1/5 các cửa sổ chồng lấn.
 - Kèm theo 957 checkpoint (1,9 GB; 162 cho thí nghiệm chính ở Bảng 2 = 18 cấu hình đồ thị × 3 kiến trúc × 3 cách chia, 3 cho MLP, 108 cho ablation, 684 cho mạng con), đủ để tính lại NSE đúng mà không cần huấn luyện lại. Việc tính lại cần 14,8 GB dữ liệu giờ; dữ liệu được tải trên Kaggle và lưu thành Kaggle Dataset (`LamaHCE/LamaHCE.md`).
 - Mã gồm khoảng 880 dòng Python và 8 notebook phân tích.
+
+**Phản biện.** Trang OpenReview của bài (ICML 2024 Poster) chỉ công khai tóm tắt và PDF, không công khai nhận xét phản biện; không có nguồn nào khác để biết hội đồng ICML đã phê bình gì.
 
 **Tính mới của hướng cải tiến.** 15 công trình trích dẫn (Semantic Scholar) và các công trình trích dẫn #103 không có công trình nào dùng Mamba làm bộ mã hóa thời gian trên LamaH-CE. Công trình gần nhất là Mosaffa và cs. (HESS 2026, #120) ghép LSTM với GNN trên LamaH-CE **theo ngày**, không dùng Q quá khứ (Mục 6).
 
@@ -225,8 +228,78 @@ Ouyang, Deng, Ni. Water Resources Research 62, e2026WR043815 (2026), CC BY. Mô 
 
 ### 5.10. MTPre
 
-Song, Chae, Chung — Mamba-Transformer lai, CAMELS-US 674 lưu vực, mã MIT trên Zenodo `19367140`; bài đang phản biện, chưa xuất bản; chi tiết mã ở `CHECKCODE.md` Mục 12. Đánh giá sơ bộ (chỉ dựa trên README và mã, chưa có toàn văn): điểm mạnh là đã có Mamba, bài toán dự báo 7 ngày, mã MIT; điểm yếu là chưa qua phản biện, pipeline chính dùng EMD tính trên toàn chuỗi trước khi cắt cửa sổ (rò rỉ tương lai, số liệu công bố bị thổi phồng), dùng khí tượng tương lai quan trắc làm đầu vào dự báo, cửa sổ chỉ 15 ngày quá khứ (không khai thác chuỗi dài), và Mamba đã có sẵn nên hướng cải tiến chủ yếu là sửa phương pháp. Nếu được phép dùng bài chưa xuất bản, MTPre xếp khoảng hạng 7 (sau #53, trên #42); nếu không, chỉ dùng làm tham khảo. Khi xuất bản: nếu bản chính thức vẫn giữ EMD, hạng không đổi; nếu bỏ EMD và đăng ở venue uy tín, có thể lên khoảng hạng 3–4 (nhận định, chưa có toàn văn), vẫn sau #104 vì Mamba đã có sẵn, cửa sổ ngắn và giả định khí tượng tương lai hoàn hảo. Vai trò chắc chắn: công trình liên quan và baseline Mamba-Transformer (mã MIT, bỏ nhánh EMD).
+Song, Chae, Chung — Mamba-Transformer lai, CAMELS-US 674 lưu vực, mã MIT trên Zenodo `19367140`; bài đang phản biện, chưa xuất bản; chi tiết mã ở `CHECKCODE.md` Mục 12. Đánh giá sơ bộ (chỉ dựa trên README và mã, chưa có toàn văn): điểm mạnh là đã có Mamba, bài toán dự báo 7 ngày, mã MIT; điểm yếu là chưa qua phản biện, pipeline chính dùng EMD tính trên toàn chuỗi trước khi cắt cửa sổ (rò rỉ tương lai, số liệu công bố bị thổi phồng), dùng khí tượng tương lai quan trắc làm đầu vào dự báo, cửa sổ chỉ 15 ngày quá khứ (không khai thác chuỗi dài), và Mamba đã có sẵn nên hướng cải tiến chủ yếu là sửa phương pháp. Nếu được phép dùng bài chưa xuất bản, MTPre xếp khoảng hạng 9 (sau #53, trên #42); nếu không, chỉ dùng làm tham khảo. Khi xuất bản: nếu bản chính thức vẫn giữ EMD, hạng không đổi; nếu bỏ EMD và đăng ở venue uy tín, có thể lên khoảng hạng 5–6 (nhận định, chưa có toàn văn), vẫn sau #104 vì Mamba đã có sẵn, cửa sổ ngắn và giả định khí tượng tương lai hoàn hảo. Vai trò chắc chắn: công trình liên quan và baseline Mamba-Transformer (mã MIT, bỏ nhánh EMD).
 
+
+### 5.11. OpenHydroNet — mô hình dự báo của Google FloodHub
+
+**Nguồn.** Mã `github.com/google-research/flood-forecasting` (Apache 2.0, Google Research; commit mới nhất 21/9/2026; ~19.300 dòng Python; tài liệu `openhydronet.readthedocs.io`), fork NeuralHydrology. Hai mô hình: Handoff-Forecast-LSTM — #109 Nearing và cs., *Global prediction of extreme floods in ungauged watersheds*, Nature 627:559–563 (2024), CC BY 4.0, mô hình vận hành trước đây; Mean-Embedding-Forecast-LSTM — mô hình vận hành hiện tại, dùng cơ chế masked mean của #56 Gauch và cs., HESS 29:6221 (2025). Kèm notebook Colab, 2 bộ trọng số huấn luyện sẵn, cấu hình mẫu. Bản thân OpenHydroNet là phần mềm, chưa có bài báo riêng; tìm thấy tóm tắt hội nghị EGU26-6973 (*The Next-Generation Google Flood Forecasting Model & Community…*), không phải bài báo qua phản biện. Khi trích dẫn dùng hai bài Nature 2024 (Q1) và HESS 2025 (Q1).
+
+**Bài toán.** Dự báo lưu lượng ngày với lead time 0–7 ngày: bộ hindcast đọc 365 ngày khí tượng quá khứ, bộ forecast đọc khí tượng dự báo (ECMWF HRES, GraphCast); đầu ra xác suất (CMAL). Không dùng lưu lượng quan trắc làm đầu vào: bài Nature đặt bài toán cho lưu vực không có trạm (kiểm định chéo 10 phần theo trạm, cách biệt thời gian ≥ 1 năm). Mã chỉ hỗ trợ tần suất ngày (`multimet.py`: `frequencies = ['1D']`), không có cơ chế đưa Q quan trắc vào đầu vào. Bài #56 là mô phỏng trên CAMELS-US 531 (train 1999–2008, test 1989–1999), không phải dự báo.
+
+**Dữ liệu.** Nature 2024 dùng 5.680 trạm GRDC (dữ liệu GRDC không được phân phối lại); đầu vào HRES, ERA5-Land, CPC, IMERG. Mã hiện tại dùng Caravan (Zenodo) và Caravan MultiMet (Shalev & Kratzert, arXiv 2411.09459; CC BY 4.0; Zenodo 14161235 và 14161281, tổng 55,5 GB cho toàn cầu; bản zarr công khai `gs://caravan-multimet/v1.1`, đọc được từng lưu vực). Khoảng thời gian trong bản công khai: HRES 01/01/2012–30/09/2020, GraphCast 01/01/2015–20/12/2022, ERA5-Land tới 31/10/2024; ngoài các khoảng này cấu hình lấp bằng ERA5-Land (tái phân tích, tức coi như dự báo hoàn hảo). Ước tính cho 531 lưu vực CAMELS-US: HRES ~0,34 GB, GraphCast ~0,25 GB, ERA5-Land ~0,93 GB (float32, chưa nén).
+
+**Trọng số và số liệu mốc.** Hai bộ trọng số huấn luyện sẵn được huấn luyện trên toàn bộ 1982–2023, README ghi rõ không có tập kiểm tra theo thời gian và không được dùng để đánh giá lịch sử; cấu hình vận hành đặt train, validation và test cùng 1982–2023. Cấu hình mẫu CAMELS-US (`camels-multimet-mean-embedding-forecast-lstm-config.yml`: LSTM 512, 80 epoch, train 2016–2020, validation và test cùng 2021–2025, dữ liệu `camels-updated-2025` chưa rõ nguồn) là cấu hình kiểm thử nội bộ, không kèm số liệu công bố. Chưa tìm thấy số liệu công bố tái lập được trên dữ liệu công khai cho bài toán dự báo này.
+
+**Quan hệ với RiverMamba.** Cùng dòng dự báo toàn cầu theo ngày, lead 7 ngày, đầu vào ERA5-Land + CPC + dự báo HRES, so với GloFAS theo ngưỡng return period, lùi đầu vào theo thời điểm có dữ liệu. RiverMamba dùng Encoder-Decoder LSTM kiểu mô hình của Google làm baseline (`lstm_repo/`, 3.366 trạm GRDC; `LyThuyet/RiverMamba.md` Mục 8). Khác biệt: Google dự báo theo lưu vực, hindcast 365 ngày, không dùng Q, đầu ra xác suất; RiverMamba dự báo trên ô lưới 0,05°, Mamba quét không gian theo đường cong lấp đầy, hindcast 4 ngày có Q tái phân tích GloFAS, đầu ra tất định (chênh lệch Q, 7 đầu MLP).
+
+**Chấm theo tiêu chí.**
+
+| Tiêu chí | Đánh giá |
+|---|---|
+| A1. Phù hợp đề tài | Khá — dự báo 0–7 ngày bằng khí tượng dự báo thật (sát vận hành), nhưng không dùng Q quan trắc, bài gốc là bài toán lưu vực không có trạm |
+| A2. Cải tiến được | Tốt — thay LSTM hindcast 365 bước (và LSTM forecast) bằng Mamba; chưa thấy công trình làm; rủi ro: LSTM vận hành đã được tối ưu nhiều năm |
+| B1. Mã, tái lập | Mã tốt nhất trong các ứng viên (duy trì, có kiểm thử, tài liệu, Colab); số liệu bài Nature không tái lập được (GRDC), trọng số sẵn không dùng làm mốc theo thời gian → mốc phải tự huấn luyện |
+| B2. Dữ liệu | Công khai CC BY 4.0, tập con CAMELS-US nhỏ; nhưng dữ liệu dự báo thật chỉ phủ 2012–2020 (HRES) và 2015–2022 (GraphCast) nên kỳ kiểm tra dùng dự báo thật ngắn |
+| B3. Tài nguyên | Chưa đo; LSTM ngày, 531 lưu vực, dự kiến chạy được trên T4 |
+| B4. Độ dài chuỗi | Ngày, hindcast 365 bước |
+| C1. Phương pháp | Tốt ở mã (NeuralHydrology, đầu ra xác suất, nhiều chỉ số); cấu hình mẫu cần tách validation khỏi test |
+| C2. Uy tín | Nature 2024, HESS 2025; ngành thủy văn/đa ngành |
+| C3. Demo | Theo lưu vực, giống Google FloodHub |
+| C5. Bộ dữ liệu khác | Caravan gồm nhiều bộ (có LamaH-CE ngày, CAMELS-US) |
+
+**Kết luận.** Xếp hạng 3: bài toán dự báo sát vận hành hơn #67 và #22, mã và nơi công bố mạnh nhất. Đứng sau #104 và #121 BiasCast vì không dùng Q quan trắc, dữ liệu ngày, không có đồ thị (chỉ một câu hỏi nghiên cứu), không có số liệu công bố tái lập được làm mốc, và kỳ có dự báo thời tiết thật trong dữ liệu công khai ngắn. Ý tưởng dùng được cho #104: đầu ra xác suất CMAL, tách hindcast/forecast, masked mean khi thiếu nguồn khí tượng; khung phù hợp cho bộ dữ liệu thứ hai ở giai đoạn khóa luận.
+
+### 5.12. #121 BiasCast — dự báo trên LamaH-CE với dự báo thời tiết thật
+
+**Nguồn.** Konold, Feigl, Podest, Klingler, Schulz — *BiasCast: learning and adjusting real time biases from meteorological forecasts to enhance runoff predictions*, HESS 30:5067–5096 (2026, Q1), DOI 10.5194/hess-30-5067-2026. Mã phân tích `github.com/conestone/biascast` (Zenodo 17293199, CC BY 4.0; bản trong `Code/BiasCast`), huấn luyện bằng bản fork NeuralHydrology `github.com/conestone/neuralhydrology`; cấu hình, trọng số và kết quả test của mọi thí nghiệm trên Zenodo 17292895 (0,23 GB); dữ liệu Extended LamaH-CE trên Zenodo 17119635 (0,95 GB, theo ngày, CC BY-NC 4.0, bản 1.0 ghi chưa phải bản sửa cuối).
+
+**Dữ liệu.** Extended LamaH-CE bổ sung cho 859 lưu vực (mức A) các nguồn khí tượng E-OBS, MSWEP, GLEAM và **dự báo ECMWF HRES** gộp theo lưu vực, cùng qmin, qmax, qmean tại trạm. Bài dùng 451 lưu vực; train 2003–2009, validation 2010–2013, test 2014–2017 (chia theo thời gian).
+
+**Bài toán và mô hình.** Dự báo lưu lượng cực đại ngày trước 24 giờ, đầu vào dự báo HRES (3 giờ, gộp thành ngày) và tái phân tích, có và không có Q quan trắc quá khứ trong phần hindcast; chuỗi 365 ngày. So sánh CUDA LSTM (baseline tái phân tích, chỉ dự báo, kết hợp), Encoder–Decoder LSTM (handoff), Sequential Forecast LSTM, học chuyển giao; thí nghiệm chạy 1 hạt giống.
+
+**Kết quả (trung vị NSE).** Mô hình học trên tái phân tích nhưng chạy với dự báo thật: 0,58 → 0,33; Sequential Forecast LSTM 0,63, thêm Q quan trắc 0,71; Encoder–Decoder LSTM 0,57, thêm Q 0,66; học chuyển giao 0,44.
+
+**Đọc toàn văn (26/9/2026).**
+- Mục 2.1: LamaH-CE gốc có 21 biến khí tượng (ERA5-Land) và hơn 60 thuộc tính; bản mở rộng thêm 15 biến từ ECMWF-HRES, E-OBS, MSWEP, GLEAM; dự báo HRES lấy trung bình 8 giá trị 3 giờ tính từ lần phát hành 00 UTC; 451 lưu vực ít chịu tác động con người ở mức A (72,5% đầu nguồn, 27,5% lồng nhau).
+- Mục 2.2: siêu tham số tối ưu Bayes trên validation (hidden 64/128/256, dropout 0,1–0,3, nhiễu nhãn, batch; 100 lần thử, Phụ lục D); hàm mất mát NSE* (Kratzert và cs. 2019); Encoder–Decoder LSTM là kiến trúc của Nearing và cs. (2024).
+- Mâu thuẫn nhỏ: phương trình (7), (10) ghi Q quá khứ là q_max, trong khi phần chữ và cấu hình dùng lưu lượng trung bình ngày (`qmean`).
+- Mục 3.7 tác giả tự nêu hạn chế: chỉ Trung Âu; chỉ lead 1 ngày (dự báo nhiều ngày là "nghiên cứu sắp tới" của nhóm); **chỉ đánh giá các kiến trúc dựa trên LSTM**; dữ liệu gộp theo lưu vực và theo ngày — thiết lập phân bố, độ phân giải thời gian cao hơn có thể cho kết quả khác; độ trễ công bố của tái phân tích hạn chế dùng vận hành.
+- Phụ lục G: RTX 4090, vài phút tới khoảng 1 giờ mỗi lần chạy; chỉ 1 hạt giống do giới hạn tính toán.
+
+**Phản biện công khai (HESS Discussions egusphere-2025-4978, đọc 26/9/2026).** Hai người phản biện, hai vòng, cộng một vòng sửa kỹ thuật của biên tập viên (Micha Werner); cả hai đánh giá tích cực ("well written", "well-posed experiments").
+- Phản biện 1 (vòng 1) yêu cầu phân tích biến động kỹ năng giữa các lưu vực và vai trò thuộc tính tĩnh → tác giả thêm Mục 2.3, 3.1.1 (khoảng cách Wasserstein giữa tái phân tích và dự báo) và Mục 3.6 (tương quan ΔNSE với thuộc tính). Phản biện 1 cũng lưu ý Q quan trắc chủ yếu giảm bất định trạng thái ban đầu chứ không chỉ sai lệch dự báo thời tiết → tác giả thừa nhận, giữ cách đặt vấn đề "bias".
+- Phản biện 1 đề nghị so với **persistence** vì ở lead 1 ngày persistence thường mạnh. Tác giả **không thêm**, lập luận rằng qmax ngày tự tương quan thấp hơn Q trung bình ngày nên persistence kém ý nghĩa — lập luận chưa được kiểm bằng số.
+- Phản biện 2 nêu hạn chế lớn duy nhất là chỉ lead 1 ngày (tác giả xác nhận bài là bước đệm cho nghiên cứu dự báo nhiều ngày sắp tới); hỏi vì sao dùng tanh ở lớp nhúng (bão hòa) → tác giả trả lời tanh là mặc định của NeuralHydrology, lớp nhúng không có dropout, ReLU và dropout là hướng tương lai. Trong mã, nhúng đơn giản một lớp không có hàm kích hoạt (`CHECKCODE.md` Mục 15).
+- Các chi tiết khác xác nhận qua trả lời tác giả: validation và test đủ 4 năm (NeuralHydrology nạp thêm giai đoạn khởi động trước mỗi kỳ); lưu vực thiếu nhãn bị NeuralHydrology tự loại khi huấn luyện (tệp kết quả test mô hình tốt nhất có 451 lưu vực, 1 lưu vực NSE rỗng); mạng handoff của Encoder–Decoder là 1 lớp 128, không tinh chỉnh; ECMWF HRES là hệ thống duy nhất có kho dự báo mở đủ dài nên chỉ dùng HRES; lưu vực kém nhất (758) nghi do tác động con người còn sót; chú thích Hình 7 và giá trị ΔNSE 0,3 → 0,24 ở Hình 4 bản thảo đã sửa.
+- Vòng 2: phản biện 1 xác nhận mọi ý đã được giải quyết, chỉ còn 3 góp ý kỹ thuật nhỏ.
+
+**Chấm theo tiêu chí.**
+
+| Tiêu chí | Đánh giá |
+|---|---|
+| A1. Phù hợp đề tài | Tốt — dự báo có cả Q quan trắc và dự báo thời tiết thật, sát vận hành nhất trong các ứng viên |
+| A2. Cải tiến được | Tốt — tác giả tự nêu chỉ thử kiến trúc LSTM và chỉ dữ liệu gộp theo ngày (Mục 3.7): so sánh Transformer, SSM/Mamba, đồ thị giữa các lưu vực lồng nhau, dữ liệu giờ đều là khoảng trống do chính bài chỉ ra; baseline LSTM mạnh |
+| B1. Mã, tái lập | Tốt — fork NeuralHydrology chỉ sửa bộ nạp LamaH, dừng sớm, lập lịch lr; mô hình và chỉ số giữ nguyên upstream; cắt cửa sổ không rò rỉ nhãn; trung vị NSE tự tính từ tệp kết quả của tác giả khớp bài; thí nghiệm có Q cần tự tạo biến thể dữ liệu (`CHECKCODE.md` Mục 15); chưa chạy thử |
+| B2. Dữ liệu | Tốt — 0,95 GB, cùng vùng LamaH-CE, có dự báo HRES; giấy phép phi thương mại |
+| B3. Tài nguyên | Nhẹ (LSTM ngày, 451 lưu vực) — chưa đo |
+| B4. Độ dài | Ngày, chuỗi 365 bước; kỳ có HRES 2003–2017 |
+| C1. Phương pháp | Tốt — chia theo thời gian, NSE/KGE theo lưu vực; 1 hạt giống; baseline "tái phân tích" dùng thời tiết của chính ngày nhãn (mốc tham chiếu trên); không lùi đầu vào theo độ trễ công bố |
+| C2. Uy tín | HESS 2026 — Scimago 2025: Q1 ở Earth and Planetary Sciences (miscellaneous) và Water Science and Technology, SJR 2,035, H-index 194; không thuộc ngành Computer Science; mới xuất bản (08/2026); 3 trích dẫn (Google Scholar, bản HESS Discussions 2025), trong đó có AIFL của ECMWF (J. Hydrol. 2026) |
+| C3. Demo | Theo lưu vực |
+| C6. Rủi ro | Sequential Forecast LSTM có Q đã đạt NSE trung vị 0,71 |
+
+**Kết luận.** Xếp hạng 2: bài toán dự báo đầy đủ nhất (Q quan trắc + dự báo thời tiết thật), mốc tái lập được, dữ liệu nhẹ, cùng vùng với #104. Đứng sau #104 vì dữ liệu theo ngày (lợi thế chuỗi dài của Mamba kém rõ), không có đồ thị (một câu hỏi nghiên cứu), lead chỉ 1 ngày cho lưu lượng cực đại ngày, và nơi công bố thuộc ngành thủy văn. Vai trò: hướng mở rộng tự nhiên của #104 — cùng LamaH-CE, thêm dự báo thời tiết thật theo ngày — cho giai đoạn khóa luận; baseline Sequential Forecast LSTM là mốc mạnh khi so Mamba.
 ---
 
 ## 6. Công trình liên quan phát hiện trong quá trình tra cứu
@@ -265,18 +338,32 @@ Song, Chae, Chung — Mamba-Transformer lai, CAMELS-US 674 lưu vực, mã MIT t
 **7.2. Xếp hạng.**
 
 | Hạng | Bài | Lý do chính |
-|---|---|---|
+|**7.3. Đầu vào và đầu ra của các ứng viên đứng đầu (đọc từ mã và cấu hình).**
+
+| Ứng viên | Loại bài toán | Độ dài chuỗi vào | Biến động | Thuộc tính tĩnh | Đầu ra |
+|---|---|---|---|---|---|
+| #104 Kirschstein & Sun | Dự báo, theo giờ, 358 trạm cùng lúc | 24 giờ | 5: lưu lượng Q, mưa, độ ẩm đất lớp mặt, nhiệt độ 2 m, áp suất bề mặt | Không | 1 giá trị Q của mỗi trạm tại t + 6 giờ |
+| OpenHydroNet (cấu hình CAMELS-US) | Dự báo, theo ngày, từng lưu vực | Hindcast 365 ngày; forecast 365 ngày chồng lấn + 7 ngày | Hindcast 9 (HRES 5, GraphCast 2, IMERG 1, CPC 1); forecast 7 (HRES 5, GraphCast 2); không có Q | 18 (cấu hình vận hành: 85) | Phân phối xác suất Q (CMAL, 3 thành phần) cho 8 ngày, lead 0–7 |
+| #121 BiasCast | Dự báo, theo ngày, từng lưu vực | 365 ngày | Tái phân tích và/hoặc dự báo HRES; có biến thể thêm Q quan trắc | Có (thuộc tính LamaH-CE) | Lưu lượng cực đại ngày kế tiếp (lead 24 giờ) |
+| #67 MF-LSTM | Mô phỏng, theo giờ | 1 năm: 351 bước ngày + 336 bước giờ = 687 bước | 11 biến NLDAS theo giờ; không có Q | 26 | 24 giá trị Q theo giờ cuối chuỗi |
+| #22 S4D-FT | Mô phỏng, theo ngày | 365 ngày | 5 biến khí tượng; không có Q | 27 (nối vào đầu vào, tổng 32 kênh) | 1 giá trị Q của ngày cuối cửa sổ |
+
+Bài cơ sở có cửa sổ ngắn nhất (24 giờ, tức 1 ngày) và là bài duy nhất dùng Q quan trắc làm đầu vào; các ứng viên còn lại nhìn lại khoảng 1 năm.
+
+---|---|---|
 | **1** | **#104** | Duy nhất đạt tốt cả hai tiêu chí quyết định; các nhược điểm (NSE, validation) sửa được; ảnh hưởng của lỗi NSE lên kết luận chính cần tính lại để xác nhận |
-| **2** | **#67** | Phương pháp chuẩn nhất, chuỗi dài nhất; thư viện có sẵn chế độ dự báo đã chạy thử; nhẹ hơn #22 khi chạy trên GPU miễn phí; bài gốc mô phỏng, lợi thế chuỗi dài bị đặt dấu hỏi |
-| **3** | **#22** | So sánh SSM bất biến ↔ chọn lọc có cơ sở lý thuyết (B2S6); bài gốc mô phỏng, chuỗi vừa phải; chi phí lớn nhất (~10 giờ/thành viên trên L40S, tổ hợp 8 thành viên) |
-| 4 | #103 | Hợp đề tài nhưng mã lỗi, không có bảng số, không có checkpoint, phụ thuộc dữ liệu đã xử lý của tác giả; venue ngành Khoa học Trái đất; làm baseline đồ thị cho #104 |
-| 5 | #71/#54 | Dự báo 1–7 ngày nhưng không tái lập được số liệu |
-| 6 | #53 | Dự báo, cải tiến được; chọn epoch trên tập test |
-| 7 | #42 | Dự báo, cải tiến được; NSE gộp, chọn cấu hình trên tập test |
-| 8 | #6 | Bài benchmark, không có kiến trúc cụ thể để cải tiến |
-| 9 | #36 | Mô hình lai, mô phỏng; HBV làm mờ khác biệt kiến trúc |
-| 10 | #135 | Bài benchmark mô hình nền tảng |
-| 11 | #38 | Mô phỏng; trọng tâm là biểu diễn thuộc tính tĩnh |
+| **2** | **#121 BiasCast** | Dự báo có cả Q quan trắc và dự báo thời tiết thật trên LamaH-CE; mã, trọng số, kết quả công khai; dữ liệu 0,95 GB; theo ngày, không đồ thị (Mục 5.12) |
+| **3** | **OpenHydroNet** (#109 + #56) | Dự báo 0–7 ngày bằng khí tượng dự báo thật, mã Google duy trì, Nature 2024; không dùng Q quan trắc, dữ liệu ngày, không có mốc công bố tái lập được (Mục 5.11) |
+| **4** | **#67** | Phương pháp chuẩn nhất, chuỗi dài nhất; thư viện có sẵn chế độ dự báo đã chạy thử; nhẹ hơn #22 khi chạy trên GPU miễn phí; bài gốc mô phỏng, lợi thế chuỗi dài bị đặt dấu hỏi |
+| **5** | **#22** | So sánh SSM bất biến ↔ chọn lọc có cơ sở lý thuyết (B2S6); bài gốc mô phỏng, chuỗi vừa phải; chi phí lớn nhất (~10 giờ/thành viên trên L40S, tổ hợp 8 thành viên) |
+| 6 | #103 | Hợp đề tài nhưng mã lỗi, không có bảng số, không có checkpoint, phụ thuộc dữ liệu đã xử lý của tác giả; venue ngành Khoa học Trái đất; làm baseline đồ thị cho #104 |
+| 7 | #71/#54 | Dự báo 1–7 ngày nhưng không tái lập được số liệu |
+| 8 | #53 | Dự báo, cải tiến được; chọn epoch trên tập test |
+| 9 | #42 | Dự báo, cải tiến được; NSE gộp, chọn cấu hình trên tập test |
+| 10 | #6 | Bài benchmark, không có kiến trúc cụ thể để cải tiến |
+| 11 | #36 | Mô hình lai, mô phỏng; HBV làm mờ khác biệt kiến trúc |
+| 12 | #135 | Bài benchmark mô hình nền tảng |
+| 13 | #38 | Mô phỏng; trọng tâm là biểu diễn thuộc tính tĩnh |
 
 ---
 
@@ -315,10 +402,62 @@ Phần đáp ứng yêu cầu (làm ở mức cần thiết):
 | Cửa sổ dài cần viết lại bộ nạp dữ liệu | Viết bộ nạp theo chuỗi liên tục, dùng cách chia năm liên tục 2008–2015 |
 | Mức thổi phồng NSE chưa đo | Bước đầu tiên: tải LamaH-CE trên Kaggle, tính lại NSE từ checkpoint |
 
-**8.4. So sánh với hai ứng viên hạng 2 và 3.**
+**8.4. So sánh với các ứng viên hạng 4 và 5.**
 - **#22** phù hợp khi muốn một nghiên cứu so sánh SSM thuần (S4D-FT, Mamba, B2S6); hạn chế: bài gốc mô phỏng, phần chuyển sang dự báo đã được nhóm tác giả thực hiện, cải tiến chỉ là thay khối, CAMELS-US không có mạng sông để thêm GNN hoặc XAI không gian.
 - **#67** phù hợp khi ưu tiên chuỗi giờ dài, phương pháp chuẩn và nhiều bộ dữ liệu (giai đoạn khóa luận); hạn chế: bài gốc mô phỏng, chế độ dự báo chưa có số liệu công bố, dữ liệu lớn, không có mạng sông.
 
+
+**8.4b. So sánh trực tiếp #104 và OpenHydroNet (26/9/2026).**
+
+| Khía cạnh | #104 Kirschstein & Sun (ICML 2024) | OpenHydroNet (Nature 2024, HESS 2025) |
+|---|---|---|
+| Bài toán | Dự báo 6 giờ từ 24 giờ quá khứ có Q quan trắc; không dùng khí tượng tương lai; 358 trạm cùng lúc | Dự báo 0–7 ngày từ 365 ngày khí tượng quá khứ + khí tượng dự báo; không dùng Q quan trắc; từng lưu vực |
+| Độ khó, ý nghĩa vận hành | Lead ngắn, có Q gần nhất nên phần lớn kỹ năng đến từ quán tính dòng chảy (Bảng A.8: lead 1 giờ đạt 98,87%); bài không báo cáo baseline persistence | Sát vận hành hơn (dự báo thời tiết thật), bài toán khó hơn |
+| Độ phân giải, chuỗi | Theo giờ; cửa sổ kéo tới hàng nghìn bước sau khi sửa bộ nạp — đúng thế mạnh chuỗi dài của Mamba | Theo ngày; hindcast 365 bước — LSTM vốn xử lý tốt, lợi thế của Mamba kém rõ |
+| Câu hỏi nghiên cứu | Hai: bộ mã hóa thời gian; vai trò đồ thị sông | Một: kiến trúc hindcast/forecast (thêm phân tích theo lead time) |
+| Mốc so sánh | Có bảng số + 957 checkpoint để tính lại; nhiễu giữa các lần chạy lớn | Không có số liệu công bố tái lập được; baseline tự huấn luyện bằng chính kiến trúc vận hành của Google |
+| Mã | ~880 dòng, nhiều lỗi (NSE, relevancy, ResGAT, bộ nạp) | Chất lượng cao, được duy trì, có kiểm thử và tài liệu |
+| Dữ liệu | LamaH-CE theo giờ 2000–2017, đang tải (14,8 GB nén) | Caravan + MultiMet. Lưu lượng CAMELS-US trong Caravan chỉ tới 2014 (Caravan 1.6 chỉ cập nhật CAMELS-AUS) trong khi HRES bắt đầu 2012 và GraphCast 2015: kỳ trùng với dự báo thật chỉ 2012–2014; muốn dài hơn phải tự lấy lưu lượng USGS sau 2014 (cấu hình mẫu dùng `camels-updated-2025` chưa rõ nguồn). Với 859 lưu vực LamaH-CE trong Caravan (lưu lượng tới 2017), kỳ trùng HRES là 2012–2017 |
+| Tính toán | Nhẹ | Chưa đo |
+| Nơi công bố | ICML (CORE A*, ngành học máy) | Nature (đa ngành), HESS (thủy văn) |
+| Demo | Bản đồ 358 trạm theo giờ trên mạng sông | Theo lưu vực, kiểu Google FloodHub |
+| Khả năng có kết quả dương | Cao với so sánh Mamba và lớp affine (Bảng A.8 đã cho thấy cửa sổ dài giúp); chưa chắc với LSTM/Transformer | Thấp hơn: LSTM vận hành đã được tối ưu nhiều năm |
+
+Nhận định: #104 giữ hạng 1 vì hợp thế mạnh chuỗi dài của Mamba, có hai câu hỏi nghiên cứu, có mốc tính lại được và dữ liệu đầy đủ; OpenHydroNet mạnh hơn về mã và ý nghĩa vận hành nhưng vướng dữ liệu dự báo thật ngắn và không có mốc. Việc bổ sung cho #104 rút ra từ so sánh: báo cáo thêm baseline persistence; dùng OpenHydroNet trên các lưu vực LamaH-CE (Caravan, dữ liệu ngày, HRES 2012–2017) làm hướng mở rộng dự báo nhiều ngày cho giai đoạn khóa luận.
+
+**8.4c. So sánh #104 và #121 BiasCast khi không xét mức phù hợp với Mamba và đồ thị (26/9/2026).** Người dùng đặt trọng tâm vào chất lượng của bản thân bài cơ sở (kiến trúc sẽ thử nhiều biến thể; đồ thị có thể để dành cho khóa luận).
+
+| Khía cạnh | #104 Kirschstein & Sun | #121 BiasCast | Bên hơn |
+|---|---|---|---|
+| Bài toán | Dự báo 6 giờ, có Q quan trắc, không có khí tượng tương lai | Dự báo 24 giờ (lưu lượng cực đại ngày), có Q quan trắc và dự báo HRES thật | #121 |
+| Độ tin cậy số liệu gốc | NSE trong mã sai công thức; nhiễu giữa các lần chạy lớn cỡ toàn bảng | NSE, KGE chuẩn của NeuralHydrology; đã đọc fork và cấu hình, trung vị tự tính khớp bài; 1 hạt giống | #121 |
+| Chia tập | Validation ngẫu nhiên trên cửa sổ chồng lấn | Theo thời gian 2003–2009 / 2010–2013 / 2014–2017 | #121 |
+| Trọng tâm so sánh của bài | Các cách định nghĩa đồ thị | Các kiến trúc và chiến lược huấn luyện LSTM — gần với đề tài so sánh kiến trúc | #121 |
+| Tái lập | 957 checkpoint | Cấu hình, trọng số, kết quả theo lưu vực; khung NeuralHydrology | Ngang |
+| Dữ liệu | Theo giờ, 14,8 GB | Theo ngày, 0,95 GB; bản 1.0 ghi chưa phải bản sửa cuối; CC BY-NC | Tùy: #104 có độ phân giải giờ, #121 nhẹ và có dự báo thời tiết |
+| Nơi công bố | ICML (CORE A*, ngành AI) | HESS (Q1 Scimago, ngành Khoa học Trái đất / nước) | #104 |
+| Trích dẫn | 21 (Google Scholar, 25/9/2026) | 3 (Google Scholar, 26/9/2026); xuất bản 08/2026 | #104 |
+| Số hạt giống | 1 | 1 | Ngang |
+| Mở rộng sang đồ thị ở khóa luận | Có sẵn | Làm được: cùng trạm LamaH-CE, dùng `Stream_dist.csv` của bộ gốc | Ngang |
+
+Bảng so sánh đầy đủ (mẫu minh họa, kích thước đầu vào/đầu ra, số mẫu, số tham số, huấn luyện, tính toán): `SOSANH.md`.
+
+Nhận định: khi bỏ hai tiêu chí mức phù hợp với Mamba và đồ thị, #121 hơn #104 về bài toán và độ tin cậy phương pháp; #104 hơn về nơi công bố và số trích dẫn. Đã đọc fork NeuralHydrology, 24 cấu hình và tệp kết quả của #121 (`CHECKCODE.md` Mục 15): không có lỗi làm sai số liệu công bố. Việc còn phải xác nhận: yêu cầu của GVHD về số trích dẫn tối thiểu cho bài cơ sở.
+
+**8.6. Đề xuất chọn bài cơ sở theo ưu tiên của người dùng (26/9/2026, chờ người dùng quyết định).** Ưu tiên: chất lượng và độ vững của bài cơ sở trước hội đồng; kiến trúc sẽ thử nhiều biến thể; đồ thị có thể để cho khóa luận.
+
+| Câu hỏi hội đồng có thể đặt | Nếu chọn #104 | Nếu chọn #121 |
+|---|---|---|
+| "Có bài nào mới hơn, tốt hơn trên cùng dữ liệu không?" | Có: #121 (2026) dùng cả dự báo thời tiết thật và Q, phương pháp chặt hơn — phải giải thích vì sao không chọn | Là bài mới nhất có mã trên LamaH-CE (theo phạm vi đã rà) |
+| "Số liệu bài gốc có tin được không?" | Không nguyên trạng: NSE sai công thức, nhiễu lớn — phải tính lại (đồng thời là đóng góp) | Có: tự tính lại khớp bài; chỉ yếu ở 1 hạt giống |
+| "Mô hình gốc có phải loại chính xác nhất hiện nay không?" | Không: lớp affine + GNN, bài tự kết luận đồ thị không giúp | Dùng các kiến trúc LSTM dự báo kiểu mô hình vận hành của Google (handoff, sequential) — dòng mô hình mạnh nhất đang dùng thực tế |
+| "Bài toán có sát thực tế không?" | Dự báo 6 giờ, không dùng dự báo thời tiết | Dự báo 24 giờ với dự báo ECMWF thật và Q quan trắc |
+| "Nơi công bố, trích dẫn?" | ICML (A*, ngành AI), 21 trích dẫn | HESS (Q1, thủy văn), 3 trích dẫn |
+| "Dữ liệu?" | Theo giờ | Theo ngày |
+
+Nhận định: với ưu tiên trên, #121 vững hơn trước hội đồng ở các câu hỏi về độ tin cậy số liệu, mô hình mốc và tính thực tế; #104 chỉ vững hơn ở nơi công bố và trích dẫn. Nếu chọn #121: #104 trở thành công trình tham khảo và nguồn đồ thị cho khóa luận; dữ liệu LamaH-CE gốc đang tải vẫn cần (thuộc tính, shapefile, mạng sông, dữ liệu giờ).
+
+Đề xuất: chọn #121, với điều kiện GVHD không bắt buộc bài cơ sở có từ 5 trích dẫn trở lên; nếu bắt buộc thì giữ #104. So sánh chi tiết từng khía cạnh (mẫu minh họa, đầu vào, đầu ra, số mẫu, số tham số, huấn luyện, tính toán, lỗi): `SOSANH.md`.
 
 **8.5. Các bài hỗ trợ cho dự án dựa trên #104.**
 
@@ -329,6 +468,11 @@ Phần đáp ứng yêu cầu (làm ở mức cần thiết):
 | #103 FloodGNNs | Cùng 358 trạm LamaH-CE, tiền xử lý theo #104: đối chiếu kết quả và baseline đồ thị dense (reachability) |
 | #120 Mosaffa và cs. | Công trình gần nhất (LSTM mã hóa thời gian + GNN định tuyến trên LamaH-CE) cho phần công trình liên quan và lập luận tính mới |
 | RiverMamba | Hàm mất mát có trọng số return period và LOAN đưa thuộc tính tĩnh vào chuẩn hóa — ý tưởng có thể thử thêm |
+| Demiray & Demir — Mamba + XAI (EarthArXiv 2025, preprint, DOI 10.31223/X5B164) | Công trình cạnh tranh trực tiếp: Mamba dự báo 120 giờ từ cửa sổ 72 giờ (có Q quá khứ và mưa tương lai) trên 125 trạm WaterBench-Iowa, train 10/2011–9/2017, test 10/2017–9/2018; trung vị NSE Mamba 0,7749, Transformer 0,7461; so với Persistence, LSTM, GRU, Seq2Seq; SHAP. Bài không nêu mã công khai; repo WaterBench chỉ có dữ liệu và baseline LSTM/GRU/Seq2Seq. Dùng cho công trình liên quan và lập luận khác biệt (dữ liệu có mạng sông, đồ thị, sửa lỗi đánh giá) |
+| MTPre (chưa xuất bản, Zenodo 19367140, MIT) | Mã Mamba encoder + Transformer decoder cho dự báo 7 ngày có Q quá khứ — tham khảo cách ghép Mamba vào bài toán dự báo; bỏ nhánh EMD vì rò rỉ tương lai |
+| #71/#54 FHNN | Thiết kế bộ mã hóa quá khứ (có Q) + bộ giải mã chạy trên khí tượng tương lai — tham khảo nếu mở rộng sang nhiều lead time |
+| #53 HydroTFT, #42 TFRN | Mã Transformer/TFT cho dự báo lưu lượng — tham khảo khi cài baseline Transformer; không dùng giao thức đánh giá của hai bài (chọn epoch hoặc cấu hình trên tập test) |
+| #105 HydroGAT | GAT không gian + attention thời gian, dự báo theo giờ, mã công khai (DGL) — tham khảo thiết kế không gian–thời gian; cấu hình gốc cần tới 64 GPU A100 |
 
 ---
 

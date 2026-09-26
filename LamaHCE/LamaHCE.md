@@ -46,4 +46,21 @@ Chạy thử trên tệp nén giả mô phỏng đủ 7 phần: mỗi tệp ch�
 
 ## 5. Kết quả chạy
 
-Chưa có — cập nhật sau khi chạy trên Kaggle.
+| Gói | Kích thước output trên Kaggle | Dòng "XONG" (thời gian, GB nén đã đọc, số file) | Dòng "Kiểm tra ZIP" (số mục, lỗi CRC) | Cảnh báo vượt dung lượng |
+|---|---|---|---|---|
+| `lamah_ce_core.zip` | 6,82 GB | Chưa ghi | Chưa ghi | Chưa ghi |
+| `lamah_ce_extra.zip` | 6,32 GB | Chưa ghi | Chưa ghi | Chưa ghi |
+
+Tổng 13,14 GB, dưới giới hạn 20 GB của output notebook; mỗi gói dưới ngưỡng bỏ qua 18 GB của mã. Gói lõi đạt độ đầy đủ khi log có dòng "Kiểm tra ZIP" với lỗi CRC `None` và không có dòng "CẢNH BÁO".
+
+## 6. Extended LamaH-CE (BiasCast, HESS 2026)
+
+Notebook `LamaHCEExt_Download.py` phục vụ đánh giá ứng viên bài cơ sở BiasCast (`BaiCoSo/SOSANH.md`).
+
+| Mục | Nội dung |
+|---|---|
+| Dữ liệu | Extended LamaH-CE theo ngày, Zenodo 17119635, tệp `Extended_LamaH-CE_daily.tar.gz` 0,95 GB, CC BY-NC 4.0; thư mục gốc `LamaH_extended/` gồm `A_basins_total_upstrm` và `D_gauges` (mỗi phần có thuộc tính, chuỗi thời gian, shapefile); tệp trạm ngày có cột `YYYY;MM;DD;qmin;qmean;qmax` (m³/s) |
+| Kết quả tác giả | Zenodo 17292895, tệp `Experiments.tar.gz` 0,23 GB: cấu hình, trọng số, scaler, NSE/KGE theo lưu vực của 24 cấu hình |
+| Cách tải | Đọc theo luồng, ghi vào `lamah_ce_ext.zip` và `biascast_experiments.zip`; lưu thành Kaggle Dataset (Private) `lamah-ce-ext` |
+| Kiểm tra trong notebook | % thiếu `qmax` và `qmean` theo kỳ train 2003–2009 / validation 2010–2013 / test 2014–2017 của 451 lưu vực; % thiếu từng biến khí tượng 2003–2017 và ngày có ECMWF đầu tiên; persistence trên test (qmax(t−1) và qmean(t−1) làm dự báo cho qmax(t)) so với NSE theo lưu vực của 5 cấu hình tác giả; hình CDF |
+| Kết quả | Đã chạy trên Kaggle (26/9/2026); log và số liệu chưa ghi |

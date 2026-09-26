@@ -8,7 +8,9 @@
 
 | # | Repo | Chia tập | Chuẩn hóa theo train | Chọn mô hình | Kèm dữ liệu | Vấn đề chính |
 |---|---|---|---|---|---|---|
-| #104 | `Code/104_ICML-RiverTopology` | Test 2016–2017, train theo năm | Có (2000–2015) | Loss nhỏ nhất trên 1/5 cửa sổ train ngẫu nhiên | Tự tải LamaH-CE; kèm 162 checkpoint | Công thức NSE sai; validation không độc lập; cửa sổ cắt trong từng năm |
+| #104 | `Code/104_ICML-RiverTopology` | Test 2016–2017, train theo năm | Có (2000–2015) | Loss nhỏ nhất trên 1/5 cửa sổ train ngẫu nhiên | Tự tải LamaH-CE; kèm 957 checkpoint | Công thức NSE sai; validation không độc lập; cửa sổ cắt trong từng năm |
+| #121 | `Code/BiasCast` + fork NeuralHydrology + Zenodo 17292895 | 2003–2009 / 2010–2013 / 2014–2017 | Có (scaler lưu kèm) | Theo validation (NeuralHydrology) | Extended LamaH-CE 0,95 GB (Zenodo 17119635) | 1 hạt giống; chưa chạy thử |
+| #109 + #56 | `Code/OpenHydroNet` (Google, Apache 2.0) | Cấu hình vận hành: train = validation = test 1982–2023; cấu hình CAMELS-US: validation trùng test 2021–2025 | Có | Theo cấu hình (NeuralHydrology) | Mẫu Caravan nhỏ; MultiMet zarr công khai; kèm 2 bộ trọng số (huấn luyện trên toàn bộ 1982–2023) | Không có mốc công bố tái lập được; chỉ dữ liệu ngày; không dùng Q quan trắc |
 | #67 | Hy2DL + Zenodo `14780059` | 1990–2003 / 2003–2008 / 2008–2018 | Có | Epoch cuối | Tự tải CAMELS-US giờ | Không có vấn đề phương pháp; dữ liệu ~20 GB |
 | #22 | `Code/22_S4D-FT` | Train 1999–2008 / test 1989–1999 | Có (hằng số) | Epoch cố định 49; validation 10% cửa sổ train ngẫu nhiên | Tự tải CAMELS + NLDAS mở rộng | Script không khớp Bảng S3; một số tiện ích hỏng |
 | #103 | FloodGNNs | Theo tỉ lệ thời gian | Có | Theo validation | Dữ liệu đã xử lý trên Google Drive | Lỗi import; NSE gộp; loss khác bài |
@@ -35,11 +37,15 @@
 
 **Huấn luyện.** `train`: `random_split` 1/5 cửa sổ làm holdout (cửa sổ chồng lấn cùng kỳ train), lưu `best_model_params` ở epoch có loss holdout nhỏ nhất. Loss = MSE × "interestingness score" (bình phương độ dốc trung bình × tích phân lưu lượng tương đối trong cửa sổ). Hạt giống 42.
 
-**Đánh giá.** `evaluate_nse` lấy `mean = dataset.mean[:, [0]]` (lưu lượng trung bình **đơn vị gốc**) và tính `mse_loss(mean, data.y)` với `data.y` **đã chuẩn hóa**, rồi nhân σ² cho cả tử và mẫu. Mẫu số vì vậy là (μ_gốc − y_chuẩn_hóa)²·σ² thay vì (μ − y_gốc)², lệch với công thức "Testing Metric" của bài (tr. 4, mẫu số dùng μ là lưu lượng trung bình của trạm). Mọi thí nghiệm đặt `normalized: True` nên lỗi này áp dụng cho toàn bộ kết quả; tử số (sai số mô hình) vẫn đúng. Trong `results_mlp.csv`, MLP có NSE trung vị 0,937, 28% trạm có NSE > 0,99, 10% trạm ≥ 0,9998. Cách sửa đúng theo bài: mẫu số Σ w·(0 − y_chuẩn_hóa)²·σ², tương đương Σ w·(μ − y_gốc)²; khi so với bài khác thì báo cáo thêm NSE chuẩn dùng trung bình tập kiểm tra. Mẫu số của mỗi trạm giống nhau cho mọi mô hình nên thứ tự giữa các mô hình trên cùng trạm không đổi; riêng NSE tổng hợp (trung bình qua các trạm) có thể đổi thứ tự vì mỗi trạm bị thổi phồng một mức khác nhau — cần tính lại để xác nhận.
+**Đánh giá.** `evaluate_nse` lấy `mean = dataset.mean[:, [0]]` (lưu lượng trung bình **đơn vị gốc**) và tính `mse_loss(mean, data.y)` với `data.y` **đã chuẩn hóa**, rồi nhân σ² cho cả tử và mẫu. Mẫu số vì vậy là (μ_gốc − y_chuẩn_hóa)²·σ² thay vì (μ − y_gốc)², lệch với công thức "Testing Metric" của bài (tr. 4, mẫu số dùng μ là lưu lượng trung bình của trạm). Mọi thí nghiệm đặt `normalized: True` nên lỗi này áp dụng cho toàn bộ kết quả; tử số (sai số mô hình) vẫn đúng. Trong `results_mlp.csv`, MLP có NSE trung vị 0,937, 28% trạm có NSE > 0,99, 10% trạm ≥ 0,9998. Cách sửa đúng theo bài: mẫu số Σ w·(0 − y_chuẩn_hóa)²·σ², tương đương Σ w·(μ − y_gốc)²; khi so với bài khác thì báo cáo thêm NSE chuẩn dùng trung bình tập kiểm tra. Mẫu số của mỗi trạm giống nhau cho mọi mô hình nên thứ tự giữa các mô hình trên cùng trạm không đổi; riêng NSE tổng hợp (trung bình qua các trạm) có thể đổi thứ tự vì mỗi trạm bị thổi phồng một mức khác nhau — cần tính lại để xác nhận. Mức thổi phồng tăng theo lưu lượng trung bình của trạm (xấp xỉ 1 + μ²/E[y_chuẩn_hóa²]), nên chênh lệch giữa các mô hình ở trạm sông lớn, hạ lưu bị nén về gần 0 và gần như không đóng góp vào trung bình; trong khi đây là nhóm trạm mà thông tin thượng nguồn (đồ thị) được kỳ vọng giúp nhiều nhất (suy luận từ công thức, chưa kiểm bằng số). Việc chọn trạm kém nhất ở Mục 4.5 của bài cũng dựa trên NSE bị lỗi này.
 
 **Trọng số "relevancy score" khác mô tả của bài.** `interestingness_score` (`functions.py` dòng 157–170) tính `torch.gradient(...)[0].mean()` không chỉ định chiều, nên đạo hàm được lấy trung bình trên **toàn bộ batch** (mọi trạm × mọi mẫu) thành một số duy nhất rồi mới bình phương; bài mô tả trọng số tính riêng cho từng trạm (tr. 4). Hệ quả: trọng số của một trạm phụ thuộc các trạm và mẫu khác cùng batch (batch 64 khi huấn luyện, 1 mẫu × 358 trạm khi đánh giá); đạo hàm có dấu nên đoạn lên và đoạn xuống triệt tiêu nhau. Trọng số này có mặt ở cả hàm mất mát lẫn NSE có trọng số.
 
-**ResGAT bỏ qua trọng số cạnh vật lý.** `ResGAT` truyền trọng số cạnh vào `GATConv` nhưng không khai báo `edge_dim`; trong PyTorch Geometric 2.6.1 (`gat_conv.py` dòng 175–180 và 400), khi `edge_dim` là None thì `lin_edge` là None và `edge_attr` bị bỏ qua. Trọng số chỉ còn tác dụng lọc cạnh có giá trị 0 (dòng 104–105 `models.py`). Vì vậy các cấu hình ResGAT "stream length", "elevation difference", "average slope", "all" ở Bảng 2(c) thực chất gần như đồ thị nhị phân; khác biệt giữa các dòng này chủ yếu do ngẫu nhiên khi huấn luyện.
+**ResGAT bỏ qua trọng số cạnh vật lý.** `ResGAT` truyền trọng số cạnh vào `GATConv` nhưng không khai báo `edge_dim`; trong PyTorch Geometric 2.6.1 (`gat_conv.py` dòng 175–180 và 400), khi `edge_dim` là None thì `lin_edge` là None và `edge_attr` bị bỏ qua. Kiểm lại mã nguồn PyTorch Geometric 2.5.0 cho cùng kết quả (`requirements.txt` ghi 2.6.1, phát hành sau ICML 2024, nên phiên bản dùng khi chạy thí nghiệm chưa xác nhận). Trọng số chỉ còn tác dụng lọc cạnh có giá trị 0 (dòng 104–105 `models.py`). Vì vậy các cấu hình ResGAT "stream length", "elevation difference", "average slope", "all" ở Bảng 2(c) thực chất gần như đồ thị nhị phân; khác biệt giữa các dòng này chủ yếu do ngẫu nhiên khi huấn luyện.
+
+**Nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong Bảng 2.** ResGAT "all" (ma trận trọng số 3 cột, không lọc cạnh) và ResGAT "binary" (trọng số 1, không cạnh nào bị lọc) giống hệt nhau về chức năng theo mã: cùng tập cạnh, cùng khởi tạo (hạt giống 42), `edge_attr` bị bỏ qua. Tuy vậy checkpoint của hai cấu hình khác nhau ở toàn bộ 80 tensor, và NSE trung bình theo từng fold trong `results_full.csv` lệch nhau tới 6,67 điểm % (downstream, fold 0: 75,30% so với 81,97%); 9 cặp (3 hướng × 3 fold) lệch từ −1,40 đến +6,67 điểm %. Toàn bộ Bảng 2 chỉ trải trong 80,2%–85,6%. Nguyên nhân khả dĩ là phép cộng scatter trên GPU không tất định (`ensure_reproducibility` không bật `torch.use_deterministic_algorithms`); các cấu hình "isolated" ở ba hướng cho checkpoint trùng khớp từng bit vì không có cạnh nào để cộng dồn. Hệ quả: mỗi cấu hình chỉ chạy 1 lần nên chênh lệch giữa các dòng Bảng 2 không phân biệt được với nhiễu; kết luận đúng của bài là "không phát hiện khác biệt", chưa đủ để khẳng định đồ thị không giúp.
+
+**Bài ghi NSE nằm trong [0, 1].** Mục 3.2 (tr. 4) mô tả NSE thuộc [0, 1]; `results_mlp.csv` có NSE âm ở một số trạm (thấp nhất −1,98) và các giá trị này vẫn được lấy trung bình.
 
 **Nạp checkpoint không kiểm tra khớp tham số.** `load_model_and_dataset` gọi `load_state_dict(..., strict=False)`: nếu tên tham số lệch (ví dụ do khác phiên bản thư viện), mô hình vẫn chạy với trọng số khởi tạo ngẫu nhiên mà không báo lỗi. Khi tính lại NSE cần kiểm tra danh sách tham số thiếu/thừa.
 
@@ -205,12 +211,68 @@
 
 ---
 
-## 14. Kết luận từ việc đọc mã nguồn
+## 14. OpenHydroNet — mã mô hình dự báo của Google FloodHub
+
+**Nguồn.** `github.com/google-research/flood-forecasting` (Apache 2.0), bản trong `Code/OpenHydroNet` (clone 26/9/2026, commit 21/9/2026, 236 MB gồm 80 MB trọng số, ~19.300 dòng Python). Fork NeuralHydrology, gói `googlehydrology`: `datasetzoo/` (`caravan.py`, `multimet.py`), `modelzoo/` (`handoff_forecast_lstm.py`, `mean_embedding_forecast_lstm.py`, mỗi tệp ~560 dòng; `head.py` gồm đầu ra CMAL), `training/`, `evaluation/`, thư mục `test/`, notebook `tutorial/OpenHydroNet_Tutorial.ipynb` kèm mẫu Caravan nhỏ.
+
+**Mô hình.** `MeanEmbeddingForecastLSTM`: mỗi nguồn khí tượng qua một mạng nhúng riêng, gộp bằng trung bình có mặt nạ (bỏ nguồn bị thiếu), rồi vào LSTM hindcast (365 bước) và LSTM forecast (lead time 7); trạng thái LSTM hindcast truyền sang LSTM forecast; thuộc tính tĩnh qua mạng nhúng riêng. Không có Mamba hay Transformer.
+
+**Dữ liệu và cấu hình.** Chỉ hỗ trợ tần suất ngày (`multimet.py` dòng 196). Không có cơ chế đưa lưu lượng quan trắc vào đầu vào. Cấu hình vận hành (`floodhub-settings-config.yml`, `handoff-forecast-lstm-config.yml`) đặt train, validation, test cùng 01/01/1982–31/12/2023. Cấu hình CAMELS-US đặt validation trùng test (2021–2025) và đọc thư mục `camels-updated-2025` chưa rõ nguồn. Bản zarr công khai `gs://caravan-multimet/v1.1` đọc được theo từng lưu vực (khối 128 lưu vực): HRES 22.492 lưu vực × 3.196 ngày (01/01/2012–30/09/2020) × 10 lead time; GraphCast 2.911 ngày (01/01/2015–20/12/2022); ERA5-Land 27.333 ngày (tới 31/10/2024).
+
+**Trọng số huấn luyện sẵn.** 2 bộ (`google-floodhub-settings-55-epochs`, bản lọc NSE > 0,5 — 85 epoch), huấn luyện trên 1982–2023; `Pretrained-Models-README.md` cấm dùng để đánh giá theo thời gian trong 1982–2023 vì rò rỉ dữ liệu, chỉ dùng cho tinh chỉnh, đánh giá lưu vực không tham gia huấn luyện, hoặc dự báo sau 2023.
+
+**Pipeline (đọc `datasetzoo/multimet.py`, `modelzoo/mean_embedding_forecast_lstm.py`, `training/loss.py`, `datautils/scaler.py`, `evaluation/metrics.py`).**
+- **Mẫu tại ngày phát hành t:** hindcast lấy các biến không có lead time trong [t−364, t]; sản phẩm dự báo dùng làm hindcast chỉ lấy lead 0 của các lần phát hành [t−365, t−1] (lùi một ngày để không dùng thông tin chưa có tại t); forecast lấy dự báo phát hành tại t với lead 1–7, cộng phần chồng lấn `forecast_overlap` (lead 0 của các ngày trước, 365 ngày ở cấu hình vận hành). Nhãn là chuỗi Q kết thúc tại t + 7; hàm mất mát chỉ tính trên 8 bước cuối (`predict_last_n: 8`, lead 0–7).
+- **Mô hình:** mỗi nguồn khí tượng qua mạng nhúng riêng (có nối thuộc tính tĩnh đã nhúng), gộp bằng trung bình có mặt nạ để bỏ nguồn bị thiếu; LSTM hindcast chạy trước, đầu ra của nó đưa vào LSTM forecast; đầu CMAL (3 thành phần phân phối, lấy 7.500 mẫu, báo cáo trung bình mẫu, cắt giá trị âm về 0). Có biến đếm bước thời gian (`timestep_counter`).
+- **Huấn luyện:** Adam, ReduceLROnPlateau, cắt gradient chuẩn 1, nhiễu nhãn 0,005, dropout đầu ra 0,4, forget bias khởi tạo 3; hàm mất mát có sẵn: MSE, RMSE, NSE* chia theo độ lệch chuẩn từng lưu vực, CMAL.
+- **Chuẩn hóa và dữ liệu thiếu:** scaler tính trên kỳ train, lưu `scaler.nc`, dùng lại khi suy luận/tinh chỉnh; `validate_samples.py` đánh dấu mẫu hợp lệ (bỏ mẫu thiếu nhãn thay vì bỏ cả lưu vực); `union_features.py` lấp nguồn thiếu bằng nguồn thay thế.
+- **Đánh giá:** `metrics.py` có NSE, MSE, RMSE, KGE, Alpha/Beta-NSE, Beta-KGE, Pearson r, FHV, FLV, FMS, Peak-Timing, Missed-Peaks, sai số % đỉnh; tính theo từng lead time.
+
+**Điểm chèn Mamba.** Thay `self.hindcast_lstm` (và có thể `self.forecast_lstm`) trong `mean_embedding_forecast_lstm.py` bằng khối Mamba, giữ cơ chế truyền trạng thái bằng lớp chiếu; đăng ký mô hình mới trong `modelzoo/__init__.py`.
+
+---
+
+## 15. #121 BiasCast
+
+**Nguồn.** `github.com/conestone/biascast` (bản trong `Code/BiasCast`, commit 03/08/2026, ~1.550 dòng Python + notebook): chỉ gồm notebook chạy thí nghiệm (`Experiments/_run/Run_Experiment.ipynb`, `Transfer_Weights.ipynb`) và mã phân tích, vẽ hình (`Inspect_Experiments/`). Huấn luyện dùng bản fork NeuralHydrology `github.com/conestone/neuralhydrology` (đọc ở đoạn dưới). Thư mục `Experiments/` và `Data/` để trống, phải thay bằng Zenodo 17292895 (cấu hình `config.yml`, `best_model.pt`, scaler, `test_metrics.csv` NSE/KGE theo lưu vực cho từng thí nghiệm) và Zenodo 17119635 (Extended LamaH-CE, 0,95 GB).
+
+**Fork NeuralHydrology** (`Code/BiasCast_NH`, `github.com/conestone/neuralhydrology`): tách từ NeuralHydrology upstream tại commit `f00cf47`, thêm đúng 1 commit `9d94908` (16/09/2025) sửa 7 tệp: `datasetzoo/lamah.py` (cho phép nhãn `qmean`, `qmin`, `qmax`; chỉ nạp 1 cột lưu lượng — cột nhãn đầu tiên khớp), `evaluation/tester.py` (thêm đánh giá bằng `best_model.pt`), `training/early_stopping.py` (mới), `training/__init__.py` (bộ lập lịch learning rate), `training/basetrainer.py` (dừng sớm theo NSE validation, lưu mô hình tốt nhất), `training/logger.py`, `utils/config.py`. Mô hình (`sequential_forecast_lstm.py`, `handoff_forecast_lstm.py`, `cudalstm.py`) và hàm tính chỉ số là của upstream, không sửa.
+
+**Cắt cửa sổ (kiểm chống rò rỉ).** `basedataset.py` dòng 158–164: với ngày nhãn t, hindcast lấy [t − 364, t − 1], forecast lấy ngày t; nên Q quan trắc (`qmean`) và khí tượng tái phân tích chỉ tới hôm trước, dự báo ECMWF cho ngày t, nhãn `qmax` của ngày t — không rò rỉ nhãn.
+
+**Cấu hình thí nghiệm (Zenodo 17292895, 24 cấu hình, đọc bằng cách giải nén theo luồng, không lưu tệp nén).** 451 lưu vực LamaH-CE mức A; train 01/2003–12/2009, validation 2010–2013, test 2014–2017; `seq_length` 365, `forecast_seq_length` 1; LSTM 128, dropout đầu ra 0,3, Adam lr 1e-3, CosineAnnealing 30 epoch, cắt gradient 1, hàm mất mát NSE (chia theo độ lệch chuẩn từng lưu vực), dừng sớm theo NSE validation (patience 5, min_delta 0,005); mọi cấu hình cùng hạt giống 111 (1 lần chạy). Mô hình tốt nhất (Sequential Forecast LSTM có Q): hindcast 32 biến (ERA5-Land 21, E-OBS 7, MSWEP 1, GLEAM 2, `qmean`), forecast 5 biến ECMWF (t2m, d2m, ssrd, tp, e), 33 thuộc tính tĩnh, nhãn `qmax`.
+
+**Tự tính lại từ `test_metrics.csv` của tác giả (trung vị NSE / KGE, 451 lưu vực).** CrossDomain tái phân tích 0,581 → chạy với dự báo 0,327; Sequential Forecast LSTM có Q 0,705 / 0,774 (Complex) và 0,705 / 0,767 (Simple); không Q 0,609–0,628; Encoder–Decoder LSTM có Q 0,662–0,672, không Q 0,568–0,591; học chuyển giao 0,388–0,440; baseline CUDA LSTM chỉ dự báo 0,387, chỉ tái phân tích 0,688–0,692, tái phân tích + dự báo 0,679–0,701. Khớp các số trong tóm tắt bài (0,58 → 0,33; 0,63; 0,71).
+
+**Vấn đề phát hiện.**
+- Chỉ 1 hạt giống cho mọi cấu hình; chênh lệch nhỏ (khoảng 0,01–0,02 NSE) giữa các biến thể không phân biệt được với nhiễu.
+- Baseline CUDA LSTM "tái phân tích" và "tái phân tích + dự báo" nhận khí tượng tái phân tích của chính ngày nhãn (thời tiết hoàn hảo), nên là mốc tham chiếu trên, không phải cấu hình vận hành được.
+- Đầu vào hindcast dùng tái phân tích tới hôm trước; thực tế ERA5-Land, E-OBS, GLEAM công bố trễ nhiều ngày — cấu hình không lùi đầu vào theo độ trễ công bố (tác giả tự nêu hạn chế này ở Mục 3.7).
+- Thí nghiệm có Q đọc thư mục `LamaH_expanded_q_input` — không có trong bản Zenodo; phải tự chép cột `qmean` từ `D_gauges` vào tệp khí tượng mức A (do bộ nạp chỉ nạp 1 cột lưu lượng).
+- Đơn vị lưu lượng: bộ nạp `datasetzoo/lamah.py` chỉ nạp 1 cột lưu lượng từ `D_gauges` (cột nhãn đầu tiên khớp, ở đây `qmax`) và luôn chia theo diện tích `area_gov` sang mm/ngày; tệp `D_gauges` của Extended LamaH-CE có cột `qmin;qmean;qmax` cùng đơn vị m³/s (kiểm tệp `ID_205.csv`). `qmean` đầu vào đọc từ thư mục khí tượng riêng, không đổi đơn vị; scaler của tác giả cho `qmean` trung bình 4,58 / độ lệch 16,15 so với `qmax` 2,57 / 5,26 — nhiều khả năng `qmean` ở m³/s còn nhãn ở mm/ngày (chưa kiểm được vì thư mục không công khai). NSE theo lưu vực không bị ảnh hưởng bởi đơn vị nhãn.
+- Lọc mẫu huấn luyện (`basedataset.py`, `_validate_samples`): mẫu bị loại nếu bất kỳ cột nào trong 37 biến động có giá trị thiếu ở bất kỳ ngày nào của cửa sổ 365 ngày — kể cả cột ECMWF ở các ngày hindcast mà mô hình không dùng, và `qmean` ở biến thể có Q; validation và test giữ mọi mẫu. Nếu ECMWF bắt đầu từ 2003 thì phần lớn năm 2003 mất mẫu huấn luyện (năm bắt đầu chưa kiểm).
+- Dừng sớm và chọn mô hình theo **trung vị** NSE validation qua các lưu vực (`logger.py` trả trung vị cho mọi chỉ số validation).
+- Hàm mất mát NSE* dùng độ lệch chuẩn `qmax` từng lưu vực tính trên dữ liệu chưa chuẩn hóa (mm/ngày) làm trọng số cho sai số trên dữ liệu đã chuẩn hóa toàn cục — như NeuralHydrology gốc.
+- Mạng handoff của Encoder–Decoder LSTM (`handoff_forecast_lstm.py`, `state_handoff_network: hiddens 128`): `FC` một lớp không có kích hoạt, tiếp theo `handoff_linear` tuyến tính → ánh xạ tuyến tính 256 → 128 → 256; bài mô tả là mạng phi tuyến.
+- 24 cấu hình: mọi cấu hình Sequential Forecast LSTM và Encoder–Decoder LSTM cùng siêu tham số (hidden 128, batch 256, dropout 0,3, không nhiễu nhãn); các baseline có bộ khác nhau (hidden 128–256, dropout 0,2–0,4, nhiễu nhãn 0,001–0,1) — chưa rõ tối ưu Bayes chạy riêng cho từng kiến trúc hay không.
+- `_is_best_model` so với `best_value` không tính `min_delta` trong khi `EarlyStopping` chỉ cập nhật `best_value` khi cải thiện > 0,005: `best_model.pt` có thể bị ghi đè bởi epoch kém hơn epoch đã lưu trước đó tối đa 0,005 NSE validation.
+- Bài ghi dự báo ECMWF HRES lấy trung bình 8 giá trị 3 giờ từ lần phát hành 00 UTC của ngày t (Mục 2.1); mã tạo Extended LamaH-CE không công khai nên chưa kiểm được từ mã, căn chỉnh giữa ngày UTC và ngày của LamaH-CE chưa xác nhận.
+- Nhúng "đơn giản" (`hiddens: [16]`) trong mã là một lớp `Linear` thuần: lớp `FC` của NeuralHydrology không áp hàm kích hoạt cho lớp cuối; Mục 2.2.6 của bài mô tả có tanh, Mục 3.5 gọi là nhúng tuyến tính. Số tham số tính từ mã: Sequential Forecast LSTM nhúng đơn giản 84.785, nhúng phức tạp (30-20-64) 143.291.
+
+**Tái lập.** Theo README: cài fork NeuralHydrology, sửa đường dẫn trong `config.yml`, chạy notebook để huấn luyện hoặc nạp `best_model.pt` qua `checkpoint_path`. Yêu cầu Python 3.12.3 và GPU CUDA. Chưa chạy thử.
+
+**Điểm chèn Mamba.** Thêm mô hình vào `modelzoo` của fork NeuralHydrology, thay LSTM trong Sequential Forecast LSTM; lưu ý lớp Mamba có sẵn của NeuralHydrology bị sai trục (Mục 13).
+
+---
+
+## 16. Kết luận từ việc đọc mã nguồn
 
 1. **#104:** mã nhỏ, dễ chèn bộ mã hóa thời gian; lỗi NSE và validation sửa được; có checkpoint để tính lại.
-2. **#67:** mã của bài sạch nhất (NSE chuẩn, đơn vị gốc, scaler kỳ train, không chọn mô hình trên test); thư viện có sẵn chế độ dự báo đã chạy thử được.
-3. **#22:** khung nhỏ, thay một dòng khởi tạo lớp SSM; NSE chuẩn; phải sửa cấu hình về Bảng S3.
-4. **#6:** tái lập nhanh nhất để làm baseline, cần đồng nhất hàm mất mát.
-5. **#53, #42:** chọn mô hình hoặc cấu hình dựa trên tập test.
-6. **#71/#54, #103:** thiếu tiền xử lý hoặc có lỗi khiến không tái lập được số liệu.
-7. Chưa chạy repo nào trên dữ liệu thật; Mamba cần GPU CUDA.
+2. **#121 BiasCast:** mã dựa trên NeuralHydrology, công khai đủ cấu hình, trọng số và kết quả test theo lưu vực; dữ liệu nhẹ.
+3. **OpenHydroNet:** mã chất lượng nhất (Google duy trì, có kiểm thử, tài liệu); không có mốc công bố tái lập được trên dữ liệu công khai, trọng số sẵn không dùng làm mốc theo thời gian.
+4. **#67:** mã của bài sạch nhất (NSE chuẩn, đơn vị gốc, scaler kỳ train, không chọn mô hình trên test); thư viện có sẵn chế độ dự báo đã chạy thử được.
+5. **#22:** khung nhỏ, thay một dòng khởi tạo lớp SSM; NSE chuẩn; phải sửa cấu hình về Bảng S3.
+6. **#6:** tái lập nhanh nhất để làm baseline, cần đồng nhất hàm mất mát.
+7. **#53, #42:** chọn mô hình hoặc cấu hình dựa trên tập test.
+8. **#71/#54, #103:** thiếu tiền xử lý hoặc có lỗi khiến không tái lập được số liệu.
+9. Chưa chạy repo nào trên dữ liệu thật; Mamba cần GPU CUDA.
