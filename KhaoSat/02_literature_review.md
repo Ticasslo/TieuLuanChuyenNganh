@@ -1,6 +1,6 @@
 # Khảo sát tài liệu — Mamba và bài toán dự báo lưu lượng dòng chảy
 
-> Tài liệu trình bày kết quả khảo sát tính hợp lý của đề tài theo hai yêu cầu đánh giá: **(1) yêu cầu riêng cho nhóm nghiên cứu** — đánh giá Mamba có cải thiện đáng kể trong các công trình đã công bố hay không (Mục 1), và tìm ít nhất 5 bài báo trong 5 năm gần đây giải quyết bài toán dự báo lưu lượng theo tiêu chí uy tín: không MDPI, không chỉ là preprint, trích dẫn ≥ 5, ưu tiên Scimago Q1/Q2, ưu tiên Việt Nam → Đông Nam Á → châu Á, **bắt buộc đăng ở tạp chí/hội nghị ngành CNTT hoặc AI** (Mục 2); **(2) yêu cầu chung** — tiểu luận phải ra được demo/phần mềm (Mục 3). Số trích dẫn và hạng Scimago lấy từ Google Scholar và Scimago tại thời điểm tra (08–09/2026).
+> Tài liệu trình bày kết quả khảo sát tính hợp lý của đề tài theo hai yêu cầu đánh giá: **(1) yêu cầu riêng cho nhóm nghiên cứu** — đánh giá Mamba có cải thiện đáng kể trong các công trình đã công bố hay không (Mục 1), và tìm ít nhất 5 bài báo trong 5 năm gần đây giải quyết bài toán dự báo lưu lượng theo tiêu chí uy tín: không MDPI, không chỉ là preprint, trích dẫn ≥ 5, ưu tiên Scimago Q1/Q2, ưu tiên Việt Nam → Đông Nam Á → châu Á, **ưu tiên tạp chí/hội nghị ngành CNTT hoặc AI** (có ưu thế về AI) (Mục 2); **(2) yêu cầu chung** — tiểu luận phải ra được demo/phần mềm (Mục 3). Số trích dẫn và hạng Scimago lấy từ Google Scholar và Scimago tại thời điểm tra (08–09/2026).
 >
 > Hướng đề tài hiện tại: tự xây dựng và so sánh mô hình trên 4 bộ dữ liệu benchmark công khai (`Dataset.md`, `flood-forecasting-research.md`); RiverMamba là tài liệu tham khảo về kiến trúc.
 
@@ -65,7 +65,7 @@ Bài toán của đề tài là dự báo **lưu lượng dòng chảy (Q)**; ng
 
 ### 2.1. Dự báo lưu lượng dòng chảy
 
-Tiêu chí: không MDPI, không chỉ preprint, trích dẫn ≥ 5, ưu tiên Scimago Q1/Q2, trong giai đoạn 2021–2026, bắt buộc ngành CNTT/AI (Scimago Subject Category có Computer Science/Artificial Intelligence, hoặc venue IEEE/ACM).
+Tiêu chí: không MDPI, không chỉ preprint, trích dẫn ≥ 5, ưu tiên Scimago Q1/Q2, trong giai đoạn 2021–2026, ưu tiên ngành CNTT/AI (Scimago Subject Category có Computer Science/Artificial Intelligence, hoặc venue IEEE/ACM).
 
 **Việt Nam**
 

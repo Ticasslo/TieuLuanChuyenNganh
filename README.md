@@ -13,6 +13,7 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `BaiCoSo/RESEARCHDONE.md` | Tổng hợp các bài quan trọng và xếp hạng ứng viên bài cơ sở |
 | `BaiCoSo/CHECKPDF.md` | Báo cáo đọc toàn văn các ứng viên bài cơ sở, tiêu chí, xếp hạng và đề xuất |
 | `BaiCoSo/CHECKCODE.md` | Báo cáo đọc mã nguồn các ứng viên bài cơ sở |
+| `LamaHCE/` | Ghi chú và mã tải, xử lý bộ dữ liệu LamaH-CE cho bài cơ sở (chạy trên Kaggle) |
 | `LyThuyet/LyThuyetCauTruc.md` | Ghi chú lý thuyết LSTM, Transformer, GRU, Mamba kèm ví dụ số |
 | `LyThuyet/RiverMamba.md` | Ghi chú đọc mã nguồn RiverMamba (tài liệu tham khảo) |
 

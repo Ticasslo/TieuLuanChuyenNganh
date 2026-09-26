@@ -1918,7 +1918,7 @@ Nội dung
 3. Kiến trúc model
 GNN (GCN, GAT…) mô hình hóa lưu lượng trên mạng lưới trạm, so các cách định nghĩa ma trận kề; kết quả: đồ thị thô KHÔNG cải thiện. Tác giả: Kirschstein, Sun
 4. Tạp chí & ngành
-ICML 2024 (PMLR, tr. 24713–24725), arXiv 2405.19836 — ✅ Hội nghị ML — DOI 10.5555/3692070.3693060 (Crossref, 26/9/2026)
+ICML 2024, PMLR 235:24713–24725, https://proceedings.mlr.press/v235/kirschstein24a.html, arXiv 2405.19836 — ✅ Hội nghị ML — không có DOI đăng ký (mã `10.5555/3692070.3693060` chỉ là định danh trang ACM DL, doi.org không phân giải được)
 5. Xếp hạng Q
 Hội nghị — CORE A* (ICML, chưa tra lại portal CORE)
 6. Dataset

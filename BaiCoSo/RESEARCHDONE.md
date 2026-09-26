@@ -17,10 +17,10 @@
 
 | Hạng | # | Bài | Venue | Dữ liệu | Nhận xét chính |
 |---|---|---|---|---|---|
-| **1** | #104 | Kirschstein & Sun — *The Merit of River Network Topology for Neural Flood Forecasting* | ICML 2024 (CORE A*) | LamaH-CE theo giờ 2000–2017, 358 trạm | Dự báo 6 giờ; bộ mã hóa thời gian chỉ là một lớp affine → chỗ cải tiến bằng Mamba rõ nhất; có 162 checkpoint; mã tính NSE sai công thức (sửa được, không đảo kết luận so sánh) |
-| **2** | #67 | Acuña Espinoza và cs. — MF-LSTM | HESS 2025 (Q1) | CAMELS-US theo giờ 1990–2018, 516 lưu vực | Chuỗi dài nhất (8.760 bước), phương pháp chuẩn nhất, thư viện Hy2DL có chế độ dự báo; bài gốc là mô phỏng |
-| **2** | #22 | Wang và cs. — S4D-FT | WRR 2025 (Q1) | CAMELS-US ngày, 531 lưu vực | So sánh S4D-FT với Mamba và B2S6 có cơ sở lý thuyết; bài gốc là mô phỏng, phần chuyển sang dự báo đã có (HydroDiffusion) |
-| 4 | #103 | Wang, Chen, Zheng, Song — FloodGNNs | npj Natural Hazards 2025 | LamaH-CE theo giờ | Hợp đề tài; mã lỗi import, kết quả chỉ dạng hình → baseline đồ thị dense cho #104 |
+| **1** | #104 | Kirschstein & Sun — *The Merit of River Network Topology for Neural Flood Forecasting* | ICML 2024 (CORE A*) | LamaH-CE theo giờ 2000–2017, 358 trạm | Dự báo 6 giờ; bộ mã hóa thời gian chỉ là một lớp affine → chỗ cải tiến bằng Mamba rõ nhất; có 957 checkpoint (162 cho thí nghiệm chính); mã tính NSE sai công thức (sửa được bằng checkpoint; ảnh hưởng lên kết luận so sánh cần tính lại) |
+| **2** | #67 | Acuña Espinoza và cs. — MF-LSTM | HESS 2025 (Q1) | CAMELS-US theo giờ 1990–2018, 516 lưu vực | Chuỗi dài nhất (8.760 bước), phương pháp chuẩn nhất, thư viện Hy2DL có chế độ dự báo; nhẹ hơn #22 trên GPU miễn phí; bài gốc là mô phỏng |
+| **3** | #22 | Wang và cs. — S4D-FT | WRR 2025 (Q1) | CAMELS-US ngày, 531 lưu vực | So sánh S4D-FT với Mamba và B2S6 có cơ sở lý thuyết; bài gốc là mô phỏng, phần chuyển sang dự báo đã có (HydroDiffusion); chi phí huấn luyện lớn nhất |
+| 4 | #103 | Wang, Chen, Zheng, Song — FloodGNNs | npj Natural Hazards 2025 | LamaH-CE theo giờ | Hợp đề tài; mã lỗi import, không có checkpoint, kết quả chỉ dạng hình → baseline đồ thị dense cho #104 |
 | 5 | #71 (+#54) | FHNN | ICDM 2025 (CORE A*) + WRR 2025 | CAMELS-US ngày | Dự báo 1–7 ngày; không tái lập được số liệu (thiếu tiền xử lý) |
 | 6 | #53 | HydroTFT | Machine Learning: Earth 2026 | CAMELS-US ngày | Chọn epoch trên tập test |
 | 7 | #42 | TFRN | IEEE TGRS 2025 | CAMELS + CAMELS-AUS | NSE gộp mọi lưu vực; cấu hình chọn trên tập test |
@@ -60,9 +60,10 @@
 **1.3. Các bài venue CNTT/AI không có mã nguồn:** #122 EAAI 2026 (LamaH-CE), #123 ESWA 2025 (WaterBench-Iowa), #124 Neural Networks 2026 (Columbia DART theo giờ, 2016–2019). #4: repo hydroDL không chứa mã Transformer của bài.
 
 **1.4. Kết quả rà soát bổ sung.**
+- Rà lại toàn bộ 137 bài theo tiêu chí có mã nguồn + bài toán dự báo + dữ liệu miễn phí dài năm + venue uy tín (26/9/2026): không có bài nào vượt Kirschstein & Sun (#104). Các bài venue CNTT/AI còn lại hoặc không có mã (#107, #122–#124, #130–#133, #137), hoặc khác bài toán (#47 tái tạo chuỗi, #45 lưu vực không trạm, #127–#129 đồng hóa dữ liệu), hoặc cần tài nguyên vượt khả năng (#105).
 - Rà GitHub cho 18 bài có đóng góp kiến trúc nhưng ghi "không có mã" (#1, #5, #9, #14, #21, #23, #24, #32, #37, #41, #69, #70, #72, #77, #79, #94, #108, #117): chỉ #37 HydEquivNet có repo nhưng repo rỗng.
 - Tra mạng theo các hướng Mamba/SSM, xLSTM, Caravan, TSFM, GNN, dữ liệu giờ, LamaH-CE, WaterBench, Columbia, Transformer, TCN/KAN, venue CNTT/AI, và tra ngược GitHub: bổ sung #135, #136, #137; ngoài RiverMamba không có repo Mamba nào cho dòng chảy gắn với bài đã xuất bản.
-- Loại khi tra: xLSTM 430 lưu vực Canada (SSRN), học bán giám sát CAMELS-DE (HESS Discussions), Benford Loss, DL vs National Water Model (1 trạm), Mamba_Runoff_demo (repo trống), Vischer và cs. HESS 2025 (chỉ có mã tiền xử lý), Izadi và cs. ESWA 2024, Wang và cs. EMS 2024, Liu và cs. ESWA 2025, BS-Former 2024, PatchTST-LSTM WRM 2026, TiDE/N-HiTS/PatchTST JAWRA 2026, KAN-LSTM HESS 2026, FlowNet (arXiv), Yu và cs. HESS 2024.
+- Loại khi tra: xLSTM 430 lưu vực Canada (SSRN), học bán giám sát CAMELS-DE (HESS Discussions), Benford Loss, DL vs National Water Model (1 trạm), Mamba_Runoff_demo (repo trống), Vischer và cs. HESS 2025 (chỉ có mã tiền xử lý), Izadi và cs. ESWA 2024, Wang và cs. EMS 2024, Liu và cs. ESWA 2025, BS-Former 2024, PatchTST-LSTM WRM 2026, TiDE/N-HiTS/PatchTST JAWRA 2026, KAN-LSTM HESS 2026, FlowNet (arXiv), Yu và cs. HESS 2024; các mô hình đồ thị nhân quả không gian–thời gian CSF (#133, IEEE BigData 2024: 73 trạm Brazos, dữ liệu ngày 1967–1977, không có mã), CauSTream (#132, IEEE BigData 2025: không có mã), STREAMS (mã công khai nhưng xuất bản 2023, repo không kèm dữ liệu), TC-GTN (workshop Climate Change AI tại NeurIPS 2025).
 
 **1.5. Về venue.** Trong các ứng viên, #104 (ICML) và #71 (ICDM) thuộc venue CNTT/AI; #36 ở ESWA (CNTT/AI) nhưng xếp thấp vì là mô hình lai. Các bài còn lại ở tạp chí thủy văn Q1. Có thể lập luận: kiến trúc gốc thuộc venue AI (Mamba — COLM 2024; PatchTST — ICLR 2023; Informer — AAAI 2021), bài cơ sở là bài ứng dụng.
 

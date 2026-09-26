@@ -4,7 +4,7 @@
 
 ## Tóm tắt
 
-- **Xếp hạng:** 1. **#104** (Kirschstein & Sun, ICML 2024) · 2. **#67** (Acuña Espinoza và cs., HESS 2025) và **#22** (Wang và cs., WRR 2025) đồng hạng · 4. #103 · 5. #71/#54 · 6. #53 · 7. #42 · 8. #6 · 9. #36 · 10. #135 · 11. #38. Các bài #122, #123, #124 không có mã nguồn, chỉ dùng để trích dẫn; MTPre chưa xuất bản (đánh giá ở Mục 5.10).
+- **Xếp hạng:** 1. **#104** (Kirschstein & Sun, ICML 2024) · 2. **#67** (Acuña Espinoza và cs., HESS 2025) · 3. **#22** (Wang và cs., WRR 2025) · 4. #103 · 5. #71/#54 · 6. #53 · 7. #42 · 8. #6 · 9. #36 · 10. #135 · 11. #38. Các bài #122, #123, #124 không có mã nguồn, chỉ dùng để trích dẫn; MTPre chưa xuất bản (đánh giá ở Mục 5.10).
 - **Bài cơ sở đã chốt (26/9/2026): #104** — bài gốc là bài toán dự báo, mô hình chưa có thành phần học chuỗi thời gian (chỗ cải tiến bằng Mamba rõ ràng), cho phép xây dựng kiến trúc không gian–thời gian (Mamba + GNN), có dữ liệu mạng sông để làm XAI theo không gian và demo bản đồ.
 
 ---
@@ -32,7 +32,7 @@
 | | A2. Cải tiến được | Có chỗ chèn Mamba tự nhiên; có động cơ lấy từ hạn chế do chính bài nêu; chưa có công trình làm; đo được cải thiện trong khung so sánh công bằng; có hướng cải tiến phụ |
 | **B — điều kiện cần** | B1. Mã nguồn, tái lập | Mã công khai, chạy được, số liệu tái lập được |
 | | B2. Dữ liệu | Công khai, miễn phí, đủ lớn cho học sâu |
-| | B3. Tài nguyên tính toán | Chạy được trên Google Colab (người dùng có Colab Pro) hoặc Kaggle (GPU T4; 12 giờ/phiên, 30 giờ/tuần theo tài liệu Kaggle). `mamba-ssm` biên dịch cho kiến trúc sm_75 trở lên nên chạy được trên T4, không chạy trên P100 (sm_60) |
+| | B3. Tài nguyên tính toán | Chạy được trên Google Colab (bản miễn phí) hoặc Kaggle (GPU T4; 12 giờ/phiên, 30 giờ/tuần theo tài liệu Kaggle). `mamba-ssm` biên dịch cho kiến trúc sm_75 trở lên nên chạy được trên T4, không chạy trên P100 (sm_60) |
 | | B4. Độ dài dữ liệu và chuỗi | Dữ liệu dài nhiều năm, chuỗi đầu vào đủ dài để thể hiện ưu thế của Mamba |
 | **C — điểm cộng** | C1. Độ tin cậy phương pháp | Chia tập theo thời gian, có validation độc lập, NSE tính theo trạm, nhiều hạt giống |
 | | C2. Uy tín | Nơi công bố, số trích dẫn |
@@ -41,7 +41,7 @@
 | | C5. Mở rộng sang bộ dữ liệu khác | Cách làm chuyển được sang bộ dữ liệu thứ hai |
 | | C6. Rủi ro cải tiến không thắng | Baseline gốc mạnh tới đâu, còn dư địa hay không |
 
-Venue CNTT/AI là điểm cộng đối với bài cơ sở (bắt buộc đối với phần khảo sát tài liệu). Độ khó của mã nguồn không được xem là tiêu chí.
+Venue ngành CNTT/AI là điểm cộng (có ưu thế về AI), không phải điều kiện bắt buộc. Phân biệt mô phỏng và dự báo: **mô phỏng** chỉ dùng khí tượng tính cả thời điểm hiện tại để ước lượng Q của chính thời điểm đó, không dùng Q quan trắc (phục vụ lưu vực không có trạm, kịch bản khí hậu); **dự báo** dùng dữ liệu tới thời điểm t, thường có Q quan trắc quá khứ, để ước lượng Q sau t (phục vụ cảnh báo). Phân loại: bài cơ sở, RiverMamba (Q quá khứ là GloFAS reanalysis, không phải Q trạm) và MTPre là dự báo; #67 và #22 là mô phỏng. Độ khó của mã nguồn không được xem là tiêu chí.
 
 ---
 
@@ -76,27 +76,28 @@ Chưa tải: Supplement của #6, #38, #54; bảng bổ sung S1–S5 của #135;
 
 ### 4.1. #104 — The Merit of River Network Topology for Neural Flood Forecasting
 
-**Thông tin xuất bản.** Nikolas Kirschstein, Yixuan Sun (University of Oxford; Technical University of Munich). Proceedings of the 41st International Conference on Machine Learning (ICML 2024), PMLR 235, tr. 24713–24725 — hội nghị CORE A*, ngành CNTT/AI. Mã nguồn `github.com/nkirschi/neural-flood-forecasting` (đẩy lần cuối 31/03/2025, không có tệp LICENSE).
+**Thông tin xuất bản.** Nikolas Kirschstein, Yixuan Sun (University of Oxford; Technical University of Munich). Proceedings of the 41st International Conference on Machine Learning (ICML 2024), PMLR 235, tr. 24713–24725, `proceedings.mlr.press/v235/kirschstein24a.html` (bài không có DOI đăng ký; OpenReview `QE6iC9s6vU` ghi "ICML 2024 Poster") — hội nghị CORE A*, ngành CNTT/AI. Mã nguồn `github.com/nkirschi/neural-flood-forecasting` (đẩy lần cuối 31/03/2025, không có tệp LICENSE).
 
 **Bài toán.** Dự báo lưu lượng theo giờ đồng thời cho toàn bộ mạng trạm đo (hồi quy trên nút đồ thị): từ W giờ gần nhất (lưu lượng + 4 biến khí tượng) của mọi trạm, dự báo lưu lượng sau L giờ. Câu hỏi nghiên cứu: đưa cấu trúc mạng sông vào mô hình bằng mạng nơ-ron đồ thị (GNN) có cải thiện dự báo không.
 
 **Dữ liệu và giao thức.**
-- LamaH-CE theo giờ (CC BY 4.0); thành phần liên thông "Danube A" (608/859 trạm), lọc trạm có dữ liệu đầy đủ 2000–2017 còn **358 trạm**; nối lại cạnh khi xóa trạm để giữ liên thông.
+- LamaH-CE theo giờ (CC BY-SA 4.0; tệp `1_LamaH-CE_daily_hourly.tar.gz` 14,8 GB, giải nén toàn bộ khoảng 70 GB theo trang Zenodo); thành phần liên thông "Danube A" (608/859 trạm), lọc trạm có dữ liệu đầy đủ 2000–2017 còn **358 trạm**; nối lại cạnh khi xóa trạm để giữ liên thông.
 - Biến khí tượng: mưa, độ ẩm đất lớp mặt, nhiệt độ không khí, áp suất bề mặt. Chuẩn hóa z-score theo trạm với thống kê 2000–2015.
 - Tập kiểm tra 2016–2017; ba cách chọn 8 năm huấn luyện (năm chẵn 2000–2015, năm lẻ 2000–2015, liên tục 2008–2015). Validation là 1/5 số cửa sổ huấn luyện chọn ngẫu nhiên.
 - Cửa sổ W = 24 giờ, lead time L = 6 giờ. Quy mô: 358 trạm × 157.800 giờ ≈ 56,5 triệu bước trạm–giờ (≈ 1,1 GB float32).
 
 **Mô hình.** Kiến trúc "bánh kẹp": làm phẳng cửa sổ W giờ × 5 biến rồi đưa qua một lớp affine → N = 19 lớp GNN (bằng đường đi dài nhất của đồ thị) → lớp affine giải mã. Ba loại lớp ResGCN, GCNII, ResGAT; sáu định nghĩa ma trận kề (cô lập, nhị phân, chiều dài sông, chênh cao, độ dốc, học được); ba hướng cạnh.
 
-**Huấn luyện và đánh giá.** Adam, lr 1e-4, 100 epoch, batch 64, L2 1e-5; hàm mất mát MSE nhân "điểm liên quan" (ưu tiên cửa sổ biến động mạnh); chọn trạng thái có loss validation nhỏ nhất; mỗi cấu hình 1 hạt giống × 3 cách chia năm. Chỉ số: NSE có trọng số, trung bình qua các trạm.
+**Huấn luyện và đánh giá.** Adam, lr 1e-4, 100 epoch, batch 64, L2 1e-5; hàm mất mát MSE nhân "điểm liên quan" (ưu tiên cửa sổ biến động mạnh); chọn trạng thái có loss validation nhỏ nhất; mỗi cấu hình 1 hạt giống × 3 cách chia năm. Chỉ số: NSE có trọng số theo "relevancy score", tính trên lưu lượng đã khử chuẩn hóa rồi lấy trung bình qua các trạm; bài ghi dạng phần trăm (NSE × 100, ví dụ 85,37% tương ứng NSE 0,8537) và báo cáo trung bình ± độ lệch chuẩn qua 3 cách chia. Chú thích 3 của bài cho biết NSE không trọng số cho kết quả định tính tương tự nhưng giá trị cao hơn. Bài mô tả NSE nằm trong [0, 1], trong khi NSE có thể âm. Vị trí trong bài: chia tập ở Mục 3.1 (tr. 3); bài toán, relevancy score, hàm mất mát và "Testing Metric" ở Mục 3.2 (tr. 3–4); siêu tham số ở Mục 4.1 và Bảng 1 (tr. 5); kết quả ở Mục 4.2 và Bảng 2 (tr. 6); ảnh hưởng cửa sổ và lead time ở Phụ lục A.4, Bảng A.8 (tr. 13).
 
-**Kết quả.** NSE có trọng số của mọi tổ hợp nằm trong 80,2%–85,6%; không tổ hợp đồ thị nào vượt MLP 2 lớp (85,37% ± 1,64%); bỏ hết cạnh không làm giảm hiệu năng quá độ lệch chuẩn; trọng số cạnh học được không tương quan với trọng số vật lý. Trạm kém nhất có các đỉnh đột ngột, hẹp mà mô hình bỏ lỡ.
+**Kết quả.** NSE có trọng số của mọi tổ hợp nằm trong 80,2%–85,6% (Bảng 2); không tổ hợp đồ thị nào vượt MLP 2 lớp (85,37% ± 1,64%) quá độ lệch chuẩn — cao nhất là GCNII, trọng số học được, hai chiều đạt 85,56% ± 1,41%, cao hơn MLP về số nhưng nằm trong độ lệch chuẩn; bỏ hết cạnh không làm giảm hiệu năng quá độ lệch chuẩn; trọng số cạnh học được không tương quan với trọng số vật lý. Trạm kém nhất có các đỉnh đột ngột, hẹp mà mô hình bỏ lỡ.
 
 **Kết quả kiểm chứng mã nguồn và chạy thử.**
-- **Lỗi công thức NSE:** hàm `evaluate_nse` lấy trung bình lưu lượng ở đơn vị gốc (m³/s) trừ cho nhãn đã chuẩn hóa. Mẫu số NSE bị thổi phồng xấp xỉ μ² lần ở trạm có lưu lượng trung bình lớn, đẩy NSE sát 1 (28% trạm có NSE > 0,99 trong tệp kết quả tác giả nộp). Giá trị NSE tuyệt đối của bài vì thế không dùng được. Do mẫu số của mỗi trạm như nhau với mọi mô hình, **thứ tự giữa các mô hình trên cùng trạm được giữ nguyên**, nên kết luận "đồ thị không hơn MLP" nhiều khả năng vẫn đúng.
+- **Lỗi công thức NSE:** hàm `evaluate_nse` lấy trung bình lưu lượng ở đơn vị gốc (m³/s) trừ cho nhãn đã chuẩn hóa. Mẫu số NSE bị thổi phồng xấp xỉ μ² lần ở trạm có lưu lượng trung bình lớn, đẩy NSE sát 1 (28% trạm có NSE > 0,99 trong tệp kết quả tác giả nộp). Giá trị NSE tuyệt đối của bài vì thế không dùng được. Do mẫu số của mỗi trạm như nhau với mọi mô hình, **thứ tự giữa các mô hình trên cùng trạm được giữ nguyên**; thứ tự sau khi lấy trung bình qua các trạm có thể đổi, nên kết luận "đồ thị không hơn MLP" cần tính lại để xác nhận.
 - Validation chọn ngẫu nhiên trên các cửa sổ chồng lấn nên không độc lập với tập huấn luyện.
 - Bộ nạp dữ liệu cắt cửa sổ **bên trong từng năm**: cửa sổ không vượt ranh giới năm, mỗi năm mất W + L mẫu; cửa sổ dài từ 1 năm trở lên không chạy được với cấu trúc hiện tại.
-- Kèm theo 162 checkpoint (1,9 GB), đủ để tính lại NSE đúng mà không cần huấn luyện lại. Việc tính lại cần tải 14,8 GB dữ liệu giờ; tốc độ tải trên máy hiện tại (0,37–0,75 MB/s) không phù hợp, nên thực hiện trên Colab.
+- **Các sai khác mã–bài khác** (chi tiết `CHECKCODE.md` Mục 1): trọng số relevancy tính trung bình đạo hàm trên cả batch thay vì từng trạm; ResGAT bỏ qua trọng số cạnh vật lý do không khai báo `edge_dim` (các dòng ResGAT có trọng số ở Bảng 2(c) thực chất gần như đồ thị nhị phân); nạp checkpoint với `strict=False`; lọc trạm chặt hơn mô tả; validation lấy ngẫu nhiên 1/5 các cửa sổ chồng lấn.
+- Kèm theo 957 checkpoint (1,9 GB; 162 cho thí nghiệm chính ở Bảng 2 = 18 cấu hình đồ thị × 3 kiến trúc × 3 cách chia, 3 cho MLP, 108 cho ablation, 684 cho mạng con), đủ để tính lại NSE đúng mà không cần huấn luyện lại. Việc tính lại cần 14,8 GB dữ liệu giờ; dữ liệu được tải trên Kaggle và lưu thành Kaggle Dataset (`LamaHCE/LamaHCE.md`).
 - Mã gồm khoảng 880 dòng Python và 8 notebook phân tích.
 
 **Tính mới của hướng cải tiến.** 15 công trình trích dẫn (Semantic Scholar) và các công trình trích dẫn #103 không có công trình nào dùng Mamba làm bộ mã hóa thời gian trên LamaH-CE. Công trình gần nhất là Mosaffa và cs. (HESS 2026, #120) ghép LSTM với GNN trên LamaH-CE **theo ngày**, không dùng Q quá khứ (Mục 6).
@@ -178,7 +179,7 @@ S4D-FT tốt ở lưu vực khô hạn, tuyết chi phối, ít "flashy"; kém �
 
 Wang, Chen, Zheng, Song. npj Natural Hazards 2:45 (2025), DOI `10.1038/s44304-025-00083-6`; mã `github.com/Dreamzz5/FloodGNNs` (MIT). Dự báo nhiều bước (24 giờ quá khứ → 24 giờ tới) trên 358 trạm LamaH-CE (tiền xử lý theo #104), train 2010–2015, test 2016–2017. Đóng góp: giải thích việc đồ thị không giúp trong #104 bằng hiện tượng over-squashing trên cây sông và đề xuất **đồ thị dense theo khả năng tới được** (RBF trên chiều dài sông). Kết quả chỉ trình bày dạng hình: đồ thị dense hơn topo/cô lập và EA-LSTM, rõ hơn ở tầm xa và dòng lớn; NSE 24 giờ của GNN xấp xỉ NSE 14 giờ của EA-LSTM.
 
-Đối chiếu mã: cấu hình import `GCN_Point` nhưng module chỉ có `FloodGNN` (lỗi import khi chạy nguyên trạng); loss MSE trong khi bài ghi MAE; NSE cộng gộp mọi trạm, không trọng số, trong khi bài ghi NSE có trọng số; không có mã tiền xử lý (dữ liệu đã xử lý tải từ Google Drive) và mã EA-LSTM. Mô hình cũng không có thành phần học chuỗi thời gian. **Vai trò:** baseline đồ thị dense trong tiểu luận nếu chọn #104.
+Đối chiếu mã: cấu hình import `GCN_Point` nhưng module chỉ có `FloodGNN` (lỗi import khi chạy nguyên trạng); loss MSE trong khi bài ghi MAE; NSE cộng gộp mọi trạm, không trọng số, mốc so sánh là trung bình kỳ train, trong khi bài ghi NSE có trọng số; không có mã tiền xử lý (dữ liệu đã xử lý tải từ Google Drive), mã EA-LSTM và checkpoint. Mô hình cũng không có thành phần học chuỗi thời gian. **Vai trò:** baseline đồ thị dense trong tiểu luận nếu chọn #104.
 
 ### 5.2. #54 và #71 — FHNN
 
@@ -224,7 +225,7 @@ Ouyang, Deng, Ni. Water Resources Research 62, e2026WR043815 (2026), CC BY. Mô 
 
 ### 5.10. MTPre
 
-Song, Chae, Chung — Mamba-Transformer lai, CAMELS-US 674 lưu vực, mã MIT trên Zenodo `19367140`; bài đang phản biện, chưa xuất bản; chi tiết mã ở `CHECKCODE.md` Mục 12. Đánh giá sơ bộ (chỉ dựa trên README và mã, chưa có toàn văn): điểm mạnh là đã có Mamba, bài toán dự báo 7 ngày, mã MIT; điểm yếu là chưa qua phản biện, pipeline chính dùng EMD tính trên toàn chuỗi trước khi cắt cửa sổ (rò rỉ tương lai, số liệu công bố bị thổi phồng), dùng khí tượng tương lai quan trắc làm đầu vào dự báo, cửa sổ chỉ 15 ngày quá khứ (không khai thác chuỗi dài), và Mamba đã có sẵn nên hướng cải tiến chủ yếu là sửa phương pháp. Nếu được phép dùng bài chưa xuất bản, MTPre xếp khoảng hạng 7 (sau #53, trên #42); nếu không, chỉ dùng làm tham khảo.
+Song, Chae, Chung — Mamba-Transformer lai, CAMELS-US 674 lưu vực, mã MIT trên Zenodo `19367140`; bài đang phản biện, chưa xuất bản; chi tiết mã ở `CHECKCODE.md` Mục 12. Đánh giá sơ bộ (chỉ dựa trên README và mã, chưa có toàn văn): điểm mạnh là đã có Mamba, bài toán dự báo 7 ngày, mã MIT; điểm yếu là chưa qua phản biện, pipeline chính dùng EMD tính trên toàn chuỗi trước khi cắt cửa sổ (rò rỉ tương lai, số liệu công bố bị thổi phồng), dùng khí tượng tương lai quan trắc làm đầu vào dự báo, cửa sổ chỉ 15 ngày quá khứ (không khai thác chuỗi dài), và Mamba đã có sẵn nên hướng cải tiến chủ yếu là sửa phương pháp. Nếu được phép dùng bài chưa xuất bản, MTPre xếp khoảng hạng 7 (sau #53, trên #42); nếu không, chỉ dùng làm tham khảo. Khi xuất bản: nếu bản chính thức vẫn giữ EMD, hạng không đổi; nếu bỏ EMD và đăng ở venue uy tín, có thể lên khoảng hạng 3–4 (nhận định, chưa có toàn văn), vẫn sau #104 vì Mamba đã có sẵn, cửa sổ ngắn và giả định khí tượng tương lai hoàn hảo. Vai trò chắc chắn: công trình liên quan và baseline Mamba-Transformer (mã MIT, bỏ nhánh EMD).
 
 ---
 
@@ -251,10 +252,10 @@ Song, Chae, Chung — Mamba-Transformer lai, CAMELS-US 674 lưu vực, mã MIT t
 | A1. Phù hợp đề tài | Tốt — bài gốc là dự báo 6 giờ | Khá — bài gốc mô phỏng; thư viện có chế độ dự báo đã chạy thử | Khá — bài gốc mô phỏng; chuyển sang dự báo cần sửa 2 hàm |
 | A2. Cải tiến được | Tốt — bộ mã hóa thời gian chưa có; Mamba + GNN + dữ liệu giờ chưa ai làm; rủi ro từ Block-Biased Mamba khi kéo dài cửa sổ | Tốt — tác giả nêu LSTM gặp khó ở chuỗi dài; rủi ro từ Block-Biased Mamba | Tốt — S4D-FT vs Mamba vs B2S6 có cơ sở lý thuyết; phần chuyển sang dự báo đã có |
 | B1. Mã, tái lập | Khá — mã đủ, có checkpoint; phải sửa NSE | Tốt — mã bài khớp, thư viện bảo trì | Khá — phải sửa cấu hình về Bảng S3 |
-| B2. Dữ liệu | LamaH-CE, CC BY 4.0 | CAMELS-US giờ, CC BY 4.0 (~20 GB) | CAMELS-US |
+| B2. Dữ liệu | LamaH-CE, CC BY-SA 4.0 (tải 14,8 GB, giải nén ~70 GB) | CAMELS-US giờ, CC BY 4.0 (~20 GB) | CAMELS-US |
 | B3. Tài nguyên | Nhẹ ở cửa sổ 24 giờ | ~7,9 giờ/hạt giống (V100) | ~10 giờ/hạt giống (L40S) |
 | B4. Độ dài | 18 năm giờ; cửa sổ kéo được tới dưới 1 năm | 28 năm giờ, chuỗi 8.760 bước | Dữ liệu ngày, chuỗi 365 bước |
-| C1. Phương pháp | Yếu — validation ngẫu nhiên, NSE sai, 1 hạt giống | Tốt — chia theo thời gian, NSE theo lưu vực, 10 hạt giống | Trung bình — validation ngẫu nhiên |
+| C1. Phương pháp | Yếu — validation ngẫu nhiên, NSE sai, relevancy tính trên cả batch, 1 hạt giống | Tốt — chia theo thời gian, NSE chuẩn theo lưu vực ở đơn vị gốc, 10 hạt giống | Trung bình — NSE chuẩn, epoch cố định; validation ngẫu nhiên |
 | C2. Uy tín | ICML (CORE A*) | HESS Q1, nhóm Kratzert | WRR Q1 |
 | C3. Demo | Bản đồ 358 trạm theo giờ | Theo lưu vực, theo giờ | Theo lưu vực, theo ngày |
 | C4. So sánh nhiều kiến trúc | Mã nhỏ, dễ thêm LSTM/GRU/Transformer/Mamba | Registry mô hình, có LSTM/MF-LSTM/MF2LSTM | Có LSTM và S4D |
@@ -265,10 +266,10 @@ Song, Chae, Chung — Mamba-Transformer lai, CAMELS-US 674 lưu vực, mã MIT t
 
 | Hạng | Bài | Lý do chính |
 |---|---|---|
-| **1** | **#104** | Duy nhất đạt tốt cả hai tiêu chí quyết định; các nhược điểm (NSE, validation) sửa được và không đảo kết luận chính |
-| **2** | **#67** (đồng hạng) | Phương pháp chuẩn nhất, chuỗi dài nhất; bài gốc mô phỏng, lợi thế chuỗi dài bị đặt dấu hỏi |
-| **2** | **#22** (đồng hạng) | So sánh SSM bất biến ↔ chọn lọc có cơ sở lý thuyết (B2S6); bài gốc mô phỏng, chuỗi vừa phải |
-| 4 | #103 | Hợp đề tài nhưng mã lỗi, không có bảng số; làm baseline đồ thị cho #104 |
+| **1** | **#104** | Duy nhất đạt tốt cả hai tiêu chí quyết định; các nhược điểm (NSE, validation) sửa được; ảnh hưởng của lỗi NSE lên kết luận chính cần tính lại để xác nhận |
+| **2** | **#67** | Phương pháp chuẩn nhất, chuỗi dài nhất; thư viện có sẵn chế độ dự báo đã chạy thử; nhẹ hơn #22 khi chạy trên GPU miễn phí; bài gốc mô phỏng, lợi thế chuỗi dài bị đặt dấu hỏi |
+| **3** | **#22** | So sánh SSM bất biến ↔ chọn lọc có cơ sở lý thuyết (B2S6); bài gốc mô phỏng, chuỗi vừa phải; chi phí lớn nhất (~10 giờ/thành viên trên L40S, tổ hợp 8 thành viên) |
+| 4 | #103 | Hợp đề tài nhưng mã lỗi, không có bảng số, không có checkpoint, phụ thuộc dữ liệu đã xử lý của tác giả; venue ngành Khoa học Trái đất; làm baseline đồ thị cho #104 |
 | 5 | #71/#54 | Dự báo 1–7 ngày nhưng không tái lập được số liệu |
 | 6 | #53 | Dự báo, cải tiến được; chọn epoch trên tập test |
 | 7 | #42 | Dự báo, cải tiến được; NSE gộp, chọn cấu hình trên tập test |
@@ -294,7 +295,7 @@ Song, Chae, Chung — Mamba-Transformer lai, CAMELS-US 674 lưu vực, mã MIT t
 Câu hỏi nghiên cứu đề xuất: với dự báo lưu lượng theo giờ trên mạng sông, bộ mã hóa thời gian dạng SSM (Mamba) với cửa sổ dài hơn có cải thiện so với lớp affine của bài gốc hay không, và đồ thị mạng sông còn đóng góp gì khi đã có bộ mã hóa thời gian tốt. Kết quả khẳng định hay phủ định đều là câu trả lời hợp lệ; nên thống nhất cách đặt vấn đề này với GVHD từ đầu để không phụ thuộc vào việc Mamba hay đồ thị phải thắng.
 
 Phần cốt lõi (ưu tiên):
-1. Chạy lại #104, sửa công thức NSE, tính lại bằng 162 checkpoint (baseline chính xác).
+1. Chạy lại #104, sửa công thức NSE, tính lại bằng checkpoint của tác giả (162 checkpoint thí nghiệm chính + 3 MLP; baseline chính xác).
 2. Thay lớp affine bằng Mamba làm bộ mã hóa thời gian, kéo cửa sổ 24 giờ lên vài ngày–vài tuần.
 3. So sánh MLP, GNN gốc, LSTM, GRU, Transformer, S4D, Mamba (có và không có đồ thị) trong cùng điều kiện, validation chia theo thời gian. S4D (SSM bất biến theo thời gian; mã S4D của #22 đã chạy thử được trên CPU, không cần kernel CUDA riêng) là đối chứng để phân biệt "Mamba không hợp" với "SSM nói chung không hợp" nếu Mamba không vượt baseline.
 
@@ -312,11 +313,22 @@ Phần đáp ứng yêu cầu (làm ở mức cần thiết):
 | Đồ thị không đóng góp thêm khi đã có bộ mã hóa thời gian tốt | Là một câu trả lời hợp lệ của câu hỏi nghiên cứu; demo bản đồ trạm vẫn dùng được |
 | Khối lượng lớn so với một học kỳ | Ưu tiên phần cốt lõi 1–3; XAI và demo làm ở mức đáp ứng yêu cầu |
 | Cửa sổ dài cần viết lại bộ nạp dữ liệu | Viết bộ nạp theo chuỗi liên tục, dùng cách chia năm liên tục 2008–2015 |
-| Mức thổi phồng NSE chưa đo | Bước đầu tiên trên Colab: tải LamaH-CE, tính lại NSE từ checkpoint |
+| Mức thổi phồng NSE chưa đo | Bước đầu tiên: tải LamaH-CE trên Kaggle, tính lại NSE từ checkpoint |
 
-**8.4. So sánh với hai ứng viên đồng hạng 2.**
+**8.4. So sánh với hai ứng viên hạng 2 và 3.**
 - **#22** phù hợp khi muốn một nghiên cứu so sánh SSM thuần (S4D-FT, Mamba, B2S6); hạn chế: bài gốc mô phỏng, phần chuyển sang dự báo đã được nhóm tác giả thực hiện, cải tiến chỉ là thay khối, CAMELS-US không có mạng sông để thêm GNN hoặc XAI không gian.
 - **#67** phù hợp khi ưu tiên chuỗi giờ dài, phương pháp chuẩn và nhiều bộ dữ liệu (giai đoạn khóa luận); hạn chế: bài gốc mô phỏng, chế độ dự báo chưa có số liệu công bố, dữ liệu lớn, không có mạng sông.
+
+
+**8.5. Các bài hỗ trợ cho dự án dựa trên #104.**
+
+| Bài | Dùng vào việc gì |
+|---|---|
+| #22 S4D-FT | Lấy mã S4D (thuần PyTorch, đã chạy thử trên CPU) làm đối chứng SSM bất biến trong phần cốt lõi 3; HydroDiffusion và Block-Biased Mamba của cùng nhóm cho phần công trình liên quan |
+| #67 MF-LSTM / Hy2DL | Ý tưởng kết hợp tần suất ngày + giờ để kéo dài cửa sổ với chi phí thấp, làm baseline khi so sánh cửa sổ dài; giao thức đánh giá chuẩn (chia tập theo thời gian, nhiều hạt giống, NSE trung vị theo lưu vực) để khắc phục điểm yếu phương pháp của #104 |
+| #103 FloodGNNs | Cùng 358 trạm LamaH-CE, tiền xử lý theo #104: đối chiếu kết quả và baseline đồ thị dense (reachability) |
+| #120 Mosaffa và cs. | Công trình gần nhất (LSTM mã hóa thời gian + GNN định tuyến trên LamaH-CE) cho phần công trình liên quan và lập luận tính mới |
+| RiverMamba | Hàm mất mát có trọng số return period và LOAN đưa thuộc tính tĩnh vào chuẩn hóa — ý tưởng có thể thử thêm |
 
 ---
 

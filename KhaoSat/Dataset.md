@@ -53,7 +53,7 @@
 | Tạp chí | Earth System Science Data (ESSD), 2021 |
 | DOI bài báo | [10.5194/essd-13-4529-2021](https://doi.org/10.5194/essd-13-4529-2021) |
 | DOI dữ liệu | [10.5281/zenodo.4525244](https://doi.org/10.5281/zenodo.4525244), bản v1.0 tại [zenodo.org/records/5153305](https://zenodo.org/records/5153305) |
-| Giấy phép | Creative Commons Attribution 4.0 |
+| Giấy phép | CC BY-SA 4.0 (Attribution-ShareAlike, theo mô tả bản v1.0 trên Zenodo): được dùng và sửa đổi, kể cả thương mại, nhưng phải ghi nguồn và dữ liệu phái sinh khi chia sẻ phải dùng cùng giấy phép |
 
 ### 2.2 Phạm vi
 

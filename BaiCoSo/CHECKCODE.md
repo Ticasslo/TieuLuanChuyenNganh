@@ -35,11 +35,21 @@
 
 **Huấn luyện.** `train`: `random_split` 1/5 cửa sổ làm holdout (cửa sổ chồng lấn cùng kỳ train), lưu `best_model_params` ở epoch có loss holdout nhỏ nhất. Loss = MSE × "interestingness score" (bình phương độ dốc trung bình × tích phân lưu lượng tương đối trong cửa sổ). Hạt giống 42.
 
-**Đánh giá.** `evaluate_nse` lấy `mean = dataset.mean[:, [0]]` (lưu lượng trung bình **đơn vị gốc**) và tính `mse_loss(mean, data.y)` với `data.y` **đã chuẩn hóa**, rồi nhân σ² cho cả tử và mẫu. Mẫu số vì vậy là (μ_gốc − y_chuẩn_hóa)²·σ² thay vì (y − ȳ)², lệch với công thức "Testing Metric" của bài. Trong `results_mlp.csv`, MLP có NSE trung vị 0,937, 28% trạm có NSE > 0,99, 10% trạm ≥ 0,9998. Cách sửa: tính mẫu số Σ w·(y_chuẩn_hóa − ȳ_chuẩn_hóa)² hoặc tính cả hai vế ở đơn vị gốc. Mẫu số của mỗi trạm giống nhau cho mọi mô hình nên thứ tự giữa các mô hình trên cùng trạm không đổi.
+**Đánh giá.** `evaluate_nse` lấy `mean = dataset.mean[:, [0]]` (lưu lượng trung bình **đơn vị gốc**) và tính `mse_loss(mean, data.y)` với `data.y` **đã chuẩn hóa**, rồi nhân σ² cho cả tử và mẫu. Mẫu số vì vậy là (μ_gốc − y_chuẩn_hóa)²·σ² thay vì (μ − y_gốc)², lệch với công thức "Testing Metric" của bài (tr. 4, mẫu số dùng μ là lưu lượng trung bình của trạm). Mọi thí nghiệm đặt `normalized: True` nên lỗi này áp dụng cho toàn bộ kết quả; tử số (sai số mô hình) vẫn đúng. Trong `results_mlp.csv`, MLP có NSE trung vị 0,937, 28% trạm có NSE > 0,99, 10% trạm ≥ 0,9998. Cách sửa đúng theo bài: mẫu số Σ w·(0 − y_chuẩn_hóa)²·σ², tương đương Σ w·(μ − y_gốc)²; khi so với bài khác thì báo cáo thêm NSE chuẩn dùng trung bình tập kiểm tra. Mẫu số của mỗi trạm giống nhau cho mọi mô hình nên thứ tự giữa các mô hình trên cùng trạm không đổi; riêng NSE tổng hợp (trung bình qua các trạm) có thể đổi thứ tự vì mỗi trạm bị thổi phồng một mức khác nhau — cần tính lại để xác nhận.
+
+**Trọng số "relevancy score" khác mô tả của bài.** `interestingness_score` (`functions.py` dòng 157–170) tính `torch.gradient(...)[0].mean()` không chỉ định chiều, nên đạo hàm được lấy trung bình trên **toàn bộ batch** (mọi trạm × mọi mẫu) thành một số duy nhất rồi mới bình phương; bài mô tả trọng số tính riêng cho từng trạm (tr. 4). Hệ quả: trọng số của một trạm phụ thuộc các trạm và mẫu khác cùng batch (batch 64 khi huấn luyện, 1 mẫu × 358 trạm khi đánh giá); đạo hàm có dấu nên đoạn lên và đoạn xuống triệt tiêu nhau. Trọng số này có mặt ở cả hàm mất mát lẫn NSE có trọng số.
+
+**ResGAT bỏ qua trọng số cạnh vật lý.** `ResGAT` truyền trọng số cạnh vào `GATConv` nhưng không khai báo `edge_dim`; trong PyTorch Geometric 2.6.1 (`gat_conv.py` dòng 175–180 và 400), khi `edge_dim` là None thì `lin_edge` là None và `edge_attr` bị bỏ qua. Trọng số chỉ còn tác dụng lọc cạnh có giá trị 0 (dòng 104–105 `models.py`). Vì vậy các cấu hình ResGAT "stream length", "elevation difference", "average slope", "all" ở Bảng 2(c) thực chất gần như đồ thị nhị phân; khác biệt giữa các dòng này chủ yếu do ngẫu nhiên khi huấn luyện.
+
+**Nạp checkpoint không kiểm tra khớp tham số.** `load_model_and_dataset` gọi `load_state_dict(..., strict=False)`: nếu tên tham số lệch (ví dụ do khác phiên bản thư viện), mô hình vẫn chạy với trọng số khởi tạo ngẫu nhiên mà không báo lỗi. Khi tính lại NSE cần kiểm tra danh sách tham số thiếu/thừa.
+
+**Lọc trạm chặt hơn mô tả.** Bài (tr. 3) loại trạm có khoảng thiếu dài hoặc thiếu dữ liệu 2000–2017; mã (`_has_valid_data`) loại trạm nếu lưu lượng ≤ 0 tại **bất kỳ giờ nào trong toàn bộ chuỗi** (kể cả trước năm 2000), nên cũng loại trạm từng có lưu lượng bằng 0 hoặc thiếu dữ liệu ngoài giai đoạn nghiên cứu.
+
+**Mốc so sánh của NSE.** Công thức của bài và mã đều so với lưu lượng trung bình giai đoạn 2000–2015 của trạm (không phải trung bình tập kiểm tra như NSE chuẩn), nên con số không so trực tiếp được với NSE ở các bài khác.
 
 **Sai khác nhỏ khác.** Bài mô tả chuẩn hóa trên toàn chuỗi, mã dùng 2000–2015 (mã đúng hơn); bài ghi trọng số cạnh âm bị cắt về 0, mã lấy trị tuyệt đối; phần chữ ghi "MLP 19 lớp" trong khi Bảng 2 và `train_mlp.py` dùng MLP 2 lớp 512 nút; `ResGAT` truyền trọng số cạnh vào `GATConv` không khai báo `edge_dim`.
 
-**Tái lập.** Kèm 162 checkpoint để tính lại NSE không cần huấn luyện lại; cần PyTorch Geometric; đường dẫn đặt trong `DATASET_PATH`, `CHECKPOINT_PATH` đầu mỗi script.
+**Tái lập.** Kèm 957 checkpoint (1,9 GB; 162 cho thí nghiệm chính ở Bảng 2 = 18 cấu hình đồ thị × 3 kiến trúc × 3 cách chia, 3 cho MLP, 108 cho ablation, 684 cho mạng con) để tính lại NSE không cần huấn luyện lại; cần PyTorch Geometric; đường dẫn đặt trong `DATASET_PATH`, `CHECKPOINT_PATH` đầu mỗi script.
 
 **Điểm chèn Mamba.** Thay `self.encoder = Linear(...)` trong `BaseModel` bằng bộ mã hóa thời gian: đưa tensor (số trạm, W, 5) qua Mamba, lấy đầu ra bước cuối làm embedding d = 128 cho GNN; tăng `window_size`; so Mamba có/không có đồ thị và so với MLP.
 
@@ -49,7 +59,7 @@
 
 **Nguồn.** Thư viện `github.com/eduardoAcunaEspinoza/Hy2DL` (BSD-3, bản 2.0.1, cập nhật 03/09/2026, ~8.500 dòng, cấu trúc dựa theo NeuralHydrology) và bản mã dùng cho bài trên Zenodo `10.5281/zenodo.14780059` (7,4 GB, gồm mã, kết quả, mô hình; đọc từ xa bằng HTTP Range, chỉ tải các tệp cần).
 
-**Bản mã của bài (Zenodo).** `experiments/Result_reproducibility.pdf` hướng dẫn 3 script (`mflstm.py`, `mflstm_differentinputsperfreq.py`, `mflstm_3freq.py`); tổ hợp bằng cách chạy nhiều hạt giống. `experiments/mflstm.py`: train 1990–2003, val 2003–2008, test 2008–2018, `seq_length = 365×24`, `predict_last_n = 24`, hidden 128, batch 256, 30 epoch, loss `nse_basin_averaged` (NSE*), test bằng epoch cuối; `functions_evaluation.nse` tính NSE theo từng lưu vực rồi lấy trung vị. Kết quả lưu cho 10 hạt giống (110, 111, 222, …, 999) ở cả hai thí nghiệm chính; thí nghiệm 3 tần suất có 1 hạt giống. `run_progress.txt` (hạt giống 110): ~890 s/epoch, tổng 28.608 s ≈ 7,9 giờ; NSE validation 0,705 (epoch 4) → 0,743 (epoch 16) → 0,729 (epoch 28).
+**Bản mã của bài (Zenodo).** `experiments/Result_reproducibility.pdf` hướng dẫn 3 script (`mflstm.py`, `mflstm_differentinputsperfreq.py`, `mflstm_3freq.py`); tổ hợp bằng cách chạy nhiều hạt giống. `experiments/mflstm.py`: train 1990–2003, val 2003–2008, test 2008–2018, `seq_length = 365×24`, `predict_last_n = 24`, hidden 128, batch 256, 30 epoch, loss `nse_basin_averaged` (NSE*), test bằng epoch cuối; `functions_evaluation.nse` tính NSE chuẩn theo từng lưu vực (mẫu số dùng trung bình quan trắc kỳ test, bỏ NaN ở cả dự báo và quan trắc) rồi lấy trung vị. Nhãn val/test không chuẩn hóa (`standardize_data(standardize_output=False)`, dòng 231 và 375), dự báo khử chuẩn hóa bằng scaler kỳ train, nên NSE tính ở đơn vị gốc; mô hình test là mô hình sau epoch cuối, validation chỉ để theo dõi. Kết quả lưu cho 10 hạt giống (110, 111, 222, …, 999) ở cả hai thí nghiệm chính; thí nghiệm 3 tần suất có 1 hạt giống. `run_progress.txt` (hạt giống 110): ~890 s/epoch, tổng 28.608 s ≈ 7,9 giờ; NSE validation 0,705 (epoch 4) → 0,743 (epoch 16) → 0,729 (epoch 28).
 
 **Thư viện hiện tại.** `datasetzoo/` (CAMELS-US/GB/DE/CH/PL, Caravan, `hourlycamelsus.py` đọc CSV NLDAS giờ + USGS giờ theo từng lưu vực), `modelzoo/` (CudaLSTM, MF2LSTM, HBV/SHM lai; đăng ký qua `factory.py`), `evaluation/` (`simulation_tester.py`, `forecast_tester.py`, `metrics.py` với NSE theo lưu vực và PNSE so với persistence), `training/` (loss NSEBasinAveraged, WeightedMSE, NLL, CRPS). Scaler chỉ tính trên kỳ train; kỳ val/test bắt buộc nạp `scaler.yml`. Hỗ trợ lưu dữ liệu dạng zarr trên đĩa khi RAM không đủ. Ví dụ `examples/lstm_rainfall_runoff.py` test bằng mô hình epoch cuối.
 
@@ -71,7 +81,7 @@
 
 **Mô hình.** `HOPE`: Linear(32 → d_model) → n lớp [S4D + Dropout + residual + BatchNorm1d] → trung bình theo thời gian → Linear(d_model → 1). S4D tính tích chập bằng FFT độ dài 2L rồi cắt L (nhân quả); `cfr`, `cfi` tỉ lệ lại phần thực và ảo của A. Nhãn là Q của ngày cuối cửa sổ (`datautils.reshape_data`: `y_new[i] = y[i + seq_length − 1]`).
 
-**Huấn luyện và đánh giá.** Loss NSE*; lưu checkpoint mọi epoch; đánh giá tại epoch 49 cố định; 8 hạt giống (200–207) qua `run_global_parallel.py`.
+**Huấn luyện và đánh giá.** Loss NSE*; lưu checkpoint mọi epoch; đánh giá tại epoch 49 cố định; 8 hạt giống (200–207) qua `run_global_parallel.py`. Chỉ số NSE (`analysis/performance_functions.py::nse`) là NSE chuẩn theo từng lưu vực: mẫu số dùng trung bình quan trắc của chính kỳ test, bỏ quan trắc âm (-999); nhãn test để ở đơn vị gốc (chỉ chuẩn hóa khi `is_train`), dự báo được khử chuẩn hóa và cắt giá trị âm về 0.
 
 **Sai khác mã – bài.**
 1. `train_val.sh` chỉ truyền lr, weight decay, batch, epoch, d_model, d_state, n_layers, dropout, cfr, cfi; các tham số còn lại lấy mặc định: `lr_min` 1e-3 (bảng 4e-5), `min_dt` 1e-3 (bảng 1e-2), `max_dt` 1 (bảng 1e-1), `lr_dt` 0, `wd` 0. Theo Hình S1/S2 của SI, các giá trị này nằm trong nhóm cấu hình làm KGE giảm 0,05–0,11.
@@ -97,7 +107,7 @@
 
 **Mô hình.** Conv2d 1×1 nhúng 3 kênh mỗi bước thời gian → 3 lớp GNN áp riêng từng bước (nối tắt x0) → làm phẳng (thời gian × 32 kênh) → Conv 1×1 ra 24 bước. Không có thành phần học chuỗi thời gian.
 
-**Sai khác mã – bài.** `config.py` import `GCN_Point` nhưng `arch/__init__.py` chỉ export `FloodGNN` (lỗi import); loss `masked_mse` (bài: MAE); `masked_nse` cộng tử và mẫu trên toàn bộ trạm và bước, `if_score=False` (bài: NSE có trọng số); `input_dim = 3` trong khi `FORWARD_FEATURES = [0..6]`; `train.py` ghi đè chính tệp cấu hình để đổi `conv_type`.
+**Sai khác mã – bài.** `config.py` import `GCN_Point` nhưng `arch/__init__.py` chỉ export `FloodGNN` (lỗi import); loss `masked_mse` (bài: MAE); `masked_nse` cộng tử và mẫu trên toàn bộ trạm và bước, `if_score=False` (bài: NSE có trọng số); mốc trung bình trong `masked_nse` là `scaler.mean` của kỳ train (`base_tsf_runner.py` dòng 469, 521), cùng đơn vị với nhãn chỉ khi `RESCALE = True` — giá trị này đọc từ `desc.json` trên Google Drive, chưa xác nhận; `input_dim = 3` trong khi `FORWARD_FEATURES = [0..6]`; `train.py` ghi đè chính tệp cấu hình để đổi `conv_type`.
 
 ---
 
@@ -185,7 +195,7 @@
 
 **Nguồn.** Zenodo `10.5281/zenodo.19367140` (01/04/2026), MIT; repo GitHub trả về 404. Gồm dữ liệu (`camels_rrformer_dataset_v4_static_scaled_raid.py`, `camels_dataset_emd.py`), mô hình (`rrformer_variants.py` với `MambaEncRRFormer`, `lstm_backbone.py`), huấn luyện (`train_full.py`), script `run_benchmark_suite.py` (không EMD), `run_emd_suite.py` (có EMD), `run_transfer_gb*.py`.
 
-**Chi tiết.** CAMELS-US 674 lưu vực, forcing Daymet; train 1980–1995, val 1995–1999, test 1999–2014; cửa sổ 22 ngày (15 quá khứ + 7 dự báo, khí tượng tương lai quan trắc); chọn checkpoint theo "NSE-like" trên validation, patience 15. README ghi mọi mô hình dùng chung pipeline EMD + nhúng CNN 1D; EMD tính trên toàn chuỗi trước khi cắt cửa sổ nên rò rỉ tương lai. Loại mọi ngày có cờ chất lượng khác "A" rồi `dropna`.
+**Chi tiết.** CAMELS-US 674 lưu vực, forcing Daymet; train 1980–1995, val 1995–1999, test 1999–2014; cửa sổ 22 ngày (15 quá khứ + 7 dự báo, khí tượng tương lai quan trắc); đầu vào có Q quan trắc 15 ngày quá khứ, 7 ngày tương lai điền bằng Q ngày cuối (`__getitem__`, dòng 521–529) — bài toán dự báo; chọn checkpoint theo "NSE-like" trên validation, patience 15. README ghi mọi mô hình dùng chung pipeline EMD + nhúng CNN 1D; EMD tính trên toàn chuỗi trước khi cắt cửa sổ nên rò rỉ tương lai. Loại mọi ngày có cờ chất lượng khác "A" rồi `dropna`.
 
 ---
 
@@ -198,8 +208,8 @@
 ## 14. Kết luận từ việc đọc mã nguồn
 
 1. **#104:** mã nhỏ, dễ chèn bộ mã hóa thời gian; lỗi NSE và validation sửa được; có checkpoint để tính lại.
-2. **#67:** mã của bài sạch nhất; thư viện có sẵn chế độ dự báo đã chạy thử được.
-3. **#22:** khung nhỏ, thay một dòng khởi tạo lớp SSM; phải sửa cấu hình về Bảng S3.
+2. **#67:** mã của bài sạch nhất (NSE chuẩn, đơn vị gốc, scaler kỳ train, không chọn mô hình trên test); thư viện có sẵn chế độ dự báo đã chạy thử được.
+3. **#22:** khung nhỏ, thay một dòng khởi tạo lớp SSM; NSE chuẩn; phải sửa cấu hình về Bảng S3.
 4. **#6:** tái lập nhanh nhất để làm baseline, cần đồng nhất hàm mất mát.
 5. **#53, #42:** chọn mô hình hoặc cấu hình dựa trên tập test.
 6. **#71/#54, #103:** thiếu tiền xử lý hoặc có lỗi khiến không tái lập được số liệu.

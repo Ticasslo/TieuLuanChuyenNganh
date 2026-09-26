@@ -43,7 +43,7 @@ Chi tiết đầy đủ (quy mô, biến, topology, công trình đã huấn luy
 **Vai trò từng bộ (dataset chính/phụ, dùng để làm gì):** ⏳ chưa chốt. Các phương án đã phân tích ở `Dataset.md` Mục 9.2 (A/B/C) được viết khi xét từng bộ riêng lẻ — cần xét lại khi chốt dùng cả 4.
 
 **Rủi ro dữ liệu đã biết:**
-- CAMELS-US ~15 GB nén / **~130 GB giải nén** — có thể vượt dung lượng đĩa Colab nếu giải nén hết (dung lượng đĩa hiện tại của gói Colab Pro chưa kiểm tra); cần tải/giải nén từng phần (chưa xác nhận cách làm).
+- CAMELS-US ~15 GB nén / **~130 GB giải nén** — có thể vượt dung lượng đĩa Colab nếu giải nén hết (dung lượng đĩa Colab hiện tại chưa kiểm tra); cần tải/giải nén từng phần (chưa xác nhận cách làm).
 - Columbia Basin không đóng gói sẵn, không có forcing khí tượng, không có thuộc tính lưu vực — phải tự dựng pipeline truy vấn DART + tự ghép forcing từ nguồn khác.
 - HydroGAT (WaterBench) không công bố dữ liệu đã xử lý — muốn tái lập phải tự dựng lại từ Stage IV/DEM/USGS.
 
@@ -124,7 +124,8 @@ Số liệu tham chiếu của RiverMamba (R² 0,873 vs GloFAS; 0,506 vs GRDC) *
 
 ## 9. Hạ tầng
 
-- **Compute train:** Google Colab Pro là chính, Kaggle dự phòng (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Lightning AI khi cần. Thư viện `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel 1 lần rồi lưu Drive/Kaggle Dataset (`RiverMamba.md` Mục 0).
+- **Compute train:** Google Colab (bản miễn phí) là chính, Kaggle dự phòng (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Lightning AI khi cần. Thư viện `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel 1 lần rồi lưu Drive/Kaggle Dataset (`RiverMamba.md` Mục 0).
+- **Lưu trữ dữ liệu:** LamaH-CE được tải một lần trên Kaggle (notebook CPU chạy nền) và lưu thành Kaggle Dataset private (`lamah-ce-core`, `lamah-ce-extra`) để mọi notebook sau gắn vào dùng lại, không tải lại 14,8 GB mỗi phiên; lý do và cách làm ở `LamaHCE/LamaHCE.md`. Notebook dùng Colab lấy dữ liệu qua Kaggle API (token lưu trong Colab Secrets).
 - **Demo (yêu cầu bắt buộc của TLCN — `02_literature_review.md` Mục 3):** ⏳ chưa chốt; đề xuất hiện tại ở `CHECKPDF.md` Mục 8.2. Lưu ý: 4 bộ dữ liệu là dữ liệu lịch sử, không có luồng cập nhật hằng ngày. VPS Oracle Cloud Always Free (2 OCPU/12 GB từ 15/6/2026) vẫn dùng được để host demo.
 
 ---
@@ -143,6 +144,7 @@ SOICT (mời mở rộng sang *Multimedia Tools and Applications* / *Informatica
 
 ## Tài liệu tham khảo chính
 
+- **Bài cơ sở** — Kirschstein, N., & Sun, Y. (2024). The Merit of River Network Topology for Neural Flood Forecasting. *Proceedings of the 41st International Conference on Machine Learning*, PMLR 235, 24713–24725. https://proceedings.mlr.press/v235/kirschstein24a.html (bài không có DOI đăng ký; phản biện: OpenReview `QE6iC9s6vU`, "ICML 2024 Poster"; mã: `github.com/nkirschi/neural-flood-forecasting`).
 - Danh sách bộ dữ liệu + 19 công trình huấn luyện trên chúng: `Dataset.md` Mục 6 (nguồn tham khảo ở Mục 10).
 - RiverMamba — NeurIPS 2025, DOI `10.52202/085713-4446` · [arXiv 2505.22535](https://arxiv.org/abs/2505.22535) · [code](https://github.com/HakamShams/RiverMamba_code).
 - G-Mamba — Chen & Tang, Neurocomputing 680 (2026), DOI [10.1016/j.neucom.2026.133280](https://doi.org/10.1016/j.neucom.2026.133280) (tổng quát, không phải thủy văn — xem Mục 5).
