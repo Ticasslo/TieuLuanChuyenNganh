@@ -48,10 +48,24 @@ Chạy thử trên tệp nén giả mô phỏng đủ 7 phần: mỗi tệp ch�
 
 | Gói | Kích thước output trên Kaggle | Dòng "XONG" (thời gian, GB nén đã đọc, số file) | Dòng "Kiểm tra ZIP" (số mục, lỗi CRC) | Cảnh báo vượt dung lượng |
 |---|---|---|---|---|
-| `lamah_ce_core.zip` | 6,82 GB | Chưa ghi | Chưa ghi | Chưa ghi |
-| `lamah_ce_extra.zip` | 6,32 GB | Chưa ghi | Chưa ghi | Chưa ghi |
+| `lamah_ce_core.zip` | 6,82 GB | 183,4 phút; 14,85 GB nén; duyệt 7.366, giữ 2.000 file (31,43 GB gốc) | 2.001 mục (2.000 file + `manifest.csv`), lỗi CRC `None` | Không |
+| `lamah_ce_extra.zip` | 6,32 GB | 98,8 phút; 14,85 GB nén; duyệt 7.366, giữ 1.866 file (26,50 GB gốc) | 1.867 mục (1.866 file + `manifest.csv`), lỗi CRC `None` | Không |
 
-Tổng 13,14 GB, dưới giới hạn 20 GB của output notebook; mỗi gói dưới ngưỡng bỏ qua 18 GB của mã. Gói lõi đạt độ đầy đủ khi log có dòng "Kiểm tra ZIP" với lỗi CRC `None` và không có dòng "CẢNH BÁO".
+Tổng 13,14 GB, dưới giới hạn 20 GB của output notebook; mỗi gói dưới ngưỡng bỏ qua 18 GB của mã. Cả hai gói đầy đủ: có dòng "Kiểm tra ZIP" với lỗi CRC `None`, không có dòng "CẢNH BÁO".
+
+Số file theo thư mục:
+
+| Gói | Thư mục | Số file |
+|---|---|---|
+| Lõi | `B_basins_intermediate_all`: thuộc tính / chuỗi giờ / shapefile | 4 / 859 / 7 |
+| Lõi | `D_gauges`: thuộc tính / chuỗi giờ / tệp khoảng trống (`gaps`) / shapefile | 3 / 882 / 230 / 7 |
+| Lõi | `Info_deutsch`, `Info_english` | 4, 4 |
+| Phụ | `A_basins_total_upstrm`: thuộc tính / chuỗi giờ / shapefile | 3 / 859 / 7 |
+| Phụ | `C_basins_intermediate_lowimp`: thuộc tính / shapefile | 3 / 7 |
+| Phụ | `E_stream_network` | 17 |
+| Phụ | `F_hydrol_model` (COSERO): gốc / đầu vào / chuỗi / shapefile / đầu ra | 1 / 13 / 859 / 11 / 3 |
+| Phụ | `G_appendix`: thuộc tính / mã Python / mã R / shapefile / hình / CORINE | 1 / 8 / 17 / 44 / 3 / 2 |
+| Phụ | `Info_deutsch`, `Info_english` | 4, 4 |
 
 ## 6. Extended LamaH-CE (BiasCast, HESS 2026)
 
@@ -63,4 +77,50 @@ Notebook `LamaHCEExt_Download.py` phục vụ đánh giá ứng viên bài cơ s
 | Kết quả tác giả | Zenodo 17292895, tệp `Experiments.tar.gz` 0,23 GB: cấu hình, trọng số, scaler, NSE/KGE theo lưu vực của 24 cấu hình |
 | Cách tải | Đọc theo luồng, ghi vào `lamah_ce_ext.zip` và `biascast_experiments.zip`; lưu thành Kaggle Dataset (Private) `lamah-ce-ext` |
 | Kiểm tra trong notebook | % thiếu `qmax` và `qmean` theo kỳ train 2003–2009 / validation 2010–2013 / test 2014–2017 của 451 lưu vực; % thiếu từng biến khí tượng 2003–2017 và ngày có ECMWF đầu tiên; persistence trên test (qmax(t−1) và qmean(t−1) làm dự báo cho qmax(t)) so với NSE theo lưu vực của 5 cấu hình tác giả; hình CDF |
-| Kết quả | Đã chạy trên Kaggle (26/9/2026); log và số liệu chưa ghi |
+| Kết quả | Đã chạy trên Kaggle (26/9/2026), số liệu ở Mục 6.1; `lamah_ce_ext.zip` 1.991 file (2,81 GB gốc → 0,95 GB, 10,0 phút), `biascast_experiments.zip` 123 file (0,64 GB gốc → 0,23 GB, 2,2 phút), lỗi CRC `None` |
+
+### 6.1. Kết quả kiểm tra (Kaggle, 26/9/2026)
+
+**Tệp.** `lamah_ce_ext.zip`: `A_basins_total_upstrm` (3 thuộc tính, 859 chuỗi ngày, 7 shapefile), `D_gauges` (3 thuộc tính, 1.112 tệp chuỗi, 7 shapefile). `biascast_experiments.zip`: 11 nhóm thí nghiệm (Baseline 3 nhóm, CrossDomain 2, Encoder–Decoder và Sequential mỗi loại có/không Q, học chuyển giao 2). Kết quả tác giả có 451 lưu vực.
+
+**Tệp khí tượng lưu vực** có 44 cột: `DOY`; 21 biến ERA5-Land; 8 biến ECMWF (`t2m`, `d2m`, `msl`, `ssrd`, `tp`, `lsp`, `cp`, `e`); 8 biến E-OBS (`tg`, `tn`, `tx`, `rr`, `pp`, `fg`, `hu`, `qq`); `MSWEP_RR`; `GLEAM_ETA`, `GLEAM_ETP`. Cấu hình của tác giả không dùng `ECMWF_msl`, `ECMWF_lsp`, `ECMWF_cp`, `EOBS_hu`. Lưu lượng (`qmean`, `qmax`) nằm ở tệp trạm `D_gauges`, không nằm trong tệp khí tượng.
+
+**Lưu lượng thiếu (451 lưu vực).** Không có ô mang mã −999. `qmax` và `qmean` thiếu cùng ngày.
+
+| Kỳ | Ngày-lưu vực lý thuyết (451 × số ngày) | Dòng có trong tệp | Ô trống trong các dòng có | Tổng thiếu | Tỷ lệ |
+|---|---|---|---|---|---|
+| Train 2003–2009 | 1.153.207 | 1.115.347 | 3.040 | 40.900 | 3,55% |
+| Validation 2010–2013 | 658.911 | 658.581 | 2.300 | 2.630 | 0,40% |
+| Test 2014–2017 | 658.911 | 658.911 | 1.545 | 1.545 | 0,23% |
+
+Số liệu bảng trên được xác nhận khi chạy lại Phần 3 đã sửa (27/9/2026, tính thiếu trên đủ mọi ngày của kỳ). Lưu vực có thiếu: train 45 (29 thiếu trên 10%), validation 10 (5), test 10 (3).
+
+Phần thiếu tập trung ở train, chủ yếu do **27 lưu vực bắt đầu đo sau 01/01/2003** (tệp không có dòng trước ngày bắt đầu): 104 (04/06/2003), 839, 876 (01/01/2004), 110 (30/04/2004), 341 (20/08/2004), 822, 823, 824 (01/11/2004), 329 (04/08/2005), 327 (21/10/2005), 298 (28/10/2005), 92 (01/01/2006), 485, 622 (01/01/2007), 590 (10/05/2007), 577 (07/08/2007), 608 (14/09/2007), 309 (28/10/2007), 561 (01/01/2008), 391 (22/01/2008), 791 (01/03/2008), 296 (17/12/2008), 295 (01/01/2009), 800 (24/11/2009), 623 (01/01/2010), 600 (23/03/2010), 324 (07/09/2010). Ba lưu vực cuối (623, 600, 324) không có Q trong cả kỳ train nhưng vẫn được đánh giá ở test. Với mô hình có Q trong hindcast 365 ngày, bộ lọc mẫu của NeuralHydrology còn bỏ thêm năm đầu sau ngày bắt đầu đo của các lưu vực này. Ngày cuối có `qmax`: 26/11/2017 – 31/12/2017.
+
+**Khí tượng 2003–2017** (2.471.029 ngày-lưu vực = 451 × 5.479, đủ dòng): gần như không thiếu; cột thiếu nhiều nhất `EOBS_hu` 0,36% (không dùng trong cấu hình), mọi cột khác 0,00%. Dự báo ECMWF bắt đầu 01/01/2003 ở mọi lưu vực. Tệp khí tượng bắt đầu 01/01/1981 ở mọi lưu vực, nên hindcast 730 ngày (cần khí tượng từ 2001) không mất mẫu train năm 2003.
+
+**NSE tập test 2014–2017 theo lưu vực.**
+
+| Mô hình | Số lưu vực | P10 | P25 | Trung vị | P75 | P90 |
+|---|---|---|---|---|---|---|
+| Sequential LSTM có Q (nhúng đơn giản) | 450 | 0,419 | 0,575 | 0,705 | 0,810 | 0,876 |
+| Sequential LSTM có Q (nhúng phức tạp) | 450 | 0,416 | 0,588 | 0,705 | 0,805 | 0,864 |
+| Sequential LSTM không Q | 451 | 0,346 | 0,495 | 0,628 | 0,716 | 0,788 |
+| Encoder–Decoder có Q (nhúng đơn giản) | 450 | 0,397 | 0,566 | 0,672 | 0,772 | 0,848 |
+| Baseline chỉ dự báo | 451 | 0,023 | 0,191 | 0,387 | 0,532 | 0,680 |
+| Persistence qmax(t−1) | 451 | −0,081 | 0,129 | 0,346 | 0,655 | 0,800 |
+| Persistence qmean(t−1) | 451 | 0,147 | 0,232 | 0,368 | 0,614 | 0,765 |
+
+| So với persistence | ΔNSE trung vị so với qmax(t−1) | Tỷ lệ lưu vực mô hình hơn | ΔNSE trung vị so với qmean(t−1) | Tỷ lệ lưu vực mô hình hơn |
+|---|---|---|---|---|
+| Sequential LSTM có Q (đơn giản) | +0,341 | 93,3% | +0,261 | 94,0% |
+| Sequential LSTM có Q (phức tạp) | +0,330 | 92,2% | +0,261 | 93,1% |
+| Sequential LSTM không Q | +0,244 | 80,3% | +0,189 | 82,5% |
+| Encoder–Decoder có Q (đơn giản) | +0,306 | 88,4% | +0,235 | 90,9% |
+| Baseline chỉ dự báo | +0,042 | 55,9% | +0,000 | 50,1% |
+
+**Nhận định.**
+- Trung vị tự tính khớp bài (0,705; 0,628; 0,387).
+- Mô hình tốt nhất hơn persistence rõ ràng (trung vị +0,26 đến +0,34, hơn ở hơn 92% lưu vực) — bài chưa báo cáo mốc này. Mô hình chỉ dùng dự báo thời tiết (0,387) ngang persistence, tức không hơn cách lấy lưu lượng hôm qua.
+- Ở nhóm lưu vực dễ (P90), persistence qmax(t−1) đạt 0,800, sát mô hình (0,876): phần cải thiện của mô hình tập trung ở lưu vực khó.
+- Dữ liệu thiếu ít (test 0,23%, khí tượng gần như đủ; train 3,55% chủ yếu do 27 trạm bắt đầu đo muộn): lợi ích của masked mean trong việc giữ lại mẫu huấn luyện dự kiến nhỏ, tập trung ở các trạm bắt đầu muộn; giá trị chính của cơ chế này là chịu được dữ liệu mất khi vận hành (`BaiCoSo/YTUONG.md` Y1, Y2).

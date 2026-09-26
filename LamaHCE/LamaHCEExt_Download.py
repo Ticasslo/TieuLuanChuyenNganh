@@ -108,12 +108,23 @@ for zip_name, (url, fallback_gb) in SOURCES.items():
 # (b) % thiếu từng biến khí tượng 2003–2017; (c) persistence trên test 2014–2017 — ý phản biện 1 đề nghị,
 # bài không làm: qmax(t) ≈ qmax(t−1) và qmax(t) ≈ qmean(t−1) (thông tin mô hình có Q thực sự nhận).
 # NSE theo lưu vực không đổi khi đổi đơn vị, nên so trực tiếp được với NSE (mm/ngày) trong test_metrics.csv.
+# Chạy lại riêng phần này (không tải lại): gắn Kaggle Dataset "lamah-ce-ext" bằng Add Input, chạy Phần 1 rồi Phần 3.
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-EXT_ZIP = BASE_DIR / "lamah_ce_ext.zip"
-EXP_ZIP = BASE_DIR / "biascast_experiments.zip"
+
+def find_zip(name: str) -> Path:
+    """Tìm ZIP trong thư mục làm việc (vừa tải ở Phần 2) hoặc trong dataset đã gắn (/kaggle/input, Drive)."""
+    for root in [BASE_DIR, Path("/kaggle/input"), Path("/content/drive/MyDrive")]:
+        hits = [root / name] if (root / name).exists() else sorted(root.rglob(name)) if root.exists() else []
+        if hits:
+            return hits[0]
+    raise FileNotFoundError(f"Không thấy {name}: chạy Phần 2 hoặc gắn dataset lamah-ce-ext")
+
+
+EXT_ZIP = find_zip("lamah_ce_ext.zip")
+EXP_ZIP = find_zip("biascast_experiments.zip")
 MISSING_VALUE = -999
 PERIODS = {"train": ("2003-01-01", "2009-12-31"),
            "validation": ("2010-01-01", "2013-12-31"),
@@ -162,7 +173,7 @@ print(f"Số lưu vực trong kết quả của tác giả: {len(basins)}")
 # --- Lưu lượng trạm (D_gauges) và khí tượng lưu vực (A_basins_total_upstrm) của 451 lưu vực ---
 GAUGE_DIR = "D_gauges/2_timeseries/daily/"
 MET_DIR = "A_basins_total_upstrm/2_timeseries/daily/"
-rows, forcing_missing, forcing_total, ecmwf_first = [], pd.Series(dtype=float), 0, []
+rows, forcing_missing, forcing_total, ecmwf_first, met_first = [], pd.Series(dtype=float), 0, [], []
 forcing_ok = True   # tắt phần (b) nếu cấu trúc tệp khí tượng khác dự kiến, không làm hỏng (a) và (c)
 with zipfile.ZipFile(EXT_ZIP) as zf:
     ext_names = zf.namelist()
@@ -180,7 +191,8 @@ with zipfile.ZipFile(EXT_ZIP) as zf:
         row = {"basin": bid, "n_missing_code": n_missing_code,
                "first_valid": q["qmax"].first_valid_index(), "last_valid": q["qmax"].last_valid_index()}
         for period, (start, end) in PERIODS.items():
-            part = q.loc[start:end]
+            # reindex đủ mọi ngày của kỳ: ngày không có dòng trong tệp (trạm bắt đầu đo muộn) cũng tính là thiếu
+            part = q.reindex(pd.date_range(start, end, freq="D"))
             row[f"{period}_days"] = len(part)
             row[f"{period}_qmax_missing"] = int(part["qmax"].isna().sum())
             row[f"{period}_qmean_missing"] = int(part["qmean"].isna().sum())
@@ -193,6 +205,7 @@ with zipfile.ZipFile(EXT_ZIP) as zf:
         if not forcing_ok:
             continue
         met = with_date_index(pd.read_csv(zf.open(find_member(ext_names, MET_DIR, f"/ID_{bid}.csv")), sep=";"))
+        met_first.append(met.index.min())   # hindcast 730 ngày cần khí tượng từ 2001 cho mẫu train đầu tiên
         met = met.loc[PERIODS["train"][0]:PERIODS["test"][1]]
         forcing_missing = forcing_missing.add((met.isna() | (met == MISSING_VALUE)).sum(), fill_value=0)
         forcing_total += len(met)
@@ -214,6 +227,9 @@ for period in PERIODS:
               f"| thiếu >10% {(miss > 0.1 * days).sum()} | thiếu toàn bộ {(miss == days).sum()}")
 print(f"Ngày có qmax đầu tiên: sớm nhất {quality['first_valid'].min().date()}, muộn nhất {quality['first_valid'].max().date()}")
 print(f"Ngày có qmax cuối cùng: sớm nhất {quality['last_valid'].min().date()}, muộn nhất {quality['last_valid'].max().date()}")
+late = quality[quality["first_valid"] > pd.Timestamp(PERIODS["train"][0])]
+print(f"Lưu vực bắt đầu có qmax sau {PERIODS['train'][0]}: {len(late)} — "
+      + ", ".join(f"{b} ({d.date()})" for b, d in late["first_valid"].sort_values().items()))
 
 # --- (b) Thiếu khí tượng 2003–2017 ---
 if forcing_total:
@@ -222,6 +238,9 @@ if forcing_total:
 if ecmwf_first:
     firsts = pd.Series(ecmwf_first).dropna()
     print(f"Ngày có ECMWF đầu tiên: sớm nhất {firsts.min().date()}, muộn nhất {firsts.max().date()}")
+if met_first:
+    firsts = pd.Series(met_first)
+    print(f"Ngày đầu tiên của tệp khí tượng: sớm nhất {firsts.min().date()}, muộn nhất {firsts.max().date()}")
 
 # --- (c) Persistence so với mô hình ---
 nse_all = model_nse.join(quality[list(PERSISTENCE)])

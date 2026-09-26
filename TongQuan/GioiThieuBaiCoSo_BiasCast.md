@@ -133,7 +133,7 @@ Vị trí trong bài: Mục 3.1–3.6, Hình 3–10, Phụ lục F.
 ## 9. Hạn chế phát hiện khi đọc mã nguồn và phản biện
 
 - **Một hạt giống:** mỗi cấu hình chạy 1 lần; chênh lệch nhỏ (khoảng 0,01–0,02 NSE) giữa các biến thể chưa tách được khỏi nhiễu.
-- **Không có baseline persistence:** người phản biện 1 đề nghị; tác giả chỉ lập luận rằng lưu lượng cực đại ngày ít tự tương quan, chưa kiểm bằng số.
+- **Không có baseline persistence:** người phản biện 1 đề nghị; tác giả chỉ lập luận rằng lưu lượng cực đại ngày ít tự tương quan, chưa kiểm bằng số. Nhóm đã tự tính trên tập test: persistence đạt NSE trung vị 0,35–0,37; mô hình tốt nhất (0,705) hơn persistence ở trên 92% lưu vực, còn mô hình chỉ dùng dự báo thời tiết (0,387) chỉ ngang persistence.
 - **Baseline tái phân tích dùng thời tiết của chính ngày dự báo** — là mốc tham chiếu trên, không phải cấu hình vận hành được.
 - **Không lùi đầu vào theo độ trễ công bố thật** của tái phân tích (tác giả tự nêu ở Mục 3.7).
 - **Thiếu dữ liệu cho biến thể có Q:** mã đọc thư mục `LamaH_expanded_q_input` không có trên Zenodo; phải tự dựng.
@@ -151,15 +151,16 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 **Phần cốt lõi:**
 
 1. Tái lập bài gốc bằng trọng số của tác giả; bổ sung baseline persistence; đo nhiễu giữa các hạt giống.
-2. Cải tiến LSTM của bài (tầng 1): giữ mẫu có dữ liệu thiếu bằng masked mean thay vì bỏ cả mẫu; hoàn thiện đầu vào lưu lượng quan trắc (cùng đơn vị với nhãn, Q các ngày trước, xử lý Q thiếu); tổ hợp nhiều hạt giống.
+2. Cải tiến LSTM của bài (tầng 1): giữ mẫu có dữ liệu thiếu bằng masked mean thay vì bỏ cả mẫu; hoàn thiện đầu vào lưu lượng quan trắc (cùng đơn vị với nhãn, Q các ngày trước, xử lý Q thiếu); huấn luyện có bỏ ngẫu nhiên lưu lượng quan trắc để một mô hình dùng được cả khi trạm mất số liệu (hướng tiếp theo do chính tác giả nêu); tổ hợp nhiều hạt giống.
 3. Thay lõi LSTM bằng GRU, Transformer, S4D và Mamba ở dạng thuần trên quy trình đã cải tiến (tầng 2), cùng dữ liệu, cùng chia tập, cùng ngân sách tinh chỉnh, nhiều hạt giống; sau đó một biến thể cải tiến cho Mamba và một cho Transformer, mỗi biến thể so với bản thuần của chính nó. S4D là đối chứng để phân biệt "Mamba không phù hợp" với "SSM nói chung không phù hợp".
 4. Thử chuỗi quá khứ 730 ngày cho LSTM và Mamba — nơi Mamba được kỳ vọng có lợi thế chi phí.
 5. Đầu ra xác suất (CMAL) trên cấu hình tốt nhất để có xác suất vượt ngưỡng lũ.
+6. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và tái phân tích đến trễ 5 ngày (ERA5 công bố trễ 5 ngày); so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
 
 **Phần đáp ứng yêu cầu tiểu luận:**
 
-6. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum): ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
-7. Demo bản đồ dự báo theo ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực.
+7. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum): ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
+8. Demo bản đồ dự báo theo ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực.
 
 **Giai đoạn khóa luận:** dự báo nhiều ngày; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Phạm vi chi tiết: `TongQuan/KienTrucPipeline_BiasCast.md` Mục 9.
 

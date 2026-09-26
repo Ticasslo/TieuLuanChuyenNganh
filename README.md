@@ -19,6 +19,8 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `TongQuan/GioiThieuBaiCoSo.md` | Giới thiệu bài cơ sở Kirschstein & Sun (ICML 2024), phương án thay thế |
 | `TongQuan/KienTrucPipeline.md` | Kiến trúc và pipeline của đề tài: các giai đoạn, mô-đun mô hình, chỉ số đánh giá, việc chưa chốt |
 | `TongQuan/KienTrucPipeline_BiasCast.md` | Kiến trúc và pipeline theo phương án bài cơ sở BiasCast (HESS 2026) |
+| `BaiCoSo/YTUONG.md` | Ý tưởng mới cho đề tài từ đọc sâu BiasCast và tra cứu bổ sung, cập nhật theo đợt |
+| `SoDo/QuyTrinhThucHien.drawio`, `SoDo/QuyTrinhThucHien.mmd` | Sơ đồ quy trình thực hiện tiểu luận theo từng bước (bài cơ sở BiasCast), bản draw.io và bản Mermaid |
 | `LamaHCE/` | Ghi chú và mã tải, xử lý bộ dữ liệu LamaH-CE cho bài cơ sở (chạy trên Kaggle) |
 | `LyThuyet/LyThuyetCauTruc.md` | Ghi chú lý thuyết LSTM, Transformer, GRU, Mamba kèm ví dụ số |
 | `LyThuyet/RiverMamba.md` | Ghi chú đọc mã nguồn RiverMamba (tài liệu tham khảo) |

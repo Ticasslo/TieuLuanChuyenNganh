@@ -1,0 +1,66 @@
+%% Quy trình thực hiện tiểu luận — bài cơ sở BiasCast (HESS 2026)
+%% Bản Mermaid của SoDo/QuyTrinhThucHien.drawio; xem tại https://mermaid.live hoặc extension Mermaid của VS Code
+%% Bài toán: dự báo qmax (lưu lượng lớn nhất trong ngày) của ngày mai cho 451 lưu vực; Q = lưu lượng quan trắc; hindcast = chuỗi 364 ngày quá khứ
+flowchart TD
+    subgraph P0["0. Chuẩn bị dữ liệu"]
+        direction LR
+        d1["Zenodo<br>Extended LamaH-CE 0,95 GB<br>+ kết quả, trọng số tác giả 0,23 GB"] --> d2["Notebook LamaHCEExt_Download.py<br>tải theo luồng → ZIP (Kaggle, CPU)"] --> d3[["Kaggle Dataset lamah-ce-ext<br>451 lưu vực, theo ngày"]]
+    end
+
+    subgraph PA["A. Khảo sát dữ liệu và dựng mốc so sánh"]
+        direction LR
+        a1["Khảo sát dữ liệu<br>% thiếu, phân phối,<br>bản đồ 451 lưu vực"] --> a2["Chạy lại mô hình đã huấn luyện<br>của tác giả trên test 2014–2017<br>(kiểm khớp NSE trung vị 0,71)"] --> a3["Persistence: lấy Q hôm qua<br>làm dự báo hôm nay<br>(đã tính: NSE 0,35–0,37)"] --> a4[["BẢNG MỐC"]]
+    end
+
+    subgraph PB["B. Tầng 1 — Cải tiến trên chính mô hình của tác giả (giữ kiến trúc LSTM, chỉ đổi dữ liệu và cách huấn luyện; 3 hạt giống)"]
+        direction LR
+        b0["B0. Mô hình của tác giả<br>huấn luyện lại (chưa đổi gì)"] --> b1["B1. Không bỏ mẫu thiếu dữ liệu<br>(masked mean, sửa bộ lọc mẫu)"] --> b2["B2. Đưa Q quan trắc vào đúng cách<br>(cùng đơn vị, Q các ngày trước)"] --> b3["B3. Chịu mất Q<br>(huấn luyện có bỏ ngẫu nhiên Q)"] --> b4["B4. Gộp các cải tiến có ích<br>+ trung bình 3 hạt giống"] --> b5[["LSTM CẢI TIẾN<br>(mốc để so ở tầng 2)"]]
+    end
+
+    subgraph PC["C. Tầng 2 — Thay lõi LSTM bằng từng lõi khác, giữ nguyên mọi thứ của B (tinh chỉnh chiều ẩn 64/128/256)"]
+        direction LR
+        subgraph CC["4 lõi chạy độc lập, cùng điều kiện"]
+            c1["GRU<br>(RNN gọn hơn LSTM)"]
+            c2["Transformer<br>(cơ chế attention)"]
+            c3["S4D<br>(SSM đơn giản, đối chứng)"]
+            c4["Mamba<br>(SSM chọn lọc — mô hình chính)"]
+        end
+        CC --> c5[["BẢNG SO SÁNH KIẾN TRÚC<br>(cùng dữ liệu, chia tập, ngân sách)"]]
+    end
+
+    subgraph PD["D–F. Thí nghiệm mở rộng (3 thí nghiệm độc lập)"]
+        direction LR
+        x1["D. Chuỗi quá khứ dài hơn<br>LSTM và Mamba nhìn lại 365 so với 730 ngày"]
+        x2["E. Thêm 1 cải tiến cho mỗi lõi chính<br>Mamba+: quét hai chiều trong phần quá khứ<br>Transformer+: gom chuỗi thành đoạn (patch)<br>so với bản thuần cùng số tham số"]
+        x3["F. Dự báo xác suất (đầu CMAL)<br>→ xác suất vượt ngưỡng lũ"]
+    end
+
+    EV["ĐÁNH GIÁ mọi bước B–F trên test 2014–2017<br>NSE, KGE từng lưu vực (trung vị, CDF) · sai số đỉnh lũ (FHV), lệch thời điểm đỉnh<br>· so với persistence và bài gốc · trung bình ± độ lệch chuẩn qua 3 hạt giống<br>Kịch bản thực tế: trạm mất Q 1–7 ngày, tái phân tích đến trễ 5 ngày<br>Mamba hơn LSTM ở loại lưu vực nào (so từng lưu vực với 33 đặc trưng)"]
+
+    subgraph PG["G. Giải thích mô hình, ngưỡng nguy cơ lũ, demo"]
+        direction LR
+        g1["XAI — Integrated Gradients<br>ngày nào, nhóm biến nào ảnh hưởng tới dự báo"] --> g2["Ngưỡng nguy cơ lũ theo chu kỳ lặp lại<br>Gumbel / L-moments trên qmax lớn nhất mỗi năm"] --> g3["Demo bản đồ 451 lưu vực<br>xác suất vượt ngưỡng, XAI"]
+    end
+
+    FIN[["BÁO CÁO TIỂU LUẬN + DEMO"]]
+    KL["Để dành cho khóa luận: dữ liệu giờ · dự báo nhiều ngày · loss ưu tiên đỉnh lũ<br>· đồ thị mạng sông · biến thể lai · xLSTM · phần mềm ứng dụng"]
+
+    P0 --> PA --> PB --> PC --> PD --> EV --> PG --> FIN
+    FIN -.-> KL
+
+    classDef data fill:#dae8fc,stroke:#6c8ebf
+    classDef a fill:#fff2cc,stroke:#d6b656
+    classDef b fill:#d5e8d4,stroke:#82b366
+    classDef c fill:#e1d5e7,stroke:#9673a6
+    classDef d fill:#ffe6cc,stroke:#d79b00
+    classDef ev fill:#f8cecc,stroke:#b85450,font-weight:bold
+    classDef kl fill:#f5f5f5,stroke:#666666,stroke-dasharray:5 5
+    class P0 data
+    class PA a
+    class PB b
+    class PC c
+    class CC c
+    class PD d
+    class PG data
+    class EV ev
+    class KL kl

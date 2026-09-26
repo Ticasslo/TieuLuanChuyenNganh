@@ -124,7 +124,7 @@ Số liệu tham chiếu của RiverMamba (R² 0,873 vs GloFAS; 0,506 vs GRDC) *
 
 ## 9. Hạ tầng
 
-- **Compute train:** Google Colab (bản miễn phí) là chính, Kaggle dự phòng (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Lightning AI khi cần. Thư viện `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel 1 lần rồi lưu Drive/Kaggle Dataset (`RiverMamba.md` Mục 0).
+- **Compute train:** Kaggle là chính (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Google Colab bản miễn phí dự phòng, Lightning AI khi cần. Thư viện `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel 1 lần rồi lưu Drive/Kaggle Dataset (`RiverMamba.md` Mục 0).
 - **Lưu trữ dữ liệu:** LamaH-CE được tải một lần trên Kaggle (notebook CPU chạy nền) và lưu thành Kaggle Dataset private (`lamah-ce-core`, `lamah-ce-extra`) để mọi notebook sau gắn vào dùng lại, không tải lại 14,8 GB mỗi phiên; lý do và cách làm ở `LamaHCE/LamaHCE.md`. Notebook dùng Colab lấy dữ liệu qua Kaggle API (token lưu trong Colab Secrets).
 - **Demo (yêu cầu bắt buộc của TLCN — `02_literature_review.md` Mục 3):** ⏳ chưa chốt; đề xuất hiện tại ở `CHECKPDF.md` Mục 8.2. Lưu ý: 4 bộ dữ liệu là dữ liệu lịch sử, không có luồng cập nhật hằng ngày. VPS Oracle Cloud Always Free (2 OCPU/12 GB từ 15/6/2026) vẫn dùng được để host demo.
 

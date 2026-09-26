@@ -142,7 +142,7 @@ Mọi mô hình đi qua ba khối, giống cấu trúc "bánh kẹp" của bài 
 
 ## 4. Hạ tầng và tổ chức mã
 
-- **Tính toán:** Google Colab bản miễn phí là chính, Kaggle dự phòng (GPU 30 giờ/tuần, tối đa 12 giờ/phiên); mã chạy được trên cả hai nền tảng.
+- **Tính toán:** Kaggle là chính (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Google Colab bản miễn phí dự phòng; mã chạy được trên cả hai nền tảng.
 - **Dữ liệu:** Kaggle Dataset private, gắn vào notebook bằng Add Input; Colab lấy qua Kaggle API với token trong Colab Secrets.
 - **Tổ chức mã:** mỗi notebook là một tệp `.py` tự đủ, đặt tên `LamaHCE_<Việc>.py`, có mục lục đầu tệp và chia cell theo "Phần". Ghi chú kết quả đặt ở `LamaHCE/LamaHCE.md`, không để trong mã.
 

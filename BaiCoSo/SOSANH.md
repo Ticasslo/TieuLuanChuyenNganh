@@ -175,7 +175,7 @@ Về độ tin cậy số liệu công bố, #121 hơn rõ: số tự tính lạ
 | Có công khai không | Không: OpenReview của ICML 2024 chỉ có tóm tắt và PDF | Có: 2 phản biện, 2 vòng, trả lời của tác giả, bản đánh dấu sửa đổi (HESS Discussions egusphere-2025-4978) |
 | Đánh giá chung | Không biết | Tích cực ở cả hai phản biện; vòng 2 xác nhận mọi ý đã được giải quyết |
 | Ý phê bình chính | Không biết | Chỉ lead 1 ngày; cách đặt vấn đề "bias" trong khi Q quan trắc chủ yếu giảm bất định trạng thái ban đầu; thiếu phân tích theo lưu vực (đã bổ sung Mục 2.3, 3.1.1, 3.6); tanh ở lớp nhúng; đề nghị so với persistence — tác giả không thêm, chỉ lập luận rằng qmax ngày tự tương quan thấp |
-| Ý nghĩa cho tiểu luận | Không có | Persistence và dự báo nhiều ngày là hai điểm mở mà người phản biện đã chỉ ra — làm được và có căn cứ để nêu trước hội đồng |
+| Ý nghĩa cho tiểu luận | Không có | Persistence và dự báo nhiều ngày là hai điểm mở mà người phản biện đã chỉ ra — làm được và có căn cứ để nêu trước hội đồng; persistence đã tính: NSE trung vị 0,35–0,37, mô hình tốt nhất hơn ở trên 92% lưu vực (`LamaHCE/LamaHCE.md` Mục 6.1) |
 
 Chi tiết: `CHECKPDF.md` Mục 5.12.
 
