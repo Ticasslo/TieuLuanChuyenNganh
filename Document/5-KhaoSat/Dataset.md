@@ -693,7 +693,7 @@ Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN
 
 ### 9.2 Các phương án
 
-> *Cập nhật 25/9/2026:* người dùng đã chốt **dùng cả 4 bộ dữ liệu**. Ba phương án dưới đây được viết khi còn chọn tập con — giữ lại làm phân tích tham khảo; vai trò cụ thể của từng bộ trong 4 bộ chưa chốt (xem `flood-forecasting-research.md` Mục 3).
+> Đề tài dùng Extended LamaH-CE theo bài cơ sở BiasCast (chốt 6/10/2026); ba bộ còn lại dùng cho phần khảo sát và công trình liên quan. Ba phương án dưới đây là phân tích tham khảo khi chọn bộ dữ liệu.
 
 **Phương án A: WaterBench-Iowa làm bộ dữ liệu chính.** Có đủ mốc đối chiếu (LSTM/GRU/Seq2Seq, Transformer, Mamba, mô hình đồ thị), có mã nguồn HydroGAT để phát triển hướng kết hợp đồ thị và Mamba, dữ liệu theo giờ, tải trực tiếp từ GitHub. Hạn chế: chuỗi 7 năm, 7 đặc trưng, một khu vực; HydroGAT không công bố dữ liệu đã xử lý (phải tự dựng từ Stage IV, DEM, USGS), thiết lập khác benchmark gốc, và bản đầy đủ được huấn luyện trên GPU A100.
 

@@ -206,12 +206,12 @@ with zipfile.ZipFile(EXT_ZIP) as zf:
             continue
         met = with_date_index(pd.read_csv(zf.open(find_member(ext_names, MET_DIR, f"/ID_{bid}.csv")), sep=";"))
         met_first.append(met.index.min())   # hindcast 730 ngày cần khí tượng từ 2001 cho mẫu train đầu tiên
+        ecmwf_cols = [c for c in met.columns if c.startswith("ECMWF")]
+        if ecmwf_cols:                      # tìm trên toàn chuỗi, trước khi cắt về 2003–2017
+            ecmwf_first.append(met[ecmwf_cols[0]].where(met[ecmwf_cols[0]] != MISSING_VALUE).first_valid_index())
         met = met.loc[PERIODS["train"][0]:PERIODS["test"][1]]
         forcing_missing = forcing_missing.add((met.isna() | (met == MISSING_VALUE)).sum(), fill_value=0)
         forcing_total += len(met)
-        ecmwf_cols = [c for c in met.columns if c.startswith("ECMWF")]
-        if ecmwf_cols:
-            ecmwf_first.append(met[ecmwf_cols[0]].where(met[ecmwf_cols[0]] != MISSING_VALUE).first_valid_index())
 
 quality = pd.DataFrame(rows).set_index("basin")
 

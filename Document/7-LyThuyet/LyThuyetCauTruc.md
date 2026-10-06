@@ -435,7 +435,7 @@ Về công thức thì đúng chỉ là 1 bước trước, nhưng vì `h_(t-1)`
 | Số ma trận trọng số | 4 (`W_f,W_i,W_o,W_C`) | **3** (`W_r,W_z,W_h`) — ít hơn 25% |
 | Chuỗi đệ quy mang lịch sử | Có (qua `C_t`) | Có (qua `h_t`) — cùng nguyên lý |
 | Tốc độ train | Chậm hơn (nhiều tham số hơn) | Nhanh hơn |
-| Độ chính xác thực tế | Gần tương đương nhau, tùy bài toán | Gần tương đương nhau, tùy bài toán — không cái nào áp đảo hẳn (đúng như nhiều bài trong `02_literature_review.md` dùng cả LSTM lẫn GRU làm baseline song song) |
+| Độ chính xác thực tế | Gần tương đương nhau, tùy bài toán | Gần tương đương nhau, tùy bài toán — không cái nào áp đảo hẳn (đúng như nhiều bài trong `KhaoSatTaiLieu.md` dùng cả LSTM lẫn GRU làm baseline song song) |
 
 ### 3.10 Đã tự kiểm tra lại (12/8/2026)
 
@@ -462,7 +462,7 @@ Về công thức thì đúng chỉ là 1 bước trước, nhưng vì `h_(t-1)`
 
 ### 4.2 Tính toán ít hơn Transformer thì có kém chính xác hơn không
 
-**Trả lời ngắn: KHÔNG rõ rệt** — đã verify thật ở file `02_literature_review.md`, Mục 1 (khảo sát Mamba — *khác Phần 1 của chính file này, Phần 1 ở đây là LSTM*): 2 bài (463 và 68 trích dẫn, số tra 19/8/2026) đều kết luận Mamba và Transformer **cạnh tranh ngang nhau** về độ chính xác, dù Mamba tính ít hơn hẳn (O(n) vs O(n²)).
+**Trả lời ngắn: KHÔNG rõ rệt** — đã verify thật ở file `KhaoSatTaiLieu.md`, Mục 1 (khảo sát Mamba — *khác Phần 1 của chính file này, Phần 1 ở đây là LSTM*): 2 bài (463 và 68 trích dẫn, số tra 19/8/2026) đều kết luận Mamba và Transformer **cạnh tranh ngang nhau** về độ chính xác, dù Mamba tính ít hơn hẳn (O(n) vs O(n²)).
 
 **Vì sao "tính ít hơn" ≠ "kém chính xác hơn":** Độ phức tạp (Big-O) đo **lượng phép tính**, không đo **độ thông minh của thuật toán**. Thuật toán rẻ hơn hoàn toàn có thể đạt kết quả ngang bằng nếu nó chọn việc để làm thông minh hơn, thay vì tính kiểu "vét cạn".
 
@@ -909,7 +909,7 @@ h_1=1   h_2=2,8   h_3=2,46   h_4=2,976   h_5=3,3296   h_6=3,4972
 
 #### 4.6.8 Liên hệ cài đặt thực tế
 
-Cài đặt bằng **CUDA kernel chuyên dụng** (`selective_scan_cuda`, `causal_conv1d_cuda` — đúng tên đã ghi trong `flood-forecasting-research.md` Mục 8.2, lý do bắt buộc cần GPU) — tối ưu phần cứng: giữ tính toán trong bộ nhớ nhanh trên chip (SRAM) thay vì đọc/ghi liên tục ra bộ nhớ GPU chậm hơn (HBM) — lý do Mamba chạy nhanh thật trên GPU, không chỉ nhanh trên giấy.
+Cài đặt bằng **CUDA kernel chuyên dụng** (`selective_scan_cuda`, `causal_conv1d_cuda` — đúng tên đã ghi trong `Document/1-KeHoach/KeHoachTongThe.md` Mục 8, lý do bắt buộc cần GPU) — tối ưu phần cứng: giữ tính toán trong bộ nhớ nhanh trên chip (SRAM) thay vì đọc/ghi liên tục ra bộ nhớ GPU chậm hơn (HBM) — lý do Mamba chạy nhanh thật trên GPU, không chỉ nhanh trên giấy.
 
 #### 4.6.9 Đã tự kiểm tra lại + nguồn tham khảo (14/8/2026)
 

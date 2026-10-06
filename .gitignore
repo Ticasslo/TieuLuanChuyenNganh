@@ -225,5 +225,8 @@ CLAUDE.md
 .codegraph/
 
 # Tai lieu tham khao tai ve (ban quyen / dung luong lon) — khong dua len git
-PDF/
-Code/
+PaperResearchPDF/
+PaperResearchCode/
+
+# Tệp sao lưu tự động của draw.io
+*.bkp

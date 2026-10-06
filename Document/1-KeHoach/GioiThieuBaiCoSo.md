@@ -1,6 +1,6 @@
 # Giới thiệu bài cơ sở — BiasCast (HESS 2026)
 
-> Tài liệu trình bày bài báo được đề xuất làm bài cơ sở cho đề tài *Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy*: nội dung bài, mô hình, chỉ số đánh giá, kết quả, lý do chọn, hạn chế phát hiện khi đọc mã nguồn và phản biện, hướng cải tiến. Phương án thay thế: Kirschstein & Sun (ICML 2024), `TongQuan/GioiThieuBaiCoSo.md`. Đề xuất và lý do xếp thứ tự: `TongQuan/ChonBaiCoSo.md`. Pipeline: `TongQuan/KienTrucPipeline_BiasCast.md`. So sánh chi tiết hai bài: `BaiCoSo/SOSANH.md`.
+> Tài liệu trình bày bài báo được chọn làm bài cơ sở cho đề tài *Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy*: nội dung bài, mô hình, chỉ số đánh giá, kết quả, lý do chọn, hạn chế phát hiện khi đọc mã nguồn và phản biện, hướng cải tiến. Pipeline của đề tài: `Document/1-KeHoach/KienTrucPipeline.md`.
 
 ## 1. Thông tin bài báo
 
@@ -128,7 +128,7 @@ Vị trí trong bài: Mục 3.1–3.6, Hình 3–10, Phụ lục F.
 7. **Tái lập được, dữ liệu nhẹ:** cấu hình, trọng số và kết quả theo lưu vực của mọi thí nghiệm công khai; dữ liệu 0,95 GB; chạy được trên GPU miễn phí (Kaggle, Google Colab).
 8. **Hỗ trợ demo:** 451 lưu vực có ranh giới, tọa độ; dữ liệu trạm có từ 1981 để tính ngưỡng lũ.
 
-**So với phương án thay thế (Kirschstein & Sun, ICML 2024):** Kirschstein & Sun hơn về uy tín nơi công bố (hội nghị A* ngành học máy, 21 trích dẫn) và có dữ liệu theo giờ, mạng sông; nhưng công thức NSE trong mã tính sai, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train, mô hình không có thành phần học chuỗi thời gian và bài toán không dùng dự báo thời tiết. Chi tiết: `TongQuan/ChonBaiCoSo.md`, `BaiCoSo/SOSANH.md`.
+**So với Kirschstein & Sun (ICML 2024), ứng viên đã cân nhắc:** Kirschstein & Sun hơn về uy tín nơi công bố (hội nghị A* ngành học máy, 21 trích dẫn) và có dữ liệu theo giờ, mạng sông; nhưng công thức NSE trong mã tính sai, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train, mô hình không có thành phần học chuỗi thời gian và bài toán không dùng dự báo thời tiết. Chi tiết: `Document/6-ChonBaiCoSo/CHECKPDF.md` Mục 8.4c, 8.6.
 
 ## 9. Hạn chế phát hiện khi đọc mã nguồn và phản biện
 
@@ -162,7 +162,7 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 7. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum): ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
 8. Demo bản đồ dự báo theo ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực.
 
-**Giai đoạn khóa luận:** dự báo nhiều ngày; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Phạm vi chi tiết: `TongQuan/KienTrucPipeline_BiasCast.md` Mục 9.
+**Giai đoạn khóa luận:** dự báo nhiều ngày; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Phạm vi chi tiết: `Document/1-KeHoach/KienTrucPipeline.md` Mục 9.
 
 ## 11. Pipeline và kiến trúc chi tiết của bài (đọc từ mã)
 
@@ -217,4 +217,4 @@ Mọi cấu hình dùng hạt giống 111.
 - Mạng handoff của Encoder–Decoder LSTM gồm hai lớp tuyến tính liên tiếp không có hàm kích hoạt (lớp `FC` của NeuralHydrology không áp kích hoạt cho lớp cuối), trong khi bài mô tả là mạng handoff phi tuyến; tác giả xác nhận khi trả lời phản biện là "một lớp 128".
 - Mạng nhúng "đơn giản" là một lớp tuyến tính, không có tanh như Mục 2.2.6 mô tả.
 - Mọi cấu hình Sequential Forecast LSTM và Encoder–Decoder LSTM dùng cùng một bộ siêu tham số (128, 256, 0,3), trong khi các baseline có bộ khác nhau; bài không nêu rõ tối ưu Bayes được chạy riêng cho từng kiến trúc hay không.
-- Quy tắc lọc mẫu ở bước 4 khiến mẫu huấn luyện bị loại khi thiếu `qmean` hoặc thiếu dữ liệu ECMWF ở bất kỳ ngày nào trong 365 ngày trước đó — dữ liệu ECMWF bắt đầu 01/01/2003 ở mọi lưu vực (`LamaHCE/LamaHCE.md` Mục 6.1), nên mọi mẫu năm 2003 có cửa sổ chứa ngày 2002 thiếu ECMWF và bị loại: kỳ train thực chất chỉ còn 2004–2009 (khoảng 14% mẫu train bị mất), cộng năm đầu của 27 trạm bắt đầu đo muộn.
+- Quy tắc lọc mẫu ở bước 4 khiến mẫu huấn luyện bị loại khi thiếu `qmean` hoặc thiếu dữ liệu ECMWF ở bất kỳ ngày nào trong 365 ngày trước đó — dữ liệu ECMWF có từ năm 2002 (`Document/3-DuLieu/LamaHCE.md` Mục 6.1), nên năm 2003 không bị loại vì ECMWF; mẫu huấn luyện bị loại chủ yếu ở năm đầu của 27 trạm bắt đầu đo muộn và các ngày thiếu `qmean`.

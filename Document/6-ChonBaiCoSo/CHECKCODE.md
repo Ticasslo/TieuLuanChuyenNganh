@@ -1,6 +1,6 @@
 # Báo cáo đọc mã nguồn các bài báo ứng viên làm bài cơ sở
 
-> Ngày lập: 26/9/2026. Tài liệu kiểm tra mã nguồn thật của từng ứng viên về tính đúng đắn phương pháp (chia tập, chuẩn hóa, chọn mô hình, cách tính chỉ số), mức độ khớp với mô tả trong bài, khả năng tái lập trên Google Colab và vị trí chèn khối Mamba. Phân tích toàn văn và xếp hạng nằm ở `CHECKPDF.md`. Mã nguồn lưu tại thư mục `Code/` (không đưa lên git).
+> Ngày lập: 26/9/2026. Tài liệu kiểm tra mã nguồn thật của từng ứng viên về tính đúng đắn phương pháp (chia tập, chuẩn hóa, chọn mô hình, cách tính chỉ số), mức độ khớp với mô tả trong bài, khả năng tái lập trên Google Colab và vị trí chèn khối Mamba. Phân tích toàn văn và xếp hạng nằm ở `CHECKPDF.md`. Mã nguồn lưu tại thư mục `PaperResearchCode/` (không đưa lên git).
 >
 > Phạm vi đọc: toàn bộ đường ống dữ liệu → mô hình → huấn luyện → đánh giá → script chạy của mỗi repo. Không đọc từng dòng các thư viện bên thứ ba được chép nguyên vào repo mà đường ống không gọi tới (`22_S4D-FT/papercode/src`, `42_TFRN/utils/notebooks/backend`, phần nội tại các mô hình Time-Series-Library của #6, notebook vẽ hình của #38). Chạy thử thực hiện trên CPU (PyTorch 2.14) trong môi trường riêng, không nằm trong repo.
 
@@ -8,26 +8,26 @@
 
 | # | Repo | Chia tập | Chuẩn hóa theo train | Chọn mô hình | Kèm dữ liệu | Vấn đề chính |
 |---|---|---|---|---|---|---|
-| #104 | `Code/104_ICML-RiverTopology` | Test 2016–2017, train theo năm | Có (2000–2015) | Loss nhỏ nhất trên 1/5 cửa sổ train ngẫu nhiên | Tự tải LamaH-CE; kèm 957 checkpoint | Công thức NSE sai; validation không độc lập; cửa sổ cắt trong từng năm |
-| #121 | `Code/BiasCast` + fork NeuralHydrology + Zenodo 17292895 | 2003–2009 / 2010–2013 / 2014–2017 | Có (scaler lưu kèm) | Theo validation (NeuralHydrology) | Extended LamaH-CE 0,95 GB (Zenodo 17119635) | 1 hạt giống; chưa chạy thử |
-| #109 + #56 | `Code/OpenHydroNet` (Google, Apache 2.0) | Cấu hình vận hành: train = validation = test 1982–2023; cấu hình CAMELS-US: validation trùng test 2021–2025 | Có | Theo cấu hình (NeuralHydrology) | Mẫu Caravan nhỏ; MultiMet zarr công khai; kèm 2 bộ trọng số (huấn luyện trên toàn bộ 1982–2023) | Không có mốc công bố tái lập được; chỉ dữ liệu ngày; không dùng Q quan trắc |
+| #104 | `PaperResearchCode/104_ICML-RiverTopology` | Test 2016–2017, train theo năm | Có (2000–2015) | Loss nhỏ nhất trên 1/5 cửa sổ train ngẫu nhiên | Tự tải LamaH-CE; kèm 957 checkpoint | Công thức NSE sai; validation không độc lập; cửa sổ cắt trong từng năm |
+| #121 | `PaperResearchCode/BiasCast` + fork NeuralHydrology + Zenodo 17292895 | 2003–2009 / 2010–2013 / 2014–2017 | Có (scaler lưu kèm) | Theo validation (NeuralHydrology) | Extended LamaH-CE 0,95 GB (Zenodo 17119635) | 1 hạt giống; chưa chạy thử |
+| #109 + #56 | `PaperResearchCode/OpenHydroNet` (Google, Apache 2.0) | Cấu hình vận hành: train = validation = test 1982–2023; cấu hình CAMELS-US: validation trùng test 2021–2025 | Có | Theo cấu hình (NeuralHydrology) | Mẫu Caravan nhỏ; MultiMet zarr công khai; kèm 2 bộ trọng số (huấn luyện trên toàn bộ 1982–2023) | Không có mốc công bố tái lập được; chỉ dữ liệu ngày; không dùng Q quan trắc |
 | #67 | Hy2DL + Zenodo `14780059` | 1990–2003 / 2003–2008 / 2008–2018 | Có | Epoch cuối | Tự tải CAMELS-US giờ | Không có vấn đề phương pháp; dữ liệu ~20 GB |
-| #22 | `Code/22_S4D-FT` | Train 1999–2008 / test 1989–1999 | Có (hằng số) | Epoch cố định 49; validation 10% cửa sổ train ngẫu nhiên | Tự tải CAMELS + NLDAS mở rộng | Script không khớp Bảng S3; một số tiện ích hỏng |
+| #22 | `PaperResearchCode/22_S4D-FT` | Train 1999–2008 / test 1989–1999 | Có (hằng số) | Epoch cố định 49; validation 10% cửa sổ train ngẫu nhiên | Tự tải CAMELS + NLDAS mở rộng | Script không khớp Bảng S3; một số tiện ích hỏng |
 | #103 | FloodGNNs | Theo tỉ lệ thời gian | Có | Theo validation | Dữ liệu đã xử lý trên Google Drive | Lỗi import; NSE gộp; loss khác bài |
 | #71/#54 | FHNN (GitHub) | 1985–1993 / 1993–1995 / 1995–2005 | Có | Loss validation nhỏ nhất | Không (thiếu tiền xử lý) | Không tái lập được số liệu |
-| #53 | `Code/53_HydroTFT` | Không có validation | Hằng số toàn cục | Chọn epoch theo NSE trên kỳ test | Không | Chọn mô hình trên tập test |
-| #42 | `Code/42_TFRN` | 1980–1995 / 1995–2000 / 2000–2014 | Có | MSE validation nhỏ nhất | Không | Lỗi vòng lặp DiT; NSE gộp |
-| #6 | `Code/06_RNNs-to-Transformers` | Có | Có | Epoch cuối | Có (`CAMELS.nc`) | Hàm mất mát khác nhau giữa LSTM và Transformer |
+| #53 | `PaperResearchCode/53_HydroTFT` | Không có validation | Hằng số toàn cục | Chọn epoch theo NSE trên kỳ test | Không | Chọn mô hình trên tập test |
+| #42 | `PaperResearchCode/42_TFRN` | 1980–1995 / 1995–2000 / 2000–2014 | Có | MSE validation nhỏ nhất | Không | Lỗi vòng lặp DiT; NSE gộp |
+| #6 | `PaperResearchCode/06_RNNs-to-Transformers` | Có | Có | Epoch cuối | Có (`CAMELS.nc`) | Hàm mất mát khác nhau giữa LSTM và Transformer |
 | #36 | dmg-research (GitHub) | 1980–1995 / 1995–2010 | Có | Epoch cố định 100 | Không | Cần gói `dmg`, PyTorch 2.9.1 |
-| #135 | `Code/135_TSFM` | 1980–1992 / 1992–1995 / 1995–2005 | Có | MSE validation + dừng sớm | Không | Thiếu mã phần đa biến |
-| #38 | `Code/38_CNN-LSTM` | Kratzert + PUB 12 phần | Có (hằng số) | Epoch cố định 30 | Không (raster tự tạo) | Cấu hình raster mặc định lệch bài |
-| — | `Code/MTPre` | 1980–1995 / 1995–1999 / 1999–2014 | Có | NSE-like validation | Không | Nhánh EMD rò rỉ tương lai |
+| #135 | `PaperResearchCode/135_TSFM` | 1980–1992 / 1992–1995 / 1995–2005 | Có | MSE validation + dừng sớm | Không | Thiếu mã phần đa biến |
+| #38 | `PaperResearchCode/38_CNN-LSTM` | Kratzert + PUB 12 phần | Có (hằng số) | Epoch cố định 30 | Không (raster tự tạo) | Cấu hình raster mặc định lệch bài |
+| — | `PaperResearchCode/MTPre` | 1980–1995 / 1995–1999 / 1999–2014 | Có | NSE-like validation | Không | Nhánh EMD rò rỉ tương lai |
 
 ---
 
 ## 1. #104 — River Network Topology, ICML 2024
 
-**Nguồn.** `github.com/nkirschi/neural-flood-forecasting`, đẩy lần cuối 31/03/2025, không có tệp LICENSE. Bản trong `Code/` (3,4 GB) kèm checkpoint (1,9 GB) và kết quả. Mã ~880 dòng Python (`dataset.py`, `functions.py`, `models.py`, 8 script `train_*`/`test_*`) và 8 notebook.
+**Nguồn.** `github.com/nkirschi/neural-flood-forecasting`, đẩy lần cuối 31/03/2025, không có tệp LICENSE. Bản trong `PaperResearchCode/` (3,4 GB) kèm checkpoint (1,9 GB) và kết quả. Mã ~880 dòng Python (`dataset.py`, `functions.py`, `models.py`, 8 script `train_*`/`test_*`) và 8 notebook.
 
 **Dữ liệu.** `LamaHDataset` (PyTorch Geometric) tự tải `1_LamaH-CE_daily_hourly.tar.gz` (Zenodo `5153305`, 14,8 GB). Bắt đầu từ trạm 399, duyệt ngược dòng lấy thành phần liên thông; trạm hợp lệ khi lưu lượng > 0 trên toàn chuỗi và đủ (18×365+5)×24 giờ trong 2000–2017; trạm không hợp lệ bị xóa và nối lại cạnh. Toàn bộ dữ liệu ≈ 358 × 157.800 × 5 float32 ≈ 1,1 GB.
 
@@ -213,7 +213,7 @@
 
 ## 14. OpenHydroNet — mã mô hình dự báo của Google FloodHub
 
-**Nguồn.** `github.com/google-research/flood-forecasting` (Apache 2.0), bản trong `Code/OpenHydroNet` (clone 26/9/2026, commit 21/9/2026, 236 MB gồm 80 MB trọng số, ~19.300 dòng Python). Fork NeuralHydrology, gói `googlehydrology`: `datasetzoo/` (`caravan.py`, `multimet.py`), `modelzoo/` (`handoff_forecast_lstm.py`, `mean_embedding_forecast_lstm.py`, mỗi tệp ~560 dòng; `head.py` gồm đầu ra CMAL), `training/`, `evaluation/`, thư mục `test/`, notebook `tutorial/OpenHydroNet_Tutorial.ipynb` kèm mẫu Caravan nhỏ.
+**Nguồn.** `github.com/google-research/flood-forecasting` (Apache 2.0), bản trong `PaperResearchCode/OpenHydroNet` (clone 26/9/2026, commit 21/9/2026, 236 MB gồm 80 MB trọng số, ~19.300 dòng Python). Fork NeuralHydrology, gói `googlehydrology`: `datasetzoo/` (`caravan.py`, `multimet.py`), `modelzoo/` (`handoff_forecast_lstm.py`, `mean_embedding_forecast_lstm.py`, mỗi tệp ~560 dòng; `head.py` gồm đầu ra CMAL), `training/`, `evaluation/`, thư mục `test/`, notebook `tutorial/OpenHydroNet_Tutorial.ipynb` kèm mẫu Caravan nhỏ.
 
 **Mô hình.** `MeanEmbeddingForecastLSTM`: mỗi nguồn khí tượng qua một mạng nhúng riêng, gộp bằng trung bình có mặt nạ (bỏ nguồn bị thiếu), rồi vào LSTM hindcast (365 bước) và LSTM forecast (lead time 7); trạng thái LSTM hindcast truyền sang LSTM forecast; thuộc tính tĩnh qua mạng nhúng riêng. Không có Mamba hay Transformer.
 
@@ -234,9 +234,9 @@
 
 ## 15. #121 BiasCast
 
-**Nguồn.** `github.com/conestone/biascast` (bản trong `Code/BiasCast`, commit 03/08/2026, ~1.550 dòng Python + notebook): chỉ gồm notebook chạy thí nghiệm (`Experiments/_run/Run_Experiment.ipynb`, `Transfer_Weights.ipynb`) và mã phân tích, vẽ hình (`Inspect_Experiments/`). Huấn luyện dùng bản fork NeuralHydrology `github.com/conestone/neuralhydrology` (đọc ở đoạn dưới). Thư mục `Experiments/` và `Data/` để trống, phải thay bằng Zenodo 17292895 (cấu hình `config.yml`, `best_model.pt`, scaler, `test_metrics.csv` NSE/KGE theo lưu vực cho từng thí nghiệm) và Zenodo 17119635 (Extended LamaH-CE, 0,95 GB).
+**Nguồn.** `github.com/conestone/biascast` (bản trong `PaperResearchCode/BiasCast`, commit 03/08/2026, ~1.550 dòng Python + notebook): chỉ gồm notebook chạy thí nghiệm (`Experiments/_run/Run_Experiment.ipynb`, `Transfer_Weights.ipynb`) và mã phân tích, vẽ hình (`Inspect_Experiments/`). Huấn luyện dùng bản fork NeuralHydrology `github.com/conestone/neuralhydrology` (đọc ở đoạn dưới). Thư mục `Experiments/` và `Data/` để trống, phải thay bằng Zenodo 17292895 (cấu hình `config.yml`, `best_model.pt`, scaler, `test_metrics.csv` NSE/KGE theo lưu vực cho từng thí nghiệm) và Zenodo 17119635 (Extended LamaH-CE, 0,95 GB).
 
-**Fork NeuralHydrology** (`Code/BiasCast_NH`, `github.com/conestone/neuralhydrology`): tách từ NeuralHydrology upstream tại commit `f00cf47`, thêm đúng 1 commit `9d94908` (16/09/2025) sửa 7 tệp: `datasetzoo/lamah.py` (cho phép nhãn `qmean`, `qmin`, `qmax`; chỉ nạp 1 cột lưu lượng — cột nhãn đầu tiên khớp), `evaluation/tester.py` (thêm đánh giá bằng `best_model.pt`), `training/early_stopping.py` (mới), `training/__init__.py` (bộ lập lịch learning rate), `training/basetrainer.py` (dừng sớm theo NSE validation, lưu mô hình tốt nhất), `training/logger.py`, `utils/config.py`. Mô hình (`sequential_forecast_lstm.py`, `handoff_forecast_lstm.py`, `cudalstm.py`) và hàm tính chỉ số là của upstream, không sửa.
+**Fork NeuralHydrology** (`PaperResearchCode/BiasCast_NH`, `github.com/conestone/neuralhydrology`): tách từ NeuralHydrology upstream tại commit `f00cf47`, thêm đúng 1 commit `9d94908` (16/09/2025) sửa 7 tệp: `datasetzoo/lamah.py` (cho phép nhãn `qmean`, `qmin`, `qmax`; chỉ nạp 1 cột lưu lượng — cột nhãn đầu tiên khớp), `evaluation/tester.py` (thêm đánh giá bằng `best_model.pt`), `training/early_stopping.py` (mới), `training/__init__.py` (bộ lập lịch learning rate), `training/basetrainer.py` (dừng sớm theo NSE validation, lưu mô hình tốt nhất), `training/logger.py`, `utils/config.py`. Mô hình (`sequential_forecast_lstm.py`, `handoff_forecast_lstm.py`, `cudalstm.py`) và hàm tính chỉ số là của upstream, không sửa.
 
 **Cắt cửa sổ (kiểm chống rò rỉ).** `basedataset.py` dòng 158–164: với ngày nhãn t, hindcast lấy [t − 364, t − 1], forecast lấy ngày t; nên Q quan trắc (`qmean`) và khí tượng tái phân tích chỉ tới hôm trước, dự báo ECMWF cho ngày t, nhãn `qmax` của ngày t — không rò rỉ nhãn.
 
@@ -250,12 +250,12 @@
 - Đầu vào hindcast dùng tái phân tích tới hôm trước; thực tế ERA5-Land, E-OBS, GLEAM công bố trễ nhiều ngày — cấu hình không lùi đầu vào theo độ trễ công bố (tác giả tự nêu hạn chế này ở Mục 3.7).
 - Thí nghiệm có Q đọc thư mục `LamaH_expanded_q_input` — không có trong bản Zenodo; phải tự chép cột `qmean` từ `D_gauges` vào tệp khí tượng mức A (do bộ nạp chỉ nạp 1 cột lưu lượng).
 - Đơn vị lưu lượng: bộ nạp `datasetzoo/lamah.py` chỉ nạp 1 cột lưu lượng từ `D_gauges` (cột nhãn đầu tiên khớp, ở đây `qmax`) và luôn chia theo diện tích `area_gov` sang mm/ngày; tệp `D_gauges` của Extended LamaH-CE có cột `qmin;qmean;qmax` cùng đơn vị m³/s (kiểm tệp `ID_205.csv`). `qmean` đầu vào đọc từ thư mục khí tượng riêng, không đổi đơn vị; scaler của tác giả cho `qmean` trung bình 4,58 / độ lệch 16,15 so với `qmax` 2,57 / 5,26 — nhiều khả năng `qmean` ở m³/s còn nhãn ở mm/ngày (chưa kiểm được vì thư mục không công khai). NSE theo lưu vực không bị ảnh hưởng bởi đơn vị nhãn.
-- Lọc mẫu huấn luyện (`basedataset.py`, `_validate_samples`): mẫu bị loại nếu bất kỳ cột nào trong 37 biến động có giá trị thiếu ở bất kỳ ngày nào của cửa sổ 365 ngày — kể cả cột ECMWF ở các ngày hindcast mà mô hình không dùng, và `qmean` ở biến thể có Q; validation và test giữ mọi mẫu. Nếu ECMWF bắt đầu từ 2003 thì phần lớn năm 2003 mất mẫu huấn luyện (năm bắt đầu chưa kiểm).
+- Lọc mẫu huấn luyện (`basedataset.py`, `_validate_samples`): mẫu bị loại nếu bất kỳ cột nào trong 37 biến động có giá trị thiếu ở bất kỳ ngày nào của cửa sổ 365 ngày — kể cả cột ECMWF ở các ngày hindcast mà mô hình không dùng, và `qmean` ở biến thể có Q; validation và test giữ mọi mẫu. ECMWF bắt đầu 01/01/2002 (`LamaHCE/LamaHCEExt_Explore.py` Phần 1), nên cửa sổ của mẫu năm 2003 có đủ ECMWF; mẫu huấn luyện bị loại chủ yếu ở các trạm bắt đầu đo muộn và ngày thiếu `qmean`.
 - Dừng sớm và chọn mô hình theo **trung vị** NSE validation qua các lưu vực (`logger.py` trả trung vị cho mọi chỉ số validation).
 - Hàm mất mát NSE* dùng độ lệch chuẩn `qmax` từng lưu vực tính trên dữ liệu chưa chuẩn hóa (mm/ngày) làm trọng số cho sai số trên dữ liệu đã chuẩn hóa toàn cục — như NeuralHydrology gốc.
 - Mạng handoff của Encoder–Decoder LSTM (`handoff_forecast_lstm.py`, `state_handoff_network: hiddens 128`): `FC` một lớp không có kích hoạt, tiếp theo `handoff_linear` tuyến tính → ánh xạ tuyến tính 256 → 128 → 256; bài mô tả là mạng phi tuyến.
 - 24 cấu hình: mọi cấu hình Sequential Forecast LSTM và Encoder–Decoder LSTM cùng siêu tham số (hidden 128, batch 256, dropout 0,3, không nhiễu nhãn); các baseline có bộ khác nhau (hidden 128–256, dropout 0,2–0,4, nhiễu nhãn 0,001–0,1) — chưa rõ tối ưu Bayes chạy riêng cho từng kiến trúc hay không.
-- Tệp danh sách lưu vực `basins_filtered.txt` mà mọi cấu hình trỏ tới (`train_basin_file`, `validation_basin_file`, `test_basin_file`) không có trong `Experiments.tar.gz` trên Zenodo; dựng lại được từ cột `basin` của `test_metrics.csv` (451 lưu vực). Mọi đường dẫn trong `config.yml` ghi cứng theo máy tác giả (`/home/ok2907/...`).
+- Tệp danh sách lưu vực `basins_filtered.txt` mà mọi cấu hình trỏ tới (`train_basin_file`, `validation_basin_file`, `test_basin_file`) nằm ở thư mục gốc `Experiments/` của `Experiments.tar.gz` trên Zenodo (xác nhận khi tải về Kaggle, 27/9/2026); đối chiếu được với cột `basin` của `test_metrics.csv` (451 lưu vực). Mọi đường dẫn trong `config.yml` ghi cứng theo máy tác giả (`/home/ok2907/...`).
 - Bản fork có sẵn các tùy chọn cải tiến: `nan_handling_method` (masked mean, input replacing, attention ở `inputlayer.py`), `autoregressive_inputs`, `lagged_features`, đầu `cmal`/`gmm`/`umal`. Riêng `basedataset.py` không tham chiếu `nan_handling_method` — bộ lọc mẫu vẫn loại mẫu huấn luyện có giá trị thiếu dù bật xử lý dữ liệu thiếu; muốn giữ các mẫu này phải sửa `_validate_samples`.
 - `_is_best_model` so với `best_value` không tính `min_delta` trong khi `EarlyStopping` chỉ cập nhật `best_value` khi cải thiện > 0,005: `best_model.pt` có thể bị ghi đè bởi epoch kém hơn epoch đã lưu trước đó tối đa 0,005 NSE validation.
 - Bài ghi dự báo ECMWF HRES lấy trung bình 8 giá trị 3 giờ từ lần phát hành 00 UTC của ngày t (Mục 2.1); mã tạo Extended LamaH-CE không công khai nên chưa kiểm được từ mã, căn chỉnh giữa ngày UTC và ngày của LamaH-CE chưa xác nhận.
