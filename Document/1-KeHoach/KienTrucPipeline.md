@@ -67,7 +67,7 @@ Chi tiết ở Mục 3.
 - **Cấu hình mốc (giữ như bài gốc để so sánh được):** hàm mất mát NSE* (chia sai số cho độ lệch chuẩn lưu lượng từng lưu vực), Adam lr 1e-3, CosineAnnealing 30 epoch, batch 256, cắt gradient 1, dropout đầu ra 0,3, dừng sớm theo NSE validation (patience 5).
 - **Siêu tham số:** cùng ngân sách tìm kiếm cho mọi lõi thời gian; bài gốc tối ưu Bayes 100 lần thử (kích thước ẩn, dropout, nhiễu nhãn, batch). Đề tài tìm số chiều ẩn 64 / 128 / 256 trên validation cho mỗi lõi (Mục 9), giữ các siêu tham số khác như bài gốc; mở rộng nếu còn quota.
 - **Hạt giống:** 3 hạt giống cho mỗi cấu hình (Mục 9); kết quả báo cáo cả từng hạt giống và tổ hợp (trung bình dự báo của 3 hạt giống).
-- **Ràng buộc phần cứng:** `mamba-ssm` cần GPU CUDA từ sm_75 (T4 chạy được, P100 không); wheel biên dịch một lần rồi lưu lại (`Document/7-LyThuyet/RiverMamba.md` Mục 0). Bài gốc báo vài phút tới khoảng 1 giờ mỗi lần chạy trên RTX 4090; thời gian trên T4 chưa đo.
+- **Ràng buộc phần cứng:** `mamba-ssm` cần GPU CUDA từ sm_75 (T4 chạy được, P100 không); wheel biên dịch một lần rồi lưu lại (`Document/6-LyThuyet/RiverMamba.md` Mục 0). Bài gốc báo vài phút tới khoảng 1 giờ mỗi lần chạy trên RTX 4090; thời gian trên T4 chưa đo.
 
 ### 2.7. Đánh giá
 
@@ -117,7 +117,7 @@ Giữ khung hindcast–forecast của bài gốc, chỉ thay lõi thời gian:
 | GRU | Thay LSTM trong khung sequential | Baseline hồi quy |
 | Transformer | Chuỗi 365 bước đã nhúng, attention có mặt nạ nhân quả | Baseline attention |
 | S4D | Thay LSTM trong khung sequential | Đối chứng SSM bất biến theo thời gian; mã từ S4D-FT (Wang và cs., WRR 2025) |
-| Mamba | Nối nhúng hindcast và forecast thành một chuỗi 365 bước, lấy đầu ra bước cuối | Mô hình chính; phải tự thêm vào NeuralHydrology (lớp Mamba có sẵn quét sai trục, `Document/6-ChonBaiCoSo/CHECKCODE.md` Mục 13) |
+| Mamba | Nối nhúng hindcast và forecast thành một chuỗi 365 bước, lấy đầu ra bước cuối | Mô hình chính; phải tự thêm vào NeuralHydrology (lớp Mamba có sẵn quét sai trục, `GioiThieuBaiCoSo.md` Mục 11.5) |
 
 - Quét hai chiều chỉ được dùng bên trong phần hindcast rồi dự báo sau cửa sổ; đầu ra lấy tại bước cuối nên không rò rỉ tương lai.
 - Mạng nhúng: tuyến tính (16 chiều) như cấu hình tốt nhất của bài; có dùng mạng nhúng phức tạp hay LOAN của RiverMamba để đưa thuộc tính vào hay không: chưa chốt.
@@ -229,7 +229,7 @@ Thứ tự trong tầng 2: chạy **dạng thuần** của mỗi lõi trước (
 | Dự báo nhiều ngày | Lead 1–7 ngày | Tác giả BiasCast nêu là nghiên cứu tiếp theo của nhóm | Extended LamaH-CE chỉ có dự báo cho ngày t; cần nguồn dự báo khác (Caravan MultiMet) | Khóa luận |
 | Mô hình lai vật lý (bảo toàn khối lượng) | MC-LSTM có sẵn trong NeuralHydrology | Bằng chứng trái chiều: Frame và cs. (HESS 2022) thấy MC-LSTM kém LSTM ở sự kiện cực trị; Baste và cs. 2025 thấy mô hình lai ngoại suy đỉnh tốt hơn | Rủi ro cao | Không đề xuất cho tiểu luận |
 | xLSTM làm thêm một lõi | Biến thể LSTM mới (Beck và cs., 2024) | Nghiên cứu nhiều lưu vực mới ở dạng preprint (SSRN); các bài đăng tạp chí chủ yếu một lưu vực hoặc MDPI | Thay lõi trong cùng khung như Mamba | Tùy chọn, chưa chốt |
-| Mô hình nền tảng chuỗi thời gian (dự báo không huấn luyện) | Làm mốc so sánh kiểu "AI tổng quát" | Có trong danh sách khảo sát (`Document/6-ChonBaiCoSo/CHECKPDF.md` Mục 5.7) | Chỉ làm mốc, không phải cải tiến | Tùy chọn |
+| Mô hình nền tảng chuỗi thời gian (dự báo không huấn luyện) | Làm mốc so sánh kiểu "AI tổng quát" | Sun & Sun (Machine Learning: Earth 2026): MOIRAI, Chronos, TTM, Sundial dự báo không huấn luyện trên CAMELS-US (`Document/5-KhaoSat/Dataset.md`) | Chỉ làm mốc, không phải cải tiến | Tùy chọn |
 
 ### 8.5. Câu hỏi nghiên cứu theo hai tầng
 

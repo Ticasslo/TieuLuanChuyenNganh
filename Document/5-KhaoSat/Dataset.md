@@ -441,7 +441,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | DOI | [10.1016/j.jhydrol.2026.135727](https://doi.org/10.1016/j.jhydrol.2026.135727) |
 | Dữ liệu | 516 lưu vực CAMELS-US, theo giờ (khớp với bản CAMELS-US theo giờ của Gauch et al., 2021, xem Mục 3.3) |
 | Mô hình | LSTM, PatchTST, Mamba |
-| Kết quả | **PatchTST > LSTM > Mamba** — "Mamba" ở bài này là S-Mamba tự viết, quét theo **biến** chứ không theo thời gian (RESEARCHING #35) → không đại diện cho Mamba theo thời gian |
+| Kết quả | **PatchTST > LSTM > Mamba** — "Mamba" ở bài này là S-Mamba tự viết, quét theo **biến** chứ không theo thời gian → không đại diện cho Mamba theo thời gian |
 | Ý nghĩa với đề tài | Mamba thuần có thể kém hơn Transformer (PatchTST) và LSTM. PatchTST nên có mặt trong nhóm baseline |
 
 #### 6.2.5 Zero-shot forecasting of streamflow using time series foundation models: are we there yet?
@@ -672,7 +672,7 @@ Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN
 
 - **Hạng Q** có dấu \* được ghi theo tra cứu sơ bộ, **cần đối chiếu lại trên SCImago** trước khi dùng chính thức. Hạng CORE của ICML (A\*) và ACM SIGSPATIAL (A) đã được tra cứu.
 - **Số trích dẫn** lấy từ Google Scholar hoặc OpenAlex tại thời điểm 13/9/2026. Hai nguồn có thể cho số khác nhau và số liệu thay đổi theo thời gian. Ô "—" là chưa tra cứu.
-- **Đối chiếu số liệu với toàn văn:** NSE 0,742/0,756/0,763 (Jing et al., ESWA) đúng với bài, trong đó 0,742/0,756 trên 531 lưu vực và 0,763 (S5Dv2) trên 671 lưu vực; chạy 5 hạt giống trong repo cho NSE trung vị S4D 0,750, S5D 0,751, LSTM 0,742 (`CHECKPDF.md` Mục 5.6, Phụ lục A.6). Chưa đối chiếu: thứ tự PatchTST > LSTM > Mamba (Zhang et al.; số 516 lưu vực khớp bản CAMELS-US theo giờ của Gauch et al., 2021); cấu hình thí nghiệm chi tiết của ResBi-Mamba Plus; mô hình cụ thể đạt NSE 0,74 / KGE 0,79 trong benchmark gốc của WaterBench-Iowa.
+- **Đối chiếu số liệu với toàn văn:** NSE 0,742/0,756/0,763 (Jing et al., ESWA) đúng với bài, trong đó 0,742/0,756 trên 531 lưu vực và 0,763 (S5Dv2) trên 671 lưu vực; chạy 5 hạt giống trong repo cho NSE trung vị S4D 0,750, S5D 0,751, LSTM 0,742. Chưa đối chiếu: thứ tự PatchTST > LSTM > Mamba (Zhang et al.; số 516 lưu vực khớp bản CAMELS-US theo giờ của Gauch et al., 2021); cấu hình thí nghiệm chi tiết của ResBi-Mamba Plus; mô hình cụ thể đạt NSE 0,74 / KGE 0,79 trong benchmark gốc của WaterBench-Iowa.
 - Công trình 6.4.3 không ghi tên "WaterBench" trong abstract. Việc xếp vào WaterBench-Iowa dựa trên việc công trình dùng đúng 125 lưu vực tại Iowa và có cùng nhóm tác giả với bộ dữ liệu.
 - Các công trình **preprint** (6.2.2, 6.2.6, 6.2.7, 6.4.2) chưa qua bình duyệt, chỉ nên trích dẫn như công trình liên quan.
 - Danh sách công trình phản ánh kết quả tra cứu tới ngày 13/9/2026, **không khẳng định đã bao quát toàn bộ**.

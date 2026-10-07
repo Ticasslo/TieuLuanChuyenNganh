@@ -11,13 +11,12 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `Document/3-DuLieu/` | Ghi chú thực thi dữ liệu LamaH-CE và Extended LamaH-CE: tải, kiểm tra, kết quả |
 | `Document/4-YTuong/` | Ý tưởng cho đề tài theo từng đợt tra cứu |
 | `Document/5-KhaoSat/` | Khảo sát bộ dữ liệu và khảo sát tài liệu |
-| `Document/6-ChonBaiCoSo/` | Danh sách 137 bài báo, bản tổng hợp, báo cáo đọc toàn văn và mã nguồn các ứng viên bài cơ sở |
-| `Document/7-LyThuyet/` | Lý thuyết LSTM, Transformer, GRU, Mamba; ghi chú đọc mã RiverMamba (tham khảo) |
+| `Document/6-LyThuyet/` | Lý thuyết LSTM, Transformer, GRU, Mamba; ghi chú đọc mã RiverMamba (tham khảo) |
 | `Diagrams/` | Sơ đồ đề tài (`SoDoDT.drawio`): thứ tự thực hiện và kiến trúc chi tiết |
 | `LamaHCE/` | Notebook Kaggle: tải, giới thiệu, phân tích dữ liệu |
 | `Tools/` | Công cụ phụ trợ (chuyển giọng nói buổi họp thành văn bản) |
 
-PDF bài báo (`PaperResearchPDF/`) và mã nguồn các công trình tham khảo (`PaperResearchCode/`) chỉ lưu trên máy, không đưa lên repo (bản quyền, dung lượng).
+PDF bài báo (`PaperResearchPDF/`) và mã nguồn BiasCast (`PaperResearchCode/`) chỉ lưu trên máy, không đưa lên repo (bản quyền, dung lượng).
 
 ## Trạng thái
 

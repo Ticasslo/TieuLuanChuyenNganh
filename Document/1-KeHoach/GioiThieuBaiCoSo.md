@@ -128,7 +128,7 @@ Vị trí trong bài: Mục 3.1–3.6, Hình 3–10, Phụ lục F.
 7. **Tái lập được, dữ liệu nhẹ:** cấu hình, trọng số và kết quả theo lưu vực của mọi thí nghiệm công khai; dữ liệu 0,95 GB; chạy được trên GPU miễn phí (Kaggle, Google Colab).
 8. **Hỗ trợ demo:** 451 lưu vực có ranh giới, tọa độ; dữ liệu trạm có từ 1981 để tính ngưỡng lũ.
 
-**So với Kirschstein & Sun (ICML 2024), ứng viên đã cân nhắc:** Kirschstein & Sun hơn về uy tín nơi công bố (hội nghị A* ngành học máy, 21 trích dẫn) và có dữ liệu theo giờ, mạng sông; nhưng công thức NSE trong mã tính sai, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train, mô hình không có thành phần học chuỗi thời gian và bài toán không dùng dự báo thời tiết. Chi tiết: `Document/6-ChonBaiCoSo/CHECKPDF.md` Mục 8.4c, 8.6.
+**So với Kirschstein & Sun (ICML 2024), ứng viên đã cân nhắc:** Kirschstein & Sun hơn về uy tín nơi công bố (hội nghị A* ngành học máy, 21 trích dẫn) và có dữ liệu theo giờ, mạng sông; nhưng công thức NSE trong mã tính sai, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train, mô hình không có thành phần học chuỗi thời gian và bài toán không dùng dự báo thời tiết.
 
 ## 9. Hạn chế phát hiện khi đọc mã nguồn và phản biện
 
@@ -218,3 +218,15 @@ Mọi cấu hình dùng hạt giống 111.
 - Mạng nhúng "đơn giản" là một lớp tuyến tính, không có tanh như Mục 2.2.6 mô tả.
 - Mọi cấu hình Sequential Forecast LSTM và Encoder–Decoder LSTM dùng cùng một bộ siêu tham số (128, 256, 0,3), trong khi các baseline có bộ khác nhau; bài không nêu rõ tối ưu Bayes được chạy riêng cho từng kiến trúc hay không.
 - Quy tắc lọc mẫu ở bước 4 khiến mẫu huấn luyện bị loại khi thiếu `qmean` hoặc thiếu dữ liệu ECMWF ở bất kỳ ngày nào trong 365 ngày trước đó — dữ liệu ECMWF có từ năm 2002 (`Document/3-DuLieu/LamaHCE.md` Mục 6.1), nên năm 2003 không bị loại vì ECMWF; mẫu huấn luyện bị loại chủ yếu ở năm đầu của 27 trạm bắt đầu đo muộn và các ngày thiếu `qmean`.
+
+### 11.5. Ghi chú mã cho việc chạy lại và cải tiến
+
+- **Bản fork NeuralHydrology** (`github.com/conestone/neuralhydrology`, bản trong `PaperResearchCode/BiasCast_NH`): tách từ NeuralHydrology tại commit `f00cf47`, thêm đúng 1 commit `9d94908` (16/09/2025) sửa 7 tệp: `datasetzoo/lamah.py` (cho nhãn `qmean`, `qmin`, `qmax`; chỉ nạp 1 cột lưu lượng), `evaluation/tester.py` (đánh giá bằng `best_model.pt`), `training/early_stopping.py` (mới), `training/__init__.py` (lập lịch learning rate), `training/basetrainer.py` (dừng sớm, lưu mô hình tốt nhất), `training/logger.py`, `utils/config.py`. Mô hình và hàm tính chỉ số giữ nguyên của NeuralHydrology.
+- **Mã của tác giả** (`github.com/conestone/biascast`, bản trong `PaperResearchCode/BiasCast`): chỉ gồm notebook chạy thí nghiệm (`Experiments/_run/Run_Experiment.ipynb`, `Transfer_Weights.ipynb`) và mã phân tích, vẽ hình (`Inspect_Experiments/`). Thư mục `Experiments/`, `Data/` để trống, thay bằng Zenodo 17292895 (bản 1.1 của bản ghi 17241922: `config.yml`, `best_model.pt`, scaler, `test_metrics.csv` của 24 cấu hình) và Zenodo 17119635 (dữ liệu).
+- **Cắt cửa sổ không rò rỉ nhãn** (`basedataset.py` dòng 158–164): với ngày nhãn t, hindcast lấy [t − 364, t − 1], forecast lấy ngày t.
+- **Đường dẫn ghi cứng** theo máy tác giả (`/home/ok2907/...`) trong mọi `config.yml`; tệp danh sách lưu vực `basins_filtered.txt` nằm ở gốc `Experiments/` trên Zenodo, khớp 451 lưu vực của `test_metrics.csv`.
+- **Biến thể có Q** đọc thư mục `LamaH_expanded_q_input` không có trên Zenodo: phải tự chép cột `qmean` từ `D_gauges` vào tệp khí tượng mức A.
+- **Lưu mô hình tốt nhất:** `_is_best_model` so với `best_value` không tính `min_delta`, trong khi `EarlyStopping` chỉ cập nhật `best_value` khi cải thiện trên 0,005, nên `best_model.pt` có thể bị ghi đè bởi epoch kém hơn tối đa 0,005 NSE validation.
+- **Tùy chọn có sẵn trong fork dùng cho cải tiến:** `nan_handling_method` (masked mean, input replacing, attention ở `inputlayer.py`), `lagged_features` (mọi mô hình), `autoregressive_inputs` (chỉ `arlstm`), đầu `cmal`/`gmm`/`umal`. `basedataset.py` không tham chiếu `nan_handling_method`, nên muốn giữ mẫu huấn luyện có giá trị thiếu phải sửa `_validate_samples`.
+- **Lớp Mamba có sẵn của NeuralHydrology quét sai trục:** `modelzoo/mamba.py` (PR #163, 02/2024) đặt 1 khối Mamba (`d_state` 16, `d_conv` 4, `expand` 2) sau `InputLayer`; `InputLayer.forward` trả [seq_length, batch, n_features] trong khi `mamba_ssm.Mamba` nhận (batch, length, dim), nên Mamba quét theo trục batch (PR ghi NSE khoảng 0,4). Sửa bằng `x.transpose(0, 1)` trước khi gọi `self.mamba`. Đề tài tự thêm mô hình Mamba vào `modelzoo`, thay LSTM trong khung Sequential Forecast LSTM.
+- **Tái lập:** cài fork, sửa đường dẫn trong `config.yml`, nạp `best_model.pt` qua `checkpoint_path`; tác giả dùng Python 3.12.3, GPU CUDA (RTX 4090, mỗi lần chạy vài phút tới khoảng 1 giờ).
