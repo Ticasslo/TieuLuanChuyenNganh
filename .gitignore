@@ -227,3 +227,6 @@ __marimo__/
 
 # Tệp sao lưu tự động của draw.io
 *.bkp
+
+# Cấu hình công cụ Serena (MCP), chỉ dùng trên máy
+.serena/
