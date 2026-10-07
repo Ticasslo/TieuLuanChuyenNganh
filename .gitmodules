@@ -4,3 +4,7 @@
 [submodule "PaperResearch/PaperResearchCode/BiasCast_NH"]
 	path = PaperResearch/PaperResearchCode/BiasCast_NH
 	url = https://github.com/conestone/neuralhydrology.git
+[submodule "NeuralHydrology"]
+	path = NeuralHydrology
+	url = https://github.com/Ticasslo/neuralhydrology.git
+	branch = research
