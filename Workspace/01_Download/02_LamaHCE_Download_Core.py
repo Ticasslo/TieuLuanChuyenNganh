@@ -1,14 +1,15 @@
 # =============================================================================
-# LamaH-CE — Notebook 2: tải phần bổ sung cho cải tiến
-# Bài cơ sở: Kirschstein & Sun (ICML 2024), "The Merit of River Network Topology for Neural Flood Forecasting"
-#            — LamaH-CE theo giờ, 358 trạm; mã github.com/nkirschi/neural-flood-forecasting
+# LamaH-CE gốc theo giờ — Notebook 1: tải phần lõi (B + D theo giờ, mạng sông)
+# Dùng cho hướng khóa luận (dữ liệu giờ, mạng sông); bài cơ sở của đề tài là BiasCast, dữ liệu chính tải ở
+# 01_LamaHCEExt_Download.py. Cách chọn tệp theo mã của Kirschstein & Sun (ICML 2024), "The Merit of River
+# Network Topology for Neural Flood Forecasting" — LamaH-CE theo giờ, 358 trạm; github.com/nkirschi/neural-flood-forecasting
 # Notebook Kaggle: Accelerator = None, bật Internet, dán Phần 1 vào cell 1, Phần 2 vào cell 2,
-# rồi Save Version → Save & Run All (chạy nền). Xong: tab Output → New Dataset (Private) "lamah-ce-extra".
-# Phần 1 giống hệt Phần 1 của LamaHCE_Download_Core.py (mỗi notebook phải tự đủ code).
+# rồi Save Version → Save & Run All (chạy nền). Xong: tab Output → New Dataset (Private) "lamah-ce-core".
+# Phần 1 giống hệt Phần 1 của 03_LamaHCE_Download_Extra.py (mỗi notebook phải tự đủ code).
 #
 # MỤC LỤC
 #   Phần 1 — Thư viện, hằng số, hàm tải theo luồng dùng chung
-#   Phần 2 — Tải phần bổ sung (A theo giờ, thuộc tính, shapefile, mạng sông, COSERO) → lamah_ce_extra.zip
+#   Phần 2 — Tải phần lõi (B + D theo giờ) → lamah_ce_core.zip
 # =============================================================================
 
 
@@ -32,7 +33,7 @@ from pathlib import Path
 LAMAH_URL = "https://zenodo.org/records/5153305/files/1_LamaH-CE_daily_hourly.tar.gz?download=1"
 LAMAH_COMPRESSED_GB = 14.8             # dự phòng khi Zenodo không trả Content-Length
 DAILY_KEY = "/2_timeseries/daily/"
-CORE_DIRS = ("B_basins_intermediate_all/", "D_gauges/")   # 2 thư mục bài cơ sở đọc (gói lõi)
+CORE_DIRS = ("B_basins_intermediate_all/", "D_gauges/")   # 2 thư mục mã Kirschstein & Sun đọc (gói lõi)
 ZIP_LEVEL = 6
 MAX_OUTPUT_GB = 18.0                   # /kaggle/working chỉ lưu tối đa 20 GB
 LOG_EVERY_SECONDS = 60
@@ -123,18 +124,15 @@ def stream_lamah(zip_path: Path, keep, max_output_gb: float = MAX_OUTPUT_GB) -> 
         print(f"Kiểm tra ZIP: {len(zf.namelist())} mục, lỗi CRC: {zf.testzip()}")
 
 
-# %% Phần 2 — Tải phần bổ sung cho cải tiến → Kaggle Dataset "lamah-ce-extra"
-# Giữ mọi thứ gói lõi (LamaHCE_Download_Core.py) chưa lấy, trừ chuỗi theo ngày và chuỗi thời gian của C:
-#   A theo giờ (lượng mưa trên toàn lưu vực thượng nguồn — baseline không đồ thị công bằng),
-#   thuộc tính >60 biến (LOAN/EA-LSTM), shapefile lưu vực/trạm/mạng sông (demo bản đồ),
-#   kết quả mô hình thủy văn COSERO (baseline mô hình vật lý).
-EXTRA_SKIP_PREFIXES = CORE_DIRS + ("C_basins_intermediate_lowimp/2_timeseries/",)
+# %% Phần 2 — Tải phần lõi (B + D theo giờ) → Kaggle Dataset "lamah-ce-core"
+# Giữ đúng 3 thứ code của Kirschstein & Sun đọc (mạng sông Stream_dist, khí tượng giờ của B, lưu lượng giờ của D),
+# đủ mọi năm và mọi cột, cộng thuộc tính của B, D và thư mục Info (ghi nguồn theo CC BY-SA 4.0).
 
 
-def keep_extra(name: str) -> bool:
-    if name.startswith(EXTRA_SKIP_PREFIXES) or DAILY_KEY in name:
-        return False
-    return True
+def keep_core(name: str) -> bool:
+    if name.lower().startswith("info"):
+        return True
+    return name.startswith(CORE_DIRS) and DAILY_KEY not in name
 
 
-stream_lamah(BASE_DIR / "lamah_ce_extra.zip", keep_extra)
+stream_lamah(BASE_DIR / "lamah_ce_core.zip", keep_core)

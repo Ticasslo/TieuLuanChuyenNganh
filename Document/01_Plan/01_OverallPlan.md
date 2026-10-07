@@ -1,6 +1,6 @@
 # Kế hoạch nghiên cứu: Dự báo lưu lượng dòng chảy bằng Mamba (State Space Model)
 
-> Kế hoạch tổng thể cho tiểu luận chuyên ngành → khóa luận tốt nghiệp. Chi tiết pipeline, kiến trúc, lộ trình cải tiến và phạm vi: `Document/1-KeHoach/KienTrucPipeline.md`. Giới thiệu bài cơ sở: `Document/1-KeHoach/GioiThieuBaiCoSo.md`. Sơ đồ: `Diagrams/SoDoDT.drawio`. Các mục ghi "chưa chốt" chờ quyết định, chưa được điền.
+> Kế hoạch tổng thể cho tiểu luận chuyên ngành → khóa luận tốt nghiệp. Chi tiết pipeline, kiến trúc, lộ trình cải tiến và phạm vi: `Document/01_Plan/03_Pipeline.md`. Giới thiệu bài cơ sở: `Document/01_Plan/02_BasePaper.md`. Sơ đồ: `Diagrams/ProjectDiagram.drawio`. Các mục ghi "chưa chốt" chờ quyết định, chưa được điền.
 
 ---
 
@@ -27,17 +27,17 @@ Ràng buộc: tên không có chữ "lũ lụt" — đầu ra là lưu lượng 
 
 ## 3. Bài cơ sở và dữ liệu
 
-**Bài cơ sở (người dùng chốt 6/10/2026):** Konold và cs., *BiasCast*, HESS 30:5067–5096 (2026). Mô hình tốt nhất (Sequential Forecast LSTM có Q quan trắc) đạt NSE trung vị 0,705 trên 451 lưu vực, test 2014–2017; persistence đạt 0,35–0,37 (tự tính). Lý do chọn: `Document/1-KeHoach/GioiThieuBaiCoSo.md` Mục 8.
+**Bài cơ sở:** Konold và cs., *BiasCast*, HESS 30:5067–5096 (2026). Mô hình tốt nhất (Sequential Forecast LSTM có Q quan trắc) đạt NSE trung vị 0,705 trên 451 lưu vực, test 2014–2017; persistence đạt 0,35–0,37 (tự tính). Lý do chọn: `Document/01_Plan/02_BasePaper.md` Mục 8.
 
-**Dữ liệu:** Extended LamaH-CE theo ngày (Zenodo 17119635, 0,95 GB, CC BY-NC 4.0): 859 lưu vực, 882 trạm, 1981–2017, 40 biến khí tượng từ ERA5-Land, E-OBS, MSWEP, GLEAM (từ 1981) và ECMWF HRES (từ 01/01/2002); bài cơ sở dùng 451 lưu vực. Kết quả kiểm tra và khảo sát: `Document/3-DuLieu/LamaHCE.md` Mục 6. Dữ liệu LamaH-CE gốc theo giờ và mạng sông đã có trên Kaggle cho các hướng khóa luận.
+**Dữ liệu:** Extended LamaH-CE theo ngày (Zenodo 17119635, 0,95 GB, CC BY-NC 4.0): 859 lưu vực, 882 trạm, 1981–2017, 40 biến khí tượng từ ERA5-Land, E-OBS, MSWEP, GLEAM (từ 1981) và ECMWF HRES (từ 01/01/2002); bài cơ sở dùng 451 lưu vực. Kết quả kiểm tra và khảo sát: `Document/03_Data/01_LamaHCE.md` Mục 6. Dữ liệu LamaH-CE gốc theo giờ và mạng sông đã có trên Kaggle cho các hướng khóa luận.
 
-**Bộ dữ liệu khác** (CAMELS-US, Columbia Basin, WaterBench-Iowa) và công trình huấn luyện trên chúng: `Document/5-KhaoSat/Dataset.md`, dùng cho phần khảo sát và công trình liên quan.
+**Bộ dữ liệu khác** (CAMELS-US, Columbia Basin, WaterBench-Iowa) và công trình huấn luyện trên chúng: `Document/05_Survey/01_Datasets.md`, dùng cho phần khảo sát và công trình liên quan.
 
 ---
 
 ## 4. RiverMamba — vai trò tham khảo
 
-Shams Eddin, Zhang, Kollet, Gall — *RiverMamba: A State Space Model for Global River Discharge and Flood Forecasting*, NeurIPS 2025 (Poster), DOI `10.52202/085713-4446`, arXiv 2505.22535, mã `github.com/HakamShams/RiverMamba_code`. Ghi chú đọc mã: `Document/6-LyThuyet/RiverMamba.md`; lý thuyết: `Document/6-LyThuyet/LyThuyetCauTruc.md` Mục 4.7–4.10.
+Shams Eddin, Zhang, Kollet, Gall — *RiverMamba: A State Space Model for Global River Discharge and Flood Forecasting*, NeurIPS 2025 (Poster), DOI `10.52202/085713-4446`, arXiv 2505.22535, mã `github.com/HakamShams/RiverMamba_code`. Ghi chú đọc mã: `Document/06_Theory/02_RiverMamba.md`; lý thuyết: `Document/06_Theory/01_ArchitectureTheory.md` Mục 4.7–4.10.
 
 Không dùng trực tiếp: checkpoint có lớp đầu vào cố định theo 136 biến lưới 0,05°, khác dữ liệu theo lưu vực. Ý tưởng tham khảo (đã xác nhận từ mã, cần kiểm chứng lại khi áp dụng):
 
@@ -53,10 +53,10 @@ Không dùng trực tiếp: checkpoint có lớp đầu vào cố định theo 1
 
 ## 5. Bằng chứng về kiến trúc
 
-- **Mamba/SSM cho dòng chảy chưa thống nhất:** S4D-FT, S4D/S5D vượt LSTM trên CAMELS-US; Mamba thuần (S-Mamba, quét theo biến) thua PatchTST và LSTM (Zhang và cs., J. Hydrology 2026); lớp Mamba có sẵn trong NeuralHydrology quét sai trục (`Document/1-KeHoach/GioiThieuBaiCoSo.md` Mục 11.5); biến thể cải tiến (ResBi-Mamba Plus) cho kết quả tốt. → Đề tài là nghiên cứu so sánh, không mặc định Mamba thắng; mọi lợi ích của Mamba ghi là giả thuyết cần kiểm chứng.
+- **Mamba/SSM cho dòng chảy chưa thống nhất:** S4D-FT, S4D/S5D vượt LSTM trên CAMELS-US; trên 516 lưu vực CAMELS-US theo giờ, PatchTST tốt nhất, LSTM thứ hai, Mamba (S-Mamba) chỉ được đánh giá cân bằng độ chính xác – chi phí (Zhang và cs., J. Hydrology 2026); lớp Mamba có sẵn trong NeuralHydrology quét sai trục (`Document/01_Plan/02_BasePaper.md` Mục 11.5); biến thể cải tiến (ResBi-Mamba Plus) cho kết quả tốt. → Đề tài là nghiên cứu so sánh, không mặc định Mamba thắng; mọi lợi ích của Mamba ghi là giả thuyết cần kiểm chứng.
 - **Đồ thị mạng sông:** đồ thị thô không cải thiện (Kirschstein & Sun, ICML 2024); GAT, đồ thị reachability (Wang và cs., npj Natural Hazards 2025), đồ thị mức ô lưới (HydroGAT) cải thiện. → Chỉ dùng cách đã có bằng chứng; để cho khóa luận.
 - **Đỉnh lũ là điểm yếu chung** của SSM và GNN → đánh giá riêng đỉnh lũ và theo mức lưu lượng (Mục 7).
-- **G-Mamba** (Chen & Tang, Neurocomputing 680, 2026, DOI `10.1016/j.neucom.2026.133280`) là mô hình không gian – thời gian tổng quát, không thử trên dữ liệu dòng chảy; kết quả "cảnh báo sớm 10 giờ" thuộc Wang và cs. (npj Natural Hazards 2025, DOI `10.1038/s44304-025-00083-6`, mô hình GNN).
+- **G-Mamba** (Chen & Tang, Neurocomputing 680, 2026, DOI `10.1016/j.neucom.2026.133280`) kết hợp đồ thị với Mamba nhưng là mô hình không gian – thời gian tổng quát, không thử trên dữ liệu dòng chảy — chỉ tham khảo kiến trúc cho hướng đồ thị.
 - **XAI:** Integrated Gradients/SHAP qua Captum; không dùng LLM viết báo cáo (thay bằng câu mẫu điền số). Demiray & Demir (preprint 2025, WaterBench-Iowa) đã làm Mamba + SHAP → cần đóng góp khác biệt.
 
 ---
@@ -71,7 +71,7 @@ Không dùng trực tiếp: checkpoint có lớp đầu vào cố định theo 1
 | GRU, Transformer, S4D, Mamba trong cùng khung hindcast – forecast | So sánh lõi thời gian (tầng 2) |
 | Biến thể Mamba (quét hai chiều) và Transformer (patch như PatchTST) | Kiểm chứng một ý cải tiến cho mỗi lõi |
 
-Chi tiết và số lần huấn luyện: `Document/1-KeHoach/KienTrucPipeline.md` Mục 9.1.
+Chi tiết và số lần huấn luyện: `Document/01_Plan/03_Pipeline.md` Mục 9.1.
 
 ---
 
@@ -79,14 +79,14 @@ Chi tiết và số lần huấn luyện: `Document/1-KeHoach/KienTrucPipeline.m
 
 - **Chính:** NSE, KGE theo từng lưu vực trên test 2014–2017; báo cáo trung vị, phân vị và đường CDF như bài gốc; số lưu vực tốt lên / kém đi.
 - **Bổ sung:** FHV (đỉnh), FLV (dòng chảy kiệt), sai số thời điểm đỉnh.
-- **Theo mức lưu lượng (yêu cầu GVHD):** chia qmax thành các mức theo ngưỡng riêng từng lưu vực, tính ma trận nhầm lẫn, tỉ lệ phát hiện và báo động nhầm ở mức lũ (`Document/1-KeHoach/KienTrucPipeline.md` Mục 7).
+- **Theo mức lưu lượng (yêu cầu GVHD):** chia qmax thành các mức theo ngưỡng riêng từng lưu vực, tính ma trận nhầm lẫn, tỉ lệ phát hiện và báo động nhầm ở mức lũ (`Document/01_Plan/03_Pipeline.md` Mục 7).
 - **Độ tin cậy:** 3 hạt giống mỗi cấu hình, trung bình ± độ lệch chuẩn; chọn checkpoint theo validation, NSE test ghi mỗi epoch chỉ để theo dõi.
 
 ---
 
 ## 8. Hạ tầng
 
-- **Tính toán:** Kaggle là chính (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Google Colab miễn phí dự phòng, Lightning AI khi cần. `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel một lần rồi lưu Kaggle Dataset (`Document/6-LyThuyet/RiverMamba.md` Mục 0).
+- **Tính toán:** Kaggle là chính (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Google Colab miễn phí dự phòng, Lightning AI khi cần. `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel một lần rồi lưu Kaggle Dataset (`Document/06_Theory/02_RiverMamba.md` Mục 0).
 - **Dữ liệu:** Kaggle Dataset private `lamah-ce-ext` (dữ liệu chính và kết quả thí nghiệm của tác giả); `lamah-ce-core`, `lamah-ce-extra` (LamaH-CE gốc theo giờ, mạng sông) cho khóa luận.
 - **Khung mã:** bản fork NeuralHydrology của tác giả BiasCast.
 - **Demo (bắt buộc với tiểu luận):** công nghệ và nơi triển khai chưa chốt; VPS chỉ dùng nếu có thời gian.
@@ -116,4 +116,4 @@ SOICT (mời mở rộng sang *Multimedia Tools and Applications* / *Informatica
 - RiverMamba — NeurIPS 2025, DOI `10.52202/085713-4446`, arXiv 2505.22535.
 - Mamba — Gu & Dao, COLM 2024, arXiv 2312.00752.
 - Yilmaz, K. K., Gupta, H. V., & Wagener, T. (2008). A process-based diagnostic approach to model evaluation. *Water Resources Research* — chia đoạn đường duy trì lưu lượng.
-- Khảo sát tài liệu: `Document/5-KhaoSat/KhaoSatTaiLieu.md`, `Document/5-KhaoSat/Dataset.md`.
+- Khảo sát tài liệu: `Document/05_Survey/02_LiteratureReview.md`, `Document/05_Survey/01_Datasets.md`.

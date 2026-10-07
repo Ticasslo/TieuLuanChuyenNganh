@@ -1,6 +1,6 @@
 # Giới thiệu bài cơ sở — BiasCast (HESS 2026)
 
-> Tài liệu trình bày bài báo được chọn làm bài cơ sở cho đề tài *Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy*: nội dung bài, mô hình, chỉ số đánh giá, kết quả, lý do chọn, hạn chế phát hiện khi đọc mã nguồn và phản biện, hướng cải tiến. Pipeline của đề tài: `Document/1-KeHoach/KienTrucPipeline.md`.
+> Tài liệu trình bày bài báo được chọn làm bài cơ sở cho đề tài *Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy*: nội dung bài, mô hình, chỉ số đánh giá, kết quả, lý do chọn, hạn chế phát hiện khi đọc mã nguồn và phản biện, hướng cải tiến. Pipeline của đề tài: `Document/01_Plan/03_Pipeline.md`.
 
 ## 1. Thông tin bài báo
 
@@ -10,7 +10,7 @@
 | Tác giả | Oliver Konold, Moritz Feigl, Patrick Podest, Christoph Klingler, Karsten Schulz (BOKU University, Vienna; baseflow AI solutions, Vienna; Johannes Kepler University Linz) |
 | Nơi công bố | Hydrology and Earth System Sciences (HESS), 30, 5067–5096, 2026; bản thảo đăng HESS Discussions 27/11/2025 |
 | Xếp hạng | Scimago 2025: Q1 (Earth and Planetary Sciences; Water Science and Technology), SJR 2,035, H-index 194 |
-| Trích dẫn | 3 (Google Scholar, 26/9/2026), trong đó có AIFL — mô hình dự báo lưu lượng toàn cầu của ECMWF (J. Hydrol. 2026) |
+| Trích dẫn | 3 (Semantic Scholar, 7/10/2026), trong đó có AIFL — mô hình dự báo lưu lượng toàn cầu của ECMWF (J. Hydrol. 2026); chi tiết Mục 12 |
 | Trang chính thức | https://hess.copernicus.org/articles/30/5067/2026/ |
 | Phản biện | Công khai: https://egusphere.copernicus.org/preprints/2025/egusphere-2025-4978/ |
 | Mã nguồn | https://github.com/conestone/neuralhydrology — thư viện NeuralHydrology do tác giả chỉnh sửa: mô hình (`modelzoo`), bộ đọc dữ liệu (`datasetzoo`), vòng huấn luyện (`training`), đánh giá (`evaluation`), điều khiển bằng tệp cấu hình `config.yml`; https://github.com/conestone/biascast — notebook gọi thư viện để chạy thí nghiệm, mã phân tích kết quả và vẽ hình trong bài (không chứa mô hình) |
@@ -32,7 +32,7 @@ Kết quả chính: mô hình học trên tái phân tích rồi chạy với d�
 Dự báo cho từng lưu vực, một mô hình chung cho cả 451 lưu vực.
 
 - **Đầu vào:** 364 ngày quá khứ (hindcast) gồm 31 biến khí tượng tái phân tích, có hoặc không có lưu lượng trung bình ngày quan trắc; dự báo thời tiết ECMWF HRES cho ngày cần dự báo (5 biến); 33 thuộc tính tĩnh của lưu vực.
-- **Đầu ra:** lưu lượng cực đại trong ngày t (qmax) — đỉnh lưu lượng trong 24 giờ sau lần phát hành dự báo lúc 00 UTC.
+- **Đầu ra:** lưu lượng cực đại trong ngày t (qmax), trích từ dữ liệu giờ của LamaH-CE. Căn chỉnh giữa ngày của LamaH-CE và ngày UTC của dự báo ECMWF chưa kiểm được vì mã tạo bộ dữ liệu không công khai.
 
 Ví dụ một mẫu: dự báo cho ngày 15/05/2016 dùng khí tượng và lưu lượng từ 17/05/2015 tới 14/05/2016, dự báo ECMWF phát hành 00 UTC ngày 15/05/2016, và cho ra lưu lượng lớn nhất trong ngày 15/05/2016.
 
@@ -44,7 +44,7 @@ Lưu lượng cực đại ngày được chọn vì gần với cảnh báo lũ
 
 - **Extended LamaH-CE** (Konold và cs., Zenodo 10.5281/zenodo.17119635, bản 1.0, giấy phép CC BY-NC 4.0, 0,95 GB): bản mở rộng của LamaH-CE (Klingler và cs., ESSD 2021) cho 859 lưu vực Trung Âu, theo ngày, thêm bốn nguồn khí tượng (E-OBS, MSWEP, GLEAM, dự báo ECMWF HRES) gộp theo lưu vực, và lưu lượng cực tiểu, trung bình, cực đại ngày trích từ dữ liệu giờ.
 - **Lưu vực:** 451 lưu vực ít hoặc không chịu tác động của con người, mức A (toàn bộ lưu vực thượng nguồn của trạm, tương đương cách gộp của CAMELS); 72,5% là lưu vực đầu nguồn, 27,5% lồng nhau; từ vùng núi cao Alps tới đồng bằng.
-- **Biến đầu vào** (Phụ lục A): ERA5-Land 21 biến (nhiệt độ, điểm sương, gió, albedo, chỉ số lá, tuyết, bức xạ, áp suất, bốc thoát hơi, mưa, độ ẩm đất hai lớp); E-OBS 7; MSWEP 1 (mưa); GLEAM 2 (bốc hơi thực, tiềm năng); ECMWF HRES 5 (nhiệt độ, điểm sương, bức xạ, mưa, bốc hơi) — trung bình 8 giá trị 3 giờ tính từ lần phát hành 00 UTC; 33 thuộc tính địa hình, khí hậu, lớp phủ.
+- **Biến đầu vào** (Phụ lục A): ERA5-Land 21 biến (nhiệt độ, điểm sương, gió, albedo, chỉ số lá, tuyết, bức xạ, áp suất, bốc thoát hơi, mưa, độ ẩm đất hai lớp); E-OBS 7; MSWEP 1 (mưa); GLEAM 2 (bốc hơi thực, tiềm năng); ECMWF HRES 5 (nhiệt độ, điểm sương, bức xạ, mưa, bốc hơi) — nhiệt độ và điểm sương là trung bình 8 giá trị 3 giờ tính từ lần phát hành 00 UTC, các biến còn lại là tổng ngày; 33 thuộc tính địa hình, khí hậu, lớp phủ.
 - **Chia tập theo thời gian:** train 2003–2009, validation 2010–2013, test 2014–2017; NeuralHydrology nạp thêm giai đoạn khởi động trước mỗi kỳ nên validation và test đủ 4 năm.
 - **Quy mô:** tối đa 1,15 triệu mẫu lưu vực–ngày cho train, 0,66 triệu cho test.
 
@@ -138,8 +138,9 @@ Vị trí trong bài: Mục 3.1–3.6, Hình 3–10, Phụ lục F.
 - **Không lùi đầu vào theo độ trễ công bố thật** của tái phân tích (tác giả tự nêu ở Mục 3.7).
 - **Thiếu dữ liệu cho biến thể có Q:** mã đọc thư mục `LamaH_expanded_q_input` không có trên Zenodo; phải tự dựng.
 - **Đơn vị lưu lượng không đồng nhất:** nhãn qmax được đổi sang mm/ngày, còn lưu lượng quan trắc đầu vào nhiều khả năng giữ m³/s (suy từ thống kê chuẩn hóa của tác giả, chưa kiểm được vì thư mục trên không công khai).
-- **Sai khác nhỏ giữa bài và mã:** mạng nhúng đơn giản được mô tả có hàm kích hoạt tanh nhưng trong mã là một lớp tuyến tính; phương trình (7), (10) ghi Q quá khứ là q_max trong khi mã dùng lưu lượng trung bình ngày; hàm lưu mô hình tốt nhất không tính ngưỡng cải thiện tối thiểu của dừng sớm.
+- **Sai khác nhỏ giữa bài và mã:** mạng nhúng đơn giản được mô tả có hàm kích hoạt tanh nhưng trong mã là một lớp tuyến tính; phương trình (7), (8), (10), (11) ghi Q quá khứ là q_max trong khi phần chữ của bài và mã dùng lưu lượng trung bình ngày; hàm lưu mô hình tốt nhất không tính ngưỡng cải thiện tối thiểu của dừng sớm.
 - **Phạm vi hẹp do tác giả tự nêu:** chỉ Trung Âu, chỉ dự báo 1 ngày, chỉ kiến trúc LSTM, chỉ dữ liệu ngày.
+- **Ý kiến phản biện 2 (vòng 1):** hạn chế lớn nhất là chỉ dự báo trước 1 ngày trong khi kiến trúc và dữ liệu cho phép dài hơn; lớp nhúng dùng tanh có thể làm bão hòa đầu vào trước LSTM, đề nghị thử ReLU — liên quan tới kết quả nhúng phức tạp kém hơn (Mục 3.5 của bài).
 - **Bộ dữ liệu bản 1.0:** trang Zenodo ghi chưa phải bản sửa cuối; giấy phép phi thương mại.
 
 Các hạn chế trên không làm sai số liệu công bố, và phần lớn là chỗ đề tài bổ sung: persistence, nhiều hạt giống, thống nhất đơn vị lưu lượng, so sánh nhiều kiến trúc.
@@ -162,7 +163,7 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 7. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum): ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
 8. Demo bản đồ dự báo theo ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực.
 
-**Giai đoạn khóa luận:** dự báo nhiều ngày; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Phạm vi chi tiết: `Document/1-KeHoach/KienTrucPipeline.md` Mục 9.
+**Giai đoạn khóa luận:** dự báo nhiều ngày; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Phạm vi chi tiết: `Document/01_Plan/03_Pipeline.md` Mục 9.
 
 ## 11. Pipeline và kiến trúc chi tiết của bài (đọc từ mã)
 
@@ -217,12 +218,12 @@ Mọi cấu hình dùng hạt giống 111.
 - Mạng handoff của Encoder–Decoder LSTM gồm hai lớp tuyến tính liên tiếp không có hàm kích hoạt (lớp `FC` của NeuralHydrology không áp kích hoạt cho lớp cuối), trong khi bài mô tả là mạng handoff phi tuyến; tác giả xác nhận khi trả lời phản biện là "một lớp 128".
 - Mạng nhúng "đơn giản" là một lớp tuyến tính, không có tanh như Mục 2.2.6 mô tả.
 - Mọi cấu hình Sequential Forecast LSTM và Encoder–Decoder LSTM dùng cùng một bộ siêu tham số (128, 256, 0,3), trong khi các baseline có bộ khác nhau; bài không nêu rõ tối ưu Bayes được chạy riêng cho từng kiến trúc hay không.
-- Quy tắc lọc mẫu ở bước 4 khiến mẫu huấn luyện bị loại khi thiếu `qmean` hoặc thiếu dữ liệu ECMWF ở bất kỳ ngày nào trong 365 ngày trước đó — dữ liệu ECMWF có từ năm 2002 (`Document/3-DuLieu/LamaHCE.md` Mục 6.1), nên năm 2003 không bị loại vì ECMWF; mẫu huấn luyện bị loại chủ yếu ở năm đầu của 27 trạm bắt đầu đo muộn và các ngày thiếu `qmean`.
+- Quy tắc lọc mẫu ở bước 4 khiến mẫu huấn luyện bị loại khi thiếu `qmean` hoặc thiếu dữ liệu ECMWF ở bất kỳ ngày nào trong 365 ngày trước đó — dữ liệu ECMWF có từ năm 2002 (`Document/03_Data/01_LamaHCE.md` Mục 6.1), nên năm 2003 không bị loại vì ECMWF; mẫu huấn luyện bị loại chủ yếu ở năm đầu của 27 trạm bắt đầu đo muộn và các ngày thiếu `qmean`.
 
 ### 11.5. Ghi chú mã cho việc chạy lại và cải tiến
 
-- **Bản fork NeuralHydrology** (`github.com/conestone/neuralhydrology`, bản trong `PaperResearchCode/BiasCast_NH`): tách từ NeuralHydrology tại commit `f00cf47`, thêm đúng 1 commit `9d94908` (16/09/2025) sửa 7 tệp: `datasetzoo/lamah.py` (cho nhãn `qmean`, `qmin`, `qmax`; chỉ nạp 1 cột lưu lượng), `evaluation/tester.py` (đánh giá bằng `best_model.pt`), `training/early_stopping.py` (mới), `training/__init__.py` (lập lịch learning rate), `training/basetrainer.py` (dừng sớm, lưu mô hình tốt nhất), `training/logger.py`, `utils/config.py`. Mô hình và hàm tính chỉ số giữ nguyên của NeuralHydrology.
-- **Mã của tác giả** (`github.com/conestone/biascast`, bản trong `PaperResearchCode/BiasCast`): chỉ gồm notebook chạy thí nghiệm (`Experiments/_run/Run_Experiment.ipynb`, `Transfer_Weights.ipynb`) và mã phân tích, vẽ hình (`Inspect_Experiments/`). Thư mục `Experiments/`, `Data/` để trống, thay bằng Zenodo 17292895 (bản 1.1 của bản ghi 17241922: `config.yml`, `best_model.pt`, scaler, `test_metrics.csv` của 24 cấu hình) và Zenodo 17119635 (dữ liệu).
+- **Bản fork NeuralHydrology** (`github.com/conestone/neuralhydrology`, bản trong `PaperResearch/PaperResearchCode/BiasCast_NH`): tách từ NeuralHydrology tại commit `f00cf47`, thêm đúng 1 commit `9d94908` (16/09/2025) sửa 7 tệp: `datasetzoo/lamah.py` (cho nhãn `qmean`, `qmin`, `qmax`; chỉ nạp 1 cột lưu lượng), `evaluation/tester.py` (đánh giá bằng `best_model.pt`), `training/early_stopping.py` (mới), `training/__init__.py` (lập lịch learning rate), `training/basetrainer.py` (dừng sớm, lưu mô hình tốt nhất), `training/logger.py`, `utils/config.py`. Mô hình và hàm tính chỉ số giữ nguyên của NeuralHydrology.
+- **Mã của tác giả** (`github.com/conestone/biascast`, bản trong `PaperResearch/PaperResearchCode/BiasCast`): chỉ gồm notebook chạy thí nghiệm (`Experiments/_run/Run_Experiment.ipynb`, `Transfer_Weights.ipynb`) và mã phân tích, vẽ hình (`Inspect_Experiments/`). Thư mục `Experiments/`, `Data/` để trống, thay bằng Zenodo 17292895 (bản 1.1 của bản ghi 17241922: `config.yml`, `best_model.pt`, scaler, `test_metrics.csv` của 24 cấu hình) và Zenodo 17119635 (dữ liệu).
 - **Cắt cửa sổ không rò rỉ nhãn** (`basedataset.py` dòng 158–164): với ngày nhãn t, hindcast lấy [t − 364, t − 1], forecast lấy ngày t.
 - **Đường dẫn ghi cứng** theo máy tác giả (`/home/ok2907/...`) trong mọi `config.yml`; tệp danh sách lưu vực `basins_filtered.txt` nằm ở gốc `Experiments/` trên Zenodo, khớp 451 lưu vực của `test_metrics.csv`.
 - **Biến thể có Q** đọc thư mục `LamaH_expanded_q_input` không có trên Zenodo: phải tự chép cột `qmean` từ `D_gauges` vào tệp khí tượng mức A.
@@ -230,3 +231,13 @@ Mọi cấu hình dùng hạt giống 111.
 - **Tùy chọn có sẵn trong fork dùng cho cải tiến:** `nan_handling_method` (masked mean, input replacing, attention ở `inputlayer.py`), `lagged_features` (mọi mô hình), `autoregressive_inputs` (chỉ `arlstm`), đầu `cmal`/`gmm`/`umal`. `basedataset.py` không tham chiếu `nan_handling_method`, nên muốn giữ mẫu huấn luyện có giá trị thiếu phải sửa `_validate_samples`.
 - **Lớp Mamba có sẵn của NeuralHydrology quét sai trục:** `modelzoo/mamba.py` (PR #163, 02/2024) đặt 1 khối Mamba (`d_state` 16, `d_conv` 4, `expand` 2) sau `InputLayer`; `InputLayer.forward` trả [seq_length, batch, n_features] trong khi `mamba_ssm.Mamba` nhận (batch, length, dim), nên Mamba quét theo trục batch (PR ghi NSE khoảng 0,4). Sửa bằng `x.transpose(0, 1)` trước khi gọi `self.mamba`. Đề tài tự thêm mô hình Mamba vào `modelzoo`, thay LSTM trong khung Sequential Forecast LSTM.
 - **Tái lập:** cài fork, sửa đường dẫn trong `config.yml`, nạp `best_model.pt` qua `checkpoint_path`; tác giả dùng Python 3.12.3, GPU CUDA (RTX 4090, mỗi lần chạy vài phút tới khoảng 1 giờ).
+
+## 12. Công trình trích dẫn BiasCast
+
+Theo Semantic Scholar (tra 7/10/2026), BiasCast có 3 công trình trích dẫn:
+
+| Công trình | Nội dung | Liên quan tới đề tài |
+|---|---|---|
+| Taccari và cs. — *AIFL: A Global Daily Streamflow Forecasting Model Using a Deterministic LSTM Pre-trained on ERA5-Land and Fine-tuned on IFS*, J. Hydrology 2026 (ECMWF; arXiv 2602.16579) | LSTM toàn cầu dự báo lưu lượng ngày trên 18.588 lưu vực Caravan; huấn luyện trước trên ERA5-Land 1980–2019 rồi tinh chỉnh trên dự báo IFS 2016–2019; test 2021–2024, KGE′ trung vị 0,66 | Cùng vấn đề lệch miền tái phân tích → dự báo. **Kết luận ngược với BiasCast về học chuyển giao:** AIFL thấy huấn luyện hai giai đoạn tốt hơn chỉ dùng IFS và tốt hơn trộn hai nguồn, còn BiasCast thấy học chuyển giao kém Sequential Forecast LSTM (0,44 so với 0,63). Khác biệt có thể do quy mô dữ liệu (18.588 so với 451 lưu vực) và cách tinh chỉnh; cần nêu khi bàn về học chuyển giao |
+| Acuña Espinoza và cs. — *Everything everywhere all at once: A single-cell LSTM network unifying multi-frequency, missing data, and discharge assimilation for robust operational flood forecasting*, EGUsphere 2026 (preprint, đang phản biện ở HESS) | MF²LSTM: một LSTM gộp dữ liệu nhiều tần suất, xử lý dữ liệu thiếu và đồng hóa Q thời gian thực; vẫn chạy khi mất Q (hỏng trạm, lưu vực không đo); dự báo giờ, tốt hơn mô hình vận hành LARSIM | Gần nhất với ý tưởng mô hình chịu mất Q (Y1) và hướng dữ liệu giờ của khóa luận; nhóm tác giả gồm Kratzert, Klotz, Gauch. Bài nhắc BiasCast như lưu ý rằng dự báo thời tiết có phân phối khác dữ liệu quan trắc |
+| *Comparing novel backward hydrological models for watershed-scale precipitation estimation…*, Scientific Reports 2026 | Ước lượng mưa từ lưu lượng (thủy văn ngược) | Không liên quan trực tiếp |

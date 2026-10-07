@@ -1,17 +1,17 @@
 # Ý tưởng cho đề tài — đọc sâu BiasCast và tra cứu bổ sung
 
-Tệp này tập hợp các ý tưởng mới tìm được khi đọc lại toàn văn BiasCast (Konold và cs., HESS 30:5067–5096, 2026) và tra cứu thêm, chưa có trong lộ trình ở `Document/1-KeHoach/KienTrucPipeline.md` Mục 8–9. Mỗi ý tưởng ghi căn cứ, chi phí, vị trí đề xuất trong lộ trình. Y1, Y2, Y3 đã đưa vào pipeline (`Document/1-KeHoach/KienTrucPipeline.md` Mục 8.2, 9.1 và sơ đồ `Diagrams/SoDoDT.drawio`, 27/9/2026; người dùng giao Claude chọn). Y6 đã đưa vào pipeline (`Document/1-KeHoach/KienTrucPipeline.md` Mục 7, 9.1; yêu cầu của GVHD, 6/10/2026).
+Tệp này tập hợp các ý tưởng mới tìm được khi đọc lại toàn văn BiasCast (Konold và cs., HESS 30:5067–5096, 2026) và tra cứu thêm, chưa có trong lộ trình ở `Document/01_Plan/03_Pipeline.md` Mục 8–9. Mỗi ý tưởng ghi căn cứ, chi phí, vị trí đề xuất trong lộ trình. Y1, Y2, Y3 nằm trong pipeline (`Document/01_Plan/03_Pipeline.md` Mục 8.2, 9.1 và sơ đồ `Diagrams/ProjectDiagram.drawio`); Y6 nằm trong pipeline theo yêu cầu của GVHD (`Document/01_Plan/03_Pipeline.md` Mục 7, 9.1).
 
-## 1. Đợt tra 27/9/2026
+## 1. Ý tưởng từ toàn văn BiasCast
 
 ### 1.1. Nguồn đã đọc
 
 | Nguồn | Nội dung dùng được |
 |---|---|
 | BiasCast, toàn văn bản HESS (Mục 2.3, 3.1–3.7, 4, Phụ lục C–G) | Hướng tương lai tác giả tự nêu; phân tích theo lưu vực; tối ưu siêu tham số |
-| Mã phân tích của tác giả `PaperResearchCode/BiasCast/Inspect_Experiments/code/` | `nse_delta_static_attributes.py` (ΔNSE theo lưu vực tương quan với 33 thuộc tính), `wasserstein_distance_static_attributes.py` |
+| Mã phân tích của tác giả `PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/` | `nse_delta_static_attributes.py` (ΔNSE theo lưu vực tương quan với 33 thuộc tính), `wasserstein_distance_static_attributes.py` |
 | Cấu hình `Sequential_Forecast_LSTM_FCRA_without_q_Simple_Embedding/config.yml` (Zenodo 17292895) | Hindcast có `ERA5L_swe` (tuyết) và `ERA5L_volsw_123`, `ERA5L_volsw_4` (ẩm đất) |
-| Gauch và cs., HESS 29:6221–6235 (2025) | Khi huấn luyện, bỏ ngẫu nhiên từng bước thời gian (xác suất 0,1) và cả chuỗi của một nguồn (xác suất 0,1); chỉ áp dụng cho khí tượng, không cho lưu lượng |
+| Gauch và cs., HESS 29:6221–6235 (2025) | Khi huấn luyện, bỏ ngẫu nhiên từng bước thời gian (xác suất 0,1) và cả chuỗi của một nguồn (xác suất 0,12); chỉ áp dụng cho khí tượng, không cho lưu lượng |
 | Copernicus, trang Climate reanalysis | ERA5 và ERA5-Land cập nhật hằng ngày, trễ 5 ngày so với thời gian thực |
 | Caravan MultiMet (Shalev & Kratzert, arXiv 2411.09459 v1) | IFS HRES 01/01/2016–30/09/2024; GraphCast 02/01/2016–21/12/2023 (khởi tạo từ HRES), chỉ 4 biến (nhiệt độ 2 m, mưa, gió u, v); dữ liệu theo UTC-0; CC BY 4.0 |
 | Wang và cs., ICCS 2026 (LamaH-CE + EFAS, đồng hóa 3D-Var) | Không dùng Extended LamaH-CE, không trích BiasCast; không áp dụng |
@@ -30,7 +30,7 @@ Tệp này tập hợp các ý tưởng mới tìm được khi đọc lại to�
 
 | # | Ý tưởng | Căn cứ | Mới so với bài | Chi phí | Đề xuất |
 |---|---|---|---|---|---|
-| Y1 | **Mô hình chịu mất Q:** huấn luyện có bỏ ngẫu nhiên Q (từng ngày và cả chuỗi) theo cách của Gauch và cs.; khi test chạy các kịch bản mất Q 1, 3, 7 ngày cuối và mất hẳn — một mô hình dùng được cho cả trạm có và không có Q | Hướng tương lai tác giả tự nêu; học chuyển giao của bài thất bại; Gauch và cs. chỉ thử với khí tượng; dữ liệu thiếu ít (Q test 0,23%, khí tượng gần như đủ — `Document/3-DuLieu/LamaHCE.md` Mục 6.1); phần mẫu train bị bộ lọc loại chủ yếu ở 27 trạm đo muộn và ngày thiếu Q, được lấy lại một phần bằng sửa bộ lọc ở B1; còn masked mean + bỏ ngẫu nhiên Q cho khả năng chịu mất dữ liệu khi vận hành | Chưa tìm thấy công trình làm với Q trong khung hindcast–forecast có dự báo thật (tra 27/9/2026, chưa tra hết) | Thấp: nằm trên cải tiến masked mean (bước B1); thêm 1 cấu hình × 3 hạt giống; các kịch bản chỉ là suy luận | Tiểu luận, gộp vào tầng 1 (bước B) |
+| Y1 | **Mô hình chịu mất Q:** huấn luyện có bỏ ngẫu nhiên Q (từng ngày và cả chuỗi) theo cách của Gauch và cs.; khi test chạy các kịch bản mất Q 1, 3, 7 ngày cuối và mất hẳn — một mô hình dùng được cho cả trạm có và không có Q | Hướng tương lai tác giả tự nêu; học chuyển giao của bài thất bại; Gauch và cs. chỉ thử với khí tượng; dữ liệu thiếu ít (Q test 0,23%, khí tượng gần như đủ — `Document/03_Data/01_LamaHCE.md` Mục 6.1); phần mẫu train bị bộ lọc loại chủ yếu ở 27 trạm đo muộn và ngày thiếu Q, được lấy lại một phần bằng sửa bộ lọc ở B1; còn masked mean + bỏ ngẫu nhiên Q cho khả năng chịu mất dữ liệu khi vận hành | Chưa tìm thấy công trình làm với Q trong khung hindcast–forecast có dự báo thật (tra 27/9/2026, chưa tra hết) | Thấp: nằm trên cải tiến masked mean (bước B1); thêm 1 cấu hình × 3 hạt giống; các kịch bản chỉ là suy luận | Tiểu luận, gộp vào tầng 1 (bước B) |
 | Y2 | **Kịch bản vận hành thật:** khi test, bỏ tái phân tích 5 ngày cuối của hindcast (ERA5 trễ 5 ngày), giữ Q ngày t−1 và dự báo HRES — đo NSE khi dữ liệu đến trễ như thực tế | Copernicus: ERA5-Land trễ 5 ngày; bài thừa nhận hạn chế độ trễ nhưng không đo | Bài giả định mọi dữ liệu có ngay | Rất thấp nếu đã có Y1 (cùng cơ chế mặt nạ): chỉ suy luận. Độ trễ của E-OBS, MSWEP, GLEAM chưa tra — kịch bản thận trọng coi mọi nguồn tái phân tích cùng trễ 5 ngày | Tiểu luận, bước đánh giá; dùng cho demo |
 | Y3 | **Mamba thắng ở đâu:** ΔNSE theo lưu vực giữa Mamba và LSTM cải tiến (bản đồ nhiệt kiểu Hình 9, đếm số lưu vực tốt lên/kém đi), tương quan Spearman với 33 thuộc tính và khoảng cách Wasserstein; kiểm giả thuyết "trạng thái nhớ bù sai lệch ở lưu vực tuyết" của bài cho lõi SSM | Mục 3.6 của bài; mã phân tích của tác giả dùng lại được (đổi đường dẫn và mốc so sánh) | Bài chỉ phân tích các biến thể LSTM | Không huấn luyện thêm | Tiểu luận, bước đánh giá (C) |
 | Y4 | **Dò trạng thái ẩn (probing):** hồi quy tuyến tính từ trạng thái ô nhớ LSTM và trạng thái SSM của Mamba sang lượng nước tuyết `ERA5L_swe` và ẩm đất `ERA5L_volsw_*` | *Investigate the rainfall-runoff relationship and hydrological concepts inside LSTM* (Environ. Model. Softw. 2025: dò lượng nước trong đất, tuyết trong trạng thái ô nhớ LSTM bằng hồi quy tuyến tính); giả thuyết của BiasCast Mục 3.6 | Chưa tìm thấy công trình dò trạng thái Mamba trong thủy văn (chưa tra hết) | Thấp (chỉ suy luận + hồi quy); hạn chế: tuyết và ẩm đất đang là biến đầu vào nên kết quả dò một phần hiển nhiên — muốn chặt phải huấn luyện thêm bản bỏ các biến này | Tùy chọn cho phần XAI (bước G); bản chặt để khóa luận |
@@ -38,7 +38,7 @@ Tệp này tập hợp các ý tưởng mới tìm được khi đọc lại to�
 
 ### 1.4. Căn cứ bổ sung cho thiết kế đã chốt
 
-- Mamba nối hindcast và forecast thành một chuỗi liên tục (`KienTrucPipeline.md` Mục 3.2) đúng với phát hiện của bài: trạng thái chạy liên tục bền hơn mạng handoff (435 so với 361 lưu vực cải thiện).
+- Mamba nối hindcast và forecast thành một chuỗi liên tục (`03_Pipeline.md` Mục 3.2) đúng với phát hiện của bài: trạng thái chạy liên tục bền hơn mạng handoff (435 so với 361 lưu vực cải thiện).
 - Q ngày t−1 dùng được trong vận hành: eHYD (Áo) công bố Q trễ khoảng 2 giờ — lập luận cho phần bảo vệ.
 - Báo cáo nên kèm số lưu vực tốt lên/kém đi và trung vị, vì trung bình NSE bị vài lưu vực ngoại lệ (như 758) kéo lệch.
 
@@ -48,9 +48,9 @@ Tệp này tập hợp các ý tưởng mới tìm được khi đọc lại to�
 - Tài liệu dữ liệu của OpenHydroNet (Google FloodHub) ghi dữ liệu dự báo phủ HRES 2012–2020 và GraphCast 2015–2022, khác mốc 2016 trong bài Caravan MultiMet v1 — có thể do bản dữ liệu mới hơn; cần mở tệp zarr để kiểm nếu dùng Y5.
 - Độ trễ công bố của E-OBS, MSWEP, GLEAM.
 
-## 2. Đợt 6/10/2026 — từ góp ý của GVHD (họp 27/9/2026)
+## 2. Ý tưởng từ góp ý của GVHD (họp 27/9/2026)
 
-Nguồn: `Document/2-HopGVHD/HopNhom_2026-09-27.md` Mục 2; tra bổ sung Martel và cs. (2025), *Hydrology and Earth System Sciences* 29:4951–4968, DOI `10.5194/hess-29-4951-2025`.
+Nguồn: `Document/02_Meetings/Meeting_2026-09-27.md` Mục 2; tra bổ sung Martel và cs. (2025), *Hydrology and Earth System Sciences* 29:4951–4968, DOI `10.5194/hess-29-4951-2025`.
 
 ### 2.1. Ý tưởng
 

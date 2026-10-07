@@ -2,7 +2,7 @@
 
 > File cá nhân để học/ôn lại cơ chế hoạt động của từng kiến trúc deep learning liên quan tới đề tài (LSTM, Transformer, Mamba...). Mỗi phần đi từ công thức chuẩn → giải nghĩa từng ký hiệu → ví dụ số cụ thể (dùng bối cảnh dự báo lưu lượng sông cho dễ hình dung, số liệu là minh họa để hiểu cơ chế, không phải số từ model đã train thật).
 
-> *Phạm vi áp dụng:* đề tài dùng 4 bộ dữ liệu benchmark theo lưu vực (`Dataset.md`). Mục 4.7 (Bidirectional), 4.9 (Space-filling curve) và 4.10 là cơ chế riêng của RiverMamba cho **dữ liệu lưới không gian** — có giá trị tham khảo; phần lõi Mamba (4.1–4.6) và LOAN (4.8) vẫn áp dụng trực tiếp.
+> *Phạm vi áp dụng:* đề tài dùng 4 bộ dữ liệu benchmark theo lưu vực (`01_Datasets.md`). Mục 4.7 (Bidirectional), 4.9 (Space-filling curve) và 4.10 là cơ chế riêng của RiverMamba cho **dữ liệu lưới không gian** — có giá trị tham khảo; phần lõi Mamba (4.1–4.6) và LOAN (4.8) vẫn áp dụng trực tiếp.
 
 ---
 
@@ -80,7 +80,7 @@ Ngày 3 mưa rất ít (2mm, gần bằng ngày 1) nhưng dự báo (241) vẫn 
 
 Về công thức, `C_t` chỉ nhìn thấy đúng 1 bước trước (`C_(t-1)`) — nhưng vì `C_(t-1)` bản thân nó cũng được tính từ `C_(t-2)`, và `C_(t-2)` từ `C_(t-3)`... nên `C_t` **gián tiếp mang theo dấu vết của TOÀN BỘ lịch sử từ đầu chuỗi**, không chỉ đúng 1 ngày trước. Giống như viết nhật ký kiểu "tóm tắt tới hôm nay" — mỗi ngày chỉ đọc lại bản tóm tắt hôm qua rồi viết thêm, nhưng vì bản hôm qua đã được xây từ bản hôm kia (cứ thế lùi về), nên đọc đúng 1 bản gần nhất vẫn chứa dư âm của rất lâu về trước (dư âm mờ dần theo cổng quên). Đây là tính chất chung của **mọi kiến trúc dạng RNN** (LSTM, GRU...), không riêng gì LSTM.
 
-### 1.7 Đã tự kiểm tra lại (12/8/2026)
+### 1.7 Kiểm tra lại
 
 - Công thức khớp đúng chuẩn LSTM gốc (Hochreiter & Schmidhuber 1997, cách trình bày phổ biến nhất).
 - Đã tự tính tay lại toàn bộ số liệu ở bảng 1.4/1.5 (kể cả giá trị tanh) — khớp đúng, không có lỗi tính toán.
@@ -341,7 +341,7 @@ Tổng ước lượng cho model thật: `(6 ma trận × số head × số lớ
 
 *Lưu ý: 2 ví dụ dùng cấu trúc khác nhau (3 ngày vs 2 ngày, vị trí ngày mưa to khác nhau) — không phải cùng 1 bộ số liệu chạy qua 2 kiến trúc để so trực tiếp, chỉ minh họa riêng từng cơ chế.*
 
-### 2.13 Đã tự kiểm tra lại (12/8/2026)
+### 2.13 Kiểm tra lại
 
 - Công thức khớp chuẩn gốc "Attention Is All You Need" (Vaswani et al. 2017): `Attention(Q,K,V) = softmax(QK^T/√d_k)·V`, có Multi-head, Feed-forward, Positional Encoding — đủ đúng 5 thành phần chính.
 - Đã tự tính tay lại **toàn bộ** số liệu ở mục 2.3, 2.5, 2.6, 2.7, 2.8 (kể cả các phép softmax, dot product, ReLU) — khớp đúng, không có lỗi tính toán.
@@ -435,9 +435,9 @@ Về công thức thì đúng chỉ là 1 bước trước, nhưng vì `h_(t-1)`
 | Số ma trận trọng số | 4 (`W_f,W_i,W_o,W_C`) | **3** (`W_r,W_z,W_h`) — ít hơn 25% |
 | Chuỗi đệ quy mang lịch sử | Có (qua `C_t`) | Có (qua `h_t`) — cùng nguyên lý |
 | Tốc độ train | Chậm hơn (nhiều tham số hơn) | Nhanh hơn |
-| Độ chính xác thực tế | Gần tương đương nhau, tùy bài toán | Gần tương đương nhau, tùy bài toán — không cái nào áp đảo hẳn (đúng như nhiều bài trong `KhaoSatTaiLieu.md` dùng cả LSTM lẫn GRU làm baseline song song) |
+| Độ chính xác thực tế | Gần tương đương nhau, tùy bài toán | Gần tương đương nhau, tùy bài toán — không cái nào áp đảo hẳn (đúng như nhiều bài trong `02_LiteratureReview.md` dùng cả LSTM lẫn GRU làm baseline song song) |
 
-### 3.10 Đã tự kiểm tra lại (12/8/2026)
+### 3.10 Kiểm tra lại
 
 - Công thức khớp chuẩn GRU gốc (Cho et al. 2014, "Learning Phrase Representations using RNN Encoder-Decoder").
 - Đã tự tính tay lại toàn bộ số liệu ở bảng 3.4/3.5 — khớp đúng, không có lỗi tính toán.
@@ -462,7 +462,7 @@ Về công thức thì đúng chỉ là 1 bước trước, nhưng vì `h_(t-1)`
 
 ### 4.2 Tính toán ít hơn Transformer thì có kém chính xác hơn không
 
-**Trả lời ngắn: KHÔNG rõ rệt** — đã verify thật ở file `KhaoSatTaiLieu.md`, Mục 1 (khảo sát Mamba — *khác Phần 1 của chính file này, Phần 1 ở đây là LSTM*): 2 bài (463 và 68 trích dẫn, số tra 19/8/2026) đều kết luận Mamba và Transformer **cạnh tranh ngang nhau** về độ chính xác, dù Mamba tính ít hơn hẳn (O(n) vs O(n²)).
+**Trả lời ngắn: KHÔNG rõ rệt** — đã verify thật ở file `02_LiteratureReview.md`, Mục 1 (khảo sát Mamba — *khác Phần 1 của chính file này, Phần 1 ở đây là LSTM*): 2 bài (463 và 68 trích dẫn, số tra 19/8/2026) đều kết luận Mamba và Transformer **cạnh tranh ngang nhau** về độ chính xác, dù Mamba tính ít hơn hẳn (O(n) vs O(n²)).
 
 **Vì sao "tính ít hơn" ≠ "kém chính xác hơn":** Độ phức tạp (Big-O) đo **lượng phép tính**, không đo **độ thông minh của thuật toán**. Thuật toán rẻ hơn hoàn toàn có thể đạt kết quả ngang bằng nếu nó chọn việc để làm thông minh hơn, thay vì tính kiểu "vét cạn".
 
@@ -493,7 +493,7 @@ Mamba **nén toàn bộ lịch sử vào 1 trạng thái kích thước CỐ Đ�
 
 **Liên hệ ràng buộc thực tế của đề tài:** chạy trên GPU free, ngân sách hạn chế — dùng Transformer với chuỗi dài (nhiều ngày lịch sử) có thể **vượt quá khả năng GPU free** vì chi phí O(n²). Mamba cho phép dùng context dài hơn mà vẫn nằm trong ngân sách — lý do thực tế, không chỉ lý thuyết, để chọn Mamba.
 
-### 4.2d Đã tra thêm để xác nhận — không chỉ suy luận, có bằng chứng thật (12/8/2026)
+### 4.2d Bằng chứng từ tài liệu
 
 Tra thêm literature xác nhận đúng cả 2 chiều, cần nói thẳng cả ưu lẫn nhược, không chỉ nói phần có lợi cho Mamba:
 
@@ -739,7 +739,7 @@ y(2) = C_2×h(2) = 1,6×0,018 = 0,0288
 
 #### 4.5.6 Vì sao `A` KHÔNG được làm chọn lọc trực tiếp — đã tra xác nhận, không suy đoán
 
-Tra thật (12/8/2026): `A` giữ cố định **để đơn giản hóa tính toán**, nhưng ảnh hưởng của nó vẫn thay đổi theo input **gián tiếp qua `Δ_t`** (vì `Ā_t = 1+A×Δ_t`, và `Δ_t` đã chọn lọc). Không cần làm `A` tự thay đổi trực tiếp (phức tạp thêm không cần thiết) — `Δ` chọn lọc là đủ để "mượn" luôn tính chọn lọc gián tiếp cho `A`.
+Theo bài gốc: `A` giữ cố định **để đơn giản hóa tính toán**, nhưng ảnh hưởng của nó vẫn thay đổi theo input **gián tiếp qua `Δ_t`** (vì `Ā_t = 1+A×Δ_t`, và `Δ_t` đã chọn lọc). Không cần làm `A` tự thay đổi trực tiếp (phức tạp thêm không cần thiết) — `Δ` chọn lọc là đủ để "mượn" luôn tính chọn lọc gián tiếp cho `A`.
 
 **Chứng minh bằng đúng số đã tính ở 4.5.4:** `A=-0,1` không đổi suốt 3 ngày, nhưng `Ā_t` (giá trị thật dùng để nhân `h(t)`) ra 3 số khác nhau: `0,928 / 0,883 / 0,930` — vì `Δ_t` khác nhau mỗi ngày. Ngày mưa to (`Δ_2` lớn nhất) → `Ā_2` nhỏ nhất → giữ lại ít trạng thái cũ hơn, hợp lý vì ngày mưa to nên nghiêng nhiều về thông tin mới.
 
@@ -909,9 +909,9 @@ h_1=1   h_2=2,8   h_3=2,46   h_4=2,976   h_5=3,3296   h_6=3,4972
 
 #### 4.6.8 Liên hệ cài đặt thực tế
 
-Cài đặt bằng **CUDA kernel chuyên dụng** (`selective_scan_cuda`, `causal_conv1d_cuda` — đúng tên đã ghi trong `Document/1-KeHoach/KeHoachTongThe.md` Mục 8, lý do bắt buộc cần GPU) — tối ưu phần cứng: giữ tính toán trong bộ nhớ nhanh trên chip (SRAM) thay vì đọc/ghi liên tục ra bộ nhớ GPU chậm hơn (HBM) — lý do Mamba chạy nhanh thật trên GPU, không chỉ nhanh trên giấy.
+Cài đặt bằng **CUDA kernel chuyên dụng** (`selective_scan_cuda`, `causal_conv1d_cuda` — đúng tên đã ghi trong `Document/01_Plan/01_OverallPlan.md` Mục 8, lý do bắt buộc cần GPU) — tối ưu phần cứng: giữ tính toán trong bộ nhớ nhanh trên chip (SRAM) thay vì đọc/ghi liên tục ra bộ nhớ GPU chậm hơn (HBM) — lý do Mamba chạy nhanh thật trên GPU, không chỉ nhanh trên giấy.
 
-#### 4.6.9 Đã tự kiểm tra lại + nguồn tham khảo (14/8/2026)
+#### 4.6.9 Kiểm tra lại và nguồn
 
 - Đã tự tính tay toàn bộ số liệu ở 4.6.1, 4.6.3, 4.6.5, 4.6.7 (cả tuần tự lẫn gộp theo vòng) — khớp đúng nhau 100%, không có lỗi tính toán.
 - **Đã tra web xác nhận lại nguồn gốc kỹ thuật** (không chỉ suy luận riêng): kỹ thuật "parallel scan" Mamba dùng chính là **Blelloch parallel scan (1990)** — nguyên văn tìm được: *"Mamba can be computed in parallel via the Blelloch parallel scan algorithm... enables efficient computation of all prefix values of a sequence, obtained by repeatedly applying an associative binary operator... arrays storing all hidden states can be computed in parallel in O(log t) time."* — khớp đúng những gì đã học ở đây (tính chất kết hợp được/associative, số vòng theo log). Nguồn: paper gốc "Mamba: Linear-Time Sequence Modeling with Selective State Spaces" (arxiv 2312.00752) và các bài phân tích kỹ thuật liên quan.
@@ -919,7 +919,7 @@ Cài đặt bằng **CUDA kernel chuyên dụng** (`selective_scan_cuda`, `causa
 
 ---
 
-### 4.7 Bidirectional Mamba — cơ chế đặc thù RiverMamba (đã tra kỹ paper gốc, không suy đoán)
+### 4.7 Bidirectional Mamba — cơ chế đặc thù RiverMamba
 
 **Nguồn:** `arxiv.org/html/2505.22535v3` (bản đầy đủ RiverMamba, có appendix) — đọc trực tiếp, trích nguyên văn.
 
@@ -1019,7 +1019,7 @@ y_4 = 0,9222×(4,061+1,76)  = 5,37
 
 LSTM cũng có biến thể "Bidirectional LSTM" (BiLSTM) — ý tưởng y hệt: chạy 1 LSTM xuôi + 1 LSTM ngược, ghép kết quả. RiverMamba áp dụng đúng ý tưởng đó vào Mamba, chỉ khác cách ghép: BiLSTM thường ghép bằng concatenate đơn giản (nối 2 vector lại), RiverMamba ghép bằng **gating** `SiLU(z)` — cho phép model tự học "nên tin bao nhiêu % vào mỗi hướng" thay vì luôn cộng/nối cố định.
 
-#### 4.7.5 Đã tự kiểm tra lại (14/8/2026)
+#### 4.7.5 Kiểm tra lại
 
 - Toàn bộ nội dung 4.7.2/4.7.3 trích nguyên văn từ bản đầy đủ paper (`arxiv.org/html/2505.22535v3`, có appendix) — không suy đoán.
 - Ký hiệu `x'_o`, `o∈{f,b}`, `y_forward/y_backward`, `SiLU(z)` giữ nguyên đúng tên paper dùng, không đổi ký hiệu riêng để tránh sai lệch khi đối chiếu lại paper sau này.
@@ -1132,7 +1132,7 @@ Công thức LOAN và ma trận `W` — **CHỈ CÓ 1 BỘ DUY NHẤT, DÙNG CHU
 
 **Nhận xét:** dùng LOAN CHỈ ở Hindcast thực ra **tệ hơn** không dùng LOAN gì cả (0,8862 vs 0,9183) — chỉ khi dùng ở CẢ 2 khối mới tốt hơn baseline. Paper không giải thích sâu vì sao, chỉ kết luận dùng cả 2 "balances the metrics".
 
-#### 4.8.12 Đã tự kiểm tra lại + nguồn (14/8/2026)
+#### 4.8.12 Kiểm tra lại và nguồn
 
 - Toàn bộ công thức, shape, trích dẫn Table 2b lấy từ `arxiv.org/html/2505.22535v3` (Equation 2, Algorithm 1 Appendix D) — không suy đoán.
 - Đã tự tính tay lại độc lập toàn bộ số liệu ở 4.8.5 (chuẩn hóa, Linear, GELU xấp xỉ, cộng cuối cho cả A và B) — khớp đúng, không lỗi.
@@ -1282,7 +1282,7 @@ Kiểm tra ranh giới hàng: vị trí 4=`(1,4)`, vị trí 5=`(2,4)` — cùng
 
 Trích nguyên văn: *"a combination of Sweep and Gilbert curves performs best"* — số liệu ablation chi tiết nằm ở phụ lục (Section F.4), chưa truy cập được bản đầy đủ, chỉ xác nhận được kết luận tổng quát này.
 
-#### 4.9.14 Đã tự kiểm tra lại + nguồn (14/8/2026)
+#### 4.9.14 Kiểm tra lại và nguồn
 
 - Toàn bộ trích dẫn nguyên văn lấy từ `arxiv.org/html/2505.22535v3` (bản đầy đủ, có appendix) — không suy đoán.
 - Cơ chế Gilbert curve (4.9.8) tra từ đúng trang tác giả gốc `jakubcerveny.github.io/gilbert` — không suy đoán.
@@ -1422,7 +1422,7 @@ Toàn bộ chuỗi Serialization→LOAN₁→Mamba→LOAN₂→Downsample chạy
 #### 4.10.9 Bước 8 — MLP → dự báo m³/s (mô tả, không tính đủ số)
 
 Vector tóm tắt cuối cùng (sau `T=1`, sau cả 3 lớp) qua 1 lớp tuyến tính cuối (`Dự_báo=a×h+b`, đúng nguyên tắc đã học ở LSTM 1.5) — ra đúng 1 số dự báo lưu lượng (m³/s) cho từng điểm sông.
-**Phần lược bỏ:** khối Forecast (dùng thêm HRES), Embedding đầu vào, và Loss function (biến đổi `log1p` có dấu + trọng số return-period/lead-time, xem `RiverMamba.md` Mục 11) — không nằm trong phạm vi ví dụ 4.10.
+**Phần lược bỏ:** khối Forecast (dùng thêm HRES), Embedding đầu vào, và Loss function (biến đổi `log1p` có dấu + trọng số return-period/lead-time, xem `02_RiverMamba.md` Mục 11) — không nằm trong phạm vi ví dụ 4.10.
 
 #### 4.10.10 Bảng tổng hợp phạm vi — đã làm ĐỦ gì, còn thiếu gì (không giấu)
 
@@ -1434,7 +1434,7 @@ Vector tóm tắt cuối cùng (sau `T=1`, sau cả 3 lớp) qua 1 lớp tuyến
 | Lớp 1 Hindcast hoàn chỉnh, ý nghĩa vật lý từng kênh rõ ràng | Lớp 2, Lớp 3, khối Forecast (dùng HRES), Embedding đầu vào, Loss function |
 | Mọi số liệu tự tính tay verify khớp | Mọi trọng số (`A,w_B,W`...) là tự bịa minh họa — KHÔNG phải trọng số đã train thật |
 
-#### 4.10.11 Đã tự kiểm tra lại (15/8/2026)
+#### 4.10.11 Kiểm tra lại
 
 - Đã tự tính tay lại toàn bộ số liệu ở 4.10.4-4.10.6 (đủ 4 vị trí × 3 kênh × 2 chiều) — khớp đúng nhau, không lỗi tính toán.
 - Số liệu là ví dụ tự xây dựng để minh họa cách các cơ chế (4.5-4.9) GHÉP LẠI với nhau trong 1 pipeline thật — không phải số liệu/trọng số thật từ paper.

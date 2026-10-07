@@ -13,7 +13,7 @@
 6. Công trình huấn luyện mô hình trên từng bộ dữ liệu
 7. Phân tích tổng hợp
 8. Lưu ý về số liệu
-9. Đề xuất
+9. Thế mạnh của từng bộ dữ liệu
 10. Nguồn tham khảo
 
 ---
@@ -440,9 +440,9 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | Venue | Journal of Hydrology, 2026 |
 | DOI | [10.1016/j.jhydrol.2026.135727](https://doi.org/10.1016/j.jhydrol.2026.135727) |
 | Dữ liệu | 516 lưu vực CAMELS-US, theo giờ (khớp với bản CAMELS-US theo giờ của Gauch et al., 2021, xem Mục 3.3) |
-| Mô hình | LSTM, PatchTST, Mamba |
-| Kết quả | **PatchTST > LSTM > Mamba** — "Mamba" ở bài này là S-Mamba tự viết, quét theo **biến** chứ không theo thời gian → không đại diện cho Mamba theo thời gian |
-| Ý nghĩa với đề tài | Mamba thuần có thể kém hơn Transformer (PatchTST) và LSTM. PatchTST nên có mặt trong nhóm baseline |
+| Mô hình | LSTM, GRU, Transformer, Informer, Autoformer, RRformer, PatchTST, DLinear, Mamba (S-Mamba); chuỗi vào 96 giờ, dự báo 1–24 giờ, có và không có Q quan trắc |
+| Kết quả | Lead 1 giờ: DLinear tốt nhất ở 76,7% lưu vực. Lead 3–24 giờ: **PatchTST tốt nhất** (53–91% lưu vực), **LSTM đứng thứ hai**; Mamba được đánh giá cân bằng giữa độ chính xác và chi phí; các biến thể Transformer khác kém cả LSTM và Mamba. Khi không có Q quan trắc (chỉ khí tượng), lợi thế của PatchTST giảm, LSTM và Mamba bền hơn. "Mamba" ở bài này là S-Mamba, trích tương quan giữa các **biến** trước khối Mamba |
+| Ý nghĩa với đề tài | Mamba thuần có thể kém PatchTST và LSTM ở bài toán có Q quan trắc; PatchTST là ứng viên biến thể Transformer (bước E). Chuỗi vào chỉ 96 giờ, ngắn hơn nhiều so với hindcast 364 ngày của BiasCast |
 
 #### 6.2.5 Zero-shot forecasting of streamflow using time series foundation models: are we there yet?
 
@@ -604,7 +604,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 |---|---|---|
 | S4D-FT (WRR 2025) | CAMELS-US | SSM vượt LSTM, nhưng kém hơn ở dòng chảy biến động nhanh, biên độ lớn |
 | Benchmarking SSM (ESWA 2026) | CAMELS-US | S4D, S5D vượt baseline |
-| Temporal inductive biases (J. Hydrology 2026) | CAMELS-US | Mamba kém hơn PatchTST và LSTM |
+| Temporal inductive biases (J. Hydrology 2026) | CAMELS-US | PatchTST tốt nhất, LSTM thứ hai; Mamba cân bằng độ chính xác – chi phí |
 | ResBi-Mamba Plus (AISE 2026) | Columbia | Mamba lai vượt các baseline |
 | Mamba + XAI (preprint 2025) | WaterBench-Iowa | Mamba tương đương Transformer |
 
@@ -653,7 +653,7 @@ Cả SSM và GNN đều yếu ở loại sự kiện quan trọng nhất với c
 
 Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN với Mamba** cho dự báo lưu lượng dòng chảy.
 
-*Bổ sung 25/9/2026:* có tồn tại kiến trúc kết hợp GNN + Mamba ở bài toán **tổng quát** — G-Mamba (Xiaojian Chen, Qiusheng Tang, *"Graph-enhanced Mamba: Efficient spatiotemporal sequence modeling with selective state space and graph neural networks"*, Neurocomputing vol 680, 2026, DOI [10.1016/j.neucom.2026.133280](https://doi.org/10.1016/j.neucom.2026.133280)): tiêm ngữ cảnh láng giềng từ đồ thị (tĩnh + động) vào bước cập nhật trạng thái của selective SSM, thử trên benchmark giao thông, điện, khí tượng, tỷ giá, nhiệt độ máy biến áp — **không có dữ liệu dòng chảy** (đã đọc trang abstract + phần mở đầu). Vì vậy nhận định trên vẫn đúng với riêng bài toán dòng chảy; G-Mamba dùng làm tham khảo kiến trúc.
+Ở bài toán tổng quát, có kiến trúc kết hợp GNN + Mamba ở bài toán **tổng quát** — G-Mamba (Xiaojian Chen, Qiusheng Tang, *"Graph-enhanced Mamba: Efficient spatiotemporal sequence modeling with selective state space and graph neural networks"*, Neurocomputing vol 680, 2026, DOI [10.1016/j.neucom.2026.133280](https://doi.org/10.1016/j.neucom.2026.133280)): tiêm ngữ cảnh láng giềng từ đồ thị (tĩnh + động) vào bước cập nhật trạng thái của selective SSM, thử trên benchmark giao thông, điện, khí tượng, tỷ giá, nhiệt độ máy biến áp — **không có dữ liệu dòng chảy** (đã đọc trang abstract + phần mở đầu). Vì vậy nhận định trên vẫn đúng với riêng bài toán dòng chảy; G-Mamba dùng làm tham khảo kiến trúc.
 
 ### 7.5 Gợi ý phương pháp rút ra
 
@@ -672,16 +672,16 @@ Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN
 
 - **Hạng Q** có dấu \* được ghi theo tra cứu sơ bộ, **cần đối chiếu lại trên SCImago** trước khi dùng chính thức. Hạng CORE của ICML (A\*) và ACM SIGSPATIAL (A) đã được tra cứu.
 - **Số trích dẫn** lấy từ Google Scholar hoặc OpenAlex tại thời điểm 13/9/2026. Hai nguồn có thể cho số khác nhau và số liệu thay đổi theo thời gian. Ô "—" là chưa tra cứu.
-- **Đối chiếu số liệu với toàn văn:** NSE 0,742/0,756/0,763 (Jing et al., ESWA) đúng với bài, trong đó 0,742/0,756 trên 531 lưu vực và 0,763 (S5Dv2) trên 671 lưu vực; chạy 5 hạt giống trong repo cho NSE trung vị S4D 0,750, S5D 0,751, LSTM 0,742. Chưa đối chiếu: thứ tự PatchTST > LSTM > Mamba (Zhang et al.; số 516 lưu vực khớp bản CAMELS-US theo giờ của Gauch et al., 2021); cấu hình thí nghiệm chi tiết của ResBi-Mamba Plus; mô hình cụ thể đạt NSE 0,74 / KGE 0,79 trong benchmark gốc của WaterBench-Iowa.
+- **Đối chiếu số liệu với toàn văn:** NSE 0,742/0,756/0,763 (Jing et al., ESWA) đúng với bài, trong đó 0,742/0,756 trên 531 lưu vực và 0,763 (S5Dv2) trên 671 lưu vực; chạy 5 hạt giống trong repo cho NSE trung vị S4D 0,750, S5D 0,751, LSTM 0,742. Thứ tự PatchTST tốt nhất, LSTM thứ hai của Zhang et al. đúng với toàn văn (516 lưu vực CAMELS-US theo giờ). Chưa đối chiếu: cấu hình thí nghiệm chi tiết của ResBi-Mamba Plus; mô hình cụ thể đạt NSE 0,74 / KGE 0,79 trong benchmark gốc của WaterBench-Iowa.
 - Công trình 6.4.3 không ghi tên "WaterBench" trong abstract. Việc xếp vào WaterBench-Iowa dựa trên việc công trình dùng đúng 125 lưu vực tại Iowa và có cùng nhóm tác giả với bộ dữ liệu.
 - Các công trình **preprint** (6.2.2, 6.2.6, 6.2.7, 6.4.2) chưa qua bình duyệt, chỉ nên trích dẫn như công trình liên quan.
 - Danh sách công trình phản ánh kết quả tra cứu tới ngày 13/9/2026, **không khẳng định đã bao quát toàn bộ**.
 
 ---
 
-## 9. Đề xuất
+## 9. Thế mạnh của từng bộ dữ liệu
 
-### 9.1 Thế mạnh của từng bộ dữ liệu
+Đề tài dùng Extended LamaH-CE theo bài cơ sở BiasCast; ba bộ còn lại dùng cho phần khảo sát và công trình liên quan.
 
 | Nhu cầu | Bộ dữ liệu phù hợp |
 |---|---|
@@ -691,17 +691,7 @@ Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN
 | Dữ liệu vận hành hồ chứa thực tế | Columbia Basin |
 | Lưu lượng theo giờ | WaterBench-Iowa, LamaH-CE, CAMELS-US (bản mở rộng 516 lưu vực) |
 
-### 9.2 Các phương án
-
-> Đề tài dùng Extended LamaH-CE theo bài cơ sở BiasCast (chốt 6/10/2026); ba bộ còn lại dùng cho phần khảo sát và công trình liên quan. Ba phương án dưới đây là phân tích tham khảo khi chọn bộ dữ liệu.
-
-**Phương án A: WaterBench-Iowa làm bộ dữ liệu chính.** Có đủ mốc đối chiếu (LSTM/GRU/Seq2Seq, Transformer, Mamba, mô hình đồ thị), có mã nguồn HydroGAT để phát triển hướng kết hợp đồ thị và Mamba, dữ liệu theo giờ, tải trực tiếp từ GitHub. Hạn chế: chuỗi 7 năm, 7 đặc trưng, một khu vực; HydroGAT không công bố dữ liệu đã xử lý (phải tự dựng từ Stage IV, DEM, USGS), thiết lập khác benchmark gốc, và bản đầy đủ được huấn luyện trên GPU A100.
-
-**Phương án B: CAMELS-US để kiểm chứng cài đặt, LamaH-CE làm thí nghiệm chính.** Dùng các mốc SSM trên CAMELS-US để kiểm tra cài đặt mô hình, sau đó chạy trên LamaH-CE với chuỗi dài và topology có sẵn, dùng mã nguồn GNN công khai của công trình ICML 2024 làm nền. Hạn chế: chưa có mốc Mamba/Transformer trên LamaH-CE, và phải xử lý kết luận trái chiều của ICML 2024.
-
-**Phương án C: WaterBench-Iowa để kiểm chứng, LamaH-CE làm thí nghiệm chính.** Kết hợp ưu điểm có mã nguồn và mốc đối chiếu của WaterBench-Iowa với chuỗi dài và topology của LamaH-CE. Hạn chế: khối lượng công việc lớn hơn.
-
-### 9.3 Ghi chú
+**Ghi chú:**
 
 Các bộ dữ liệu trên phục vụ hướng **tự xây dựng mô hình**. Chúng không thay thế trực tiếp dữ liệu đầu vào của RiverMamba, vốn yêu cầu 136 biến trên lưới 0,05°.
 

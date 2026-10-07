@@ -2,7 +2,7 @@
 
 > Tài liệu trình bày kết quả khảo sát tính hợp lý của đề tài theo hai yêu cầu đánh giá: **(1) yêu cầu riêng cho nhóm nghiên cứu** — đánh giá Mamba có cải thiện đáng kể trong các công trình đã công bố hay không (Mục 1), và tìm ít nhất 5 bài báo trong 5 năm gần đây giải quyết bài toán dự báo lưu lượng theo tiêu chí uy tín: không MDPI, không chỉ là preprint, trích dẫn ≥ 5, ưu tiên Scimago Q1/Q2, ưu tiên Việt Nam → Đông Nam Á → châu Á, **ưu tiên tạp chí/hội nghị ngành CNTT hoặc AI** (có ưu thế về AI) (Mục 2); **(2) yêu cầu chung** — tiểu luận phải ra được demo/phần mềm (Mục 3). Số trích dẫn và hạng Scimago lấy từ Google Scholar và Scimago tại thời điểm tra (08–09/2026).
 >
-> Hướng đề tài hiện tại: bài cơ sở BiasCast (HESS 2026) trên Extended LamaH-CE, so sánh các lõi thời gian (`Document/1-KeHoach/KeHoachTongThe.md`, `Document/1-KeHoach/KienTrucPipeline.md`); RiverMamba là tài liệu tham khảo về kiến trúc.
+> Hướng đề tài hiện tại: bài cơ sở BiasCast (HESS 2026) trên Extended LamaH-CE, so sánh các lõi thời gian (`Document/01_Plan/01_OverallPlan.md`, `Document/01_Plan/03_Pipeline.md`); RiverMamba là tài liệu tham khảo về kiến trúc.
 
 ---
 
@@ -55,13 +55,13 @@ Lưu ý khi tra cứu: "Jamba" trùng tên tạp chí *Jàmbá*; "Hyena" trùng 
 
 **Nếu có công trình Transformer tương đương thì sao?** Đó là tiến bộ khoa học bình thường, không phủ nhận giá trị kết quả so sánh tại thời điểm thực hiện.
 
-**Mamba có nhớ kém hơn Transformer không?** Có một đánh đổi thật: Mamba nén lịch sử vào trạng thái kích thước cố định; trên bài kiểm tra "needle-in-a-haystack", Transformer nhớ chi tiết đơn lẻ chính xác hơn. Tuy nhiên dự báo lưu lượng cần thông tin tổng hợp và xu hướng tích lũy (độ ẩm đất, giai đoạn mùa mưa) hơn là chi tiết đơn lẻ, nên phù hợp với cách nén của Mamba (chi tiết ở `LyThuyetCauTruc.md` Mục 4.2).
+**Mamba có nhớ kém hơn Transformer không?** Có một đánh đổi thật: Mamba nén lịch sử vào trạng thái kích thước cố định; trên bài kiểm tra "needle-in-a-haystack", Transformer nhớ chi tiết đơn lẻ chính xác hơn. Tuy nhiên dự báo lưu lượng cần thông tin tổng hợp và xu hướng tích lũy (độ ẩm đất, giai đoạn mùa mưa) hơn là chi tiết đơn lẻ, nên phù hợp với cách nén của Mamba (chi tiết ở `01_ArchitectureTheory.md` Mục 4.2).
 
 ---
 
-## 2. Bài báo giải quyết bài toán dự báo lưu lượng và mực nước
+## 2. Bài báo giải quyết bài toán dự báo lưu lượng
 
-Bài toán của đề tài là dự báo **lưu lượng dòng chảy (Q)**; nguy cơ lũ được đánh giá gián tiếp qua ngưỡng return period trên Q. Mục 2.1 là nhánh chính (bắt buộc); Mục 2.2 là nhánh mực nước, chỉ để tham khảo.
+Bài toán của đề tài là dự báo **lưu lượng dòng chảy (Q)**; nguy cơ lũ được đánh giá gián tiếp qua ngưỡng return period trên Q.
 
 ### 2.1. Dự báo lưu lượng dòng chảy
 
@@ -94,10 +94,7 @@ Tiêu chí: không MDPI, không chỉ preprint, trích dẫn ≥ 5, ưu tiên Sc
 - **Bài #3 (Johor):** wavelet-ANN RMSE 119,25 so với ANN 126,88; CNN ổn định hơn nhưng quá khớp ở thành phần tần số thấp. Không so Transformer/Mamba; có giá trị tham khảo cho phần đánh giá bất định.
 - **Bài #4 (Dương Tử):** Transformer tùy biến thắng ARIMA, TCN, LSTM và Transformer thường; năm lũ 1998/2016 R² > 0,95. Đối chiếu với bài #2 cho thấy cách tùy biến kiến trúc theo bài toán quyết định kết quả hơn là bản thân kiến trúc gốc.
 
-### 2.2. Dự báo mực nước (tham khảo)
-
-| # | Bài báo | Tạp chí | Năm | Trích dẫn | Vùng | Thuật toán | DOI |
-|---|---|---|---|---|---|---|---|
+---|---|---|---|---|---|---|---|
 | 2.2.1 | Water Level Prediction Model Based on GRU and CNN | IEEE Access (Q1) | 2020 | 264 | Dương Tử và nhiều sông khác, Trung Quốc | GRU + CNN qua IoT. Tác giả: Pan, Zhou, Cao, Liu, Hao, Li, Chen | [10.1109/ACCESS.2020.2982433](https://doi.org/10.1109/ACCESS.2020.2982433) |
 
 Bài 2.2.1 lệch mốc 5 năm (2020) nhưng được giữ vì số trích dẫn cao và dùng học sâu. Đã loại: Water Level Prediction at TICH-BUI river (IEEE ICMLC 2019, SVR); Multi-input LSTM for water level forecasting in Black River (IEEE ICMLANT 2021, 1 trích dẫn); "Accurate discharge and water level forecasting… Red River + Dakbla" (Scientific Reports, ngành đa lĩnh vực).
@@ -108,7 +105,7 @@ Bài 2.2.1 lệch mốc 5 năm (2020) nhưng được giữ vì số trích dẫ
 
 Yêu cầu: *"Phải ra được phần mềm/demo. Trường hợp là demo thì sang KLTN phải nâng lên thành phần mềm có tính ứng dụng."*
 
-- **Tiểu luận:** Extended LamaH-CE là dữ liệu lịch sử, không có luồng cập nhật hằng ngày, nên demo phát lại theo thời gian trên tập test 2014–2017: bản đồ 451 lưu vực theo ngày, chuỗi Q, tô màu theo ngưỡng return period, kèm giải thích XAI (`Document/1-KeHoach/KienTrucPipeline.md` Mục 2.10). Công nghệ và nơi triển khai demo chưa chốt.
+- **Tiểu luận:** Extended LamaH-CE là dữ liệu lịch sử, không có luồng cập nhật hằng ngày, nên demo phát lại theo thời gian trên tập test 2014–2017: bản đồ 451 lưu vực theo ngày, chuỗi Q, tô màu theo ngưỡng return period, kèm giải thích XAI (`Document/01_Plan/03_Pipeline.md` Mục 2.10). Công nghệ và nơi triển khai demo chưa chốt.
 - **Khóa luận:** cần làm rõ mức "phần mềm có tính ứng dụng" (tài khoản người dùng, chọn nhiều lưu vực, cảnh báo qua email/SMS…) khi tới giai đoạn khóa luận.
 
 ---
@@ -119,3 +116,44 @@ Yêu cầu: *"Phải ra được phần mềm/demo. Trường hợp là demo th�
 - Mamba không có bằng chứng vượt trội tuyệt đối so với Transformer; đề tài lập luận theo hiệu quả tính toán, tính mới và so sánh có kiểm soát.
 - Bài #2 và #4 cho thấy kết quả phụ thuộc cách tùy biến kiến trúc theo bài toán — cơ sở để thiết kế thí nghiệm so sánh công bằng giữa các kiến trúc.
 - Bài #1 cho thấy cần đánh giá riêng đỉnh lũ, không chỉ dựa vào NSE tổng thể — phù hợp với việc dùng trọng số return period trong hàm mất mát.
+
+---
+
+## 5. Công trình ở venue CNTT/AI có huấn luyện mô hình dự báo lưu lượng
+
+Lọc từ khảo sát 137 bài (từ 2024, dữ liệu công khai dài năm, có huấn luyện mô hình học sâu cho Q).
+
+| Bài | Nơi công bố | Hạng | Mã nguồn |
+|---|---|---|---|
+| Kirschstein & Sun — *The Merit of River Network Topology for Neural Flood Forecasting* (LamaH-CE) | ICML 2024 | CORE A\* | Có |
+| *ZeroDiff: Zero-Shot Time Series Reconstruction via Informed-Prior Diffusion* (có huấn luyện trên CAMELS) | ICML 2026 | CORE A\* | Có |
+| *Transfer Learning Using Inaccurate Physics Rule for Streamflow Prediction* | IJCAI 2024 | CORE A\* | Không |
+| HDRN — *Hierarchically disentangled recurrent network…* (CAMELS-US) | IEEE ICDM 2025 | CORE A\* | Một phần |
+| HydroGAT — *Distributed Heterogeneous Graph Attention Transformer for Spatiotemporal Flood Prediction* | ACM SIGSPATIAL 2025 | CORE A | Có |
+| FedHydroDSW — học liên kết cho lưu vực thiếu dữ liệu | ICPR 2024 | CORE B | Có |
+| Jing và cs. — S4D/S5D trong mô hình học tham số khả vi (CAMELS-US) | Expert Systems with Applications 2026 | Q1 | Có |
+| FedMSF — học liên kết, CAMELS-GB | Information Fusion 2026 | Q1 | Không |
+| LSTM ở vùng giới hạn nước/năng lượng (Mỹ) | Machine Learning with Applications 2024 | Q1 | Không |
+| HydroTFT; Sun & Sun — mô hình nền tảng chuỗi thời gian dự báo không huấn luyện; Demiray & Demir — Transformer 120 giờ | Machine Learning: Earth 2026 | Chưa có hạng | Có / Có / Một phần |
+| Zhou và cs. — mạng không gian–thời gian đa đồ thị (có thử trên LamaH-CE) | Engineering Applications of Artificial Intelligence 2026 | Q1 | Không |
+| ResBi-Mamba Plus (Columbia Basin) | Artificial Intelligence Science and Engineering 2026 | Chưa có hạng | Không |
+
+Các công trình ở venue CNTT/AI phần lớn không trên cùng bộ dữ liệu và bài toán với BiasCast; chỉ Kirschstein & Sun và Zhou và cs. dùng LamaH-CE (bản theo giờ, không có dự báo thời tiết).
+
+## 6. Công trình nền tảng và mốc so sánh
+
+| Bài | Nơi công bố | Vai trò trong đề tài |
+|---|---|---|
+| Nearing và cs. — *Global prediction of extreme floods in ungauged watersheds* | Nature 2024 | Mô hình LSTM hindcast–forecast của Google Flood Hub; nguồn gốc kiến trúc Encoder–Decoder LSTM trong BiasCast |
+| Kratzert và cs. — *Towards learning universal, regional, and local hydrological behaviors…* | HESS 2019 | Hàm mất mát NSE\* dùng trong BiasCast; tổ hợp nhiều hạt giống |
+| Kratzert và cs. — *HESS Opinions: Never train an LSTM on a single basin* | HESS 2024 | Lý do huấn luyện một mô hình chung cho nhiều lưu vực |
+| Liu, Bian, Lawson, Shen — *Probing the limit of hydrologic predictability with the Transformer network* | J. Hydrology 2024 | Transformer thuần không vượt LSTM trên CAMELS-US — mốc kỳ vọng cho lõi Transformer |
+| Koya & Roy — *Temporal Fusion Transformers for streamflow prediction* | J. Hydrology 2024 | Kết hợp attention và hồi quy |
+| Nearing và cs. — *Technical note: Data assimilation and autoregression for using near-real-time streamflow observations in LSTM networks* | HESS 2022 | Đưa Q quan trắc gần thời gian thực vào LSTM — căn cứ cho bước hoàn thiện đầu vào Q |
+| Gauch và cs. — *How to deal w\_\_\_ missing input data* | HESS 2025 | Masked mean, input replacing, attention cho đầu vào thiếu — căn cứ cho ý tưởng mô hình chịu mất Q |
+| Klotz và cs. — *Uncertainty estimation with deep learning for rainfall–runoff modeling* | HESS 2022 | Đầu ra xác suất CMAL |
+| Frame và cs. — *Deep learning rainfall–runoff predictions of extreme events* | HESS 2022 | LSTM và MC-LSTM ở sự kiện cực trị |
+| Martel và cs. — *Exploring the ability of LSTM-based hydrological models to simulate streamflow time series for flood frequency analysis* | HESS 2025 | Lấy mẫu nhiều đỉnh làm kết quả đỉnh kém đi — bằng chứng cho gợi ý lấy mẫu theo mức lưu lượng |
+| Baste và cs. — *Unveiling the limits of deep learning models in hydrological extrapolation tasks* | HESS 2025 | Căn cứ cho tinh chỉnh số chiều ẩn và ưu tiên đỉnh lũ |
+| Gu & Dao — *Mamba: Linear-Time Sequence Modeling with Selective State Spaces* | COLM 2024 | Kiến trúc Mamba gốc |
+| Yang và cs. — DI-LSTM, tích hợp lưu lượng trễ | HESS 2025 | Đưa lưu lượng trễ vào đầu vào (KGE 0,80 → 0,96) |

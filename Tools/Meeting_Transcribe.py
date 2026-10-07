@@ -73,7 +73,7 @@ def load_audio(path: Path) -> np.ndarray:
     return np.concatenate(chunks).astype(np.float32) / 32768.0
 
 
-model =WhisperModel(MODEL_NAME, device="cuda", compute_type="float16")
+model = WhisperModel(MODEL_NAME, device="cuda", compute_type="float16")
 for src in media:
     out = OUT_DIR / f"{src.stem}_transcript.txt"
     t0 = time.time()

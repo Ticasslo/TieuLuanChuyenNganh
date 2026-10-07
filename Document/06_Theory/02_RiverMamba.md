@@ -1,6 +1,6 @@
 # RiverMamba — Ghi chú đọc mã nguồn (tài liệu tham khảo)
 
-> Tài liệu tổng hợp kết quả đọc repo chính thức của RiverMamba (Shams Eddin, Zhang, Kollet, Gall — NeurIPS 2025; DOI proceedings `10.52202/085713-4446`; arXiv 2505.22535; mã nguồn `github.com/HakamShams/RiverMamba_code`, đọc ngày 26/8/2026). Đề tài không chạy hay fine-tune RiverMamba (đề tài dùng 4 bộ dữ liệu benchmark theo lưu vực, xem `Document/1-KeHoach/KeHoachTongThe.md`); tài liệu này dùng để tham khảo kiến trúc, hàm mất mát, quy ước dữ liệu và kinh nghiệm cài đặt `mamba-ssm` trên Colab/Kaggle. Thư mục `docs/` của repo chỉ chứa ảnh và poster, không có tài liệu văn bản bổ sung.
+> Tài liệu tổng hợp kết quả đọc repo chính thức của RiverMamba (Shams Eddin, Zhang, Kollet, Gall — NeurIPS 2025; DOI proceedings `10.52202/085713-4446`; arXiv 2505.22535; mã nguồn `github.com/HakamShams/RiverMamba_code`, đọc ngày 26/8/2026). Đề tài không chạy hay fine-tune RiverMamba (đề tài dùng 4 bộ dữ liệu benchmark theo lưu vực, xem `Document/01_Plan/01_OverallPlan.md`); tài liệu này dùng để tham khảo kiến trúc, hàm mất mát, quy ước dữ liệu và kinh nghiệm cài đặt `mamba-ssm` trên Colab/Kaggle. Thư mục `docs/` của repo chỉ chứa ảnh và poster, không có tài liệu văn bản bổ sung.
 
 ---
 
@@ -40,7 +40,7 @@
 | `models/build.py` | Dựng mô hình |
 | `models/encoder/`, `models/decoder/` | Mỗi thư mục có 3 lựa chọn backbone: `FlashTransformer.py`, `Mamba.py`, `Mamba2.py` |
 | `models/head/MLP.py` | Đầu ra MLP |
-| `models/loan.py` | Module LOAN (lý thuyết ở `LyThuyetCauTruc.md` Mục 4.8) |
+| `models/loan.py` | Module LOAN (lý thuyết ở `01_ArchitectureTheory.md` Mục 4.8) |
 | `models/loss.py` | Hàm mất mát (log1p có dấu, trọng số return period và lead time) |
 | `models/mha.py` | Multi-head attention |
 | `models/vim/` | Mã Vision Mamba gốc, cần chép vào site-packages (Mục 2) |
@@ -56,7 +56,7 @@
 
 - **Đường dẫn dữ liệu:** 6 biến `root_glofas_reanalysis`, `root_era5_land_reanalysis`, `root_static`, `root_hres_forecast`, `root_cpc`, `root_obs` (GRDC).
 - **Chọn backbone:** `encoder="Mamba"`, `decoder="Mamba"`, `head="MLP"` (mặc định); đổi sang `"FlashTransformer"` hoặc `"Mamba2"` chỉ cần sửa cấu hình.
-- **Encoder:** `en_embed_dim=[192,192,192]`, `en_depths=[2,2,2]` (3 tầng, mỗi tầng 2 khối). Phần SSM: `en_d_state=[1,1,1]` (nhỏ hơn nhiều so với giá trị 16 thường dùng), `en_d_conv=[3,3,3]`, `en_expand=[1,1,1]`, `en_dt_min=0.001`, `en_dt_max=0.1`, `en_bi_ssm=True` (bidirectional, xem `LyThuyetCauTruc.md` Mục 4.7). Dropout mặc định 0.
+- **Encoder:** `en_embed_dim=[192,192,192]`, `en_depths=[2,2,2]` (3 tầng, mỗi tầng 2 khối). Phần SSM: `en_d_state=[1,1,1]` (nhỏ hơn nhiều so với giá trị 16 thường dùng), `en_d_conv=[3,3,3]`, `en_expand=[1,1,1]`, `en_dt_min=0.001`, `en_dt_max=0.1`, `en_bi_ssm=True` (bidirectional, xem `01_ArchitectureTheory.md` Mục 4.7). Dropout mặc định 0.
 - **Decoder:** 1 tầng (`de_embed_dim=[192]`, `de_depths=[1]`).
 - **Embedding riêng từng nguồn:** `en_embed_glofas=48`, `en_embed_era5=128`, `en_embed_cpc=16`, `de_embed_hres=64` — mỗi nhóm đầu vào qua lớp embedding riêng trước khi ghép.
 - **Huấn luyện:** `batch_size_train=1`, trong đó mỗi mẫu đã gồm `n_points=254945` điểm không gian (bản thân một mẫu đóng vai trò như một batch lớn). `n_epochs=100`, Adam, `lr=1e-3`, `weight_decay=1e-6`, `max_norm=10` (cắt gradient). Lịch học cosine, `lr_min=1e-5`, `lr_decay_step=20`, `lr_decay_rate=0.9`, không warmup.
@@ -86,7 +86,7 @@
 
 ## 7. Space-filling curve (`serialization/generate_curves.py`)
 
-5 loại curve (lý thuyết ở `LyThuyetCauTruc.md` Mục 4.9):
+5 loại curve (lý thuyết ở `01_ArchitectureTheory.md` Mục 4.9):
 - **Gilbert** — Hilbert curve tổng quát cho vùng chữ nhật có kích thước không phải lũy thừa của 2 (dùng implementation numpy từ `jakubcerveny/gilbert`).
 - **Sweep_h / Sweep_v** — quét xoắn ốc cầu (loxodrome) theo chiều ngang/dọc.
 - **Zigzag_h / Zigzag_v** — như Sweep nhưng bảo đảm các điểm liền kề trên curve cũng liền kề trong không gian.
