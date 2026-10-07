@@ -65,30 +65,35 @@ Không dùng trực tiếp: checkpoint có lớp đầu vào cố định theo 1
 
 | Mô hình | Vai trò |
 |---|---|
-| Persistence (qmax và qmean ngày t−1) | Mốc sàn (đã tính) |
-| Mô hình của tác giả BiasCast (chạy lại trọng số) | Mốc tái lập |
-| LSTM cải tiến (tầng 1) | Mốc mạnh cho tầng 2 |
-| GRU, Transformer, S4D, Mamba trong cùng khung hindcast – forecast | So sánh lõi thời gian (tầng 2) |
+| Persistence (qmax ngày t−1) | Mốc sàn (đã tính: NSE trung vị 0,35–0,37) |
+| DLinear | Mốc tuyến tính giữa persistence và học sâu |
+| Mô hình của tác giả BiasCast (chạy lại trọng số) và huấn luyện lại 3 hạt giống | Mốc tái lập, đo nhiễu hạt giống |
+| LSTM cải tiến (tầng 1: sửa mã, Q cùng đơn vị, masked mean theo nguồn, che dữ liệu khi huấn luyện) | Mốc mạnh cho tầng 2 |
+| GRU, Transformer, S4D, Mamba trong cùng khung hindcast – forecast | So sánh lõi thời gian ở mức cùng tham số và sau tinh chỉnh cùng ngân sách |
 | Biến thể Mamba (quét hai chiều) và Transformer (patch như PatchTST) | Kiểm chứng một ý cải tiến cho mỗi lõi |
 
-Chi tiết và số lần huấn luyện: `Document/01_Plan/03_Pipeline.md` Mục 9.1.
+Câu hỏi nghiên cứu, đóng góp, tính mới, giao thức so sánh và ma trận thí nghiệm (tối đa khoảng 112 lần huấn luyện): `Document/01_Plan/03_Pipeline.md` Mục 1, 5, 7.
 
 ---
 
 ## 7. Chỉ số đánh giá
 
-- **Chính:** NSE, KGE theo từng lưu vực trên test 2014–2017; báo cáo trung vị, phân vị và đường CDF như bài gốc; số lưu vực tốt lên / kém đi.
-- **Bổ sung:** FHV (đỉnh), FLV (dòng chảy kiệt), sai số thời điểm đỉnh.
-- **Theo mức lưu lượng (yêu cầu GVHD):** chia qmax thành các mức theo ngưỡng riêng từng lưu vực, tính ma trận nhầm lẫn, tỉ lệ phát hiện và báo động nhầm ở mức lũ (`Document/01_Plan/03_Pipeline.md` Mục 7).
-- **Độ tin cậy:** 3 hạt giống mỗi cấu hình, trung bình ± độ lệch chuẩn; chọn checkpoint theo validation, NSE test ghi mỗi epoch chỉ để theo dõi.
+- **Chính:** NSE, KGE, PNSE (NSE lấy persistence làm mốc) theo từng lưu vực trên test 2014–2017; trung vị, phân vị, đường CDF, số lưu vực tốt lên / kém đi.
+- **Kiểm định:** Wilcoxon signed-rank ghép cặp theo lưu vực kèm Cohen's d, hiệu chỉnh Holm khi so nhiều cặp.
+- **Theo mức lưu lượng (yêu cầu GVHD):** bốn mức theo đoạn đường duy trì lưu lượng (Yilmaz 2008), ngưỡng riêng từng lưu vực tính trước kỳ test; ma trận nhầm lẫn, %BiasFHV/FMS/FLV.
+- **Theo sự kiện lũ:** ngưỡng chu kỳ lặp lại 1, 2, 5, 10 năm (Gumbel, L-moments); POD, FAR, precision, F1, CSI trong cửa sổ ±1 ngày; sai số thời điểm đỉnh.
+- **Kịch bản vận hành:** mất Q, độ trễ thực tế của từng nguồn dữ liệu.
+- **Độ tin cậy và chi phí:** 3 hạt giống mỗi cấu hình; chọn checkpoint theo validation, NSE test ghi mỗi epoch chỉ để theo dõi; số tham số, thời gian, bộ nhớ.
+
+Chi tiết: `Document/01_Plan/03_Pipeline.md` Mục 6.
 
 ---
 
 ## 8. Hạ tầng
 
-- **Tính toán:** Kaggle là chính (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Google Colab miễn phí dự phòng, Lightning AI khi cần. `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel một lần rồi lưu Kaggle Dataset (`Document/06_Theory/02_RiverMamba.md` Mục 0).
+- **Tính toán:** Kaggle là chính, từ 3 tài khoản trở lên (mỗi tài khoản GPU 30 giờ/tuần, tối đa 12 giờ/phiên; chỉ dùng T4 vì `mamba-ssm` không chạy trên P100); dự phòng Mamba bằng `mambapy` (PyTorch thuần), Google Colab miễn phí dự phòng, Lightning AI khi cần. `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel một lần rồi lưu Kaggle Dataset (`Document/06_Theory/02_RiverMamba.md` Mục 0).
 - **Dữ liệu:** Kaggle Dataset private `lamah-ce-ext` (dữ liệu chính và kết quả thí nghiệm của tác giả); `lamah-ce-core`, `lamah-ce-extra` (LamaH-CE gốc theo giờ, mạng sông) cho khóa luận.
-- **Khung mã:** bản fork NeuralHydrology của tác giả BiasCast.
+- **Khung mã:** fork riêng từ bản fork NeuralHydrology của tác giả BiasCast; mô hình chung "Sequential Forecast" nhận lõi thời gian bất kỳ; kiểm thử đơn vị trước khi huấn luyện (`Document/01_Plan/03_Pipeline.md` Mục 9).
 - **Demo (bắt buộc với tiểu luận):** công nghệ và nơi triển khai chưa chốt; VPS chỉ dùng nếu có thời gian.
 
 ---

@@ -217,9 +217,9 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Claude Code local settings
+# Claude Code local settings (CLAUDE.md được theo dõi trong git)
 .claude/
-CLAUDE.md
+
 
 # CodeGraph index (local, rebuild bằng codegraph sync)
 .codegraph/

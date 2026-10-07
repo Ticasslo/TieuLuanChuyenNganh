@@ -1,6 +1,6 @@
 # Ý tưởng cho đề tài — đọc sâu BiasCast và tra cứu bổ sung
 
-Tệp này tập hợp các ý tưởng mới tìm được khi đọc lại toàn văn BiasCast (Konold và cs., HESS 30:5067–5096, 2026) và tra cứu thêm, chưa có trong lộ trình ở `Document/01_Plan/03_Pipeline.md` Mục 8–9. Mỗi ý tưởng ghi căn cứ, chi phí, vị trí đề xuất trong lộ trình. Y1, Y2, Y3 nằm trong pipeline (`Document/01_Plan/03_Pipeline.md` Mục 8.2, 9.1 và sơ đồ `Diagrams/ProjectDiagram.drawio`); Y6 nằm trong pipeline theo yêu cầu của GVHD (`Document/01_Plan/03_Pipeline.md` Mục 7, 9.1).
+Tệp này tập hợp các ý tưởng mới tìm được khi đọc lại toàn văn BiasCast (Konold và cs., HESS 30:5067–5096, 2026) và tra cứu thêm, kèm căn cứ, chi phí, vị trí đề xuất trong lộ trình. Trạng thái từng ý tưởng trong pipeline (`Document/01_Plan/03_Pipeline.md`): Mục 4 của tệp này.
 
 ## 1. Ý tưởng từ toàn văn BiasCast
 
@@ -38,7 +38,7 @@ Tệp này tập hợp các ý tưởng mới tìm được khi đọc lại to�
 
 ### 1.4. Căn cứ bổ sung cho thiết kế đã chốt
 
-- Mamba nối hindcast và forecast thành một chuỗi liên tục (`03_Pipeline.md` Mục 3.2) đúng với phát hiện của bài: trạng thái chạy liên tục bền hơn mạng handoff (435 so với 361 lưu vực cải thiện).
+- Mamba nối hindcast và forecast thành một chuỗi liên tục (`03_Pipeline.md` Mục 4.1) đúng với phát hiện của bài: trạng thái chạy liên tục bền hơn mạng handoff (435 so với 361 lưu vực cải thiện).
 - Q ngày t−1 dùng được trong vận hành: eHYD (Áo) công bố Q trễ khoảng 2 giờ — lập luận cho phần bảo vệ.
 - Báo cáo nên kèm số lưu vực tốt lên/kém đi và trung vị, vì trung bình NSE bị vài lưu vực ngoại lệ (như 758) kéo lệch.
 
@@ -59,3 +59,41 @@ Nguồn: `Document/02_Meetings/Meeting_2026-09-27.md` Mục 2; tra bổ sung Mar
 | Y6 | **Đánh giá theo mức lưu lượng:** mô hình vẫn dự báo Q; sau khi dự báo, chia cả Q quan trắc và Q dự báo thành các mức (thấp, trung bình, cao, lũ) theo ngưỡng riêng từng lưu vực, rồi tính độ chính xác từng mức, ma trận nhầm lẫn, tỉ lệ phát hiện lũ và tỉ lệ báo động nhầm; kèm sai lệch đoạn cao (2% lớn nhất) và đoạn thấp (30% nhỏ nhất) của đường duy trì lưu lượng | Yêu cầu của GVHD; Yilmaz, Gupta, Wagener (2008, *Water Resources Research*) cho cách chia đoạn đường duy trì; FHV, FLV có sẵn trong NeuralHydrology | BiasCast chỉ báo cáo NSE, KGE | Không huấn luyện thêm | Tiểu luận, bước đánh giá — đã đưa vào pipeline |
 | Y7 | **Lấy mẫu nhiều ngày lưu lượng cao khi huấn luyện:** bộ nạp chọn mẫu có ngày t thuộc mức cao/lũ với xác suất lớn hơn | GVHD gợi ý; Martel và cs. (2025, 88 lưu vực Québec, LSTM, kiểm tra lưu vực không đo) thử lấy mẫu nhiều đỉnh và kết quả đỉnh **kém đi**; thêm dữ liệu từ nhiều lưu vực khác thì tốt lên | Chưa thấy công trình thử trong khung hindcast–forecast có Q quan trắc (chưa tra hết) | 1 cấu hình × 3 hạt giống; phải xong Y6 để biết mức nào yếu | Chưa chốt. Bằng chứng trái chiều nên chỉ nên làm như thí nghiệm kiểm chứng, so với LSTM cải tiến trên cả NSE và chỉ số theo mức |
 | Y8 | **Đóng băng có chọn lọc theo giải thích mô hình:** tìm lớp hoặc nút ảnh hưởng nhiều tới mức đang yếu, chỉ huấn luyện tiếp các lớp đó | GVHD gợi ý, thầy nói chưa từng làm với LSTM | Chính BiasCast (Mục 2.2.5, 3.2) đã thử đóng băng cố định (không theo XAI): giữ LSTM và đầu ra học từ tái phân tích, chỉ huấn luyện tiếp lớp nhúng trên dữ liệu dự báo (TL EmbeddingNet) — NSE trung vị 0,44, hơn huấn luyện tiếp toàn bộ nhưng kém xa Sequential Forecast LSTM (0,63), chỉ 275/451 lưu vực tốt lên. Chưa tra công trình chọn lớp đóng băng theo XAI trong thủy văn | Cao, chưa có quy trình chuẩn cho mô hình hồi quy chuỗi | Không cho tiểu luận; khóa luận nếu Y6, Y7 cho thấy một mức yếu rõ |
+
+## 3. Ý tưởng từ đọc lại toàn bộ tài liệu tham khảo
+
+Nguồn: 44 tệp trong `PaperResearch/PaperResearchPDF/`, ghi chú từng bài ở `Document/05_Survey/03_PaperNotes.md`.
+
+### 3.1. Ý tưởng
+
+| # | Ý tưởng | Căn cứ | Mới so với bài | Chi phí | Đề xuất |
+|---|---|---|---|---|---|
+| Y9 | **Chỉ số PNSE:** NSE lấy Q quan sát ngày t−1 làm mốc thay cho trung bình; báo cáo cho mọi cấu hình có Q đầu vào, bên cạnh NSE | Acuña Espinoza và cs. (MF²LSTM, EGUsphere 2026): NSE đánh giá quá cao mô hình có Q đầu vào vì Q đã đặt dự báo vào đúng mức; PNSE là mốc chặt hơn ở tầm ngắn. Persistence của đề tài đã tính sẵn | BiasCast chỉ báo cáo NSE, KGE | Không huấn luyện thêm; tính từ dự báo đã có | Đánh giá (cùng chỗ với persistence, bước A và đánh giá chính) |
+| Y10 | **Khung ngưỡng kép cho đánh giá mức lũ:** ngưỡng mức lũ tính riêng trên chuỗi dự báo và chuỗi quan trắc; một sự kiện tính là đúng nếu cả hai vượt ngưỡng trong cùng cửa sổ thời gian (Nearing dùng 2 ngày); ngưỡng chu kỳ lặp lại fit Gumbel bằng L-moments | Nearing và cs. (Nature 2024); Taccari và cs. (AIFL, J. Hydrol. 2026) | BiasCast không đánh giá theo sự kiện | Không huấn luyện thêm | Bổ sung vào `03_Pipeline.md` Mục 6.2 (đánh giá theo mức lưu lượng) |
+| Y11 | **Nhóm Q riêng trong masked mean và xác suất che Q:** nhúng Q trễ (t−1, t−2, t−3) thành nhóm riêng, gộp với các nhóm khí tượng bằng masked mean; thử xác suất che 0,05 bên cạnh 0,1/0,12 | MF²LSTM chọn p_step = p_seq = 0,05 sau thử nghiệm để cân bằng giữa có Q và mất Q; Gauch và cs. (2025) dùng 0,1/0,12 cho khí tượng | Bài đưa qmean thẳng vào đầu vào hindcast | +1–2 lần huấn luyện ở bước B | Gộp vào Y1 ở bước B |
+| Y12 | **Transformer có lớp nhúng tích chập nhân quả:** hai lớp Conv1D có kết nối tắt, nhân chỉ nhìn về quá khứ, trước lớp attention | Liu và cs. (J. Hydrol. 2024): Transformer cơ bản thua LSTM, bản có nhúng tích chập ngang LSTM trên CAMELS | Bài không có Transformer | +1 lần huấn luyện | Ứng viên biến thể Transformer ở bước E, thay hoặc bên cạnh PatchTST |
+| Y13 | **Mốc DLinear:** mô hình tuyến tính đơn giản trên cửa sổ quá khứ | Zhang và cs. (J. Hydrol. 2026): khi có Q quá khứ, DLinear tốt nhất ở tầm 1 giờ | Bài không có mốc tuyến tính | +1 lần huấn luyện, rất nhẹ | Bước A hoặc C, làm mốc giữa persistence và học sâu |
+| Y14 | **Lớp nhúng ReLU + dropout:** thay tanh trong lớp nhúng, thêm dropout | Phản biện 2 của BiasCast: tanh trong lớp nhúng cộng với tanh trong LSTM có thể bão hòa; tác giả xác nhận chưa thử, dropout lớp nhúng bằng 0; Baste và cs. (2025) chỉ ra giới hạn đỉnh của LSTM | Tác giả nêu là hướng tương lai | +1–2 lần huấn luyện ở bước B | Bước B, nếu còn ngân sách |
+| Y15 | **Biến thể S5D cho lõi S4D:** thêm Conv1D (thiên hướng cục bộ), LayerNorm, Softsign | Jing và cs. (ESWA 2026): S4D 0,756, S5D 0,763 so với LSTM 0,742 trên CAMELS-US, nhưng trong khung lai học tham số | Bài không có SSM | +1 lần huấn luyện | Ứng viên biến thể ở bước E nếu S4D tốt hơn Mamba ở bước C |
+
+### 3.2. Giả thuyết cho phân tích theo lưu vực (Y3)
+
+Ba nguồn độc lập cùng chỉ ra SSM có lợi ở lưu vực có động lực chậm (tuyết, dòng chảy gián đoạn) và kém ở lưu vực lũ nhanh, lưu lượng lớn: Wang và cs. (WRR 2025, S4D-FT), Jing và cs. (ESWA 2026, S4D), Zhang và cs. (J. Hydrol. 2026, Mamba ổn định ở lưu vực ẩm và tuyết). Khi làm Y3, kiểm tra giả thuyết này bằng tương quan ΔNSE Mamba–LSTM với tỷ lệ tuyết, độ cao, chỉ số khô hạn. Tách thêm lưu vực đầu nguồn và lưu vực lồng nhau (27,5% trong 451 lưu vực theo thư trả lời phản biện 1 của BiasCast).
+
+## 4. Trạng thái các ý tưởng trong pipeline
+
+| Ý tưởng | Trạng thái | Vị trí trong `03_Pipeline.md` |
+|---|---|---|
+| Y1, Y11 | Đưa vào | Bước B2–B3 (nhóm Q riêng, che dữ liệu hai mức xác suất); kịch bản S1, S2 |
+| Y2 | Đưa vào, thiết kế lại theo độ trễ riêng từng nguồn | Mục 6.3, kịch bản S3, S4 |
+| Y3 | Đưa vào | Mục 6.4 |
+| Y4 | Chưa đưa vào | Khóa luận hoặc bổ sung nếu còn thời gian |
+| Y5 | Không cho tiểu luận | Mục 11 |
+| Y6 | Đưa vào | Mục 6.2 |
+| Y7 | Đưa vào dạng thí nghiệm kiểm chứng | Bước GV |
+| Y8 | Chưa đưa vào | Cần kết quả giải thích mô hình trước |
+| Y9 | Đưa vào | Mục 6.1, bước A3 |
+| Y10 | Đưa vào; ngưỡng kép chỉ là phân tích phụ | Mục 6.2 |
+| Y12, Y15 | Dự phòng | Bước E |
+| Y13 | Đưa vào | Bước A3 |
+| Y14 | Chưa đưa vào | Ứng viên bước B nếu còn ngân sách |

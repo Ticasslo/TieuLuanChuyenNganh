@@ -105,7 +105,7 @@ Bài 2.2.1 lệch mốc 5 năm (2020) nhưng được giữ vì số trích dẫ
 
 Yêu cầu: *"Phải ra được phần mềm/demo. Trường hợp là demo thì sang KLTN phải nâng lên thành phần mềm có tính ứng dụng."*
 
-- **Tiểu luận:** Extended LamaH-CE là dữ liệu lịch sử, không có luồng cập nhật hằng ngày, nên demo phát lại theo thời gian trên tập test 2014–2017: bản đồ 451 lưu vực theo ngày, chuỗi Q, tô màu theo ngưỡng return period, kèm giải thích XAI (`Document/01_Plan/03_Pipeline.md` Mục 2.10). Công nghệ và nơi triển khai demo chưa chốt.
+- **Tiểu luận:** Extended LamaH-CE là dữ liệu lịch sử, không có luồng cập nhật hằng ngày, nên demo phát lại theo thời gian trên tập test 2014–2017: bản đồ 451 lưu vực theo ngày, chuỗi Q, tô màu theo ngưỡng return period, kèm giải thích XAI (`Document/01_Plan/03_Pipeline.md` Mục 2). Công nghệ và nơi triển khai demo chưa chốt.
 - **Khóa luận:** cần làm rõ mức "phần mềm có tính ứng dụng" (tài khoản người dùng, chọn nhiều lưu vực, cảnh báo qua email/SMS…) khi tới giai đoạn khóa luận.
 
 ---

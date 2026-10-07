@@ -57,7 +57,7 @@ Mọi mô hình dùng thư viện NeuralHydrology, gồm mạng nhúng đầu v�
 | Mô hình | Cách hoạt động |
 |---|---|
 | CUDA LSTM (baseline) | LSTM chuẩn; ba biến thể dữ liệu: chỉ dự báo (cận dưới), chỉ tái phân tích với thời tiết của chính ngày dự báo (cận trên, không vận hành được), tái phân tích + dự báo |
-| CrossDomain | Huấn luyện trên 5 biến tái phân tích, chạy với 5 biến dự báo tương ứng — mô phỏng cách làm truyền thống |
+| CrossDomain | Huấn luyện trên 5 biến tái phân tích (`ERA5L_2m_temp_mean`, `ERA5L_2m_dp_temp_mean`, `ERA5L_surf_net_solar_rad_mean`, `MSWEP_RR`, `GLEAM_ETA` — theo thư trả lời phản biện 2), chạy với 5 biến dự báo ECMWF tương ứng — mô phỏng cách làm truyền thống. Cặp bức xạ ghép bức xạ thuần (ERA5-Land) với bức xạ tới (`ssrd`), hai đại lượng khác nhau |
 | Học chuyển giao | Huấn luyện trên tái phân tích, tinh chỉnh trên dự báo: toàn bộ trọng số hoặc chỉ mạng nhúng |
 | Encoder–Decoder LSTM | Hai LSTM: một cho hindcast, một cho forecast, nối bằng mạng handoff — kiến trúc của mô hình dự báo lũ Google (Nearing và cs., Nature 2024) |
 | Sequential Forecast LSTM | Một LSTM chạy liên tục qua 364 ngày hindcast rồi ngày forecast, mỗi pha có mạng nhúng riêng |
@@ -151,19 +151,19 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 
 **Phần cốt lõi:**
 
-1. Tái lập bài gốc bằng trọng số của tác giả; bổ sung baseline persistence; đo nhiễu giữa các hạt giống.
+1. Tái lập bài gốc bằng trọng số của tác giả; bổ sung mốc persistence, PNSE và mốc tuyến tính DLinear; đo nhiễu giữa các hạt giống.
 2. Cải tiến LSTM của bài (tầng 1): giữ mẫu có dữ liệu thiếu bằng masked mean thay vì bỏ cả mẫu; hoàn thiện đầu vào lưu lượng quan trắc (cùng đơn vị với nhãn, Q các ngày trước, xử lý Q thiếu); huấn luyện có bỏ ngẫu nhiên lưu lượng quan trắc để một mô hình dùng được cả khi trạm mất số liệu (hướng tiếp theo do chính tác giả nêu); tổ hợp nhiều hạt giống.
-3. Thay lõi LSTM bằng GRU, Transformer, S4D và Mamba ở dạng thuần trên quy trình đã cải tiến (tầng 2), cùng dữ liệu, cùng chia tập, cùng ngân sách tinh chỉnh, nhiều hạt giống; sau đó một biến thể cải tiến cho Mamba và một cho Transformer, mỗi biến thể so với bản thuần của chính nó. S4D là đối chứng để phân biệt "Mamba không phù hợp" với "SSM nói chung không phù hợp".
+3. Thay lõi LSTM bằng GRU, Transformer, S4D và Mamba ở dạng thuần trên quy trình đã cải tiến (tầng 2), cùng dữ liệu, cùng chia tập, cùng số tham số và cùng ngân sách tinh chỉnh, 3 hạt giống, kiểm định Wilcoxon theo lưu vực; sau đó một biến thể cải tiến cho Mamba và một cho Transformer, mỗi biến thể so với bản thuần của chính nó. S4D là đối chứng để phân biệt "Mamba không phù hợp" với "SSM nói chung không phù hợp".
 4. Thử chuỗi quá khứ 730 ngày cho LSTM và Mamba — nơi Mamba được kỳ vọng có lợi thế chi phí.
 5. Đầu ra xác suất (CMAL) trên cấu hình tốt nhất để có xác suất vượt ngưỡng lũ.
-6. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và tái phân tích đến trễ 5 ngày (ERA5 công bố trễ 5 ngày); so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
+6. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và dữ liệu đến trễ theo đúng độ trễ của từng nguồn (ERA5-Land 5 ngày, E-OBS tới 6 tháng, GLEAM tới 1 năm); đánh giá theo mức lưu lượng và theo sự kiện lũ chu kỳ lặp lại 1, 2, 5, 10 năm; so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
 
 **Phần đáp ứng yêu cầu tiểu luận:**
 
 7. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum): ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
 8. Demo bản đồ dự báo theo ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực.
 
-**Giai đoạn khóa luận:** dự báo nhiều ngày; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Phạm vi chi tiết: `Document/01_Plan/03_Pipeline.md` Mục 9.
+**Giai đoạn khóa luận:** dự báo nhiều ngày; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Câu hỏi nghiên cứu, đóng góp, tính mới và ma trận thí nghiệm: `Document/01_Plan/03_Pipeline.md` Mục 1, 7; khóa luận: Mục 11.
 
 ## 11. Pipeline và kiến trúc chi tiết của bài (đọc từ mã)
 

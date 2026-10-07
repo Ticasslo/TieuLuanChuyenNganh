@@ -10,11 +10,11 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `Document/02_Meetings/` | Biên bản họp với GVHD và việc cần làm |
 | `Document/03_Data/` | Ghi chú thực thi dữ liệu LamaH-CE và Extended LamaH-CE: tải, kiểm tra, kết quả |
 | `Document/04_Ideas/` | Ý tưởng cho đề tài: căn cứ, chi phí, vị trí trong lộ trình |
-| `Document/05_Survey/` | Khảo sát bộ dữ liệu và khảo sát tài liệu |
+| `Document/05_Survey/` | Khảo sát bộ dữ liệu, khảo sát tài liệu, ghi chú đọc từng PDF tham khảo |
 | `Document/06_Theory/` | Lý thuyết LSTM, Transformer, GRU, Mamba; ghi chú đọc mã RiverMamba (tham khảo) |
-| `Diagrams/` | Sơ đồ đề tài (`ProjectDiagram.drawio`): thứ tự thực hiện và kiến trúc chi tiết |
+| `Diagrams/` | Sơ đồ đề tài (`ProjectDiagram.drawio`, sinh bằng `Tools/Diagram_Build.py`): thứ tự thực hiện, kiến trúc chi tiết, thứ tự cắt |
 | `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc: `01_Download` (tải dữ liệu), `02_Exploration` (khám phá, phân tích dữ liệu) |
-| `Tools/` | Công cụ phụ trợ (chuyển giọng nói buổi họp thành văn bản) |
+| `Tools/` | Công cụ phụ trợ: chuyển giọng nói buổi họp thành văn bản, sinh sơ đồ đề tài |
 
 PDF bài báo (`PaperResearch/PaperResearchPDF/`) và mã nguồn BiasCast (`PaperResearch/PaperResearchCode/`) chỉ lưu trên máy, không đưa lên repo (bản quyền, dung lượng).
 

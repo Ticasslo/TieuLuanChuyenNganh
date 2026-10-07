@@ -1,264 +1,105 @@
 <mxfile host="Electron">
   <diagram id="sododetai" name="Sơ đồ đề tài">
-    <mxGraphModel dx="1030" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="2088" math="0" shadow="0">
+    <mxGraphModel dx="1030" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="2196" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="t1" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=19;fontStyle=1;" value="SƠ ĐỒ ĐỀ TÀI" vertex="1">
-          <mxGeometry height="32" width="1460" x="20" y="40" as="geometry" />
-        </mxCell>
-        <mxCell id="secI" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="I. TRÌNH TỰ" vertex="1">
-          <mxGeometry height="150" width="1460" x="20" y="82" as="geometry" />
-        </mxCell>
-        <mxCell id="s0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="0. Chuẩn bị dữ liệu" vertex="1">
-          <mxGeometry height="88" width="158.25" x="40" y="124" as="geometry" />
-        </mxCell>
-        <mxCell id="s1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="A. Tái lập bài gốc" vertex="1">
-          <mxGeometry height="88" width="158.25" x="220.25" y="124" as="geometry" />
-        </mxCell>
-        <mxCell id="s2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B. Cải tiến LSTM (15 lần)" vertex="1">
-          <mxGeometry height="88" width="158.25" x="400.5" y="124" as="geometry" />
-        </mxCell>
-        <mxCell id="s3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="C. Đổi lõi (12 lần)" vertex="1">
-          <mxGeometry height="88" width="158.25" x="580.75" y="124" as="geometry" />
-        </mxCell>
-        <mxCell id="s4" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="D–F. Mở rộng (15 lần)" vertex="1">
-          <mxGeometry height="88" width="158.25" x="761" y="124" as="geometry" />
-        </mxCell>
-        <mxCell id="s5" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Đánh giá" vertex="1">
-          <mxGeometry height="88" width="158.25" x="941.25" y="124" as="geometry" />
-        </mxCell>
-        <mxCell id="s6" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="G. Giải thích mô hình, ngưỡng lũ, ứng dụng" vertex="1">
-          <mxGeometry height="88" width="158.25" x="1121.5" y="124" as="geometry" />
-        </mxCell>
-        <mxCell id="s7" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;fontStyle=1;spacingLeft=6;spacingRight=6;" value="BÁO CÁO" vertex="1">
-          <mxGeometry height="88" width="158.25" x="1301.75" y="124" as="geometry" />
-        </mxCell>
-        <mxCell id="lgt" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;" value="II. KIẾN TRÚC" vertex="1">
-          <mxGeometry height="22" width="1460" x="20" y="240" as="geometry" />
-        </mxCell>
-        <mxCell id="lg0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="Giữ nguyên" vertex="1">
-          <mxGeometry height="26" width="292" x="40" y="268" as="geometry" />
-        </mxCell>
-        <mxCell id="lg1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="A: tái lập" vertex="1">
-          <mxGeometry height="26" width="285" x="342" y="268" as="geometry" />
-        </mxCell>
-        <mxCell id="lg2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="B: LSTM cải tiến" vertex="1">
-          <mxGeometry height="26" width="271" x="637" y="268" as="geometry" />
-        </mxCell>
-        <mxCell id="lg3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="C, D, E: lõi và xét chuỗi dài" vertex="1">
-          <mxGeometry height="26" width="404" x="918" y="268" as="geometry" />
-        </mxCell>
-        <mxCell id="lg4" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="F: xác suất" vertex="1">
-          <mxGeometry height="26" width="166" x="40" y="300" as="geometry" />
-        </mxCell>
-        <mxCell id="lg5" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="Đánh giá thêm" vertex="1">
-          <mxGeometry height="26" width="152" x="216" y="300" as="geometry" />
-        </mxCell>
-        <mxCell id="lg6" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="G: giải thích, ngưỡng lũ" vertex="1">
-          <mxGeometry height="26" width="334" x="378" y="300" as="geometry" />
-        </mxCell>
-        <mxCell id="h1" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;" value="BÀI GỐC - LSTM có Q quan trắc" vertex="1">
-          <mxGeometry height="26" width="660" x="40" y="336" as="geometry" />
-        </mxCell>
-        <mxCell id="h2" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;" value="SỬA ĐỔI (nét đứt)" vertex="1">
-          <mxGeometry height="26" width="680" x="780" y="336" as="geometry" />
-        </mxCell>
-        <mxCell id="band0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="1. Dữ liệu đầu vào" vertex="1">
-          <mxGeometry height="350" width="1460" x="20" y="372" as="geometry" />
-        </mxCell>
-        <mxCell id="a0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Hindcast 364 ngày × 31 biến (ERA5-Land, E-OBS, MSWEP, GLEAM)" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="406" as="geometry" />
-        </mxCell>
-        <mxCell id="o0_0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="D. Mở rộng lên 730 ngày (LSTM, Mamba)" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="406" as="geometry" />
-        </mxCell>
-        <mxCell id="a0_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Q quá khứ: chưa thống nhất đơn vị (cần kiểm tra), thiếu ngày → mất mẫu" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="484" as="geometry" />
-        </mxCell>
-        <mxCell id="o0_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B2. Thống nhất đơn vị, thêm qmax các ngày trước" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="484" as="geometry" />
-        </mxCell>
-        <mxCell id="o0_1_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B3. Bỏ ngẫu nhiên Q khi huấn luyện" vertex="1">
-          <mxGeometry height="66" width="330" x="1130" y="484" as="geometry" />
-        </mxCell>
-        <mxCell id="a0_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Forecast ngày t: 5 biến ECMWF HRES" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="562" as="geometry" />
-        </mxCell>
-        <mxCell id="a0_3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="33 thuộc tính tĩnh · nhãn qmax ngày t" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="640" as="geometry" />
-        </mxCell>
-        <mxCell id="band1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="2. Tiền xử lý" vertex="1">
-          <mxGeometry height="272" width="1460" x="20" y="744" as="geometry" />
-        </mxCell>
-        <mxCell id="a1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Chia tập: huấn luyện 2003–2009, kiểm định 2010–2013, kiểm tra 2014–2017 · z-score theo tập huấn luyện" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="778" as="geometry" />
-        </mxCell>
-        <mxCell id="a1_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Lọc: thiếu 1 biến ở 1 ngày là loại cả mẫu 365 ngày" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="856" as="geometry" />
-        </mxCell>
-        <mxCell id="o1_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B1. Chỉ loại khi thiếu nhãn hoặc biến thực dùng" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="856" as="geometry" />
-        </mxCell>
-        <mxCell id="a1_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Lô 256, trộn giữa các lưu vực" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="934" as="geometry" />
-        </mxCell>
-        <mxCell id="band2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="3. Mô hình (~85 nghìn tham số)" vertex="1">
-          <mxGeometry height="272" width="1460" x="20" y="1038" as="geometry" />
-        </mxCell>
-        <mxCell id="a2_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Nhúng tuyến tính 3 nguồn, ghép 32 chiều/bước" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1072" as="geometry" />
-        </mxCell>
-        <mxCell id="o2_0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B1. Nhúng masked mean, trung bình nguồn có sẵn" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="1072" as="geometry" />
-        </mxCell>
-        <mxCell id="a2_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="LSTM 32→128: 364 bước hindcast + 1 bước forecast" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1150" as="geometry" />
-        </mxCell>
-        <mxCell id="o2_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="C. Đổi lõi: GRU, Transformer, S4D, Mamba" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="1150" as="geometry" />
-        </mxCell>
-        <mxCell id="o2_1_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="E. Mamba+ hai chiều, Transformer+ patch" vertex="1">
-          <mxGeometry height="66" width="330" x="1130" y="1150" as="geometry" />
-        </mxCell>
-        <mxCell id="a2_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Dropout 0,3, tuyến tính 128→1 → qmax" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1228" as="geometry" />
-        </mxCell>
-        <mxCell id="o2_2_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="F. CMAL → xác suất vượt ngưỡng" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="1228" as="geometry" />
-        </mxCell>
-        <mxCell id="band3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="4. Huấn luyện" vertex="1">
-          <mxGeometry height="272" width="1460" x="20" y="1332" as="geometry" />
-        </mxCell>
-        <mxCell id="a3_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Hàm mất mát NSE*: (ŷ−y)² / (σ lưu vực + 0,1)²" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1366" as="geometry" />
-        </mxCell>
-        <mxCell id="a3_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Adam 10⁻³, cosine annealing, ≤30 epoch, dừng sớm" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1444" as="geometry" />
-        </mxCell>
-        <mxCell id="o3_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Sửa để tái lập: tiêu chí lưu mô hình, đường dẫn tệp cấu hình" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="1444" as="geometry" />
-        </mxCell>
-        <mxCell id="a3_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="1 hạt giống · ẩn 128, lô 256, dropout 0,3" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1522" as="geometry" />
-        </mxCell>
-        <mxCell id="o3_2_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B4. 3 hạt giống mỗi cấu hình, báo cáo trung bình và độ lệch chuẩn" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="1522" as="geometry" />
-        </mxCell>
-        <mxCell id="o3_2_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="C. Tinh chỉnh ẩn 64 / 128 / 256" vertex="1">
-          <mxGeometry height="66" width="330" x="1130" y="1522" as="geometry" />
-        </mxCell>
-        <mxCell id="band4" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="5. Đánh giá và sản phẩm" vertex="1">
-          <mxGeometry height="350" width="1460" x="20" y="1626" as="geometry" />
-        </mxCell>
-        <mxCell id="a4_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Kiểm tra 2014–2017: NSE, KGE, CDF (tốt nhất NSE≈0,705)" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1660" as="geometry" />
-        </mxCell>
-        <mxCell id="o4_0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="A. Baseline persistence (NSE≈0,35–0,37)" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="1660" as="geometry" />
-        </mxCell>
-        <mxCell id="o4_0_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Theo mức lưu lượng (thấp → lũ): bắt lũ, báo nhầm; sai số đỉnh" vertex="1">
-          <mxGeometry height="66" width="330" x="1130" y="1660" as="geometry" />
-        </mxCell>
-        <mxCell id="a4_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Mốc: chỉ dự báo (0,387) so tái phân tích (≈0,69)" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1738" as="geometry" />
-        </mxCell>
-        <mxCell id="o4_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Kịch bản: thiếu Q 1–7 ngày, tái phân tích trễ 5 ngày" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="1738" as="geometry" />
-        </mxCell>
-        <mxCell id="a4_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="ΔNSE theo lưu vực, tương quan thuộc tính" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1816" as="geometry" />
-        </mxCell>
-        <mxCell id="o4_2_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Phân tích: ΔNSE Mamba so LSTM theo lưu vực" vertex="1">
-          <mxGeometry height="66" width="330" x="780" y="1816" as="geometry" />
-        </mxCell>
-        <mxCell id="a4_3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Chưa có giải thích mô hình, ngưỡng lũ, ứng dụng" vertex="1">
-          <mxGeometry height="66" width="660" x="40" y="1894" as="geometry" />
-        </mxCell>
-        <mxCell id="o4_3_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="G. Giải thích (Integrated Gradients), ngưỡng lũ, bản đồ 451 lưu vực" vertex="1">
-          <mxGeometry height="66" width="680" x="780" y="1894" as="geometry" />
-        </mxCell>
-        <mxCell id="e0" edge="1" parent="1" source="s0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e1" edge="1" parent="1" source="s1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s2">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e2" edge="1" parent="1" source="s2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s3">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e3" edge="1" parent="1" source="s3" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s4">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e4" edge="1" parent="1" source="s4" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s5">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e5" edge="1" parent="1" source="s5" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s6">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e6" edge="1" parent="1" source="s6" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s7">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e7" edge="1" parent="1" source="a0_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o0_0_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e8" edge="1" parent="1" source="a0_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o0_1_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e9" edge="1" parent="1" source="o0_1_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o0_1_1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e10" edge="1" parent="1" source="a1_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o1_1_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e11" edge="1" parent="1" source="a0_3" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="a1_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e12" edge="1" parent="1" source="a2_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o2_0_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e13" edge="1" parent="1" source="a2_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o2_1_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e14" edge="1" parent="1" source="o2_1_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o2_1_1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e15" edge="1" parent="1" source="a2_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o2_2_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e16" edge="1" parent="1" source="a1_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="a2_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e17" edge="1" parent="1" source="a3_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o3_1_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e18" edge="1" parent="1" source="a3_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o3_2_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e19" edge="1" parent="1" source="o3_2_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o3_2_1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e20" edge="1" parent="1" source="a2_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="a3_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e21" edge="1" parent="1" source="a4_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_0_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e22" edge="1" parent="1" source="o4_0_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_0_1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e23" edge="1" parent="1" source="a4_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_1_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e24" edge="1" parent="1" source="a4_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_2_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e25" edge="1" parent="1" source="a4_3" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_3_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e26" edge="1" parent="1" source="a3_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="a4_0">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
+        <mxCell id="t1" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=19;fontStyle=1;" value="SƠ ĐỒ ĐỀ TÀI" vertex="1"><mxGeometry height="32" width="1460" x="20" y="40" as="geometry" /></mxCell>
+        <mxCell id="secI" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="I. TRÌNH TỰ" vertex="1"><mxGeometry height="150" width="1460" x="20" y="82" as="geometry" /></mxCell>
+        <mxCell id="s0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="0. Hạ tầng: fork riêng, mamba-ssm trên T4, kiểm thử đơn vị, đo thời gian" vertex="1"><mxGeometry height="88" width="158.25" x="40.0" y="124" as="geometry" /></mxCell>
+        <mxCell id="s1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="A. Tái lập, persistence, PNSE, DLinear, nhiễu 3 hạt giống (6 lần)" vertex="1"><mxGeometry height="88" width="158.25" x="220.25" y="124" as="geometry" /></mxCell>
+        <mxCell id="es1" edge="1" parent="1" source="s0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B. LSTM cải tiến: Q, masked mean theo nguồn, che dữ liệu (12 lần)" vertex="1"><mxGeometry height="88" width="158.25" x="400.5" y="124" as="geometry" /></mxCell>
+        <mxCell id="es2" edge="1" parent="1" source="s1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="C. 5 lõi cùng tham số, tinh chỉnh 8 cấu hình, 3 hạt giống (tối đa 70 lần)" vertex="1"><mxGeometry height="88" width="158.25" x="580.75" y="124" as="geometry" /></mxCell>
+        <mxCell id="es3" edge="1" parent="1" source="s2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s4" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="D–F. 730 ngày, biến thể, CMAL, kiểm chứng lấy mẫu lũ (24 lần)" vertex="1"><mxGeometry height="88" width="158.25" x="761.0" y="124" as="geometry" /></mxCell>
+        <mxCell id="es4" edge="1" parent="1" source="s3" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s5" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Đánh giá: mức, sự kiện lũ, kịch bản vận hành, kiểm định" vertex="1"><mxGeometry height="88" width="158.25" x="941.25" y="124" as="geometry" /></mxCell>
+        <mxCell id="es5" edge="1" parent="1" source="s4" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s6" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="G. Giải thích mô hình, ngưỡng lũ, demo" vertex="1"><mxGeometry height="88" width="158.25" x="1121.5" y="124" as="geometry" /></mxCell>
+        <mxCell id="es6" edge="1" parent="1" source="s5" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s6"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s7" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;fontStyle=1;" value="BÁO CÁO" vertex="1"><mxGeometry height="88" width="158.25" x="1301.75" y="124" as="geometry" /></mxCell>
+        <mxCell id="es7" edge="1" parent="1" source="s6" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="s7"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="lgt" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;" value="II. KIẾN TRÚC" vertex="1"><mxGeometry height="22" width="1460" x="20" y="240" as="geometry" /></mxCell>
+        <mxCell id="lg0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="Giữ nguyên" vertex="1"><mxGeometry height="26" width="94" x="40" y="268" as="geometry" /></mxCell>
+        <mxCell id="lg1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="A: tái lập, mốc" vertex="1"><mxGeometry height="26" width="134" x="144" y="268" as="geometry" /></mxCell>
+        <mxCell id="lg2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="B: LSTM cải tiến" vertex="1"><mxGeometry height="26" width="142" x="288" y="268" as="geometry" /></mxCell>
+        <mxCell id="lg3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="C, D, E: lõi, chuỗi dài, biến thể" vertex="1"><mxGeometry height="26" width="278" x="440" y="268" as="geometry" /></mxCell>
+        <mxCell id="lg4" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="F: xác suất" vertex="1"><mxGeometry height="26" width="102" x="728" y="268" as="geometry" /></mxCell>
+        <mxCell id="lg5" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="Đánh giá thêm" vertex="1"><mxGeometry height="26" width="118" x="840" y="268" as="geometry" /></mxCell>
+        <mxCell id="lg6" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;spacingLeft=6;spacingRight=6;" value="G: giải thích, ngưỡng lũ, demo" vertex="1"><mxGeometry height="26" width="254" x="968" y="268" as="geometry" /></mxCell>
+        <mxCell id="h1" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;" value="BÀI GỐC - Sequential Forecast LSTM có Q quan trắc" vertex="1"><mxGeometry height="26" width="660" x="40" y="304" as="geometry" /></mxCell>
+        <mxCell id="h2" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;" value="SỬA ĐỔI (mũi tên nét đứt)" vertex="1"><mxGeometry height="26" width="680" x="780" y="304" as="geometry" /></mxCell>
+        <mxCell id="band0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="1. Dữ liệu đầu vào" vertex="1"><mxGeometry height="350" width="1460" x="20" y="340" as="geometry" /></mxCell>
+        <mxCell id="a0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Hindcast 364 ngày × 31 biến (ERA5-Land, E-OBS, MSWEP, GLEAM), một khối chung" vertex="1"><mxGeometry height="66" width="660" x="40" y="374" as="geometry" /></mxCell>
+        <mxCell id="o0_0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B2. Chia nhóm theo nguồn dữ liệu" vertex="1"><mxGeometry height="66" width="330" x="780" y="374" as="geometry" /></mxCell>
+        <mxCell id="eo0_0_0" edge="1" parent="1" source="a0_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o0_0_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o0_0_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="D. Mở rộng 730 ngày (LSTM, Mamba, S4D)" vertex="1"><mxGeometry height="66" width="330" x="1130" y="374" as="geometry" /></mxCell>
+        <mxCell id="eo0_0_1" edge="1" parent="1" source="o0_0_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o0_0_1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a0_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Q quá khứ: qmean khác đơn vị nhãn, thiếu ngày → mất mẫu" vertex="1"><mxGeometry height="66" width="660" x="40" y="452" as="geometry" /></mxCell>
+        <mxCell id="o0_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B1. Q cùng đơn vị mm/ngày, thêm qmax quá khứ, nhóm Q riêng" vertex="1"><mxGeometry height="66" width="330" x="780" y="452" as="geometry" /></mxCell>
+        <mxCell id="eo0_1_0" edge="1" parent="1" source="a0_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o0_1_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o0_1_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B3. Che dữ liệu khi huấn luyện (0,1/0,12 và 0,05/0,05)" vertex="1"><mxGeometry height="66" width="330" x="1130" y="452" as="geometry" /></mxCell>
+        <mxCell id="eo0_1_1" edge="1" parent="1" source="o0_1_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o0_1_1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a0_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Forecast ngày t: 5 biến ECMWF HRES" vertex="1"><mxGeometry height="66" width="660" x="40" y="530" as="geometry" /></mxCell>
+        <mxCell id="a0_3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="33 thuộc tính tĩnh · nhãn qmax ngày t (mm/ngày theo diện tích)" vertex="1"><mxGeometry height="66" width="660" x="40" y="608" as="geometry" /></mxCell>
+        <mxCell id="band1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="2. Tiền xử lý" vertex="1"><mxGeometry height="272" width="1460" x="20" y="712" as="geometry" /></mxCell>
+        <mxCell id="a1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Chia tập: huấn luyện 2003–2009, kiểm định 2010–2013, kiểm tra 2014–2017 · z-score theo tập huấn luyện" vertex="1"><mxGeometry height="66" width="660" x="40" y="746" as="geometry" /></mxCell>
+        <mxCell id="eb1" edge="1" parent="1" source="a0_3" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="a1_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o1_0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="A1. Ngưỡng mức và ngưỡng lũ tính trên 1981–2013 (trước kỳ kiểm tra)" vertex="1"><mxGeometry height="66" width="330" x="780" y="746" as="geometry" /></mxCell>
+        <mxCell id="eo1_0_0" edge="1" parent="1" source="a1_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o1_0_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a1_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Lọc: thiếu 1 biến ở 1 ngày là loại cả mẫu 365 ngày" vertex="1"><mxGeometry height="66" width="660" x="40" y="824" as="geometry" /></mxCell>
+        <mxCell id="o1_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B2. Sửa bộ lọc: giữ mẫu thiếu đầu vào, chỉ loại khi thiếu nhãn" vertex="1"><mxGeometry height="66" width="330" x="780" y="824" as="geometry" /></mxCell>
+        <mxCell id="eo1_1_0" edge="1" parent="1" source="a1_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o1_1_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a1_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Lô 256, trộn giữa các lưu vực" vertex="1"><mxGeometry height="66" width="660" x="40" y="902" as="geometry" /></mxCell>
+        <mxCell id="band2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="3. Mô hình (~85 nghìn tham số)" vertex="1"><mxGeometry height="272" width="1460" x="20" y="1006" as="geometry" /></mxCell>
+        <mxCell id="a2_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Nhúng tuyến tính, ghép 32 chiều/bước" vertex="1"><mxGeometry height="66" width="660" x="40" y="1040" as="geometry" /></mxCell>
+        <mxCell id="eb2" edge="1" parent="1" source="a1_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="a2_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o2_0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B2. Nhúng riêng từng nguồn, masked mean các nguồn có dữ liệu" vertex="1"><mxGeometry height="66" width="330" x="780" y="1040" as="geometry" /></mxCell>
+        <mxCell id="eo2_0_0" edge="1" parent="1" source="a2_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o2_0_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a2_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="LSTM 32→128: 364 bước hindcast + 1 bước forecast, trạng thái chạy liên tục" vertex="1"><mxGeometry height="66" width="660" x="40" y="1118" as="geometry" /></mxCell>
+        <mxCell id="o2_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="C. Mô hình chung nhận lõi bất kỳ: LSTM, GRU, Transformer, S4D, Mamba (cùng tham số ±5%)" vertex="1"><mxGeometry height="66" width="330" x="780" y="1118" as="geometry" /></mxCell>
+        <mxCell id="eo2_1_0" edge="1" parent="1" source="a2_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o2_1_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o2_1_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="E. Mamba hai chiều, Transformer patch" vertex="1"><mxGeometry height="66" width="330" x="1130" y="1118" as="geometry" /></mxCell>
+        <mxCell id="eo2_1_1" edge="1" parent="1" source="o2_1_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o2_1_1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a2_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Dropout 0,3, tuyến tính 128→1 → qmax" vertex="1"><mxGeometry height="66" width="660" x="40" y="1196" as="geometry" /></mxCell>
+        <mxCell id="o2_2_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="F. Đầu CMAL → xác suất vượt ngưỡng lũ" vertex="1"><mxGeometry height="66" width="330" x="780" y="1196" as="geometry" /></mxCell>
+        <mxCell id="eo2_2_0" edge="1" parent="1" source="a2_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o2_2_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="band3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="4. Huấn luyện" vertex="1"><mxGeometry height="272" width="1460" x="20" y="1300" as="geometry" /></mxCell>
+        <mxCell id="a3_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Hàm mất mát NSE*: (ŷ−y)² / (σ lưu vực + 0,1)²" vertex="1"><mxGeometry height="66" width="660" x="40" y="1334" as="geometry" /></mxCell>
+        <mxCell id="eb3" edge="1" parent="1" source="a2_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="a3_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a3_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Adam 10⁻³, cosine annealing, ≤30 epoch, dừng sớm theo NSE kiểm định" vertex="1"><mxGeometry height="66" width="660" x="40" y="1412" as="geometry" /></mxCell>
+        <mxCell id="o3_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="B1. Sửa lưu mô hình tốt nhất; ghi NSE kiểm định và kiểm tra mỗi epoch" vertex="1"><mxGeometry height="66" width="330" x="780" y="1412" as="geometry" /></mxCell>
+        <mxCell id="eo3_1_0" edge="1" parent="1" source="a3_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o3_1_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a3_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="1 hạt giống · ẩn 128, lô 256, dropout 0,3" vertex="1"><mxGeometry height="66" width="660" x="40" y="1490" as="geometry" /></mxCell>
+        <mxCell id="o3_2_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="A4. 3 hạt giống mọi cấu hình, đo nhiễu hạt giống" vertex="1"><mxGeometry height="66" width="330" x="780" y="1490" as="geometry" /></mxCell>
+        <mxCell id="eo3_2_0" edge="1" parent="1" source="a3_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o3_2_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o3_2_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="C. Tinh chỉnh 8 cấu hình mỗi lõi: dung lượng × độ sâu × learning rate" vertex="1"><mxGeometry height="66" width="330" x="1130" y="1490" as="geometry" /></mxCell>
+        <mxCell id="eo3_2_1" edge="1" parent="1" source="o3_2_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o3_2_1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="band4" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="5. Đánh giá và sản phẩm" vertex="1"><mxGeometry height="350" width="1460" x="20" y="1594" as="geometry" /></mxCell>
+        <mxCell id="a4_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Kiểm tra 2014–2017: NSE, KGE, CDF (tốt nhất NSE≈0,705)" vertex="1"><mxGeometry height="66" width="660" x="40" y="1628" as="geometry" /></mxCell>
+        <mxCell id="eb4" edge="1" parent="1" source="a3_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="a4_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o4_0_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="A3. Persistence (NSE≈0,35–0,37), PNSE, DLinear" vertex="1"><mxGeometry height="66" width="330" x="780" y="1628" as="geometry" /></mxCell>
+        <mxCell id="eo4_0_0" edge="1" parent="1" source="a4_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_0_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o4_0_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Wilcoxon theo lưu vực + Cohen&#x27;s d, hiệu chỉnh Holm" vertex="1"><mxGeometry height="66" width="330" x="1130" y="1628" as="geometry" /></mxCell>
+        <mxCell id="eo4_0_1" edge="1" parent="1" source="o4_0_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_0_1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a4_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Mốc: chỉ dự báo (0,387) so tái phân tích (≈0,69)" vertex="1"><mxGeometry height="66" width="660" x="40" y="1706" as="geometry" /></mxCell>
+        <mxCell id="o4_1_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Theo 4 mức lưu lượng; sự kiện lũ chu kỳ 1, 2, 5, 10 năm (POD, FAR, F1)" vertex="1"><mxGeometry height="66" width="330" x="780" y="1706" as="geometry" /></mxCell>
+        <mxCell id="eo4_1_0" edge="1" parent="1" source="a4_1" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_1_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o4_1_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Kịch bản vận hành: mất Q, độ trễ thực của từng nguồn" vertex="1"><mxGeometry height="66" width="330" x="1130" y="1706" as="geometry" /></mxCell>
+        <mxCell id="eo4_1_1" edge="1" parent="1" source="o4_1_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_1_1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a4_2" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="ΔNSE theo lưu vực, tương quan thuộc tính" vertex="1"><mxGeometry height="66" width="660" x="40" y="1784" as="geometry" /></mxCell>
+        <mxCell id="o4_2_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="ΔNSE SSM so LSTM theo lưu vực: tuyết, động lực chậm, lũ nhanh" vertex="1"><mxGeometry height="66" width="330" x="780" y="1784" as="geometry" /></mxCell>
+        <mxCell id="eo4_2_0" edge="1" parent="1" source="a4_2" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_2_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="o4_2_1" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Chi phí: tham số, thời gian mỗi epoch, bộ nhớ" vertex="1"><mxGeometry height="66" width="330" x="1130" y="1784" as="geometry" /></mxCell>
+        <mxCell id="eo4_2_1" edge="1" parent="1" source="o4_2_0" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_2_1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a4_3" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Chưa có giải thích mô hình, ngưỡng lũ, ứng dụng" vertex="1"><mxGeometry height="66" width="660" x="40" y="1862" as="geometry" /></mxCell>
+        <mxCell id="o4_3_0" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="G. Integrated Gradients, ngưỡng Gumbel L-moments, bản đồ cảnh báo 451 lưu vực" vertex="1"><mxGeometry height="66" width="680" x="780" y="1862" as="geometry" /></mxCell>
+        <mxCell id="eo4_3_0" edge="1" parent="1" source="a4_3" style="endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;dashed=1;strokeWidth=1.2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="o4_3_0"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="secIII" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#999999;fontSize=14;align=left;fontStyle=1;verticalAlign=top;spacingLeft=10;spacingTop=4;" value="III. THỨ TỰ CẮT VÀ KHÓA LUẬN" vertex="1"><mxGeometry height="194" width="1460" x="20" y="1966" as="geometry" /></mxCell>
+        <mxCell id="cut" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Thứ tự cắt khi thiếu thời gian: (1) biến thể dự phòng bước E → (2) kiểm chứng lấy mẫu lũ → (3) giải thích mô hình → (4) biến thể chính bước E → (5) 730 ngày cho S4D → (6) tinh chỉnh 8 → 4 cấu hình mỗi lõi" vertex="1"><mxGeometry height="66" width="1420" x="40" y="2000" as="geometry" /></mxCell>
+        <mxCell id="thesis" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;align=center;spacingLeft=6;spacingRight=6;" value="Khóa luận: dữ liệu giờ, dự báo nhiều ngày, hàm mất mát ưu tiên đỉnh, đồ thị mạng sông, biến thể lai Mamba–Transformer, xLSTM, phần mềm ứng dụng" vertex="1"><mxGeometry height="66" width="1420" x="40" y="2078" as="geometry" /></mxCell>
       </root>
     </mxGraphModel>
   </diagram>

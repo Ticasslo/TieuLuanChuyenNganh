@@ -1,274 +1,355 @@
 # Kiến trúc và pipeline của đề tài
 
-> Tài liệu mô tả pipeline của đề tài trên bài cơ sở BiasCast (Konold và cs., HESS 2026): mỗi giai đoạn nhận gì, làm gì, cho ra gì, chạy ở đâu; kiến trúc mô hình dạng mô-đun; ma trận thí nghiệm; đánh giá theo mức lưu lượng; lộ trình cải tiến và phạm vi. Giới thiệu bài cơ sở: `Document/01_Plan/02_BasePaper.md`. Chi tiết tải dữ liệu: `Document/03_Data/01_LamaHCE.md` Mục 6. Các mục ghi "chưa chốt" chờ quyết định, chưa được điền.
+> Tài liệu gốc của đề tài: câu hỏi nghiên cứu, đóng góp và tính mới, dữ liệu và bộ nạp, kiến trúc mô hình, giao thức huấn luyện và so sánh công bằng, bộ đánh giá, ma trận thí nghiệm theo bước, ngân sách tính toán, rủi ro, phạm vi tiểu luận và khóa luận. Bài cơ sở: BiasCast (Konold và cs., HESS 2026) — `Document/01_Plan/02_BasePaper.md`. Dữ liệu: `Document/03_Data/01_LamaHCE.md`. Ý tưởng và căn cứ: `Document/04_Ideas/01_Ideas.md`. Ghi chú từng tài liệu: `Document/05_Survey/03_PaperNotes.md`. Các mục ghi "chưa chốt" chờ quyết định. Mọi nhận định "chưa có công trình nào" dựa trên tra cứu tới ngày 7/10/2026 và được ghi kèm công trình gần nhất đã biết.
 
-## 1. Tổng quan các giai đoạn
+---
 
-| Giai đoạn | Việc chính | Đầu ra | Nền tảng | Trạng thái |
-|---|---|---|---|---|
-| 1. Thu thập dữ liệu | Tải Extended LamaH-CE và kết quả thí nghiệm của tác giả từ Zenodo | Kaggle Dataset `lamah-ce-ext` | Kaggle, CPU | Xong: 1.991 + 123 file, lỗi CRC không có (`Document/03_Data/01_LamaHCE.md` Mục 6) |
-| 2. Khảo sát dữ liệu | % thiếu, phân phối, bản đồ 451 lưu vực, so sánh tái phân tích với dự báo | Báo cáo khảo sát kèm biểu đồ, bản đồ | Kaggle hoặc Colab, CPU | % thiếu đã có (`Document/03_Data/01_LamaHCE.md` Mục 6.1: Q thiếu train 3,55% do 27 trạm bắt đầu đo muộn, test 0,23%; khí tượng gần như đủ, có từ 1981); khảo sát đầy đủ chưa làm |
-| 3. Tái lập bài gốc và baseline persistence | Nạp mô hình tác giả, chạy lại tập test; tính persistence | Bảng mốc: số tự chạy lại + persistence | Kaggle hoặc Colab, GPU | Persistence xong (NSE trung vị 0,35–0,37); tái lập chưa làm |
-| 4. Tiền xử lý và bộ nạp dữ liệu | Dựng bộ dữ liệu cho NeuralHydrology: hindcast, forecast, thuộc tính, nhãn | Thư mục dữ liệu và tệp cấu hình dùng chung | Kaggle hoặc Colab | Chưa làm |
-| 5. Mô hình | Khung hindcast–forecast với lõi thời gian thay được | Các cấu hình mô hình cần so sánh | — | Chưa làm |
-| 6. Huấn luyện | Tầng 1 (cải tiến LSTM) rồi tầng 2 (các lõi), 3 hạt giống mỗi cấu hình (Mục 8–9) | Trọng số, nhật ký huấn luyện | Kaggle hoặc Colab, GPU T4 | Chưa làm |
-| 7. Đánh giá | Chỉ số theo lưu vực trên test 2014–2017, so với persistence và bài gốc; đánh giá theo mức lưu lượng (Mục 7) | Bảng, đường CDF, bản đồ ΔNSE, ma trận nhầm lẫn theo mức | Kaggle hoặc Colab | Chưa làm |
-| 8. Giải thích mô hình (XAI) | Integrated Gradients theo ngày và theo nhóm biến | Biểu đồ mức ảnh hưởng | Kaggle hoặc Colab, GPU | Chưa làm |
-| 9. Ngưỡng nguy cơ lũ | Fit phân phối cực trị trên qmax năm của từng trạm | Ngưỡng return period của mỗi trạm | CPU | Chưa làm |
-| 10. Demo | Bản đồ 451 lưu vực theo ngày, chuỗi Q, giải thích XAI | Ứng dụng demo | Chưa chốt | Chưa làm |
+## 1. Câu hỏi nghiên cứu, đóng góp và tính mới
 
-Luồng dữ liệu: hai tệp nén trên Zenodo → (1) Kaggle Dataset → (2) báo cáo khảo sát → (3) mốc tự chạy lại và persistence → (4) thư mục dữ liệu NeuralHydrology → (5, 6) trọng số các mô hình → (7) bảng kết quả → (8, 9) mức ảnh hưởng và ngưỡng nguy cơ lũ → (10) demo.
+### 1.1. Câu hỏi nghiên cứu
 
-## 2. Chi tiết từng giai đoạn
-
-### 2.1. Thu thập dữ liệu
-
-- **Đầu vào:** `Extended_LamaH-CE_daily.tar.gz` (0,95 GB, Zenodo 17119635, CC BY-NC 4.0) và `Experiments.tar.gz` (0,23 GB, Zenodo 17292895: cấu hình, trọng số, scaler, NSE/KGE theo lưu vực của 24 cấu hình).
-- **Cách làm:** đọc theo luồng, ghi vào hai tệp ZIP, lưu thành Kaggle Dataset.
-- **Dữ liệu bổ sung đã có:** LamaH-CE gốc theo giờ trên Kaggle (`lamah-ce-core`, `lamah-ce-extra`) — dữ liệu giờ và mạng sông cho các hướng của khóa luận (Mục 9.2).
-- **Tệp mã:** `Workspace/01_Download/01_LamaHCEExt_Download.py` (Phần 1–2).
-
-### 2.2. Khảo sát dữ liệu
-
-- **Cấu trúc tệp:** cột thực tế so với Bảng A1, A2 của bài (31 biến tái phân tích, 5 biến ECMWF, 33 thuộc tính); đơn vị; mã giá trị thiếu (-999).
-- **Chất lượng:** % thiếu `qmax`, `qmean` và từng biến khí tượng theo kỳ train / validation / test; lưu vực thiếu dài; năm bắt đầu có dữ liệu ECMWF và tái phân tích (quyết định độ dài hindcast tối đa).
-- **Phân phối:** histogram từng biến; so sánh phân phối tái phân tích và dự báo của 5 biến chung (Phụ lục B của bài); qmax so với qmean.
-- **Không gian:** bản đồ 451 lưu vực (72,5% đầu nguồn, 27,5% lồng nhau), diện tích, độ cao.
-- **Đỉnh lũ:** chuỗi qmax lớn nhất năm từng trạm (đầu vào cho giai đoạn 9).
-- **Tệp mã:** `Workspace/02_Exploration/` (chưa viết); số liệu đã có ở `Document/03_Data/01_LamaHCE.md` Mục 6.
-
-### 2.3. Tái lập bài gốc và baseline persistence
-
-Mục đích: có mốc tự chạy lại và bổ sung baseline mà bài gốc không báo cáo.
-
-- **Tái lập:** cài bản fork NeuralHydrology của tác giả; nạp `best_model.pt` của các cấu hình chính (Sequential Forecast LSTM, Encoder–Decoder LSTM, có và không có Q); chạy tập test 2014–2017; so NSE từng lưu vực với `test_metrics.csv` của tác giả.
-- **Việc phải làm thêm:** biến thể có Q đọc thư mục `LamaH_expanded_q_input` không có trên Zenodo — tự dựng bằng cách chép cột `qmean` từ tệp trạm vào tệp khí tượng; kiểm đơn vị `qmean` (nhiều khả năng m³/s trong khi nhãn `qmax` được đổi sang mm/ngày).
-- **Persistence:** qmax(t) ≈ qmax(t−1) và qmax(t) ≈ qmean(t−1). Người phản biện 1 của bài đề nghị mốc này, tác giả không thêm (chỉ lập luận qmax ngày tự tương quan thấp). Kết quả tự tính trên test 2014–2017: persistence đạt NSE trung vị 0,346 (qmax) và 0,368 (qmean); mô hình tốt nhất của tác giả (0,705) hơn persistence ở trên 92% lưu vực; mô hình chỉ dùng dự báo thời tiết (0,387) ngang persistence (`Document/03_Data/01_LamaHCE.md` Mục 6.1).
-- **Nhiễu giữa các lần chạy:** bài chạy 1 hạt giống; huấn luyện lại cấu hình tốt nhất với vài hạt giống để biết mức chênh lệch nào là thật.
-- **Đầu ra:** bảng mốc gồm số của tác giả, số tự chạy lại, persistence, độ lệch giữa các hạt giống.
-- **Tệp mã:** persistence và tái lập ở tệp dự kiến `Workspace/03_Baseline/01_LamaHCEExt_Reproduce.py`.
-
-### 2.4. Tiền xử lý và bộ nạp dữ liệu
-
-- **Khung:** bộ nạp `lamah_a` của NeuralHydrology (bản fork), dữ liệu mức A — toàn bộ lưu vực thượng nguồn của trạm.
-- **Đầu vào của bài gốc:** hindcast 364 ngày × 31 biến tái phân tích (+ `qmean` ở biến thể có Q); forecast ngày t × 5 biến ECMWF HRES; 33 thuộc tính tĩnh.
-- **Nhãn:** `qmax` của ngày t, bộ nạp đổi sang mm/ngày theo diện tích lưu vực; demo đổi ngược về m³/s.
-- **Chuẩn hóa:** z-score toàn cục tính trên kỳ train (mặc định NeuralHydrology).
-- **Chia tập:** giữ đúng bài gốc — train 2003–2009, validation 2010–2013, test 2014–2017.
-- **Lọc mẫu:** NeuralHydrology loại mẫu huấn luyện khi bất kỳ biến động nào thiếu ở bất kỳ ngày nào trong cửa sổ (kể cả cột ECMWF ở ngày hindcast); kéo dài hindcast sẽ làm mất thêm mẫu, nên số mẫu hợp lệ phải được báo cáo cho từng độ dài hindcast. Pipeline chi tiết của bài gốc: `Document/01_Plan/02_BasePaper.md` Mục 11.
-- **Theo phạm vi Mục 9:** hindcast 365 ngày (mốc) và 730 ngày (khí tượng có từ 1981 nên đủ mẫu train từ 2003); đưa `qmean` về cùng đơn vị mm/ngày với nhãn và sửa bộ lọc mẫu (tầng 1, Mục 8.2). Để khóa luận: ghép dữ liệu giờ của LamaH-CE gốc cho phần quá khứ gần (ý tưởng MF-LSTM, Acuña Espinoza và cs., HESS 2025); lead time nhiều ngày (Extended LamaH-CE có vẻ chỉ có dự báo cho ngày t — cần nguồn dự báo nhiều lead, ví dụ Caravan MultiMet; chưa xác nhận trên dữ liệu).
-
-### 2.5. Mô hình
-
-Chi tiết ở Mục 3.
-
-### 2.6. Huấn luyện
-
-- **Cấu hình mốc (giữ như bài gốc để so sánh được):** hàm mất mát NSE* (chia sai số cho độ lệch chuẩn lưu lượng từng lưu vực), Adam lr 1e-3, CosineAnnealing 30 epoch, batch 256, cắt gradient 1, dropout đầu ra 0,3, dừng sớm theo NSE validation (patience 5).
-- **Siêu tham số:** cùng ngân sách tìm kiếm cho mọi lõi thời gian; bài gốc tối ưu Bayes 100 lần thử (kích thước ẩn, dropout, nhiễu nhãn, batch). Đề tài tìm số chiều ẩn 64 / 128 / 256 trên validation cho mỗi lõi (Mục 9), giữ các siêu tham số khác như bài gốc; mở rộng nếu còn quota.
-- **Hạt giống:** 3 hạt giống cho mỗi cấu hình (Mục 9); kết quả báo cáo cả từng hạt giống và tổ hợp (trung bình dự báo của 3 hạt giống).
-- **Ràng buộc phần cứng:** `mamba-ssm` cần GPU CUDA từ sm_75 (T4 chạy được, P100 không); wheel biên dịch một lần rồi lưu lại (`Document/06_Theory/02_RiverMamba.md` Mục 0). Bài gốc báo vài phút tới khoảng 1 giờ mỗi lần chạy trên RTX 4090; thời gian trên T4 chưa đo.
-
-### 2.7. Đánh giá
-
-- **Chỉ số chính:** NSE và KGE theo từng lưu vực trên test 2014–2017, báo cáo trung vị, trung bình, phân vị 10/25/75/90 và đường CDF như Bảng F1, các hình của bài gốc.
-- **Chỉ số bổ sung:** FHV (sai lệch đỉnh), FLV (sai lệch dòng chảy kiệt), sai số thời điểm đỉnh; đánh giá theo mức lưu lượng (Mục 7).
-- **Theo dõi khi huấn luyện:** sau mỗi epoch ghi NSE trung vị trên cả validation và test (yêu cầu GVHD, họp 27/9/2026) để phát hiện sớm khi validation không phản ánh test; chọn checkpoint theo validation như bài gốc, NSE test chỉ để theo dõi và báo cáo.
-- **So sánh:** với persistence, với số của tác giả và số tự chạy lại; ΔNSE theo lưu vực và tương quan với thuộc tính (như Mục 3.6 của bài); trung bình ± độ lệch chuẩn qua các hạt giống; kiểm định thống kê (phương pháp chưa chốt).
-- **Mốc tham chiếu của bài:** baseline chỉ dự báo (cận dưới, NSE trung vị 0,39) và baseline tái phân tích với thời tiết hoàn hảo (cận trên, 0,69).
-
-### 2.8. Giải thích mô hình (XAI)
-
-- Integrated Gradients bằng Captum.
-- Theo thời gian: ngày nào trong 364 ngày hindcast ảnh hưởng nhiều nhất.
-- Theo nhóm biến: tỷ trọng đóng góp của tái phân tích, dự báo ECMWF và Q quan trắc — trả lời trực tiếp câu hỏi của bài gốc về vai trò của dự báo thời tiết và của Q.
-- Khác biệt với Demiray & Demir (Mamba + SHAP trên WaterBench-Iowa): tách đóng góp của dự báo thời tiết thật so với tái phân tích.
-
-### 2.9. Ngưỡng nguy cơ lũ
-
-- Mô hình dự báo lưu lượng cực đại ngày, không dự báo mực nước hay vùng ngập; nguy cơ lũ đánh giá qua ngưỡng lưu lượng ứng với chu kỳ lặp lại.
-- Ngưỡng tính riêng từng trạm bằng Gumbel hoặc L-moments trên chuỗi qmax lớn nhất năm; tệp trạm có dữ liệu từ 1981.
-- **Chưa chốt:** các chu kỳ lặp lại dùng làm ngưỡng.
-
-### 2.10. Demo
-
-- Bản đồ 451 lưu vực tô màu theo mức vượt ngưỡng; chọn ngày để xem dự báo; bấm vào lưu vực để xem chuỗi qmax dự báo so với thực đo, dự báo thời tiết đầu vào và giải thích XAI.
-- Dữ liệu lịch sử, demo phát lại theo thời gian trên tập test 2014–2017.
-- **Chưa chốt:** công nghệ làm demo và nơi triển khai.
-
-## 3. Kiến trúc mô hình
-
-### 3.1. Khung chung
-
-Giữ khung hindcast–forecast của bài gốc, chỉ thay lõi thời gian:
-
-| Khối | Đầu vào → đầu ra | Vai trò |
+| Mã | Câu hỏi | Trả lời bằng |
 |---|---|---|
-| Nhúng đầu vào | Biến hindcast (31–32), biến forecast (5), thuộc tính (33) → vector cùng số chiều | Đưa hai nguồn khác số biến về cùng không gian |
-| Lõi thời gian | 364 bước hindcast rồi 1 bước forecast → trạng thái ẩn | Học quan hệ theo thời gian, chuyển trạng thái từ quá khứ sang ngày dự báo |
-| Đầu ra | Trạng thái ẩn bước cuối → qmax ngày t | Hồi quy |
+| RQ1 | Kết quả BiasCast có tái lập được không, nhiễu giữa các hạt giống lớn cỡ nào, và mô hình thật sự hơn các mốc không học (persistence) và mốc tuyến tính bao nhiêu? | Bước A |
+| RQ2 | Các cải tiến quy trình không phụ thuộc kiến trúc (sửa lỗi mã, thống nhất đơn vị Q, giữ mẫu thiếu dữ liệu bằng masked mean theo nguồn, huấn luyện có che dữ liệu) cải thiện Sequential Forecast LSTM bao nhiêu và giúp mô hình chịu mất dữ liệu ra sao? | Bước B |
+| RQ3 | Trong bài toán dự báo có dự báo thời tiết thật và Q quan trắc, khi cùng số tham số, cùng ngân sách tinh chỉnh, cùng hạt giống, lõi SSM (S4D, Mamba) có hơn, ngang hay kém LSTM, GRU, Transformer? Hơn ở dải lưu lượng nào, loại lưu vực nào? | Bước C, E; đánh giá Mục 6 |
+| RQ4 | Khi dữ liệu đến trễ đúng như thực tế vận hành (mỗi nguồn một độ trễ) hoặc mất Q, lõi nào suy giảm ít hơn? | Đánh giá kịch bản vận hành (Mục 6.3) |
+| RQ5 | Chuỗi quá khứ dài hơn (730 ngày) có giúp không, với chi phí tính toán bao nhiêu? | Bước D |
 
-### 3.2. Các lựa chọn cho lõi thời gian
+### 1.2. Đóng góp dự kiến
 
-| Lựa chọn | Cách ghép vào khung | Nguồn |
+| Mã | Đóng góp | Loại |
 |---|---|---|
-| Sequential Forecast LSTM | Một LSTM chạy liên tục qua hindcast rồi forecast | Bài gốc (mô hình tốt nhất) |
-| Encoder–Decoder LSTM | Hai LSTM nối bằng mạng handoff | Bài gốc; Nearing và cs. (Nature 2024) |
-| GRU | Thay LSTM trong khung sequential | Baseline hồi quy |
-| Transformer | Chuỗi 365 bước đã nhúng, attention có mặt nạ nhân quả | Baseline attention |
-| S4D | Thay LSTM trong khung sequential | Đối chứng SSM bất biến theo thời gian; mã từ S4D-FT (Wang và cs., WRR 2025) |
-| Mamba | Nối nhúng hindcast và forecast thành một chuỗi 365 bước, lấy đầu ra bước cuối | Mô hình chính; phải tự thêm vào NeuralHydrology (lớp Mamba có sẵn quét sai trục, `02_BasePaper.md` Mục 11.5) |
+| C1 | So sánh có kiểm soát (cùng tham số, cùng ngân sách tinh chỉnh, 3 hạt giống, kiểm định thống kê) giữa LSTM, GRU, Transformer, S4D, Mamba trong khung hindcast–forecast dùng dự báo ECMWF HRES lưu trữ thật và Q quan trắc, trên 451 lưu vực Trung Âu | Thực nghiệm, tính mới chính |
+| C2 | Bộ đánh giá vận hành: kịch bản độ trễ theo từng nguồn dữ liệu (ERA5-Land, E-OBS, MSWEP, GLEAM, Q) và mất Q, áp dụng cho mọi lõi | Phương pháp đánh giá |
+| C3 | Tái lập BiasCast, đo nhiễu hạt giống, bổ sung mốc persistence, PNSE, mốc tuyến tính; phát hiện và sửa lỗi trong mã (bộ lọc mẫu, đơn vị Q, lưu mô hình tốt nhất) | Tái lập, chuẩn hóa đánh giá |
+| C4 | Đánh giá theo mức lưu lượng và theo sự kiện lũ (chu kỳ lặp lại), phân tích theo lưu vực kiểm giả thuyết "SSM có lợi ở lưu vực động lực chậm, bất lợi ở lũ nhanh" | Phân tích |
+| C5 | Giải thích mô hình (Integrated Gradients) so sánh độ dài nhớ hiệu dụng của LSTM và Mamba; demo bản đồ cảnh báo 451 lưu vực | Ứng dụng |
 
-- Quét hai chiều chỉ được dùng bên trong phần hindcast rồi dự báo sau cửa sổ; đầu ra lấy tại bước cuối nên không rò rỉ tương lai.
-- Mạng nhúng: tuyến tính (16 chiều) như cấu hình tốt nhất của bài; có dùng mạng nhúng phức tạp hay LOAN của RiverMamba để đưa thuộc tính vào hay không: chưa chốt.
+### 1.3. Tính mới so với công trình gần nhất
 
-### 3.3. Ma trận thí nghiệm
-
-- Mỗi lõi thời gian chạy hai biến thể dữ liệu: không có Q và có Q quan trắc trong hindcast (bài gốc cho thấy Q tăng NSE trung vị 0,63 → 0,71).
-- **LSTM là baseline chính:** so sánh quan trọng nhất là Mamba với Sequential Forecast LSTM ở cùng dữ liệu, cùng ngân sách tham số và tìm kiếm siêu tham số.
-- **Trục độ dài hindcast:** 365 ngày (mốc bài gốc) và 730 ngày cho LSTM và Mamba (Mục 9) — nơi Mamba được kỳ vọng có lợi thế về chi phí tính toán so với LSTM và Transformer.
-- **Thứ tự:** tầng 1 cải tiến LSTM trước, rồi các lõi dạng thuần, rồi một biến thể cải tiến cho Mamba và một cho Transformer (Mục 8).
-- **Mốc so sánh:** persistence; số của tác giả; số tự chạy lại nhiều hạt giống; hai baseline tham chiếu của bài (chỉ dự báo, tái phân tích).
-- Điều kiện công bằng: cùng dữ liệu, cùng chia tập, cùng hàm mất mát, cùng hạt giống, cùng ngân sách huấn luyện; cách khống chế số tham số chưa chốt (Sequential Forecast LSTM của bài có khoảng 85 nghìn tham số với nhúng đơn giản).
-
-## 4. Hạ tầng và tổ chức mã
-
-- **Tính toán:** Kaggle là chính (GPU 30 giờ/tuần, tối đa 12 giờ/phiên), Google Colab bản miễn phí dự phòng; mã chạy được trên cả hai.
-- **Khung mã:** bản fork NeuralHydrology của tác giả (1 commit sửa 7 tệp so với bản gốc): thêm mô hình vào `modelzoo`, cấu hình bằng tệp YAML như 24 cấu hình của bài.
-- **Dữ liệu:** Kaggle Dataset `lamah-ce-ext` (và `lamah-ce-core`, `lamah-ce-extra` nếu dùng dữ liệu giờ, mạng sông).
-- **Tổ chức mã:** mã đặt trong `Workspace/`, mỗi thư mục con đánh số theo một việc (`01_Download` tải dữ liệu, `02_Exploration` khám phá dữ liệu, `03_Baseline` tái lập mốc); mỗi notebook một tệp `.py` tự đủ, có mục lục, chia cell theo "Phần"; ghi chú kết quả ở `Document/03_Data/01_LamaHCE.md`.
-
-| Tệp | Giai đoạn | Trạng thái |
+| Công trình gần nhất | Đã làm | Khác biệt của đề tài |
 |---|---|---|
-| `Workspace/01_Download/01_LamaHCEExt_Download.py` | 1 | Đã chạy |
-| `Workspace/02_Exploration/` | 2 | Chưa viết |
-| `Workspace/03_Baseline/01_LamaHCEExt_Reproduce.py` | 3 | Tên dự kiến |
-| Tệp cho giai đoạn 4–10 | 4–10 | Chưa đặt tên |
+| BiasCast (Konold và cs., HESS 2026) | Khung hindcast–forecast với ECMWF HRES thật và Q quan trắc, chỉ LSTM, 1 hạt giống, không persistence | Thêm các lõi khác dưới giao thức công bằng; nhiều hạt giống; mốc persistence; sửa lỗi mã |
+| Shahriar (preprint SSRN, 10/2026) | Mamba và LSTM cùng tham số, cùng độ sâu, 671 lưu vực CAMELS; LSTM thắng mọi cặp (NSE 0,752 so với 0,727); Mamba quá khớp sau khoảng 10 epoch | Bài đó là mô phỏng (không dự báo thời tiết, không Q quá khứ); đề tài là dự báo vận hành với dự báo thật, Q quan trắc, đánh giá theo mức và kịch bản trễ |
+| Zhang và cs. (J. Hydrol. 2026) | LSTM, Transformer, PatchTST, Mamba, DLinear theo giờ, CAMELS; Mamba gần nhưng hơi kém LSTM | Đề tài dùng dự báo thời tiết lưu trữ thật, dữ liệu Trung Âu, thêm S4D, kiểm định thống kê theo lưu vực, kịch bản vận hành |
+| Demiray & Demir (preprint EarthArXiv) | Mamba so với LSTM, GRU, Transformer, 125 lưu vực Iowa, theo giờ, có SHAP | Khác bài toán (không ECMWF lưu trữ, không giao thức cùng tham số); đề tài thêm S4D, kịch bản vận hành, đánh giá theo mức |
+| RiverMamba (NeurIPS 2025) | Mamba quét không gian trên lưới 0,05°, nhãn là tái phân tích GloFAS | Đề tài theo lưu vực, nhãn là Q quan trắc, so sánh có kiểm soát với các lõi khác |
+| Gauch và cs. (HESS 2025); MF²LSTM (preprint EGUsphere 2026) | Masked mean cho dữ liệu khí tượng thiếu (mô phỏng, CAMELS); MF²LSTM che Q để đồng hóa, theo giờ, một mô hình LSTM | Đề tài áp dụng cho bài toán ngày có dự báo thật, cho mọi lõi, nhóm theo nguồn dữ liệu, và kiểm tra bằng độ trễ thực tế của từng nguồn |
+| Dubey và cs. (arXiv 2025) | Kịch bản trễ và mất dữ liệu cho LSTM mã hóa – giải mã, CAMELS-US, HYSETS, CAMELS-IND, có HRES | Đề tài: độ trễ riêng của từng nguồn (E-OBS 6 tháng, GLEAM 1 năm…), Q quan trắc, so sánh nhiều lõi |
 
-## 5. Việc chưa chốt
+Cách nói trước hội đồng: đề tài không khẳng định Mamba tốt hơn; đóng góp là trả lời có kiểm soát câu hỏi "lõi SSM có đáng thay LSTM trong dự báo vận hành không, ở đâu và với điều kiện nào", kèm bộ đánh giá sát vận hành. Kết quả Mamba kém LSTM vẫn là kết quả có giá trị (cùng chiều với Shahriar 2026, Zhang 2026) nếu giao thức chặt.
 
-Các việc đã có hướng theo phạm vi ở Mục 9: độ dài hindcast (365 và 730 ngày), đưa `qmean` về cùng đơn vị với nhãn và sửa bộ lọc mẫu (tầng 1), số hạt giống (3) và mức tinh chỉnh (số chiều ẩn 64 / 128 / 256), dữ liệu giờ, dự báo nhiều ngày và đồ thị (khóa luận). Còn lại:
+### 1.4. Nguyên tắc thiết kế
 
-| Việc | Giai đoạn |
-|---|---|
-| Biến thể cải tiến của Mamba và Transformer (ứng viên: quét hai chiều trong hindcast; patch như PatchTST) | 5 |
-| Mạng nhúng và cách đưa thuộc tính tĩnh (nhúng thường hay LOAN) | 5 |
-| Cách khống chế số tham số giữa các mô hình | 5 |
-| Phương pháp kiểm định thống kê | 7 |
-| Các chu kỳ lặp lại dùng làm ngưỡng | 9 |
-| Công nghệ và nơi triển khai demo | 10 |
+1. **So sánh công bằng:** cùng dữ liệu, chia tập, hàm mất mát, bộ nạp, khung hindcast–forecast, ngân sách tinh chỉnh, số hạt giống; chỉ khác lõi thời gian. Báo cáo kết quả cả ở mức cùng tham số và ở cấu hình tốt nhất sau tinh chỉnh.
+2. **Mốc mạnh trước khi so:** tầng 1 cải tiến LSTM trước, rồi mọi lõi dùng chung quy trình đã cải tiến.
+3. **Thay đổi từng thứ một:** mỗi cải tiến là một thí nghiệm riêng so với cấu hình liền trước.
+4. **Chống rò rỉ:** checkpoint chọn theo validation; NSE test mỗi epoch chỉ để theo dõi; ngưỡng mức lưu lượng tính trên dữ liệu trước kỳ test.
+5. **Kiểm thử trước khi huấn luyện:** mọi mô-đun mới có kiểm thử đơn vị (Mục 9.2).
+6. **Kết quả nào cũng là câu trả lời:** báo cáo cả kết quả âm tính.
 
-## 6. Đối chiếu với pipeline của BiasCast
+---
 
-Pipeline giữ nguyên những phần quyết định khả năng so sánh (cùng 451 lưu vực, cùng chia tập, cùng đầu vào và nhãn, cùng hàm mất mát và khung NeuralHydrology) và mở rộng ở những chỗ bài gốc tự nêu hạn chế hoặc người phản biện chỉ ra. Pipeline của bài đọc từ mã (`github.com/conestone/biascast`, bản fork NeuralHydrology) và 24 cấu hình trên Zenodo.
+## 2. Tổng quan các giai đoạn
 
-| Giai đoạn | BiasCast | Đề tài | Giống / khác |
+| Giai đoạn | Việc chính | Đầu ra | Trạng thái |
 |---|---|---|---|
-| Thu thập dữ liệu | Tự gộp ERA5-Land, E-OBS, MSWEP, GLEAM, ECMWF HRES theo lưu vực | Dùng bản đã công bố trên Zenodo | Cùng dữ liệu |
-| Khảo sát | Phân phối năm các nguồn (Phụ lục B), khoảng cách Wasserstein tái phân tích – dự báo | Thêm % thiếu, bản đồ, đỉnh lũ | Đề tài mở rộng |
-| Bộ nạp, chia tập | `lamah_a`, hindcast 364 + forecast 1 ngày, 2003–2009 / 2010–2013 / 2014–2017 | Giữ nguyên; thử hindcast dài hơn | Giống, thêm một trục thí nghiệm |
-| Mô hình | Chỉ các kiến trúc LSTM (tác giả tự nêu ở Mục 3.7) | LSTM, GRU, Transformer, S4D, Mamba trong cùng khung | Đề tài mở rộng — khoảng trống chính |
-| Huấn luyện | NSE*, tối ưu Bayes, 1 hạt giống | Giữ cấu hình mốc; nhiều hạt giống | Khác số hạt giống |
-| Đánh giá | NSE, KGE theo lưu vực; cận trên, cận dưới | Thêm persistence, FHV, thời điểm đỉnh, F1 theo ngưỡng, kiểm định | Đề tài mở rộng |
-| Tái lập | Không áp dụng | Chạy lại trọng số của tác giả, đo nhiễu giữa hạt giống | Chỉ có ở đề tài |
-| XAI, ngưỡng nguy cơ lũ, demo | Không có | Có | Chỉ có ở đề tài |
+| 0. Hạ tầng | Fork NeuralHydrology riêng, cài `mamba-ssm` trên Kaggle T4, kiểm thử đơn vị, đo thời gian | Môi trường chạy được mọi lõi; bảng thời gian mỗi epoch | Chưa làm |
+| 1. Thu thập dữ liệu | Tải Extended LamaH-CE và kết quả của tác giả | Kaggle Dataset `lamah-ce-ext` | Xong (`01_LamaHCE.md` Mục 6) |
+| 2. Khảo sát dữ liệu | Theo khuôn GVHD: dạng cơ bản + thống kê sâu; ngưỡng mức lưu lượng; bảng độ trễ nguồn | Báo cáo khảo sát, tệp ngưỡng | Một phần số liệu đã có; notebook viết lại |
+| 3. Tái lập và mốc | Chạy lại trọng số tác giả; persistence; DLinear; nhiễu hạt giống | Bảng mốc | Persistence xong (0,35–0,37) |
+| 4. Bộ nạp | Sửa bộ lọc mẫu, nhóm biến theo nguồn, Q cùng đơn vị | Cấu hình dữ liệu dùng chung | Chưa làm |
+| 5. Mô hình | Khung hindcast–forecast với lõi thay được | Mô-đun trong fork | Chưa làm |
+| 6. Huấn luyện | Bước B → F (Mục 7) | Trọng số, nhật ký | Chưa làm |
+| 7. Đánh giá | Bộ đánh giá Mục 6 | Bảng, hình, kiểm định | Chưa làm |
+| 8. Giải thích | Integrated Gradients | Hình mức ảnh hưởng | Chưa làm |
+| 9. Ngưỡng lũ | Gumbel L-moments trên qmax năm | Ngưỡng 1, 2, 5, 10 năm mỗi trạm | Chưa làm |
+| 10. Demo | Bản đồ cảnh báo phát lại kỳ test | Ứng dụng | Chưa làm |
 
-## 7. Đánh giá theo mức lưu lượng
+---
 
-Yêu cầu của GVHD (họp 27/9/2026, `Document/02_Meetings/Meeting_2026-09-27.md` Mục 2.2): bài toán là hồi quy nên NSE không chỉ ra mô hình mạnh, yếu ở đâu; chia lưu lượng thành các mức và đo như bài toán phân loại. Mô hình không đổi, việc chia mức làm sau khi đã có dự báo, không cần huấn luyện thêm.
+## 3. Dữ liệu, bộ nạp và tiền xử lý
+
+### 3.1. Giữ nguyên như bài gốc
+
+- 451 lưu vực mức A (`basins_filtered.txt`), train 2003–2009, validation 2010–2013, test 2014–2017; NeuralHydrology nạp thêm giai đoạn khởi động trước mỗi kỳ.
+- Nhãn `qmax` ngày t, bộ nạp đổi sang mm/ngày theo diện tích (`area_gov`); demo đổi ngược về m³/s.
+- Hindcast 364 ngày (31 biến tái phân tích), forecast ngày t (5 biến ECMWF HRES), 33 thuộc tính tĩnh.
+- z-score toàn cục tính trên train; hàm mất mát NSE* dùng độ lệch chuẩn qmax từng lưu vực.
+
+### 3.2. Nhóm biến theo nguồn dữ liệu
+
+Hindcast chia thành các nhóm theo nguồn, mỗi nhóm một mạng nhúng; masked mean lấy trung bình các nhóm có dữ liệu ở mỗi bước (Gauch và cs., HESS 2025). Nhóm theo nguồn vì dữ liệu mất khi vận hành theo cả nguồn (một nhà cung cấp chậm), không theo từng biến.
+
+| Nhóm | Biến | Độ trễ khi vận hành (nguồn tra) | Ghi chú |
+|---|---|---|---|
+| ERA5-Land | 21 biến | Khoảng 5 ngày (Copernicus) | |
+| E-OBS | 7 biến | Phiên bản mới mỗi 6 tháng (Copernicus CDS) | Có thể thiếu tới vài tháng gần nhất |
+| MSWEP | Mưa | Bản NRT trễ khoảng 2–3 giờ (GloH2O) | Bản NRT khác bản lịch sử có hiệu chỉnh trạm — lệch miền không mô phỏng được với dữ liệu hiện có |
+| GLEAM | Bốc hơi thực, tiềm năng | Cập nhật mỗi năm (tháng 3–4), kéo dài tới hết năm trước (GLEAM4, Scientific Data 2025) | Khi vận hành có thể thiếu tới khoảng 15 tháng gần nhất |
+| Q quan trắc | `qmean`, `qmax` quá khứ (cùng đơn vị mm/ngày với nhãn) | eHYD (Áo) khoảng 2 giờ (BiasCast Mục 3.7) | Nhóm riêng như MF²LSTM |
+| Forecast | 5 biến ECMWF HRES ngày t | Phát hành 00 UTC ngày t | Mạng nhúng riêng cho pha forecast |
+
+### 3.3. Sửa bộ nạp
+
+| Việc | Lý do | Cách làm |
+|---|---|---|
+| Sửa `_validate_samples` để giữ mẫu có đầu vào thiếu khi dùng masked mean | Bản gốc loại mẫu nếu bất kỳ cột nào thiếu ở bất kỳ ngày nào trong 365 ngày (`basedataset.py` dòng 861–919), kể cả khi bật `nan_handling_method` | Khi có `nan_handling_method`, chỉ yêu cầu nhãn và thuộc tính tĩnh hợp lệ; vẫn loại mẫu không đủ lịch sử |
+| Dựng thư mục có Q (thay `LamaH_expanded_q_input` không công bố) | Biến thể có Q của bài đọc thư mục này | Chép `qmean`, `qmax` từ `D_gauges` vào tệp khí tượng mức A; đổi sang mm/ngày theo `area_gov` như nhãn |
+| Báo cáo số mẫu hợp lệ từng cấu hình | Biết cải tiến lấy lại bao nhiêu mẫu | Ghi số mẫu train trước và sau sửa bộ lọc, với hindcast 365 và 730 ngày |
+
+### 3.4. Che dữ liệu khi huấn luyện
+
+Bản fork đã có `nan_step_probability`, `nan_sequence_probability` (`basedataset.py` dòng 180, 207–229): khi huấn luyện, mỗi nhóm biến bị đặt NaN ngẫu nhiên từng bước và cả chuỗi, không bao giờ che hết mọi nhóm. Xác suất dùng chung cho mọi nhóm; muốn xác suất riêng cho nhóm Q phải sửa nhỏ. Hai giá trị cần thử: 0,1/0,12 (Gauch và cs. 2025, che khí tượng) và 0,05/0,05 (MF²LSTM, che Q).
+
+---
+
+## 4. Kiến trúc mô hình
+
+### 4.1. Khung chung
+
+| Khối | Đầu vào → đầu ra | Ghi chú |
+|---|---|---|
+| Nhúng hindcast | Mỗi nhóm nguồn → d chiều; masked mean qua các nhóm; nối nhúng thuộc tính tĩnh | Lớp tuyến tính như cấu hình tốt nhất của bài (16 chiều + 16 chiều tĩnh) |
+| Nhúng forecast | 5 biến ECMWF → d chiều; nối nhúng tĩnh | Cùng số chiều với hindcast |
+| Lõi thời gian | Chuỗi 365 bước (364 hindcast + 1 forecast) → biểu diễn bước cuối | Thay được: LSTM, GRU, Transformer, S4D, Mamba |
+| Đầu ra | Bước cuối → qmax ngày t | Hồi quy hoặc CMAL (bước F) |
+
+Đề tài viết một mô hình chung "Sequential Forecast" nhận lõi bất kỳ: nối nhúng hindcast và forecast theo thời gian rồi chạy lõi một lần. Với lõi LSTM, cách này tương đương đúng Sequential Forecast LSTM của bài (LSTM chạy hết hindcast rồi tiếp tục trạng thái sang forecast); kiểm bằng cách nạp trọng số của tác giả và so đầu ra (Mục 9.2). Bài cũng cho thấy trạng thái chạy liên tục bền hơn mạng handoff (435 so với 361 lưu vực cải thiện), nên không dùng Encoder–Decoder cho các lõi mới.
+
+### 4.2. Các lõi thời gian
+
+| Lõi | Cài đặt | Vai trò |
+|---|---|---|
+| LSTM | `nn.LSTM`, forget bias 3 như bài | Mốc chính |
+| GRU | `nn.GRU` | Mốc hồi quy nhẹ hơn |
+| Transformer | Bộ mã hóa pre-LayerNorm, mặt nạ nhân quả, mã hóa vị trí sin, lấy đầu ra bước cuối; khởi điểm từ `transformer.py` của NeuralHydrology | Mốc attention; Liu và cs. (2024) cho thấy bản cơ bản thua LSTM |
+| S4D | Khối S4D (Gu và cs., NeurIPS 2022) có kết nối tắt và LayerNorm; siêu tham số khởi điểm theo S4D-FT (d_state, min_dt 0,01, max_dt 0,1, lr riêng cho tham số SSM) | Đối chứng SSM bất biến thời gian — tách "Mamba không hợp" khỏi "SSM không hợp" |
+| Mamba | Khối `mamba_ssm.Mamba` có kết nối tắt và LayerNorm, đầu vào dạng (batch, length, dim); dự phòng `mambapy` (PyTorch thuần) nếu không cài được kernel CUDA | Lõi chính của đề tài |
+| DLinear | Tách xu hướng – dao động trên cửa sổ, hai lớp tuyến tính (Zeng và cs., AAAI 2023) | Mốc tuyến tính, không phải lõi so sánh |
+
+Lớp `mamba.py` có sẵn của NeuralHydrology quét sai trục (`02_BasePaper.md` Mục 11.5) nên không dùng.
+
+### 4.3. Biến thể cải tiến (bước E)
+
+| Biến thể | Mô tả | Căn cứ | So với |
+|---|---|---|---|
+| Mamba hai chiều | Thêm nhánh quét ngược trên toàn cửa sổ 365 bước rồi gộp với nhánh xuôi; đầu ra chỉ ở bước cuối, mọi đầu vào đều ≤ ngày t nên không rò rỉ | ResBi-Mamba Plus (AISE 2026); S-Mamba, CMMamba dùng Mamba hai chiều | Mamba thuần cùng tham số |
+| Transformer patch | Chia hindcast thành đoạn (patch) làm token như PatchTST | Nie và cs. (ICLR 2023); Zhang và cs. (2026): PatchTST tốt nhất khi có Q | Transformer thuần cùng tham số |
+| Dự phòng: Transformer nhúng tích chập nhân quả | Hai lớp Conv1D nhân quả có kết nối tắt trước attention | Liu và cs. (J. Hydrol. 2024) | Transformer thuần |
+| Dự phòng: S5D | Thêm Conv1D, LayerNorm, Softsign vào S4D | Jing và cs. (ESWA 2026) | S4D thuần |
+
+### 4.4. Đầu ra xác suất (bước F)
+
+Đầu CMAL (có sẵn `head: cmal`), hàm mất mát log-likelihood; dự báo điểm lấy trung vị phân phối; xác suất vượt ngưỡng lũ cho demo. Căn cứ: Klotz và cs. (HESS 2022) — CMAL tốt nhất trong bốn cách.
+
+---
+
+## 5. Huấn luyện và giao thức so sánh
+
+### 5.1. Cấu hình chung (giữ như bài)
+
+NSE*, Adam lr 10⁻³, CosineAnnealing 30 epoch (nhỏ nhất 10⁻⁵), batch 256, cắt gradient 1, dropout đầu ra 0,3, dừng sớm theo trung vị NSE validation (patience 5, cải thiện tối thiểu 0,005, đã sửa lỗi lưu mô hình tốt nhất). Mỗi epoch ghi NSE trung vị validation và test (yêu cầu GVHD); checkpoint chọn theo validation.
+
+### 5.2. Giao thức so sánh lõi
+
+| Bước | Cách làm |
+|---|---|
+| Mức cùng tham số | Mỗi lõi chỉnh số chiều để tổng tham số lệch không quá 5% so với LSTM cải tiến (khoảng 85 nghìn tham số với 128 chiều) — tránh nhiễu do khác dung lượng, như Shahriar (2026) |
+| Tinh chỉnh cùng ngân sách | Mỗi lõi 8 cấu hình, 1 hạt giống, chọn theo validation: 2 mức dung lượng (cùng tham số, gấp khoảng 3 lần) × 2 độ sâu (1, 2 lớp) × 2 learning rate (10⁻³, 5×10⁻⁴) |
+| Chạy chính thức | Cấu hình cùng tham số và cấu hình tốt nhất của mỗi lõi chạy 3 hạt giống |
+| Báo cáo | Từng hạt giống, trung bình ± độ lệch chuẩn, tổ hợp (trung bình dự báo 3 hạt giống); số tham số, thời gian mỗi epoch, bộ nhớ GPU |
+
+### 5.3. Hạt giống và tổ hợp
+
+3 hạt giống cho mọi cấu hình chính thức. Nhiễu giữa hạt giống đo ở bước A dùng làm thước đo: chênh lệch nhỏ hơn nhiễu này không được kết luận.
+
+---
+
+## 6. Đánh giá
+
+### 6.1. Chỉ số chính và kiểm định
+
+- **Theo lưu vực trên test 2014–2017:** NSE, KGE (và ba thành phần r, α, β), **PNSE** (NSE lấy qmax ngày t−1 quan sát làm mốc, MF²LSTM; tương đương kỹ năng so với persistence).
+- **Tổng hợp:** trung vị, trung bình, P10/P25/P75/P90, đường CDF, số lưu vực tốt lên / kém đi.
+- **Kiểm định:** Wilcoxon signed-rank hai phía, ghép cặp theo lưu vực, kèm cỡ hiệu ứng Cohen's d — cách của Kratzert và cs. (2019, 2024), Gauch và cs. (2025), Nearing và cs. (2024); hiệu chỉnh Holm khi so nhiều cặp.
+
+### 6.2. Theo mức lưu lượng và theo sự kiện (yêu cầu GVHD)
 
 | Bước | Nội dung |
 |---|---|
-| Ngưỡng | Riêng từng lưu vực, tính trên qmax kỳ huấn luyện: các phân vị của đường duy trì lưu lượng (đoạn cao 2% lớn nhất, đoạn thấp 30% nhỏ nhất theo Yilmaz, Gupta, Wagener, 2008, *Water Resources Research*) và ngưỡng lũ theo chu kỳ lặp lại (giai đoạn 9). Số mức và ngưỡng cụ thể chưa chốt |
-| Gán mức | Gán mức cho cả qmax quan trắc và qmax dự báo của từng ngày kiểm tra |
-| Chỉ số | Ma trận nhầm lẫn giữa các mức; độ chính xác từng mức; với mức lũ: tỉ lệ phát hiện, tỉ lệ báo động nhầm, F1; FHV, FLV cho đoạn cao và thấp |
-| Cách đọc | Ưu tiên bỏ sót ít ở mức lũ và mức rất thấp, chấp nhận báo động nhầm nhiều hơn (theo GVHD); so sánh các lõi ở từng mức để biết Mamba hơn hay kém LSTM ở dải lưu lượng nào |
-| Dùng cho | Biện luận kết quả; chọn cải tiến tiếp theo (ý tưởng lấy mẫu nhiều ngày lưu lượng cao, `Document/04_Ideas/01_Ideas.md` Y7) |
+| Ngưỡng mức | Riêng từng lưu vực, tính trên qmax 1981–2013 (trước kỳ test): bốn mức theo xác suất vượt của đường duy trì lưu lượng — rất cao (0–0,02), cao (0,02–0,2), trung bình (0,2–0,7), thấp (0,7–1) (đoạn của Yilmaz, Gupta, Wagener, WRR 2008) |
+| Chỉ số theo mức | Ma trận nhầm lẫn 4 mức, độ chính xác, recall từng mức; %BiasFHV, %BiasFMS, %BiasFLV |
+| Ngưỡng lũ | Chu kỳ lặp lại 1, 2, 5, 10 năm (như Nearing và cs., Nature 2024), Gumbel fit bằng L-moments trên qmax năm 1981–2013 (như AIFL) |
+| Sự kiện | Một sự kiện tính là phát hiện đúng nếu dự báo và quan trắc cùng vượt ngưỡng trong cửa sổ ±1 ngày (Nearing dùng 2 ngày với dữ liệu nhiều ngày lead) |
+| Chỉ số sự kiện | Tỉ lệ phát hiện (POD/recall), tỉ lệ báo động nhầm (FAR), precision, F1, CSI; sai số thời điểm đỉnh |
+| Ngưỡng kép (phân tích độ nhạy) | Ngưỡng của mô hình tính trên chính chuỗi dự báo của mô hình (Nearing 2024, AIFL); vì mô hình chỉ có dự báo 2003–2017 (gồm cả kỳ train), chỉ dùng làm phân tích phụ, nêu rõ hạn chế |
+| Cách đọc | Ưu tiên bỏ sót ít ở mức lũ và mức rất thấp, chấp nhận báo động nhầm nhiều hơn (GVHD); so các lõi ở từng mức |
 
-## 8. Lộ trình cải tiến hai tầng
+### 6.3. Kịch bản vận hành (chỉ suy luận)
 
-Đề tài cải tiến theo hai tầng: tầng 1 cải tiến quy trình dữ liệu, đầu vào, huấn luyện ngay trên LSTM của bài gốc; tầng 2 thay lõi thời gian (Mamba, Transformer, GRU, S4D) và dùng lại toàn bộ cải tiến của tầng 1. Các cải tiến tầng 1 không phụ thuộc kiến trúc, nên làm trên LSTM trước (nhanh, đã có sẵn trong NeuralHydrology) rồi áp dụng cho mọi lõi — so sánh ở tầng 2 vì vậy công bằng và mốc LSTM đủ mạnh.
-
-### 8.1. Việc bắt buộc trước khi cải tiến (chạy lại được bài gốc)
-
-| Việc | Lý do |
+| Kịch bản | Mô tả |
 |---|---|
-| Sửa đường dẫn trong 24 tệp `config.yml` (`data_dir`, `run_dir`, `train_basin_file`) | Ghi cứng đường dẫn máy tác giả (`/home/ok2907/...`) |
-| Dựng thư mục `LamaH_expanded_q_input` (chép `qmean` vào tệp khí tượng) | Biến thể có Q đọc thư mục này; không được công bố |
-| Sửa `_is_best_model` cho khớp ngưỡng dừng sớm | Có thể lưu epoch kém hơn tối đa 0,005 NSE validation; áp dụng chung cho mọi mô hình |
+| S0 | Đủ dữ liệu (như bài) |
+| S1 | Mất Q 1, 3, 7 ngày cuối |
+| S2 | Mất Q toàn cửa sổ (trạm hỏng dài hạn) |
+| S3 | Độ trễ thực tế: ERA5-Land thiếu 5 ngày cuối; E-OBS thiếu 180 ngày cuối; GLEAM thiếu toàn cửa sổ; MSWEP đủ (giả định bản NRT tương đương bản lịch sử); Q đủ tới t−1 |
+| S4 | S3 + mất Q 1 ngày cuối |
 
-### 8.2. Tầng 1 — cải tiến trên LSTM
+Mô hình không có masked mean không chạy được với giá trị thiếu: dùng cách điền đơn giản (giá trị gần nhất, khí hậu ngày) làm mốc so sánh. Báo cáo NSE theo từng kịch bản và mức suy giảm so với S0 cho mỗi lõi.
 
-Mỗi cải tiến chạy thành một thí nghiệm riêng (bật từng cái so với LSTM gốc), nhiều hạt giống, để biết đóng góp của từng cái.
+### 6.4. Theo lưu vực
 
-| Cải tiến | Điểm yếu của bài gốc mà nó xử lý | Bằng chứng công bố | Có sẵn trong NeuralHydrology |
+ΔNSE giữa Mamba (và S4D) với LSTM cải tiến; bản đồ; tương quan Spearman với 33 thuộc tính và khoảng cách Wasserstein tái phân tích – dự báo (mã phân tích của tác giả). Kiểm giả thuyết từ Wang và cs. (WRR 2025), Jing và cs. (ESWA 2026), Zhang và cs. (2026): SSM có lợi ở lưu vực tuyết, động lực chậm, bất lợi ở lũ nhanh — dùng tỷ lệ tuyết, độ cao, chỉ số khô hạn, diện tích. Tách nhóm đầu nguồn (72,5%) và lồng nhau (27,5%).
+
+### 6.5. Chi phí tính toán
+
+Số tham số, thời gian mỗi epoch, bộ nhớ GPU, thời gian suy luận cho 365 và 730 ngày — kiểm lập luận "Mamba tuyến tính theo độ dài chuỗi" trên bài toán thật.
+
+### 6.6. Giải thích mô hình
+
+Integrated Gradients (Captum) cho LSTM cải tiến và Mamba tốt nhất: mức ảnh hưởng theo ngày trong cửa sổ (độ dài nhớ hiệu dụng của từng lõi) và theo nhóm nguồn (tái phân tích, dự báo ECMWF, Q). Khác Demiray & Demir (SHAP, Iowa): tách đóng góp của dự báo thời tiết thật và Q quan trắc, so sánh độ dài nhớ giữa hai lõi.
+
+---
+
+## 7. Ma trận thí nghiệm theo bước
+
+Số lần huấn luyện ghi dạng "cấu hình × hạt giống". Mỗi bước có điều kiện chuyển bước.
+
+| Bước | Thí nghiệm | Số lần | Điều kiện chuyển bước |
 |---|---|---|---|
-| Giữ mẫu có dữ liệu thiếu thay vì bỏ cả mẫu, dùng *masked mean* (nhúng riêng từng nguồn khí tượng rồi lấy trung bình các nguồn có dữ liệu) | Bộ nạp bỏ mọi mẫu huấn luyện có giá trị thiếu ở bất kỳ biến nào trong 365 ngày; bài dùng 5 nguồn (ERA5-Land, E-OBS, MSWEP, GLEAM, ECMWF) — đúng bối cảnh nhiều nguồn mà phương pháp được thiết kế | Gauch và cs., HESS 29:6221–6235 (2025): trong ba cách (input replacing, masked mean, attention), masked mean tốt nhất với cách biệt nhỏ; attention không hơn masked mean; mô hình vận hành của Google dùng masked mean | Có lớp nhúng (`nan_handling_method`); **phải sửa bộ lọc mẫu** — trong bản fork, `basedataset.py` vẫn loại mẫu có giá trị thiếu dù bật tùy chọn này |
-| Hoàn thiện cách đưa lưu lượng quan trắc vào: cùng đơn vị với nhãn, thêm `qmax` các ngày trước, xử lý ngày thiếu Q | Bài đã đưa `qmean` quá khứ vào hindcast (NSE trung vị 0,63 → 0,71), nhưng `qmean` nhiều khả năng lệch đơn vị với nhãn và mẫu thiếu Q bị bỏ; phần cải thiện còn lại dự kiến nhỏ hơn nhiều so với mức tăng khi lần đầu thêm Q | Nearing và cs., HESS 26:5493–5513 (2022): tự hồi quy tăng NSE trung vị ~10% so với mô hình không dùng Q (0,796 → 0,879 trên 531 lưu vực CAMELS); khi huấn luyện, thay Q thiếu bằng giá trị mô hình dự báo để chịu được dữ liệu thiếu | Một phần: `lagged_features` (thêm Q trễ) dùng được cho mọi mô hình; `autoregressive_inputs` và cách thay Q thiếu chỉ có trong mô hình `arlstm` — với Sequential Forecast LSTM phải tự viết |
-| Chịu mất lưu lượng quan trắc: khi huấn luyện bỏ ngẫu nhiên Q (từng ngày và cả chuỗi, xác suất 0,1 cho từng ngày và 0,12 cho cả chuỗi như Gauch và cs.) qua cơ chế masked mean | Mô hình có Q cần Q đủ 365 ngày; trạm mất số liệu thì phải dùng mô hình khác; tác giả thử học chuyển giao để bỏ Q nhưng thất bại (Mục 3.4 của bài) | Hướng tương lai do tác giả BiasCast nêu (Mục 4); Gauch và cs. 2025 áp dụng cách bỏ ngẫu nhiên cho khí tượng, chưa cho Q; dữ liệu thiếu thực tế ít (`Document/03_Data/01_LamaHCE.md` Mục 6.1); mẫu train bị bộ lọc loại chủ yếu ở 27 trạm đo muộn và ngày thiếu Q — lấy lại một phần bằng sửa bộ lọc; masked mean chủ yếu cho khả năng chịu mất dữ liệu khi vận hành | Dùng lớp nhúng masked mean; phải tự thêm bước bỏ ngẫu nhiên Q khi huấn luyện |
-| Tổ hợp nhiều hạt giống (ensemble) | Bài chạy 1 hạt giống | Cách làm chuẩn của các công trình NeuralHydrology (tổ hợp LSTM trong Kratzert và cs., WRR 2019; tổ hợp 8 hạt giống trong Gauch và cs., Environ. Model. Softw. 2021) | Chỉ cần chạy nhiều lần rồi lấy trung bình |
-| Tinh chỉnh siêu tham số cho LSTM dự báo | Mọi cấu hình LSTM dự báo dùng chung 128 / 256 / 0,3 | Baste và cs., HESS 29:5871–5891 (2025): LSTM có giới hạn trên của lưu lượng dự báo được (73 mm/ngày, thấp hơn đỉnh 183 mm/ngày trong dữ liệu huấn luyện); tăng số chiều ẩn lên 256 kèm tập huấn luyện lớn hơn nâng giới hạn này lên 194 mm/ngày nhưng không bảo đảm dự báo đỉnh tốt hơn | Có (tối ưu Bayes như bài gốc) |
-| Đầu ra xác suất (CMAL) | Bài chỉ dự báo một giá trị | Klotz và cs., HESS 26:1673–1693 (2022): mô hình hỗn hợp cho ước lượng bất định đáng tin cậy | Có (`head: cmal`) — cho xác suất vượt ngưỡng lũ, dùng trực tiếp cho demo |
-| Ưu tiên đỉnh lũ trong huấn luyện (trọng số theo chu kỳ lặp lại, lấy mẫu thêm sự kiện lớn) | LSTM có xu hướng dự báo thấp đỉnh lũ | Baste và cs. 2025 khuyến nghị tăng trọng số sự kiện cực trị; Talbot & Davenport (preprint 2026) cho thấy có đánh đổi giữa kỹ năng đỉnh và kỹ năng chung; RiverMamba dùng trọng số theo chu kỳ lặp lại | Phải tự viết hàm mất mát |
+| 0 | Hạ tầng: fork riêng, wheel `mamba-ssm`, kiểm thử đơn vị (Mục 9.2), đo thời gian 1 epoch mỗi lõi | 0 (chạy thử ngắn) | Mọi kiểm thử qua; có bảng thời gian |
+| A1 | Khảo sát dữ liệu; ngưỡng mức và ngưỡng lũ tính trên 1981–2013 | 0 | Có tệp ngưỡng |
+| A2 | Chạy lại trọng số tác giả (Sequential có/không Q, Encoder–Decoder có Q, baseline chỉ dự báo) | 0 | NSE trung vị lệch số của tác giả không quá 0,005 |
+| A3 | Persistence (xong), PNSE, DLinear | DLinear 1 × 3 | |
+| A4 | Huấn luyện lại Sequential LSTM có Q theo cấu hình tác giả — đo nhiễu hạt giống (B0) | 1 × 3 | Có độ lệch chuẩn giữa hạt giống |
+| B1 | B0 + sửa lỗi lưu mô hình tốt nhất + Q cùng đơn vị mm/ngày + thêm `qmax` quá khứ vào nhóm Q | 1 × 3 | |
+| B2 | B1 + nhúng theo nguồn, masked mean + sửa bộ lọc mẫu | 1 × 3 | |
+| B3 | B2 + che dữ liệu khi huấn luyện, hai mức xác suất (0,1/0,12 và 0,05/0,05) | 2 × 3 | Chọn mức tốt hơn theo validation và theo S1–S4 |
+| B* | Chọn "LSTM cải tiến" theo validation; nếu B2, B3 không hơn B1 trên validation thì giữ cấu hình đơn giản hơn, nhưng vẫn báo cáo độ bền ở S1–S4 | 0 | |
+| C1 | Tinh chỉnh 5 lõi (LSTM, GRU, Transformer, S4D, Mamba) trên quy trình B* | 5 × 8 × 1 | |
+| C2 | Chạy chính thức: cấu hình cùng tham số và cấu hình tốt nhất của mỗi lõi | tối đa 5 × 2 × 3 | |
+| D | Hindcast 730 ngày cho LSTM, Mamba, S4D (cấu hình tốt nhất) | 3 × 3 | |
+| E | Mamba hai chiều; Transformer patch (dự phòng: Transformer tích chập, S5D) | 2 × 3 (+2 × 3) | Chỉ làm nếu C xong |
+| F | CMAL cho LSTM cải tiến và lõi SSM tốt nhất | 2 × 3 | |
+| GV | Thí nghiệm kiểm chứng gợi ý GVHD: lấy mẫu nhiều ngày mức cao (Y7) trên mô hình tốt nhất, đánh giá bằng Mục 6.2 | 1 × 3 | Bằng chứng trái chiều (Martel 2025) nên trình bày là kiểm chứng |
+| Đánh giá | Mục 6.1–6.5 cho mọi cấu hình chính thức | 0 | |
+| G | Giải thích mô hình, ngưỡng lũ, demo | 0 | |
 
-Đề xuất cho tiểu luận: bốn cải tiến đầu (dữ liệu thiếu, lưu lượng quan trắc, chịu mất lưu lượng quan trắc, tổ hợp hạt giống) — xuất phát trực tiếp từ điểm yếu tìm thấy trong mã của bài, chi phí thấp. Tinh chỉnh siêu tham số làm cùng ngân sách cho mọi lõi ở tầng 2. Đầu ra xác suất làm ở bước F của tiểu luận (Mục 9); ưu tiên đỉnh lũ để cho khóa luận.
+Tổng tối đa 112 lần huấn luyện (A: 6; B: 12; C: 40 + 30; D, E, F, GV: 9 + 6 + 6 + 3), ít hơn nếu cấu hình tốt nhất của một lõi trùng cấu hình cùng tham số, thêm 12 nếu làm biến thể dự phòng.
 
-### 8.3. Tầng 2 — thay lõi thời gian
+---
 
-Lõi Mamba, Transformer, GRU, S4D thay LSTM trong cùng khung (Mục 3), dùng cấu hình dữ liệu và huấn luyện tốt nhất của tầng 1, cùng ngân sách tinh chỉnh, cùng số hạt giống.
+## 8. Ngân sách tính toán, rủi ro và thứ tự cắt
 
-Thứ tự trong tầng 2: chạy **dạng thuần** của mỗi lõi trước (Mamba thuần, Transformer thuần chỉ thay LSTM, giữ nguyên mọi thứ khác), rồi mới tới **biến thể lai hoặc cải tiến** (ví dụ Mamba quét hai chiều trong hindcast, Mamba kết hợp attention hoặc Transformer, đưa thuộc tính tĩnh bằng LOAN). Mỗi biến thể so với dạng thuần của chính nó với cùng số tham số, để biết phần cải thiện đến từ lõi hay từ thành phần thêm vào. Nhảy thẳng vào mô hình lai thì không tách được hai phần này. Thêm trục độ dài hindcast (365 ngày và dài hơn) — kết hợp với cải tiến xử lý dữ liệu thiếu để không mất mẫu khi kéo dài chuỗi.
+### 8.1. Ngân sách
 
-### 8.4. Hướng mở rộng khác (ngoài đồ thị và XAI)
+- Từ 3 tài khoản Kaggle trở lên, mỗi tài khoản 30 giờ GPU/tuần, tối đa 12 giờ/phiên — khoảng 90 giờ/tuần. Chỉ dùng GPU T4 (`mamba-ssm` cần sm_75 trở lên; P100 không chạy được).
+- Thời gian mỗi lần trên T4 chưa đo (bài: vài phút tới khoảng 1 giờ trên RTX 4090). Bước 0 đo thật rồi lập lịch; ví dụ trung bình 45 phút/lần thì 112 lần cần khoảng 84 giờ GPU, tức khoảng một tuần với 3 tài khoản.
+- Mỗi tài khoản chạy một nhóm thí nghiệm; trọng số và nhật ký lưu thành Kaggle Dataset để đánh giá tập trung.
 
-| Hướng | Mô tả | Căn cứ | Phù hợp với BiasCast | Đề xuất |
-|---|---|---|---|---|
-| Ghép dữ liệu giờ vào quá khứ gần | Giữ hindcast xa theo ngày, thêm vài ngày gần nhất theo giờ (khí tượng giờ mức A, Q giờ) | Ý tưởng MF-LSTM (Acuña Espinoza và cs., HESS 2025); tác giả BiasCast tự nêu hạn chế "chỉ dữ liệu ngày" | Nhãn qmax là đỉnh lấy từ dữ liệu giờ, nên thông tin giờ gần nhất có lý do để giúp; dữ liệu giờ đã có trên Kaggle | Khóa luận (Mục 9) |
-| Dự báo xác suất | Đầu CMAL cho phân phối qmax, suy ra xác suất vượt ngưỡng lũ | Klotz và cs., HESS 2022 | Có sẵn trong NeuralHydrology; dùng trực tiếp cho demo cảnh báo | Tiểu luận, bước F (Mục 9) |
-| Ưu tiên đỉnh lũ | Trọng số theo chu kỳ lặp lại, lấy mẫu thêm sự kiện lớn | Baste và cs. 2025; Talbot & Davenport (preprint 2026) — có đánh đổi với kỹ năng chung | Cần tự viết hàm mất mát | Khóa luận |
-| Dự báo nhiều ngày | Lead 1–7 ngày | Tác giả BiasCast nêu là nghiên cứu tiếp theo của nhóm | Bài chỉ dùng dự báo trước 1 ngày; Extended LamaH-CE có vẻ chỉ có dự báo cho ngày t (chưa xác nhận trên dữ liệu) — cần nguồn dự báo khác (Caravan MultiMet) | Khóa luận |
-| Mô hình lai vật lý (bảo toàn khối lượng) | MC-LSTM có sẵn trong NeuralHydrology | Bằng chứng trái chiều: Frame và cs. (HESS 2022) thấy MC-LSTM kém LSTM ở sự kiện cực trị; Baste và cs. 2025 thấy mô hình lai ngoại suy đỉnh tốt hơn | Rủi ro cao | Không đề xuất cho tiểu luận |
-| xLSTM làm thêm một lõi | Biến thể LSTM mới (Beck và cs., 2024) | Nghiên cứu nhiều lưu vực mới ở dạng preprint (SSRN); các bài đăng tạp chí chủ yếu một lưu vực hoặc MDPI | Thay lõi trong cùng khung như Mamba | Tùy chọn, chưa chốt |
-| Mô hình nền tảng chuỗi thời gian (dự báo không huấn luyện) | Làm mốc so sánh kiểu "AI tổng quát" | Sun & Sun (Machine Learning: Earth 2026): MOIRAI, Chronos, TTM, Sundial dự báo không huấn luyện trên CAMELS-US (`Document/05_Survey/01_Datasets.md`) | Chỉ làm mốc, không phải cải tiến | Tùy chọn |
+### 8.2. Rủi ro
 
-### 8.5. Câu hỏi nghiên cứu theo hai tầng
+| Rủi ro | Cách xử lý |
+|---|---|
+| Không cài được `mamba-ssm` trên Kaggle | Đã có notebook công khai build `mamba_ssm` 2.3.1 cho Python 3.12 trên Kaggle; dự phòng `mambapy` (PyTorch thuần, quét song song, chậm hơn) |
+| Mamba quá khớp sớm (như Shahriar 2026) | Dừng sớm theo validation, dropout, theo dõi NSE validation và test mỗi epoch |
+| Lõi mới học kém do siêu tham số của LSTM | Tinh chỉnh cùng ngân sách có learning rate (Mục 5.2) |
+| Masked mean, che dữ liệu làm giảm NSE ở S0 | Vẫn báo cáo; chọn B* theo validation; lợi ích ở kịch bản S1–S4 |
+| Ngưỡng lũ 10 năm có ít sự kiện trong 4 năm test | Báo cáo số sự kiện; kết luận chính dựa trên 1 và 2 năm |
+| Thời gian chạy vượt dự kiến | Cắt theo Mục 8.3 |
 
-1. Các cải tiến quy trình (xử lý dữ liệu thiếu, tự hồi quy, chịu mất lưu lượng quan trắc, tổ hợp) cải thiện LSTM của bài gốc bao nhiêu so với NSE trung vị 0,71 và so với persistence; mô hình giữ được bao nhiêu độ chính xác khi mất Q hoặc tái phân tích đến trễ.
-2. Trên quy trình đã cải tiến, lõi Mamba có hơn LSTM và các lõi khác không, hơn ở loại lưu vực nào, và chuỗi quá khứ dài hơn có giúp không.
+### 8.3. Thứ tự cắt nếu thiếu thời gian
 
-Lưu ý: hiệu quả của các cải tiến trên dữ liệu LamaH-CE chưa được kiểm; bằng chứng ở trên đến từ các bộ dữ liệu khác (chủ yếu CAMELS-US và Thụy Sĩ).
+Cắt từ trên xuống, không ảnh hưởng RQ2–RQ4: (1) biến thể dự phòng ở bước E; (2) thí nghiệm GV; (3) giải thích mô hình; (4) biến thể chính ở bước E; (5) 730 ngày cho S4D; (6) tinh chỉnh giảm từ 8 xuống 4 cấu hình mỗi lõi.
 
-## 9. Phạm vi đề xuất cho tiểu luận và khóa luận
+---
 
-Nguyên tắc chọn phạm vi: tiểu luận làm trọn một câu chuyện "tái lập → cải tiến LSTM → so sánh lõi → giải thích → demo" với số lần huấn luyện vừa quota GPU miễn phí; mọi hướng cần thêm dữ liệu hoặc nhiều mã mới để cho khóa luận.
+## 9. Hạ tầng và tổ chức mã
 
-### 9.1. Tiểu luận
+### 9.1. Khung và nơi chạy
 
-| Bước | Nội dung | Số lần huấn luyện (ước tính) | Sản phẩm |
+- Fork riêng của bản fork NeuralHydrology của tác giả (`conestone/neuralhydrology`), sửa trên nhánh riêng; notebook Kaggle cài bằng `pip install git+…`. Bản gốc trong `PaperResearch/PaperResearchCode/` giữ nguyên để đối chiếu. Tên tài khoản và nhánh: chưa chốt.
+- Kaggle chính, Colab dự phòng; mã chạy được trên cả hai.
+
+### 9.2. Kiểm thử đơn vị trước khi huấn luyện
+
+| Kiểm thử | Mục đích |
+|---|---|
+| Mô hình chung với lõi LSTM nạp trọng số tác giả cho đầu ra trùng Sequential Forecast LSTM (sai khác dưới 10⁻⁵) | Bảo đảm khung chung đúng |
+| Mamba nhận tensor (batch, length, dim) | Tránh lỗi trục như lớp có sẵn |
+| Không rò rỉ: đổi đầu vào sau ngày t không đổi dự báo | Kiểm mặt nạ nhân quả, quét hai chiều |
+| Bộ lọc mẫu mới giữ mẫu có NaN đầu vào, loại mẫu thiếu nhãn | Kiểm sửa `_validate_samples` |
+| Masked mean với một nhóm bị che cho kết quả hữu hạn | Kiểm đường đi NaN |
+| Số tham số các lõi ở mức cùng tham số lệch không quá 5% | Kiểm giao thức Mục 5.2 |
+
+### 9.3. Thư mục mã
+
+Mã đặt trong `Workspace/`, mỗi thư mục con một việc, tệp đánh số theo thứ tự chạy; mỗi notebook một tệp `.py` tự đủ, có mục lục, chia cell theo "Phần".
+
+| Thư mục | Việc | Trạng thái |
+|---|---|---|
+| `01_Download/` | Tải dữ liệu | Xong |
+| `02_Exploration/` | Khảo sát dữ liệu, ngưỡng | Chưa viết |
+| `03_Baseline/` | Tái lập, persistence, DLinear, nhiễu hạt giống | Chưa viết |
+| `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Chưa viết |
+| `05_Training/` | Notebook huấn luyện theo bước B–F | Chưa viết |
+| `06_Evaluation/` | Bộ đánh giá Mục 6 | Chưa viết |
+| `07_Demo/` | Demo | Chưa viết |
+
+Tên thư mục từ `04_` trở đi là đề xuất, đặt khi bắt đầu viết mã.
+
+---
+
+## 10. Đối chiếu với pipeline của BiasCast
+
+| Giai đoạn | BiasCast | Đề tài | Giống / khác |
 |---|---|---|---|
-| A. Dữ liệu và mốc | Khảo sát dữ liệu; chạy lại trọng số của tác giả trên test; persistence | 0 (chỉ suy luận) | Bảng mốc: số tác giả, số chạy lại, persistence |
-| B. Tầng 1 — cải tiến LSTM | LSTM gốc chạy lại; + xử lý dữ liệu thiếu (masked mean, sửa bộ lọc mẫu); + hoàn thiện đầu vào lưu lượng (cùng đơn vị, Q trễ, xử lý Q thiếu); + kết hợp cả hai; + huấn luyện bỏ ngẫu nhiên Q để chịu mất lưu lượng quan trắc. Mỗi cấu hình 3 hạt giống, trung bình 3 hạt giống là kết quả tổ hợp | 5 cấu hình × 3 = 15 | Bảng đóng góp từng cải tiến; "LSTM cải tiến" |
-| C. Tầng 2 — lõi thuần | GRU, Transformer, S4D, Mamba thay LSTM trên quy trình đã cải tiến; cùng ngân sách tinh chỉnh nhỏ (số chiều ẩn 64 / 128 / 256 trên validation) cho mọi lõi | 4 lõi × 3 = 12, cộng tinh chỉnh | Bảng so sánh kiến trúc |
-| D. Chuỗi dài | LSTM và Mamba với hindcast 365 và 730 ngày | 2 × 3 = 6 | Trả lời "chuỗi dài hơn có giúp không" |
-| E. Biến thể cải tiến | Một biến thể Mamba (ứng viên: quét hai chiều trong hindcast) và một biến thể Transformer (ứng viên: chia chuỗi thành đoạn — patch — như PatchTST, ICLR 2023), mỗi biến thể so với bản thuần của chính nó cùng số tham số; có cả hai để so sánh giữa các lõi ở mức cải tiến vẫn công bằng | 2 × 3 = 6 | Kiểm chứng một ý cải tiến cho mỗi lõi chính |
-| F. Dự báo xác suất | Đầu CMAL trên cấu hình tốt nhất | 3 | Xác suất vượt ngưỡng lũ cho demo |
-| Đánh giá mở rộng (cho B–F) | Kịch bản vận hành: mất Q 1, 3, 7 ngày cuối và mất hẳn; tái phân tích 5 ngày cuối của hindcast không có (ERA5 công bố trễ 5 ngày). So sánh theo lưu vực: ΔNSE giữa Mamba và LSTM cải tiến, đếm số lưu vực tốt lên / kém đi, tương quan Spearman với 33 thuộc tính và khoảng cách Wasserstein tái phân tích – dự báo (dùng lại mã phân tích của tác giả) | 0 (chỉ suy luận) | Độ chính xác khi dữ liệu đến trễ hoặc mất; Mamba hơn ở loại lưu vực nào |
-| Đánh giá theo mức lưu lượng (cho A–F) | Ma trận nhầm lẫn, tỉ lệ phát hiện và báo động nhầm ở mức lũ, FHV, FLV (Mục 7) | 0 (chỉ suy luận) | Mô hình mạnh, yếu ở dải lưu lượng nào |
-| G. XAI, ngưỡng lũ, demo | Integrated Gradients theo ngày và nhóm biến cho LSTM cải tiến và Mamba; ngưỡng chu kỳ lặp lại từ qmax năm 1981–2017; bản đồ 451 lưu vực | 0 | Hình XAI, ngưỡng, demo |
+| Dữ liệu | ERA5-Land, E-OBS, MSWEP, GLEAM, ECMWF HRES theo lưu vực | Cùng dữ liệu Zenodo | Giống |
+| Bộ nạp | Loại mẫu có bất kỳ giá trị thiếu nào; Q đầu vào khác đơn vị nhãn | Sửa bộ lọc; nhóm theo nguồn; Q cùng đơn vị | Sửa lỗi, mở rộng |
+| Mô hình | Chỉ LSTM (tác giả tự nêu hạn chế, Mục 3.7) | LSTM, GRU, Transformer, S4D, Mamba trong khung chung | Khoảng trống chính |
+| Huấn luyện | NSE*, tối ưu Bayes, 1 hạt giống | Giữ NSE* và lịch học; tinh chỉnh cùng ngân sách; 3 hạt giống | Khác số hạt giống, giao thức tinh chỉnh |
+| Đánh giá | NSE, KGE; cận trên, cận dưới | Thêm persistence, PNSE, theo mức, theo sự kiện lũ, kịch bản vận hành, kiểm định | Mở rộng |
+| Tái lập, XAI, ngưỡng lũ, demo | Không có | Có | Chỉ có ở đề tài |
 
-Tổng khoảng 42 lần huấn luyện cộng tinh chỉnh. Thời gian mỗi lần trên T4/P100 chưa đo (bài báo: vài phút tới khoảng 1 giờ trên RTX 4090) — đo ở lần chạy đầu của bước B để chỉnh số hạt giống nếu vượt quota.
+---
 
-Thứ tự cắt nếu thiếu thời gian (cắt từ trên xuống, không ảnh hưởng hai câu hỏi nghiên cứu chính ở Mục 8.5): (1) giải thích mô hình XAI ở bước G; (2) biến thể cải tiến ở bước E; (3) chuỗi 730 ngày ở bước D. Tầng 1, tầng 2 dạng thuần, đánh giá mở rộng, đánh giá theo mức lưu lượng và demo giữ nguyên.
-
-Kết quả nào cũng thành câu trả lời: cải tiến tầng 1 giúp bao nhiêu; mô hình giữ được bao nhiêu độ chính xác khi mất lưu lượng quan trắc hoặc dữ liệu đến trễ; Mamba hơn, ngang hay kém LSTM trên cùng quy trình và ở loại lưu vực nào; chuỗi dài có giúp không.
-
-### 9.2. Khóa luận
+## 11. Khóa luận
 
 | Hướng | Lý do để sau |
 |---|---|
-| Ghép dữ liệu giờ vào quá khứ gần | Cần dựng bộ nạp ghép hai độ phân giải; dữ liệu đã có |
-| Dự báo nhiều ngày | Cần nguồn dự báo nhiều lead (Caravan MultiMet) |
-| Ưu tiên đỉnh lũ trong hàm mất mát | Có đánh đổi với kỹ năng chung, cần thí nghiệm riêng |
-| Đồ thị mạng sông giữa các lưu vực lồng nhau | Cần dựng đồ thị và mô-đun không gian |
-| Thêm biến thể lai (Mamba + attention, Mamba–Transformer, LOAN), xLSTM | Sau khi có kết quả dạng thuần |
-| Nâng demo thành phần mềm ứng dụng | Yêu cầu của khóa luận |
+| Ghép dữ liệu giờ vào quá khứ gần (MF-LSTM) | Cần bộ nạp hai độ phân giải; dữ liệu giờ đã có (`lamah-ce-core`, `lamah-ce-extra`) |
+| Dự báo nhiều ngày | Extended LamaH-CE chỉ có dự báo cho ngày t (chưa xác nhận trên dữ liệu); cần nguồn dự báo nhiều lead |
+| Hàm mất mát ưu tiên đỉnh lũ | Có đánh đổi với kỹ năng chung (Baste 2025; Talbot & Davenport, preprint 2026) |
+| Đồ thị mạng sông | Đồ thị thô không tự cải thiện (Kirschstein & Sun 2024); GAT, reachability có bằng chứng (Mosaffa 2026, Wang 2025) |
+| Biến thể lai Mamba–Transformer (SST), LOAN, xLSTM | Sau khi có kết quả dạng thuần |
+| Phần mềm ứng dụng | Yêu cầu của khóa luận |
+
+---
+
+## 12. Việc chưa chốt
+
+| Việc | Ghi chú |
+|---|---|
+| Tài khoản và nhánh của fork NeuralHydrology | Cần trước bước 0 |
+| Công nghệ và nơi triển khai demo | Cần trước bước G |
+| Tên nội bộ tiểu luận | `01_OverallPlan.md` Mục 1 |
+
+---
+
+## 13. Căn cứ chính cho các quyết định
+
+| Quyết định | Căn cứ |
+|---|---|
+| Masked mean theo nhóm nguồn, che dữ liệu khi huấn luyện | Gauch và cs., HESS 29:6221–6235 (2025); MF²LSTM (EGUsphere 2026); mã fork (`basedataset.py`, `inputlayer.py`) |
+| Độ trễ từng nguồn | Copernicus (ERA5, E-OBS mỗi 6 tháng); GloH2O (MSWEP NRT 2–3 giờ); GLEAM4 (Scientific Data 2025, cập nhật mỗi năm); BiasCast Mục 3.7 (eHYD 2 giờ) |
+| Giao thức cùng tham số | Shahriar (SSRN 2026); Liu và cs. (J. Hydrol. 2024) |
+| PNSE | MF²LSTM (EGUsphere 2026) |
+| Chu kỳ lặp lại 1, 2, 5, 10 năm; precision, recall, F1; cửa sổ thời gian | Nearing và cs., Nature 627 (2024) |
+| Gumbel L-moments | AIFL (Taccari và cs., J. Hydrol. 2026) |
+| Đoạn đường duy trì lưu lượng | Yilmaz, Gupta, Wagener, WRR 44 (2008) |
+| Wilcoxon signed-rank + Cohen's d | Kratzert và cs. (2019, 2024); Gauch và cs. (2025); Nearing và cs. (2024) |
+| Siêu tham số khởi điểm S4D | Wang và cs., WRR 2025, phụ lục S4D-FT |
+| PatchTST, DLinear | Nie và cs. (ICLR 2023); Zhang và cs. (J. Hydrol. 2026) |
+| Trạng thái chạy liên tục thay vì handoff | BiasCast Mục 3.6 |
