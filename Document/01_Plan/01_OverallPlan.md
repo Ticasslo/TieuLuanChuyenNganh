@@ -1,4 +1,4 @@
-# Kế hoạch nghiên cứu: Dự báo lưu lượng dòng chảy bằng Mamba (State Space Model)
+# Kế hoạch tổng thể của đề tài
 
 > Kế hoạch tổng thể cho tiểu luận chuyên ngành → khóa luận tốt nghiệp. Chi tiết pipeline, kiến trúc, lộ trình cải tiến và phạm vi: `Document/01_Plan/03_Pipeline.md`. Giới thiệu bài cơ sở: `Document/01_Plan/02_BasePaper.md`. Sơ đồ: `Diagrams/ProjectDiagram.drawio`. Các mục ghi "chưa chốt" chờ quyết định, chưa được điền.
 
@@ -18,7 +18,7 @@ Ràng buộc: tên không có chữ "lũ lụt" — đầu ra là lưu lượng 
 
 ## 2. Bài toán
 
-- **Đầu ra:** lưu lượng lớn nhất ngày t (qmax) tại trạm cửa ra của từng lưu vực, dự báo trước 1 ngày. Q (m³/s) được bộ nạp NeuralHydrology đổi sang mm/ngày theo diện tích lưu vực: Q = q × diện tích (km²) / 86,4.
+- **Đầu ra:** lưu lượng lớn nhất ngày t (qmax) tại trạm cửa ra của từng lưu vực, dự báo trước 1 ngày như bài cơ sở; mở rộng dự báo 1–7 ngày ở bước H (`03_Pipeline.md` Mục 4.4). Q (m³/s) được bộ nạp NeuralHydrology đổi sang mm/ngày theo diện tích lưu vực: Q = q × diện tích (km²) / 86,4.
 - **Đầu vào:** 364 ngày quá khứ (31 biến khí tượng tái phân tích và quan trắc lưới + Q quá khứ), 5 biến dự báo thời tiết ECMWF HRES cho ngày t, 33 thuộc tính tĩnh của lưu vực.
 - **Q ≠ mực nước:** quy đổi cần đường quan hệ mực nước – lưu lượng riêng từng mặt cắt, ngoài phạm vi đề tài.
 - **Cách học:** một mô hình chung cho 451 lưu vực, mỗi lưu vực dự báo độc lập.
@@ -81,8 +81,8 @@ Câu hỏi nghiên cứu, đóng góp, tính mới, giao thức so sánh và ma 
 
 - **Chính:** NSE, KGE, PNSE (NSE lấy persistence làm mốc) theo từng lưu vực trên test 2014–2017; trung vị, phân vị, đường CDF, số lưu vực tốt lên / kém đi.
 - **Kiểm định:** Wilcoxon signed-rank ghép cặp theo lưu vực kèm Cohen's d, hiệu chỉnh Holm khi so nhiều cặp.
-- **Theo mức lưu lượng (yêu cầu GVHD):** bốn mức theo đoạn đường duy trì lưu lượng (Yilmaz 2008), ngưỡng riêng từng lưu vực tính trước kỳ test; ma trận nhầm lẫn, %BiasFHV/FMS/FLV.
-- **Theo sự kiện lũ:** ngưỡng chu kỳ lặp lại 1, 2, 5, 10 năm (Gumbel, L-moments); POD, FAR, precision, F1, CSI trong cửa sổ ±1 ngày; sai số thời điểm đỉnh.
+- **Theo mức lưu lượng (yêu cầu GVHD):** bốn mức theo xác suất vượt của đường duy trì lưu lượng (dựa trên ba đoạn của Yilmaz 2008, thêm mức 0,02–0,2 nằm giữa), ngưỡng riêng từng lưu vực tính trước kỳ test; ma trận nhầm lẫn, %BiasFHV/FMS/FLV.
+- **Theo sự kiện lũ:** ngưỡng chu kỳ lặp lại 1, 2, 5, 10 năm (Gumbel, L-moments); POD, FAR, precision, F1, CSI trong cửa sổ ±1 ngày (±2 ngày cho dự báo nhiều ngày, như Nearing và cs. 2024); sai số thời điểm đỉnh.
 - **Kịch bản vận hành:** mất Q, độ trễ thực tế của từng nguồn dữ liệu.
 - **Độ tin cậy và chi phí:** 3 hạt giống mỗi cấu hình; chọn checkpoint theo validation, NSE test ghi mỗi epoch chỉ để theo dõi; số tham số, thời gian, bộ nhớ.
 
@@ -104,7 +104,8 @@ Chi tiết: `Document/01_Plan/03_Pipeline.md` Mục 6.
 - Công cụ nghiên cứu, không thay cảnh báo chính thức; cần người kiểm tra.
 - Mô hình học trên tái phân tích suy giảm khi chạy với dự báo thời tiết thật — BiasCast đo được NSE trung vị 0,58 → 0,33; đề tài dùng dự báo thật ngay từ đầu vào.
 - Dữ liệu chỉ ở Trung Âu (Áo và vùng lân cận); khả năng áp dụng cho Việt Nam chưa được kiểm chứng.
-- Extended LamaH-CE dùng giấy phép CC BY-NC 4.0 (không thương mại); bản 1.0 ghi chưa phải bản sửa cuối.
+- Extended LamaH-CE dùng giấy phép CC BY-NC 4.0 (không thương mại); bản 1.0 ghi chưa phải bản sửa cuối. Hai nguồn bên trong cũng chỉ cho dùng phi thương mại: MSWEP (CC BY-NC 4.0, tài liệu MSWEP v3.16 của GloH2O), E-OBS (nghiên cứu và giáo dục phi thương mại, chính sách dữ liệu ECA&D). Đề tài và demo là nghiên cứu, giáo dục phi thương mại; sản phẩm thương mại sau này phải thay nguồn dữ liệu.
+- Trang Zenodo của LamaH-CE ghi số liệu lưu lượng của Cộng hòa Séc không được dùng để dựng hệ thống cảnh báo vận hành (điều kiện của CHMI); demo của đề tài chỉ phát lại kỳ test để minh họa, không phải hệ thống cảnh báo.
 
 ---
 

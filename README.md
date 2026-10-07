@@ -18,7 +18,7 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `Tools/` | Công cụ phụ trợ: chuyển giọng nói buổi họp thành văn bản, sinh sơ đồ đề tài |
 | `PaperResearch/` | PDF tham khảo (`PaperResearchPDF/`, ghi chú từng bài ở `Document/05_Survey/03_PaperNotes.md`) và mã tác giả BiasCast (`PaperResearchCode/`, hai submodule trỏ tới `conestone/biascast`, `conestone/neuralhydrology` — chỉ để đọc, không sửa) |
 
-PDF chỉ dùng nội bộ nhóm (repo riêng tư). Giấy phép MIT trong `LICENSE` chỉ áp dụng cho mã và tài liệu do nhóm viết; PDF thuộc bản quyền của nhà xuất bản, thư viện NeuralHydrology (`NeuralHydrology/`, `PaperResearch/PaperResearchCode/BiasCast_NH`) theo giấy phép BSD 3-Clause; kho `conestone/biascast` không có tệp giấy phép nên chỉ dùng để đọc, tham khảo; dữ liệu Extended LamaH-CE theo CC BY-NC 4.0.
+PDF trong `PaperResearch/PaperResearchPDF/` để nhóm tham khảo. Giấy phép MIT trong `LICENSE` chỉ áp dụng cho mã và tài liệu do nhóm viết; PDF thuộc bản quyền của nhà xuất bản, thư viện NeuralHydrology (`NeuralHydrology/`, `PaperResearch/PaperResearchCode/BiasCast_NH`) theo giấy phép BSD 3-Clause; kho `conestone/biascast` không có tệp giấy phép nên chỉ dùng để đọc, tham khảo; dữ liệu Extended LamaH-CE theo CC BY-NC 4.0.
 
 ## Làm việc chung
 

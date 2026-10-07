@@ -1,6 +1,6 @@
 # RiverMamba — Ghi chú đọc mã nguồn (tài liệu tham khảo)
 
-> Tài liệu tổng hợp kết quả đọc repo chính thức của RiverMamba (Shams Eddin, Zhang, Kollet, Gall — NeurIPS 2025; DOI proceedings `10.52202/085713-4446`; arXiv 2505.22535; mã nguồn `github.com/HakamShams/RiverMamba_code`, đọc ngày 26/8/2026). Đề tài không chạy hay fine-tune RiverMamba (đề tài dùng 4 bộ dữ liệu benchmark theo lưu vực, xem `Document/01_Plan/01_OverallPlan.md`); tài liệu này dùng để tham khảo kiến trúc, hàm mất mát, quy ước dữ liệu và kinh nghiệm cài đặt `mamba-ssm` trên Colab/Kaggle. Thư mục `docs/` của repo chỉ chứa ảnh và poster, không có tài liệu văn bản bổ sung.
+> Tài liệu tổng hợp kết quả đọc repo chính thức của RiverMamba (Shams Eddin, Zhang, Kollet, Gall — NeurIPS 2025; DOI proceedings `10.52202/085713-4446`; arXiv 2505.22535; mã nguồn `github.com/HakamShams/RiverMamba_code`, đọc ngày 26/8/2026). Đề tài không chạy hay fine-tune RiverMamba (đề tài dùng dữ liệu theo lưu vực Extended LamaH-CE, xem `Document/01_Plan/01_OverallPlan.md`); tài liệu này dùng để tham khảo kiến trúc, hàm mất mát, quy ước dữ liệu và kinh nghiệm cài đặt `mamba-ssm` trên Colab/Kaggle. Thư mục `docs/` của repo chỉ chứa ảnh và poster, không có tài liệu văn bản bổ sung.
 
 ---
 
@@ -129,7 +129,7 @@ BibTeX trong README repo dùng bản arXiv (`arXiv:2505.22535`, 2025). Bản ch�
 
 ## 11. Các điểm tham khảo cho đề tài
 
-- LOAN có trong mã (`models/loan.py`): `(X − μ)/σ + GELU(Linear(X_static))` — phù hợp với thuộc tính tĩnh lưu vực của các bộ dữ liệu benchmark.
+- LOAN có trong mã (`models/loan.py`): `(X − μ)/σ + GELU(Linear(X_static))` — phù hợp với thuộc tính tĩnh lưu vực của Extended LamaH-CE.
 - Hàm mất mát: biến đổi `sign(x)·log1p(|x|)` trên chênh lệch lưu lượng trước MSE/L1, trọng số theo return period (ưu tiên lũ hiếm) nhân trọng số lead time `exp(|t − max_t|·alpha)`; đầu ra là chênh lệch so với hiện tại, 7 đầu MLP cho 7 lead time.
 - Bidirectional Mamba trong RiverMamba quét chuỗi **không gian** (space-filling curve), không phải chuỗi thời gian.
 - Checkpoint không dùng lại được cho dữ liệu theo lưu vực: lớp đầu vào cố định theo 136 biến lưới 0,05° (4 GloFAS + 32 ERA5-Land + 1 CPC + 99 tĩnh).

@@ -46,8 +46,8 @@ BANDS = [
     ("1. Dữ liệu đầu vào", [
         ("Hindcast 364 ngày × 31 biến (ERA5-Land, E-OBS, MSWEP, GLEAM), một khối chung",
          [("B", "B2. Chia nhóm theo nguồn dữ liệu"), ("C", "D. Mở rộng 730 ngày (LSTM, Mamba, S4D)")]),
-        ("Q quá khứ: qmean khác đơn vị nhãn, thiếu ngày → mất mẫu",
-         [("B", "B1. Q cùng đơn vị mm/ngày, thêm qmax quá khứ, nhóm Q riêng"),
+        ("Q quá khứ: qmean (đơn vị chưa kiểm, kiểm ở A4), thiếu ngày → mất mẫu",
+         [("B", "B1. Q cùng đơn vị mm/ngày với nhãn, thêm qmax quá khứ; B2: nhóm Q riêng"),
           ("B", "B3. Che dữ liệu khi huấn luyện (0,1/0,12 và 0,05/0,05)")]),
         ("Forecast ngày t: 5 biến ECMWF HRES",
          [("C", "H. Dự báo 1–7 ngày: ngày đầu ECMWF thật, các ngày sau để trống; so với chỉ quá khứ và dự báo hoàn hảo")]),
@@ -92,9 +92,10 @@ BANDS = [
     ]),
 ]
 CUT_ORDER = ("Thứ tự cắt khi thiếu thời gian: (1) biến thể dự phòng bước E → (2) kiểm chứng lấy mẫu lũ"
-             " → (3) giải thích mô hình → (4) biến thể chính bước E → (5) 730 ngày cho S4D"
-             " → (6) cách dự báo hoàn hảo ở bước H → (7) tinh chỉnh 8 → 4 cấu hình mỗi lõi")
-THESIS = ("Khóa luận: dữ liệu giờ, dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật, hàm mất mát ưu tiên đỉnh, đồ thị mạng sông,"
+             " → (3) CMAL bước F → (4) giải thích mô hình → (5) biến thể chính bước E → (6) 730 ngày cho S4D"
+             " → (7) cách dự báo hoàn hảo ở bước H → (8) tinh chỉnh 8 → 4 cấu hình mỗi lõi")
+THESIS = ("Khóa luận: đồ thị mạng sông, tiền huấn luyện trên tái phân tích 1981–2002, so với khung mã nguồn mở của Google, dữ liệu giờ,"
+          " dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật, hàm mất mát ưu tiên đỉnh,"
           " biến thể lai Mamba–Transformer, xLSTM, phần mềm ứng dụng")
 
 # %% Phần 3 — Bố cục tọa độ và ghi tệp

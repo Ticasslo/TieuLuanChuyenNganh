@@ -36,7 +36,7 @@
 | Venue CNTT hạng cao nhất | **ICML 2024 (CORE A\*)** | Expert Systems with Applications | AI Science and Engineering (IEEE) | **ACM SIGSPATIAL 2025 (CORE A)** |
 | Kết quả mốc để đối chiếu | LSTM NSE 0,46 → LSTM-GAT 0,61 | S4D NSE 0,756 · S5D 0,763 | — | NSE trung vị 0,74 · KGE trung vị 0,79 (benchmark gốc, 120 giờ) |
 | Mã nguồn công khai | ✅ Mô hình GNN của ICML 2024 + bộ đọc dữ liệu (neuralhydrology) | Bộ đọc dữ liệu (thư viện neuralhydrology, gồm `camelsus` và `hourlycamelsus`) | — | ✅ Dataset + mô hình HydroGAT |
-| Giấy phép | CC-BY 4.0 | Công khai (NCAR/UCAR) | Công khai (cơ quan chính phủ Mỹ) | Công khai (FAIR) |
+| Giấy phép | CC BY-SA 4.0 (bản gốc); Extended LamaH-CE: CC BY-NC 4.0 | Công khai (NCAR/UCAR) | Công khai (cơ quan chính phủ Mỹ) | Công khai (FAIR) |
 | Dung lượng | 1,5 GB (ngày) · 14,8 GB (ngày + giờ) | ~15 GB nén · ~130 GB giải nén | Theo truy vấn (CSV) | Repo GitHub ~7,6 GB (gồm dữ liệu thô và dữ liệu đã xử lý) |
 | DOI dữ liệu | [10.5281/zenodo.4525244](https://doi.org/10.5281/zenodo.4525244) | [10.5065/D6MW2F4D](https://dx.doi.org/10.5065/D6MW2F4D) · [10.5065/D6G73C3Q](https://doi.org/10.5065/D6G73C3Q) | cbr.washington.edu/dart | [10.5194/essd-14-5605-2022](https://doi.org/10.5194/essd-14-5605-2022) |
 
@@ -309,7 +309,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | 3 | Global Daily Discharge Estimation Based on Grid LSTM and River Routing | LamaH-CE (một phần) | Grid LSTM | Water Resources Research | 2025 | Q1\* | ❌ | 49 |
 | 4 | BiasCast | LamaH-CE | LSTM | HESS | 2026 | Q1\* | ❌ | 3 (bản preprint) |
 | 5 | A Deep State Space Model for Rainfall-Runoff Simulations | CAMELS-US | **S4D-FT** | Water Resources Research | 2025 | Q1\* | ❌ | 9 |
-| 6 | HydroDiffusion | CAMELS-US | Diffusion + **S4D-FT** | arXiv | 2025 | Preprint | — | — |
+| 6 | HydroDiffusion | CAMELS-US | Diffusion + **S4D-FT** | Water Resources Research | 2026 | Q1\* | ❌ | — |
 | 7 | Benchmarking structured state space models for differentiable parameter learning | CAMELS-US | **S4D, S5D** | **Expert Systems with Applications** | 2026 | Q1\* | ✅ | 0 |
 | 8 | Temporal inductive biases in hourly flood forecasting | CAMELS-US | LSTM, PatchTST, **Mamba** | Journal of Hydrology | 2026 | Q1\* | ❌ | 1 |
 | 9 | Zero-shot forecasting of streamflow using time series foundation models | CAMELS-US | MOIRAI, Chronos, TTM, Sundial | Machine Learning: Earth | 2026 | Chưa xếp hạng | — | 1 |
@@ -384,9 +384,9 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | Dữ liệu | Extended LamaH-CE, **451 lưu vực** ít chịu tác động của con người |
 | Chia dữ liệu | Train 2003–2009 / Validation 2010–2013 / Test 2014–2017 |
 | Mô hình | Sequential Forecast LSTM, Encoder-Decoder LSTM, transfer learning với mạng embedding riêng cho đầu vào tĩnh và động |
-| Chỉ số | NSE trung bình theo lưu vực |
+| Chỉ số | NSE, KGE theo lưu vực (báo cáo trung vị, phân vị, CDF) |
 | Kết quả | Khi chuyển từ dữ liệu tái phân tích sang dữ liệu dự báo khí tượng thực, **NSE trung vị giảm từ 0,58 xuống 0,33**. Sequential Forecast LSTM đạt NSE trung vị **0,71** khi có thêm lưu lượng quan trắc |
-| Ý nghĩa với đề tài | Định lượng mức suy giảm khi mô hình huấn luyện bằng dữ liệu tái phân tích được chạy với dữ liệu dự báo thực. Đây là hạn chế cần nêu trong báo cáo |
+| Ý nghĩa với đề tài | Bài cơ sở của đề tài (`Document/01_Plan/02_BasePaper.md`): định lượng mức suy giảm khi mô hình huấn luyện bằng tái phân tích được chạy với dự báo thời tiết thật, và cách huấn luyện trực tiếp trên dự báo để bù sai lệch |
 
 ---
 
@@ -410,8 +410,8 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | Mục | Nội dung |
 |---|---|
 | Tác giả | Yihan Wang, Annan Yu, Lujun Zhang, Charuleka Varadharajan, N. Benjamin Erichson |
-| Venue | arXiv (preprint) |
-| Link | [arXiv 2512.12183](https://arxiv.org/abs/2512.12183) |
+| Venue | Water Resources Research, đăng 6/10/2026, DOI `10.1029/2025WR043158` |
+| Link | [doi.org/10.1029/2025WR043158](https://doi.org/10.1029/2025WR043158) · [arXiv 2512.12183](https://arxiv.org/abs/2512.12183) |
 | Dữ liệu | CAMELS, 531 lưu vực, theo ngày |
 | Mô hình | Diffusion model với backbone **S4D-FT** |
 | Cấu hình | Cửa sổ quá khứ 365 ngày → 8 ngày đầu ra (ngày hiện tại + 7 ngày dự báo) |
@@ -427,9 +427,9 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | Tác giả | Xin Jing, Jungang Luo, Xue Yang, Ganggang Zuo |
 | Venue | **Expert Systems with Applications**, tập 329, bài 133040, 2026 |
 | DOI | [10.1016/j.eswa.2026.133040](https://doi.org/10.1016/j.eswa.2026.133040) |
-| Dữ liệu | 671 lưu vực CAMELS-US |
+| Dữ liệu | CAMELS-US: so sánh chính trên 531 lưu vực, bảng bổ sung trên 671 lưu vực |
 | Mô hình | **S4D, S5D** trong khung differentiable parameter learning |
-| Kết quả | NSE: **0,742** (baseline) → **0,756** (S4D) → **0,763** (S5D) |
+| Kết quả | NSE trung vị: **0,742** (LSTM) → **0,756** (S4D) trên 531 lưu vực; biến thể S5D tốt nhất **0,763** (bảng 671 lưu vực) |
 | Ý nghĩa với đề tài | Công trình SSM ở tạp chí thuộc lĩnh vực AI. Các giá trị NSE dùng làm mốc kiểm tra khi cài đặt mô hình |
 
 #### 6.2.4 Temporal inductive biases in hourly flood forecasting: a comparative analysis of recurrent, attention-based, and state-space neural networks
@@ -640,7 +640,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 
 Cả SSM và GNN đều yếu ở loại sự kiện quan trọng nhất với cảnh báo lũ. Đề xuất:
 - Đánh giá riêng đỉnh lũ bằng **FHV**, không chỉ dùng NSE tổng thể
-- Dùng hàm mất mát có **trọng số theo chu kỳ lặp lại** (return period), như RiverMamba
+- Dùng hàm mất mát có **trọng số theo chu kỳ lặp lại** (return period), như RiverMamba — để cho khóa luận vì có đánh đổi với kỹ năng chung (`Document/01_Plan/03_Pipeline.md` Mục 11)
 
 ### 7.4 Khoảng trống nghiên cứu
 
@@ -674,7 +674,7 @@ Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN
 - **Số trích dẫn** lấy từ Google Scholar hoặc OpenAlex tại thời điểm 13/9/2026. Hai nguồn có thể cho số khác nhau và số liệu thay đổi theo thời gian. Ô "—" là chưa tra cứu.
 - **Đối chiếu số liệu với toàn văn:** NSE 0,742/0,756/0,763 (Jing et al., ESWA) đúng với bài, trong đó 0,742/0,756 trên 531 lưu vực và 0,763 (S5Dv2) trên 671 lưu vực; chạy 5 hạt giống trong repo cho NSE trung vị S4D 0,750, S5D 0,751, LSTM 0,742. Thứ tự PatchTST tốt nhất, LSTM thứ hai của Zhang et al. đúng với toàn văn (516 lưu vực CAMELS-US theo giờ). Chưa đối chiếu: cấu hình thí nghiệm chi tiết của ResBi-Mamba Plus; mô hình cụ thể đạt NSE 0,74 / KGE 0,79 trong benchmark gốc của WaterBench-Iowa.
 - Công trình 6.4.3 không ghi tên "WaterBench" trong abstract. Việc xếp vào WaterBench-Iowa dựa trên việc công trình dùng đúng 125 lưu vực tại Iowa và có cùng nhóm tác giả với bộ dữ liệu.
-- Các công trình **preprint** (6.2.2, 6.2.6, 6.2.7, 6.4.2) chưa qua bình duyệt, chỉ nên trích dẫn như công trình liên quan.
+- Các công trình **preprint** (6.2.6, 6.2.7, 6.4.2) chưa qua bình duyệt, chỉ nên trích dẫn như công trình liên quan.
 - Danh sách công trình phản ánh kết quả tra cứu tới ngày 13/9/2026, **không khẳng định đã bao quát toàn bộ**.
 
 ---
@@ -711,7 +711,7 @@ Các bộ dữ liệu trên phục vụ hướng **tự xây dựng mô hình**.
 - Yang et al. (WRR 2025): [doi.org/10.1029/2024WR039764](https://doi.org/10.1029/2024WR039764)
 - Konold et al. (HESS 2026): [hess.copernicus.org/articles/30/5067/2026](https://hess.copernicus.org/articles/30/5067/2026/)
 - Wang et al., S4D-FT (WRR 2025): [doi.org/10.1029/2025WR039888](https://doi.org/10.1029/2025WR039888)
-- Wang et al., HydroDiffusion: [arxiv.org/abs/2512.12183](https://arxiv.org/abs/2512.12183)
+- Wang et al., HydroDiffusion (WRR 2026): [doi.org/10.1029/2025WR043158](https://doi.org/10.1029/2025WR043158) · [arxiv.org/abs/2512.12183](https://arxiv.org/abs/2512.12183)
 - Jing et al. (ESWA 2026): [doi.org/10.1016/j.eswa.2026.133040](https://doi.org/10.1016/j.eswa.2026.133040)
 - Zhang et al. (J. Hydrology 2026): [doi.org/10.1016/j.jhydrol.2026.135727](https://doi.org/10.1016/j.jhydrol.2026.135727)
 - Sun & Sun (Machine Learning: Earth 2026): [iopscience.iop.org/article/10.1088/3049-4753/ae4982](https://iopscience.iop.org/article/10.1088/3049-4753/ae4982)

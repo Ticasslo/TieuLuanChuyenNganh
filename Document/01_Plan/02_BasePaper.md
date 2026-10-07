@@ -10,10 +10,10 @@
 | Tác giả | Oliver Konold, Moritz Feigl, Patrick Podest, Christoph Klingler, Karsten Schulz (BOKU University, Vienna; baseflow AI solutions, Vienna; Johannes Kepler University Linz) |
 | Nơi công bố | Hydrology and Earth System Sciences (HESS), 30, 5067–5096, 2026; bản thảo đăng HESS Discussions 27/11/2025 |
 | Xếp hạng | Scimago 2025: Q1 (Earth and Planetary Sciences; Water Science and Technology), SJR 2,035, H-index 194 |
-| Trích dẫn | 3 (Semantic Scholar, 7/10/2026), trong đó có AIFL — mô hình dự báo lưu lượng toàn cầu của ECMWF (preprint arXiv 2602.16579, 2026); chi tiết Mục 12 |
+| Trích dẫn | 3 (Semantic Scholar, 7/10/2026), trong đó có AIFL — mô hình dự báo lưu lượng toàn cầu của ECMWF (*Journal of Hydrology* 678, 136064 (2026); bản arXiv 2602.16579); chi tiết Mục 12 |
 | Trang chính thức | https://hess.copernicus.org/articles/30/5067/2026/ |
 | Phản biện | Công khai: https://egusphere.copernicus.org/preprints/2025/egusphere-2025-4978/ |
-| Mã nguồn | https://github.com/conestone/neuralhydrology — thư viện NeuralHydrology do tác giả chỉnh sửa: mô hình (`modelzoo`), bộ đọc dữ liệu (`datasetzoo`), vòng huấn luyện (`training`), đánh giá (`evaluation`), điều khiển bằng tệp cấu hình `config.yml`; https://github.com/conestone/biascast — notebook gọi thư viện để chạy thí nghiệm, mã phân tích kết quả và vẽ hình trong bài (không chứa mô hình) |
+| Mã nguồn | https://github.com/conestone/neuralhydrology — thư viện NeuralHydrology (mô hình `modelzoo`, bộ đọc dữ liệu `datasetzoo`, vòng huấn luyện `training`, đánh giá `evaluation`, điều khiển bằng tệp cấu hình `config.yml`); tác giả thêm đúng một commit (`9d94908`) trên thư viện gốc tại `f00cf47`, sửa bộ đọc LamaH, vòng huấn luyện, dừng sớm, ghi nhật ký, đánh giá và đọc cấu hình — không sửa `modelzoo`; https://github.com/conestone/biascast — notebook gọi thư viện để chạy thí nghiệm, mã phân tích kết quả và vẽ hình trong bài (không chứa mô hình) |
 | Kết quả, trọng số | https://doi.org/10.5281/zenodo.17241922 |
 | DOI | 10.5194/hess-30-5067-2026 |
 
@@ -120,7 +120,7 @@ Vị trí trong bài: Mục 3.1–3.6, Hình 3–10, Phụ lục F.
 **Lý do:**
 
 1. **Đúng bài toán dự báo, sát vận hành nhất trong các ứng viên:** dùng cả lưu lượng quan trắc và dự báo thời tiết thật, dự báo đỉnh lưu lượng ngày.
-2. **Số liệu tin được:** NSE theo lưu vực tính lại từ tệp kết quả của tác giả khớp với bài (ví dụ 0,705 cho mô hình tốt nhất); mã huấn luyện là thư viện chuẩn NeuralHydrology, bản fork chỉ sửa bộ nạp dữ liệu, dừng sớm và lập lịch learning rate.
+2. **Số liệu tin được:** NSE theo lưu vực tính lại từ tệp kết quả của tác giả khớp với bài (ví dụ 0,705 cho mô hình tốt nhất); mã huấn luyện là thư viện chuẩn NeuralHydrology, bản fork chỉ thêm một commit sửa bộ đọc LamaH, dừng sớm, lập lịch learning rate, ghi nhật ký và đánh giá bằng mô hình tốt nhất, không sửa mô hình (Mục 11.5).
 3. **Phương pháp chặt chẽ:** chia tập theo thời gian tách hẳn train, validation, test; tối ưu siêu tham số trên validation; kiểm tra trong mã không rò rỉ nhãn.
 4. **Mô hình mốc mạnh:** các kiến trúc hindcast–forecast cùng dòng với mô hình dự báo lũ vận hành của Google.
 5. **Khoảng trống do chính tác giả nêu:** chỉ thử kiến trúc LSTM, chỉ dữ liệu ngày, chỉ dự báo 1 ngày — đúng chỗ đề tài đưa Mamba vào; người phản biện đề nghị so với persistence nhưng bài chưa làm.
@@ -239,6 +239,6 @@ Theo Semantic Scholar (tra 7/10/2026), BiasCast có 3 công trình trích dẫn:
 
 | Công trình | Nội dung | Liên quan tới đề tài |
 |---|---|---|
-| Taccari và cs. — *AIFL: A Global Daily Streamflow Forecasting Model Using a Deterministic LSTM Pre-trained on ERA5-Land and Fine-tuned on IFS*, preprint 2026 (ECMWF; arXiv 2602.16579) | LSTM toàn cầu dự báo lưu lượng ngày trên 18.588 lưu vực Caravan; huấn luyện trước trên ERA5-Land 1980–2019 rồi tinh chỉnh trên dự báo IFS 2016–2019; test 2021–2024, KGE′ trung vị 0,66 | Cùng vấn đề lệch miền tái phân tích → dự báo. **Kết luận ngược với BiasCast về học chuyển giao:** AIFL thấy huấn luyện hai giai đoạn tốt hơn chỉ dùng IFS và tốt hơn trộn hai nguồn, còn BiasCast thấy học chuyển giao kém Sequential Forecast LSTM (0,44 so với 0,63). Khác biệt có thể do quy mô dữ liệu (18.588 so với 451 lưu vực) và cách tinh chỉnh; cần nêu khi bàn về học chuyển giao |
+| Taccari và cs. — *AIFL: A Global Daily Streamflow Forecasting Model Using a Deterministic LSTM Pre-trained on ERA5-Land and Fine-tuned on IFS*, *Journal of Hydrology* 678, 136064 (2026), DOI `10.1016/j.jhydrol.2026.136064` (ECMWF; bản arXiv 2602.16579) | LSTM toàn cầu dự báo lưu lượng ngày trên 18.588 lưu vực Caravan; huấn luyện trước trên ERA5-Land 1980–2019 rồi tinh chỉnh trên dự báo IFS 2016–2019; test 2021–2024, KGE′ trung vị 0,66 | Cùng vấn đề lệch miền tái phân tích → dự báo. **Kết luận ngược với BiasCast về học chuyển giao:** AIFL thấy huấn luyện hai giai đoạn tốt hơn chỉ dùng IFS và tốt hơn trộn hai nguồn, còn BiasCast thấy học chuyển giao kém Sequential Forecast LSTM (0,44 so với 0,63). Khác biệt có thể do quy mô dữ liệu (18.588 so với 451 lưu vực) và cách tinh chỉnh; cần nêu khi bàn về học chuyển giao |
 | Acuña Espinoza và cs. — *Everything everywhere all at once: A single-cell LSTM network unifying multi-frequency, missing data, and discharge assimilation for robust operational flood forecasting*, EGUsphere 2026 (preprint, đang phản biện ở HESS) | MF²LSTM: một LSTM gộp dữ liệu nhiều tần suất, xử lý dữ liệu thiếu và đồng hóa Q thời gian thực; vẫn chạy khi mất Q (hỏng trạm, lưu vực không đo); dự báo giờ, tốt hơn mô hình vận hành LARSIM | Gần nhất với ý tưởng mô hình chịu mất Q (Y1) và hướng dữ liệu giờ của khóa luận; nhóm tác giả gồm Kratzert, Klotz, Gauch. Bài nhắc BiasCast như lưu ý rằng dự báo thời tiết có phân phối khác dữ liệu quan trắc |
 | *Comparing novel backward hydrological models for watershed-scale precipitation estimation…*, Scientific Reports 2026 | Ước lượng mưa từ lưu lượng (thủy văn ngược) | Không liên quan trực tiếp |

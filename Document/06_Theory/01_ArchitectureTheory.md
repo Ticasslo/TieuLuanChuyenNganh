@@ -491,7 +491,7 @@ Mamba **nén toàn bộ lịch sử vào 1 trạng thái kích thước CỐ Đ�
 
 **Với đúng bài toán dự báo lưu lượng — "chi tiết siêu nhỏ xa xưa" có thật sự cần không?** Dự báo lũ cần biết **xu hướng tích lũy** (đất đã bão hòa chưa, mùa mưa đang giai đoạn nào) — thông tin dạng **tổng hợp/thống kê**, không phải "nhớ chính xác đúng con số mưa ngày thứ 47 cách đây rất lâu". Kiểu thông tin tổng hợp này hợp với cách nén của Mamba hơn — khác bài toán kiểu "tìm đúng 1 câu nói cụ thể ở đầu văn bản rất dài" (mới thật sự cần Transformer nhớ chính xác từng chi tiết).
 
-**Liên hệ ràng buộc thực tế của đề tài:** chạy trên GPU free, ngân sách hạn chế — dùng Transformer với chuỗi dài (nhiều ngày lịch sử) có thể **vượt quá khả năng GPU free** vì chi phí O(n²). Mamba cho phép dùng context dài hơn mà vẫn nằm trong ngân sách — lý do thực tế, không chỉ lý thuyết, để chọn Mamba.
+**Liên hệ ràng buộc thực tế của đề tài:** chạy trên GPU free, ngân sách hạn chế — dùng Transformer với chuỗi dài (nhiều ngày lịch sử) có thể **vượt quá khả năng GPU free** vì chi phí O(n²). Mamba cho phép dùng context dài hơn mà vẫn nằm trong ngân sách — đây là giả thuyết về chi phí, đề tài đo thật ở `03_Pipeline.md` Mục 6.5 (bước D, 365 so với 730 ngày).
 
 ### 4.2d Bằng chứng từ tài liệu
 

@@ -1,6 +1,6 @@
 # LamaH-CE — Ghi chú thực thi
 
-> Tài liệu ghi các quyết định và kết quả thực thi với bộ dữ liệu LamaH-CE. Dữ liệu chính của đề tài là Extended LamaH-CE theo ngày của bài cơ sở BiasCast (Mục 6). Mục 1–5 ghi gói LamaH-CE gốc theo giờ (tải ban đầu theo mã của Kirschstein & Sun, ICML 2024), giữ cho các hướng khóa luận: dữ liệu giờ, mạng sông. Mã: mỗi notebook Kaggle một tệp `.py` tự đủ — `02_LamaHCE_Download_Core.py` (notebook 1), `03_LamaHCE_Download_Extra.py` (notebook 2). Thông tin tổng quan về bộ dữ liệu: `Document/05_Survey/01_Datasets.md` Mục 2. Trích dẫn mã tải gốc: Kirschstein & Sun, PMLR 235:24713–24725, https://proceedings.mlr.press/v235/kirschstein24a.html. Trích dẫn dữ liệu: Klingler và cs. (2021), ESSD 13:4529–4565, DOI 10.5194/essd-13-4529-2021; dữ liệu DOI 10.5281/zenodo.4525244.
+> Tài liệu ghi các quyết định và kết quả thực thi với bộ dữ liệu LamaH-CE. Dữ liệu chính của đề tài là Extended LamaH-CE theo ngày của bài cơ sở BiasCast (Mục 6). Mục 1–5 ghi gói LamaH-CE gốc theo giờ (tải ban đầu theo mã của Kirschstein & Sun, ICML 2024), giữ cho các hướng khóa luận: dữ liệu giờ, mạng sông. Mã: mỗi notebook Kaggle một tệp `.py` tự đủ — `Workspace/01_Download/02_LamaHCE_Download_Core.py`, `03_LamaHCE_Download_Extra.py`. Thông tin tổng quan về bộ dữ liệu: `Document/05_Survey/01_Datasets.md` Mục 2. Trích dẫn mã tải gốc: Kirschstein & Sun, PMLR 235:24713–24725, https://proceedings.mlr.press/v235/kirschstein24a.html. Trích dẫn dữ liệu: Klingler và cs. (2021), ESSD 13:4529–4565, DOI 10.5194/essd-13-4529-2021; dữ liệu DOI 10.5281/zenodo.4525244.
 
 ## 1. Nguồn dữ liệu
 
@@ -11,7 +11,7 @@
 | Giấy phép | CC BY-SA 4.0 — ghi nguồn theo thư mục `Info`; dữ liệu phái sinh chia sẻ công khai phải dùng cùng giấy phép |
 | Cấu trúc | 7 phần (bài báo ESSD 2021): lưu vực A (toàn thượng nguồn), B (trung gian), C (trung gian, ít tác động), trạm đo D, mạng sông, mô hình thủy văn COSERO, thư mục Info. Mỗi phần A–D gồm thuộc tính, chuỗi thời gian (ngày và giờ) và shapefile |
 
-## 2. Dữ liệu bài cơ sở sử dụng
+## 2. Dữ liệu Kirschstein & Sun sử dụng
 
 Kết quả đọc toàn bộ mã của Kirschstein & Sun (`dataset.py`, `functions.py`, 8 script huấn luyện/kiểm thử, 8 notebook):
 
@@ -33,12 +33,12 @@ Kết quả đọc toàn bộ mã của Kirschstein & Sun (`dataset.py`, `functi
 
 | Gói | Nội dung | Mục đích |
 |---|---|---|
-| `lamah_ce_core.zip` (`02_LamaHCE_Download_Core.py`) | Toàn bộ B và D trừ chuỗi ngày; thư mục Info | Đủ dữ liệu tái lập bài cơ sở, đủ mọi năm 1981–2017 và mọi cột |
+| `lamah_ce_core.zip` (`02_LamaHCE_Download_Core.py`) | Toàn bộ B và D trừ chuỗi ngày; thư mục Info | Đủ dữ liệu tái lập Kirschstein & Sun, đủ mọi năm 1981–2017 và mọi cột |
 | `lamah_ce_extra.zip` (`03_LamaHCE_Download_Extra.py`) | A (trừ chuỗi ngày), thuộc tính và shapefile của C, mạng sông, COSERO, Info | Baseline không đồ thị dùng khí tượng toàn thượng nguồn; thuộc tính tĩnh (LOAN, EA-LSTM); bản đồ demo; baseline mô hình vật lý |
 
 - Không tải chuỗi theo ngày (tính lại được từ chuỗi giờ; bản chỉ có chuỗi ngày nặng 1,5 GB, tải riêng khi cần) và chuỗi thời gian của C.
 - **Lưu trữ lâu dài:** tạo Kaggle Dataset (Private) từ output của mỗi notebook; các notebook sau gắn bằng *Add Input*. Dataset riêng tư có thể chia sẻ cho cộng tác viên.
-- Mã nguồn và 957 checkpoint (1,9 GB; 162 cho thí nghiệm chính ở Bảng 2 = 18 cấu hình đồ thị × 3 kiến trúc × 3 cách chia, 3 cho MLP, 108 cho ablation, 684 cho mạng con) của bài cơ sở lấy bằng `git clone` repo `github.com/nkirschi/neural-flood-forecasting`, không đưa vào dataset.
+- Mã nguồn và 957 checkpoint (1,9 GB; 162 cho thí nghiệm chính ở Bảng 2 = 18 cấu hình đồ thị × 3 kiến trúc × 3 cách chia, 3 cho MLP, 108 cho ablation, 684 cho mạng con) của Kirschstein & Sun lấy bằng `git clone` repo `github.com/nkirschi/neural-flood-forecasting`, không đưa vào dataset.
 
 ## 4. Kiểm thử trước khi chạy
 
@@ -124,11 +124,11 @@ Phần thiếu tập trung ở train, chủ yếu do **27 lưu vực bắt đầ
 - Trung vị tự tính khớp bài (0,705; 0,628; 0,387).
 - Mô hình tốt nhất hơn persistence rõ ràng (trung vị +0,26 đến +0,34, hơn ở hơn 92% lưu vực) — bài chưa báo cáo mốc này. Mô hình chỉ dùng dự báo thời tiết (0,387) ngang persistence, tức không hơn cách lấy lưu lượng hôm qua.
 - Ở nhóm lưu vực dễ (P90), persistence qmax(t−1) đạt 0,800, sát mô hình (0,876): phần cải thiện của mô hình tập trung ở lưu vực khó.
-- Dữ liệu thiếu ít (test 0,23%, khí tượng gần như đủ; train 3,55% chủ yếu do 27 trạm bắt đầu đo muộn). Tuy vậy bộ lọc mẫu của bài loại mẫu khi bất kỳ cột nào thiếu trong cửa sổ 365 ngày, kể cả cột ECMWF; ECMWF có từ 2002 nên năm 2003 không bị loại vì ECMWF; mẫu bị loại chủ yếu ở năm đầu của các trạm đo muộn và các ngày thiếu Q. Sửa bộ lọc (bước B1) lấy lại phần này; masked mean còn có giá trị chịu dữ liệu mất khi vận hành (`Document/04_Ideas/01_Ideas.md` Y1, Y2).
+- Dữ liệu thiếu ít (test 0,23%, khí tượng gần như đủ; train 3,55% chủ yếu do 27 trạm bắt đầu đo muộn). Tuy vậy bộ lọc mẫu của bài loại mẫu khi bất kỳ cột nào thiếu trong cửa sổ 365 ngày, kể cả cột ECMWF; ECMWF có từ 2002 nên năm 2003 không bị loại vì ECMWF; mẫu bị loại chủ yếu ở năm đầu của các trạm đo muộn và các ngày thiếu Q. Sửa bộ lọc (bước B2) lấy lại phần này; masked mean còn có giá trị chịu dữ liệu mất khi vận hành (`Document/04_Ideas/01_Ideas.md` Y1, Y2).
 
 ### 6.2. Khám phá dữ liệu
 
-GVHD yêu cầu phần giới thiệu dữ liệu chỉ liệt kê các dạng cơ bản, không đi sâu vào số mẫu, số lượng chi tiết; phân tích sâu phục vụ quyết định khi dựng bộ nạp dữ liệu và chương kết quả. Mã khám phá đặt ở `Workspace/02_Exploration/` (chưa viết), chạy trên Kaggle (CPU), gắn dataset `lamah-ce-ext`.
+Theo góp ý của GVHD (`Document/02_Meetings/Meeting_2026-09-27.md` Mục 3.1): phần liệt kê mỗi bộ dữ liệu một dòng gồm kích thước, cách phát hành, thống kê cơ bản nhất; thống kê sâu (độ lệch chuẩn, tứ phân vị, khác biệt phân phối train/test) viết thành đoạn thảo luận để biện luận kết quả, đồng thời phục vụ quyết định khi dựng bộ nạp dữ liệu. Mã khám phá đặt ở `Workspace/02_Exploration/` (chưa viết), chạy trên Kaggle (CPU), gắn dataset `lamah-ce-ext`.
 
 Kết quả đọc toàn bộ tệp chuỗi ngày (27/9/2026): 859 lưu vực có chuỗi khí tượng, 882 trạm có chuỗi lưu lượng ngày, 1981–2017; 40 biến khí tượng (ERA5-Land 21, ECMWF HRES 8, E-OBS 8, MSWEP 1, GLEAM 2); 62 thuộc tính tĩnh cho 859 lưu vực; dự báo ECMWF bắt đầu 01/01/2002 với độ phủ năm 2002 là 100%, các nguồn khác bắt đầu 01/01/1981; độ phủ lưu lượng năm 1981 là 67,3%, tăng dần và gần đủ từ 2003; trạm lấy từ `Gauges.shp` (EPSG:3035), ranh giới từ `Basins_A.shp` (859 đa giác).
 

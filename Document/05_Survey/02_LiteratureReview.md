@@ -37,7 +37,7 @@ Công trình dùng **Mamba** cho đúng bài toán lưu lượng/dòng chảy:
 | MamGA, Daily runoff Mamba (Hydrology Research), D2Mamba | Tạp chí thủy văn | Không | — |
 | Demiray & Demir — *"Advancing Long-Horizon Hydrological Forecasting: A Mamba-based Approach with Explainable AI…"*, DOI [10.31223/X5B164](https://doi.org/10.31223/X5B164) | EarthArXiv 9/2025 (preprint) | — | 125 trạm Iowa, dự báo 120 giờ; Mamba tương đương, một số khía cạnh nhỉnh hơn Transformer |
 
-Công trình dùng **họ SSM (S4/S4D)** chứ không phải Mamba: Jing và cs., *Expert Systems with Applications* 2026 (S4D/S5D trong mô hình lai, 671 lưu vực CAMELS-US, venue CNTT/AI); Wang và cs., *Water Resources Research* 2025 (S4D-FT); Zhang và cs., *Journal of Hydrology* 2025 (gọi S4D là "Mamba-type", bài toán xả hồ chứa).
+Công trình dùng **họ SSM (S4/S4D)** chứ không phải Mamba: Jing và cs., *Expert Systems with Applications* 2026 (S4D/S5D trong mô hình lai, 531 và 671 lưu vực CAMELS-US, venue CNTT/AI); Wang và cs., *Water Resources Research* 2025 (S4D-FT); Zhang và cs., *Journal of Hydrology* 2025 (gọi S4D là "Mamba-type", bài toán xả hồ chứa).
 
 Công trình liên quan khác: dự báo hạn hán SPEI bằng Mamba (Tang và cs., IEEE TGRS 2025); FloodMamba-Net giám sát hình thái sông bằng ảnh vệ tinh (Journal of Hydrology 2025) — khác bài toán. Tra arXiv với "mamba AND hydrology" chỉ ra RiverMamba. Nhóm tác giả ResBi-Mamba Plus có chuỗi công trình dự báo dòng chảy ở venue CNTT/AI (IEEE TNNLS 2024, Neural Networks 2026, ESWA 2024, IEEE IoT 2023) dùng TCN/GRU, chỉ chuyển sang Mamba ở bài 2026.
 
@@ -94,7 +94,12 @@ Tiêu chí: không MDPI, không chỉ preprint, trích dẫn ≥ 5, ưu tiên Sc
 - **Bài #3 (Johor):** wavelet-ANN RMSE 119,25 so với ANN 126,88; CNN ổn định hơn nhưng quá khớp ở thành phần tần số thấp. Không so Transformer/Mamba; có giá trị tham khảo cho phần đánh giá bất định.
 - **Bài #4 (Dương Tử):** Transformer tùy biến thắng ARIMA, TCN, LSTM và Transformer thường; năm lũ 1998/2016 R² > 0,95. Đối chiếu với bài #2 cho thấy cách tùy biến kiến trúc theo bài toán quyết định kết quả hơn là bản thân kiến trúc gốc.
 
----|---|---|---|---|---|---|---|
+### 2.2. Dự báo mực nước (tham khảo)
+
+Bài toán gần với đề tài nhưng đầu ra là mực nước, không phải lưu lượng.
+
+| # | Bài báo | Tạp chí | Năm | Trích dẫn | Vùng/Trạm | Thuật toán | DOI |
+|---|---|---|---|---|---|---|---|
 | 2.2.1 | Water Level Prediction Model Based on GRU and CNN | IEEE Access (Q1) | 2020 | 264 | Dương Tử và nhiều sông khác, Trung Quốc | GRU + CNN qua IoT. Tác giả: Pan, Zhou, Cao, Liu, Hao, Li, Chen | [10.1109/ACCESS.2020.2982433](https://doi.org/10.1109/ACCESS.2020.2982433) |
 
 Bài 2.2.1 lệch mốc 5 năm (2020) nhưng được giữ vì số trích dẫn cao và dùng học sâu. Đã loại: Water Level Prediction at TICH-BUI river (IEEE ICMLC 2019, SVR); Multi-input LSTM for water level forecasting in Black River (IEEE ICMLANT 2021, 1 trích dẫn); "Accurate discharge and water level forecasting… Red River + Dakbla" (Scientific Reports, ngành đa lĩnh vực).
@@ -105,7 +110,7 @@ Bài 2.2.1 lệch mốc 5 năm (2020) nhưng được giữ vì số trích dẫ
 
 Yêu cầu: *"Phải ra được phần mềm/demo. Trường hợp là demo thì sang KLTN phải nâng lên thành phần mềm có tính ứng dụng."*
 
-- **Tiểu luận:** Extended LamaH-CE là dữ liệu lịch sử, không có luồng cập nhật hằng ngày, nên demo phát lại theo thời gian trên tập test 2014–2017: bản đồ 451 lưu vực theo ngày, chuỗi Q, tô màu theo ngưỡng return period, kèm giải thích XAI (`Document/01_Plan/03_Pipeline.md` Mục 2). Công nghệ và nơi triển khai demo chưa chốt.
+- **Tiểu luận:** Extended LamaH-CE là dữ liệu lịch sử, không có luồng cập nhật hằng ngày, nên demo phát lại theo thời gian trên tập test 2014–2017: bản đồ 451 lưu vực theo ngày, chuỗi Q, tô màu theo ngưỡng return period, kèm mức ảnh hưởng của các nhóm nguồn theo lưu vực (`Document/01_Plan/03_Pipeline.md` Mục 2, 9.5). Demo là một mục trong trang web của nhóm trên VPS; công nghệ giao diện chưa chốt.
 - **Khóa luận:** cần làm rõ mức "phần mềm có tính ứng dụng" (tài khoản người dùng, chọn nhiều lưu vực, cảnh báo qua email/SMS…) khi tới giai đoạn khóa luận.
 
 ---
@@ -115,7 +120,7 @@ Yêu cầu: *"Phải ra được phần mềm/demo. Trường hợp là demo th�
 - Đạt yêu cầu khảo sát (6 bài, đúng thứ tự ưu tiên vùng, đều thuộc ngành CNTT/AI); chưa bài nào dùng Mamba/SSM, cho thấy tính mới của hướng Mamba.
 - Mamba không có bằng chứng vượt trội tuyệt đối so với Transformer; đề tài lập luận theo hiệu quả tính toán, tính mới và so sánh có kiểm soát.
 - Bài #2 và #4 cho thấy kết quả phụ thuộc cách tùy biến kiến trúc theo bài toán — cơ sở để thiết kế thí nghiệm so sánh công bằng giữa các kiến trúc.
-- Bài #1 cho thấy cần đánh giá riêng đỉnh lũ, không chỉ dựa vào NSE tổng thể — phù hợp với việc dùng trọng số return period trong hàm mất mát.
+- Bài #1 cho thấy cần đánh giá riêng đỉnh lũ, không chỉ dựa vào NSE tổng thể — phù hợp với đánh giá theo mức lưu lượng và theo sự kiện lũ (`Document/01_Plan/03_Pipeline.md` Mục 6.2).
 
 ---
 
