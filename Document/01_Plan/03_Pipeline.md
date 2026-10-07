@@ -187,7 +187,7 @@ Theo cấu hình của tác giả (BiasCast Mục 2.2; `02_BasePaper.md` Mục 1
 
 ### 6.1. Chỉ số chính và kiểm định
 
-- **Theo lưu vực trên test 2014–2017:** NSE, KGE (và ba thành phần r, α, β), **PNSE** (NSE lấy qmax ngày t−1 quan sát làm mốc, MF²LSTM; tương đương kỹ năng so với persistence).
+- **Theo lưu vực trên test 2014–2017:** NSE, KGE (và ba thành phần r, α, β), **PNSE** (NSE lấy qmax ngày t−1 quan sát làm mốc, tức hệ số persistence của Kitanidis & Bras, WRR 1980; MF²LSTM dùng tên PNSE).
 - **Tổng hợp:** trung vị, trung bình, P10/P25/P75/P90, đường CDF, số lưu vực tốt lên / kém đi.
 - **Kiểm định:** Wilcoxon signed-rank hai phía, ghép cặp theo lưu vực, kèm cỡ hiệu ứng Cohen's d dạng ghép cặp (trung bình chênh lệch chia độ lệch chuẩn của chênh lệch) — cách của Kratzert và cs. (2019, 2024), Gauch và cs. (2025), Nearing và cs. (2024); hiệu chỉnh Holm khi so nhiều cặp.
 
@@ -197,7 +197,7 @@ Theo cấu hình của tác giả (BiasCast Mục 2.2; `02_BasePaper.md` Mục 1
 |---|---|
 | Ngưỡng mức | Riêng từng lưu vực, tính trên qmax 1981–2013 (trước kỳ test): bốn mức theo xác suất vượt của đường duy trì lưu lượng — rất cao (0–0,02), cao (0,02–0,2), trung bình (0,2–0,7), thấp (0,7–1) (đoạn của Yilmaz, Gupta, Wagener, WRR 2008) |
 | Chỉ số theo mức | Ma trận nhầm lẫn 4 mức, độ chính xác, recall từng mức; %BiasFHV, %BiasFMS, %BiasFLV |
-| Ngưỡng lũ | Chu kỳ lặp lại 1, 2, 5, 10 năm (như Nearing và cs., Nature 2024), Gumbel fit bằng L-moments trên qmax năm 1981–2013 (như AIFL) |
+| Ngưỡng lũ | Chu kỳ lặp lại 1, 2, 5, 10 năm (như Nearing và cs., Nature 2024), Gumbel fit bằng L-moments (Hosking, JRSS B 1990) trên qmax năm 1981–2013, như AIFL |
 | Sự kiện | Một sự kiện tính là phát hiện đúng nếu dự báo và quan trắc cùng vượt ngưỡng trong cửa sổ ±1 ngày — lựa chọn của đề tài cho hạn 1 ngày; Nearing và cs. (2024) tính đúng khi hai bên vượt ngưỡng "within two days of each other" với dự báo nhiều ngày; bước H dùng ±2 ngày như Nearing |
 | Chỉ số sự kiện | Tỉ lệ phát hiện (POD/recall), tỉ lệ báo động nhầm (FAR), precision, F1, CSI; sai số thời điểm đỉnh |
 | Ngưỡng kép (phân tích độ nhạy) | Ngưỡng của mô hình tính trên chính chuỗi dự báo của mô hình (Nearing 2024, AIFL); vì mô hình chỉ có dự báo 2003–2017 (gồm cả kỳ train), chỉ dùng làm phân tích phụ, nêu rõ hạn chế |
@@ -384,12 +384,12 @@ Bộ đánh giá và demo chỉ đọc dự báo đã lưu, không gọi mô hì
 
 | Quyết định | Căn cứ |
 |---|---|
-| Masked mean theo nhóm nguồn, che dữ liệu khi huấn luyện | Gauch và cs., HESS 29:6221–6235 (2025); MF²LSTM (EGUsphere 2026); mã fork (`basedataset.py`, `inputlayer.py`) |
+| Masked mean theo nhóm nguồn, che dữ liệu khi huấn luyện | Gauch và cs., HESS 29:6221–6235 (2025); mức che 0,05 lấy theo MF²LSTM (preprint EGUsphere 2026); mã fork (`basedataset.py`, `inputlayer.py`) |
 | Độ trễ từng nguồn | Copernicus (ERA5-Land khoảng 5 ngày; E-OBS hằng ngày trễ 1 ngày, bản đầy đủ 2 lần/năm); UCAR Climate Data Guide (MSWEP NRT 2–3 giờ); ICDC Hamburg (GLEAM mỗi năm); BiasCast Mục 3.7 (eHYD khoảng 2 giờ) |
 | Giao thức cùng tham số | Shahriar (SSRN 2026); Liu và cs. (J. Hydrol. 2024) |
-| PNSE | MF²LSTM (EGUsphere 2026) |
+| PNSE | Kitanidis & Bras, WRR 16:1034–1044 (1980); MF²LSTM (preprint EGUsphere 2026) |
 | Chu kỳ lặp lại 1, 2, 5, 10 năm; precision, recall, F1; cửa sổ thời gian | Nearing và cs., Nature 627 (2024) |
-| Gumbel L-moments | AIFL (Taccari và cs., preprint arXiv 2602.16579, 2026) |
+| Gumbel L-moments | Hosking, JRSS B 52:105–124 (1990); AIFL (Taccari và cs., preprint arXiv 2602.16579, 2026) |
 | Đoạn đường duy trì lưu lượng | Yilmaz, Gupta, Wagener, WRR 44 (2008) |
 | Wilcoxon signed-rank + Cohen's d | Kratzert và cs. (2019, 2024); Gauch và cs. (2025); Nearing và cs. (2024) |
 | Siêu tham số khởi điểm S4D | Wang và cs., WRR 2025, phụ lục S4D-FT |
@@ -400,7 +400,7 @@ Bộ đánh giá và demo chỉ đọc dự báo đã lưu, không gọi mô hì
 
 ## 14. Tài liệu tham khảo
 
-Tệp PDF của các bài có ghi chú nằm trong `PaperResearch/PaperResearchPDF/` (tóm tắt từng bài: `Document/05_Survey/03_PaperNotes.md`).
+Bài ghi "preprint" chưa qua phản biện; chỉ dùng làm công trình liên quan để xác định tính mới hoặc làm nguồn phụ, mọi quyết định phương pháp có thêm nguồn đã công bố. Tệp PDF của các bài có ghi chú nằm trong `PaperResearch/PaperResearchPDF/` (tóm tắt từng bài: `Document/05_Survey/03_PaperNotes.md`).
 
 **Bài cơ sở và dữ liệu**
 - Konold, O., Feigl, M., Podest, P., Klingler, C., Schulz, K. (2026). BiasCast. *Hydrology and Earth System Sciences* 30, 5067–5096. https://doi.org/10.5194/hess-30-5067-2026 — mã `github.com/conestone/biascast`, `github.com/conestone/neuralhydrology`; thư trả lời phản biện: `BasePaper/PeerReview/`.
@@ -413,6 +413,8 @@ Tệp PDF của các bài có ghi chú nằm trong `PaperResearch/PaperResearchP
 - Nearing, G. và cs. (2022). Đồng hóa và tự hồi quy với Q quan trắc. *HESS* 26, 5493–5513. https://doi.org/10.5194/hess-26-5493-2022
 - Nearing, G. và cs. (2024). Dự báo lũ toàn cầu. *Nature* 627, 559. https://doi.org/10.1038/s41586-024-07145-1
 - Klotz, D. và cs. (2022). Bất định, CMAL. *HESS* 26, 1673. https://doi.org/10.5194/hess-26-1673-2022
+- Kitanidis, P. K., Bras, R. L. (1980). Real-time forecasting with a conceptual hydrologic model, 2. Applications and results. *Water Resources Research* 16(6), 1034–1044 — hệ số persistence.
+- Hosking, J. R. M. (1990). L-moments. *Journal of the Royal Statistical Society, Series B* 52(1), 105–124.
 - Yilmaz, K. K., Gupta, H. V., Wagener, T. (2008). Đoạn đường duy trì lưu lượng. *Water Resources Research* 44, W09417. https://doi.org/10.1029/2007WR006716
 - Martel, J.-L. và cs. (2025). Lấy mẫu nhiều đỉnh. *HESS* 29, 4951–4968. https://doi.org/10.5194/hess-29-4951-2025
 - Baste, S. và cs. (2025). Giới hạn đỉnh của LSTM. *HESS* 29. https://doi.org/10.5194/hess-29-5871-2025
