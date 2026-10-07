@@ -270,7 +270,11 @@ Cắt từ trên xuống, không ảnh hưởng RQ2–RQ4: (1) biến thể dự
 
 ### 9.1. Khung và nơi chạy
 
-- Fork riêng của bản fork NeuralHydrology của tác giả (`conestone/neuralhydrology`), sửa trên nhánh riêng; notebook Kaggle cài bằng `pip install git+…`. Bản gốc trong `PaperResearch/PaperResearchCode/` giữ nguyên để đối chiếu. Tên tài khoản và nhánh: chưa chốt.
+- **Thư viện và cấu hình tách riêng.** NeuralHydrology là thư viện Python; thí nghiệm khai báo bằng tệp `config.yml` (chọn mô hình, số chiều, hạt giống, xác suất che…). Cấu hình chỉ chọn được khả năng thư viện đã có, nên các phần chưa có (bộ lọc mẫu mới, mô hình chung nhận lõi bất kỳ, S4D, Mamba đúng trục, xác suất che riêng cho Q, lưu mô hình tốt nhất) được viết vào thư viện; mọi thí nghiệm còn lại chỉ là tệp cấu hình.
+- **Fork thư viện:** `Ticasslo/neuralhydrology`, fork từ bản của tác giả BiasCast (`conestone/neuralhydrology`, commit `9d94908`). Nhánh `master` giữ nguyên mã tác giả (dùng cho bước A); nhánh `thesis` chứa phần đề tài viết thêm, mỗi thay đổi một commit để so sánh được khối giữ và khối thêm.
+- **Cài theo mã commit:** notebook Kaggle cài `pip install git+https://github.com/Ticasslo/neuralhydrology@<mã commit>`, không cài theo tên nhánh, để mỗi kết quả chạy lại được đúng phiên bản mã.
+- **Tệp cấu hình** đặt trong repo đề tài (thư mục huấn luyện ở `Workspace/`), mỗi thí nghiệm một tệp; mỗi lần huấn luyện lưu kèm tệp cấu hình đã dùng và mã commit thư viện.
+- Bản sao mã tác giả trong `PaperResearch/PaperResearchCode/` giữ nguyên để đối chiếu.
 - Kaggle chính, Colab dự phòng; mã chạy được trên cả hai.
 
 ### 9.2. Kiểm thử đơn vị trước khi huấn luyện
@@ -332,7 +336,7 @@ Tên thư mục từ `04_` trở đi là đề xuất, đặt khi bắt đầu v
 
 | Việc | Ghi chú |
 |---|---|
-| Tài khoản và nhánh của fork NeuralHydrology | Cần trước bước 0 |
+| Phân công giữa hai thành viên | Theo bước trong Mục 7 |
 | Công nghệ và nơi triển khai demo | Cần trước bước G |
 | Tên nội bộ tiểu luận | `01_OverallPlan.md` Mục 1 |
 

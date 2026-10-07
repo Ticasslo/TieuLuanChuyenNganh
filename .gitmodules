@@ -1,0 +1,6 @@
+[submodule "PaperResearch/PaperResearchCode/BiasCast"]
+	path = PaperResearch/PaperResearchCode/BiasCast
+	url = https://github.com/conestone/biascast.git
+[submodule "PaperResearch/PaperResearchCode/BiasCast_NH"]
+	path = PaperResearch/PaperResearchCode/BiasCast_NH
+	url = https://github.com/conestone/neuralhydrology.git

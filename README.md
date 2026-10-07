@@ -15,9 +15,19 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `Diagrams/` | Sơ đồ đề tài (`ProjectDiagram.drawio`, sinh bằng `Tools/Diagram_Build.py`): thứ tự thực hiện, kiến trúc chi tiết, thứ tự cắt |
 | `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc: `01_Download` (tải dữ liệu), `02_Exploration` (khám phá, phân tích dữ liệu) |
 | `Tools/` | Công cụ phụ trợ: chuyển giọng nói buổi họp thành văn bản, sinh sơ đồ đề tài |
+| `PaperResearch/` | PDF tham khảo (`PaperResearchPDF/`, ghi chú từng bài ở `Document/05_Survey/03_PaperNotes.md`) và mã tác giả BiasCast (`PaperResearchCode/`, hai submodule trỏ tới `conestone/biascast`, `conestone/neuralhydrology` — chỉ để đọc, không sửa) |
 
-PDF bài báo (`PaperResearch/PaperResearchPDF/`) và mã nguồn BiasCast (`PaperResearch/PaperResearchCode/`) chỉ lưu trên máy, không đưa lên repo (bản quyền, dung lượng).
+PDF chỉ dùng nội bộ nhóm (repo riêng tư).
+
+## Làm việc chung
+
+- **Đọc trước:** `Document/01_Plan/03_Pipeline.md` (tài liệu gốc: câu hỏi nghiên cứu, đóng góp, các bước, ma trận thí nghiệm), sau đó `02_BasePaper.md` và sơ đồ `Diagrams/ProjectDiagram.drawio` (mở bằng draw.io).
+- **Tải repo kèm mã tác giả:** `git clone --recurse-submodules <link repo>`; nếu đã clone rồi thì chạy `git submodule update --init`.
+- **Thư viện huấn luyện:** fork `github.com/Ticasslo/neuralhydrology` — nhánh `master` là mã tác giả, nhánh `thesis` là phần đề tài viết thêm; notebook cài theo mã commit.
+- **Dữ liệu:** Kaggle Dataset `lamah-ce-ext` (riêng tư, cần chia sẻ quyền truy cập cho thành viên), tải bằng `Workspace/01_Download/01_LamaHCEExt_Download.py`.
+- **Quy ước:** tên thư mục, tệp tiếng Anh, nội dung tiếng Việt; tài liệu trong `Document/` đánh số theo thứ tự đọc; mỗi thư mục `Workspace/` một việc; mỗi notebook một tệp `.py` tự đủ, chia cell `# %% Phần X`; không đưa khóa API vào mã (dùng Kaggle/Colab Secrets).
+- **Sơ đồ:** sửa nội dung trong `Tools/Diagram_Build.py` rồi chạy lại, không sửa tay tệp `.drawio`.
 
 ## Trạng thái
 
-Đã chốt bài cơ sở BiasCast; đã tải dữ liệu, kiểm tra % thiếu và tính persistence (NSE trung vị 0,35–0,37 so với 0,705 của mô hình tốt nhất); đã viết notebook giới thiệu và phân tích dữ liệu. Việc tiếp theo: gửi kiến trúc cho GVHD, chạy lại trọng số của tác giả (bước A).
+Đã chốt bài cơ sở BiasCast và pipeline; đã tải dữ liệu, kiểm tra % thiếu và tính persistence (NSE trung vị 0,35–0,37 so với 0,705 của mô hình tốt nhất). Việc tiếp theo: gửi kiến trúc cho GVHD; bước 0 (sửa thư viện trên nhánh `thesis`, cài `mamba-ssm`, kiểm thử đơn vị); viết lại notebook khám phá dữ liệu; bước A (chạy lại trọng số của tác giả).

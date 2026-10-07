@@ -224,8 +224,6 @@ __marimo__/
 # CodeGraph index (local, rebuild bằng codegraph sync)
 .codegraph/
 
-# Tai lieu tham khao tai ve (ban quyen / dung luong lon) — khong dua len git
-PaperResearch/
 
 # Tệp sao lưu tự động của draw.io
 *.bkp
