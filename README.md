@@ -23,11 +23,11 @@ PDF chỉ dùng nội bộ nhóm (repo riêng tư).
 
 - **Đọc trước:** `Document/01_Plan/03_Pipeline.md` (tài liệu gốc: câu hỏi nghiên cứu, đóng góp, các bước, ma trận thí nghiệm), sau đó `02_BasePaper.md` và sơ đồ `Diagrams/ProjectDiagram.drawio` (mở bằng draw.io).
 - **Tải repo kèm mã tác giả:** `git clone --recurse-submodules <link repo>`; nếu đã clone rồi thì chạy `git submodule update --init`.
-- **Thư viện huấn luyện:** fork `github.com/Ticasslo/neuralhydrology` — nhánh `master` là mã tác giả, nhánh `thesis` là phần đề tài viết thêm; notebook cài theo mã commit.
+- **Thư viện huấn luyện:** fork `github.com/Ticasslo/neuralhydrology` — nhánh `master` là mã tác giả, nhánh `research` là phần đề tài viết thêm; notebook cài theo mã commit.
 - **Dữ liệu:** Kaggle Dataset `lamah-ce-ext` (riêng tư, cần chia sẻ quyền truy cập cho thành viên), tải bằng `Workspace/01_Download/01_LamaHCEExt_Download.py`.
 - **Quy ước:** tên thư mục, tệp tiếng Anh, nội dung tiếng Việt; tài liệu trong `Document/` đánh số theo thứ tự đọc; mỗi thư mục `Workspace/` một việc; mỗi notebook một tệp `.py` tự đủ, chia cell `# %% Phần X`; không đưa khóa API vào mã (dùng Kaggle/Colab Secrets).
 - **Sơ đồ:** sửa nội dung trong `Tools/Diagram_Build.py` rồi chạy lại, không sửa tay tệp `.drawio`.
 
 ## Trạng thái
 
-Đã chốt bài cơ sở BiasCast và pipeline; đã tải dữ liệu, kiểm tra % thiếu và tính persistence (NSE trung vị 0,35–0,37 so với 0,705 của mô hình tốt nhất). Việc tiếp theo: gửi kiến trúc cho GVHD; bước 0 (sửa thư viện trên nhánh `thesis`, cài `mamba-ssm`, kiểm thử đơn vị); viết lại notebook khám phá dữ liệu; bước A (chạy lại trọng số của tác giả).
+Đã chốt bài cơ sở BiasCast và pipeline; đã tải dữ liệu, kiểm tra % thiếu và tính persistence (NSE trung vị 0,35–0,37 so với 0,705 của mô hình tốt nhất). Việc tiếp theo: gửi kiến trúc cho GVHD; bước 0 (sửa thư viện trên nhánh `research` của fork, cài `mamba-ssm`, kiểm thử đơn vị); viết lại notebook khám phá dữ liệu; bước A (chạy lại trọng số của tác giả).

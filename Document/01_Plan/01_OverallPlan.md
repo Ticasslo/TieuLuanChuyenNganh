@@ -70,9 +70,10 @@ Không dùng trực tiếp: checkpoint có lớp đầu vào cố định theo 1
 | Mô hình của tác giả BiasCast (chạy lại trọng số) và huấn luyện lại 3 hạt giống | Mốc tái lập, đo nhiễu hạt giống |
 | LSTM cải tiến (tầng 1: sửa mã, Q cùng đơn vị, masked mean theo nguồn, che dữ liệu khi huấn luyện) | Mốc mạnh cho tầng 2 |
 | GRU, Transformer, S4D, Mamba trong cùng khung hindcast – forecast | So sánh lõi thời gian ở mức cùng tham số và sau tinh chỉnh cùng ngân sách |
+| LSTM cải tiến và lõi SSM tốt nhất dự báo 1–7 ngày (chỉ quá khứ, lai, dự báo hoàn hảo) | Mở rộng sang dự báo nhiều ngày bằng dữ liệu sẵn có |
 | Biến thể Mamba (quét hai chiều) và Transformer (patch như PatchTST) | Kiểm chứng một ý cải tiến cho mỗi lõi |
 
-Câu hỏi nghiên cứu, đóng góp, tính mới, giao thức so sánh và ma trận thí nghiệm (tối đa khoảng 112 lần huấn luyện): `Document/01_Plan/03_Pipeline.md` Mục 1, 5, 7.
+Câu hỏi nghiên cứu, đóng góp, tính mới, giao thức so sánh và ma trận thí nghiệm (tối đa 130 lần huấn luyện): `Document/01_Plan/03_Pipeline.md` Mục 1, 5, 7.
 
 ---
 
@@ -91,10 +92,10 @@ Chi tiết: `Document/01_Plan/03_Pipeline.md` Mục 6.
 
 ## 8. Hạ tầng
 
-- **Tính toán:** Kaggle là chính, từ 3 tài khoản trở lên (mỗi tài khoản GPU 30 giờ/tuần, tối đa 12 giờ/phiên; chỉ dùng T4 vì `mamba-ssm` không chạy trên P100); dự phòng Mamba bằng `mambapy` (PyTorch thuần), Google Colab miễn phí dự phòng, Lightning AI khi cần. `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel một lần rồi lưu Kaggle Dataset (`Document/06_Theory/02_RiverMamba.md` Mục 0).
+- **Tính toán:** Kaggle là chính, từ 3 tài khoản trở lên (mỗi tài khoản GPU 30 giờ/tuần, tối đa 12 giờ/phiên; chỉ dùng T4 vì `setup.py` của `mamba-ssm` chỉ biên dịch cho GPU từ sm_75, P100 là sm_60); dự phòng Mamba bằng `mambapy` (PyTorch thuần), Google Colab miễn phí dự phòng, Lightning AI khi cần. `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel một lần rồi lưu Kaggle Dataset (`Document/06_Theory/02_RiverMamba.md` Mục 0).
 - **Dữ liệu:** Kaggle Dataset private `lamah-ce-ext` (dữ liệu chính và kết quả thí nghiệm của tác giả); `lamah-ce-core`, `lamah-ce-extra` (LamaH-CE gốc theo giờ, mạng sông) cho khóa luận.
 - **Khung mã:** fork riêng từ bản fork NeuralHydrology của tác giả BiasCast; mô hình chung "Sequential Forecast" nhận lõi thời gian bất kỳ; kiểm thử đơn vị trước khi huấn luyện (`Document/01_Plan/03_Pipeline.md` Mục 9).
-- **Demo (bắt buộc với tiểu luận):** công nghệ và nơi triển khai chưa chốt; VPS chỉ dùng nếu có thời gian.
+- **Demo (bắt buộc với tiểu luận):** một mục trong trang web nhiều mục của nhóm (giới thiệu, hồ sơ tác giả, các dự án), chạy liên tục trên VPS Oracle Cloud miễn phí; phát lại dự báo đã tính sẵn trên kỳ test (bản đồ 451 lưu vực, đường Q 1–7 ngày, ngưỡng lũ), không cần GPU. Công nghệ giao diện và cách đưa ra Internet chưa chốt (`03_Pipeline.md` Mục 12).
 
 ---
 

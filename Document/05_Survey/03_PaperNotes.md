@@ -51,7 +51,7 @@
 
 | Tệp | Nội dung | Rút ra, học được | Áp dụng cho đề tài |
 |---|---|---|---|
-| `Taccari2026_JHydrol_AIFL.pdf` | AIFL (ECMWF): LSTM toàn cầu 18.588 lưu vực, huấn luyện trước trên ERA5-Land rồi tinh chỉnh trên dự báo IFS | Học chuyển giao hai giai đoạn hơn huấn luyện một giai đoạn — ngược kết quả của BiasCast; ngưỡng lũ Gumbel bằng L-moments; khung ngưỡng kép (ngưỡng mô hình từ chuỗi mô phỏng, ngưỡng quan trắc từ chuỗi đo); precision cao, recall thấp | Thảo luận về học chuyển giao; khung ngưỡng kép cho Mục 7 (Y10) |
+| `Taccari2026_arXiv_AIFL.pdf` | AIFL (ECMWF): LSTM toàn cầu 18.588 lưu vực, huấn luyện trước trên ERA5-Land rồi tinh chỉnh trên dự báo IFS | Học chuyển giao hai giai đoạn hơn huấn luyện một giai đoạn — ngược kết quả của BiasCast; ngưỡng lũ Gumbel bằng L-moments; khung ngưỡng kép (ngưỡng mô hình từ chuỗi mô phỏng, ngưỡng quan trắc từ chuỗi đo); precision cao, recall thấp | Thảo luận về học chuyển giao; khung ngưỡng kép cho Mục 7 (Y10) |
 | `AcunaEspinoza2026_EGUsphere_MF2LSTM.pdf` | MF²LSTM: LSTM đa tần số, masked mean, đồng hóa Q, dự báo giờ (preprint) | Q trễ (t−1, t−2, t−3) nhúng thành nhóm riêng rồi masked mean với khí tượng; che ngẫu nhiên khi huấn luyện với p_step = p_seq = 0,05 sau thử nghiệm; đề xuất chỉ số PNSE — NSE lấy Q quan sát cuối cùng làm mốc thay cho trung bình, vì NSE thường đánh giá quá cao mô hình có Q đầu vào | PNSE cho mọi cấu hình có Q (Y9); xác suất che Q ở Y1 nên thử cả 0,05 (Y11) |
 
 ## 5. Khảo sát (`Survey/`)
@@ -104,3 +104,10 @@ Chi tiết căn cứ, chi phí, vị trí trong pipeline: `Document/04_Ideas/01_
 ## 8. Đánh giá danh mục PDF
 
 44 tệp đều có vai trò: căn cứ cho pipeline, lý thuyết, khảo sát theo yêu cầu GVHD hoặc hướng khóa luận. Không có bài nào cần bỏ.
+
+## 9. Công trình liên quan chưa có PDF
+
+| Công trình | Nội dung | Rút ra | Áp dụng |
+|---|---|---|---|
+| *HydroDiffusion*, arXiv 2512.12183 (12/2025, preprint) | Mô hình khuếch tán xác suất với lõi SSM S4D-FT, khử nhiễu cả quỹ đạo 7 ngày một lần; 531 lưu vực CAMELS; dự báo vận hành bằng dự báo tái lập GEFSv12; không dùng Q quan trắc làm đầu vào | Lõi SSM nhỉnh hơn lõi LSTM (NSE ngày 0 trung vị 0,75 so với 0,73); công trình gần nhất về SSM trong dự báo có dự báo thời tiết thật | `03_Pipeline.md` Mục 1.3 |
+| Saint-Fleur và cs., HESS 30:3497–3527 (2026), DOI `10.5194/hess-30-3497-2026` | Ba chiến lược đồng hóa Q (đưa Q quan trắc, thêm dự báo của mô hình nền, hậu xử lý sai số) cho dự báo 1–7 ngày; CAMELS-US, CAMELS-FR; dự báo hoàn hảo và dự báo tổ hợp ECMWF | Với LSTM, Q quan trắc giúp chủ yếu ở lưu vực LSTM vốn kém; tổ hợp của LSTM bị thiếu độ phân tán | `03_Pipeline.md` Mục 1.3; đối chiếu khi phân tích lợi ích của Q theo lưu vực (Mục 6.4) |

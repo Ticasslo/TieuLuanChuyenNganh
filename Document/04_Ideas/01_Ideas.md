@@ -69,12 +69,14 @@ Nguồn: 44 tệp trong `PaperResearch/PaperResearchPDF/`, ghi chú từng bài 
 | # | Ý tưởng | Căn cứ | Mới so với bài | Chi phí | Đề xuất |
 |---|---|---|---|---|---|
 | Y9 | **Chỉ số PNSE:** NSE lấy Q quan sát ngày t−1 làm mốc thay cho trung bình; báo cáo cho mọi cấu hình có Q đầu vào, bên cạnh NSE | Acuña Espinoza và cs. (MF²LSTM, EGUsphere 2026): NSE đánh giá quá cao mô hình có Q đầu vào vì Q đã đặt dự báo vào đúng mức; PNSE là mốc chặt hơn ở tầm ngắn. Persistence của đề tài đã tính sẵn | BiasCast chỉ báo cáo NSE, KGE | Không huấn luyện thêm; tính từ dự báo đã có | Đánh giá (cùng chỗ với persistence, bước A và đánh giá chính) |
-| Y10 | **Khung ngưỡng kép cho đánh giá mức lũ:** ngưỡng mức lũ tính riêng trên chuỗi dự báo và chuỗi quan trắc; một sự kiện tính là đúng nếu cả hai vượt ngưỡng trong cùng cửa sổ thời gian (Nearing dùng 2 ngày); ngưỡng chu kỳ lặp lại fit Gumbel bằng L-moments | Nearing và cs. (Nature 2024); Taccari và cs. (AIFL, J. Hydrol. 2026) | BiasCast không đánh giá theo sự kiện | Không huấn luyện thêm | Bổ sung vào `03_Pipeline.md` Mục 6.2 (đánh giá theo mức lưu lượng) |
+| Y10 | **Khung ngưỡng kép cho đánh giá mức lũ:** ngưỡng mức lũ tính riêng trên chuỗi dự báo và chuỗi quan trắc; một sự kiện tính là đúng nếu cả hai vượt ngưỡng trong cùng cửa sổ thời gian (Nearing dùng 2 ngày); ngưỡng chu kỳ lặp lại fit Gumbel bằng L-moments | Nearing và cs. (Nature 2024); Taccari và cs. (AIFL, preprint arXiv 2026) | BiasCast không đánh giá theo sự kiện | Không huấn luyện thêm | Bổ sung vào `03_Pipeline.md` Mục 6.2 (đánh giá theo mức lưu lượng) |
 | Y11 | **Nhóm Q riêng trong masked mean và xác suất che Q:** nhúng Q trễ (t−1, t−2, t−3) thành nhóm riêng, gộp với các nhóm khí tượng bằng masked mean; thử xác suất che 0,05 bên cạnh 0,1/0,12 | MF²LSTM chọn p_step = p_seq = 0,05 sau thử nghiệm để cân bằng giữa có Q và mất Q; Gauch và cs. (2025) dùng 0,1/0,12 cho khí tượng | Bài đưa qmean thẳng vào đầu vào hindcast | +1–2 lần huấn luyện ở bước B | Gộp vào Y1 ở bước B |
 | Y12 | **Transformer có lớp nhúng tích chập nhân quả:** hai lớp Conv1D có kết nối tắt, nhân chỉ nhìn về quá khứ, trước lớp attention | Liu và cs. (J. Hydrol. 2024): Transformer cơ bản thua LSTM, bản có nhúng tích chập ngang LSTM trên CAMELS | Bài không có Transformer | +1 lần huấn luyện | Ứng viên biến thể Transformer ở bước E, thay hoặc bên cạnh PatchTST |
 | Y13 | **Mốc DLinear:** mô hình tuyến tính đơn giản trên cửa sổ quá khứ | Zhang và cs. (J. Hydrol. 2026): khi có Q quá khứ, DLinear tốt nhất ở tầm 1 giờ | Bài không có mốc tuyến tính | +1 lần huấn luyện, rất nhẹ | Bước A hoặc C, làm mốc giữa persistence và học sâu |
 | Y14 | **Lớp nhúng ReLU + dropout:** thay tanh trong lớp nhúng, thêm dropout | Phản biện 2 của BiasCast: tanh trong lớp nhúng cộng với tanh trong LSTM có thể bão hòa; tác giả xác nhận chưa thử, dropout lớp nhúng bằng 0; Baste và cs. (2025) chỉ ra giới hạn đỉnh của LSTM | Tác giả nêu là hướng tương lai | +1–2 lần huấn luyện ở bước B | Bước B, nếu còn ngân sách |
 | Y15 | **Biến thể S5D cho lõi S4D:** thêm Conv1D (thiên hướng cục bộ), LayerNorm, Softsign | Jing và cs. (ESWA 2026): S4D 0,756, S5D 0,763 so với LSTM 0,742 trên CAMELS-US, nhưng trong khung lai học tham số | Bài không có SSM | +1 lần huấn luyện | Ứng viên biến thể ở bước E nếu S4D tốt hơn Mamba ở bước C |
+| Y16 | **FiLM cho thuộc tính lưu vực:** thuộc tính tĩnh sinh hệ số γ, β để điều chỉnh đặc trưng ẩn theo dạng γ·h + β thay cho nối thuộc tính vào đầu vào mỗi bước | GVHD giới thiệu ở buổi họp 27/9/2026 (biên bản Mục 3.2); FiLM — Perez và cs., AAAI 2018, arXiv 1709.07871. Bằng chứng gần nhất trong thủy văn: EA-LSTM dùng thuộc tính tĩnh điều khiển cổng vào, NSE trung vị tổ hợp 0,742 so với 0,758 của LSTM nối thuộc tính (Kratzert và cs., HESS 2019, Bảng 2) — điều chỉnh bằng thuộc tính tĩnh chưa cho thấy lợi thế | BiasCast nối nhúng thuộc tính tĩnh vào mỗi bước | +3 lần huấn luyện | Chưa đưa vào; ứng viên bước B nếu còn ngân sách |
+| Y17 | **Dự báo 1–7 ngày bằng dữ liệu sẵn có:** dự báo qmax ngày t đến t+6; so ba cách cấp đầu vào pha dự báo: chỉ quá khứ, lai (ngày đầu dùng ECMWF HRES thật, các ngày sau để trống xử lý bằng masked mean), dự báo hoàn hảo bằng tái phân tích làm cận trên | Phản biện 2 của BiasCast chỉ ra hạn chế chỉ dự báo 1 ngày; tác giả nêu dự báo nhiều ngày là nghiên cứu sắp tới (BiasCast Mục 4); Extended LamaH-CE chỉ có ECMWF hạn 1 ngày (8 cột, một giá trị mỗi ngày); thư viện có sẵn `forecast_seq_length` | Bài chỉ dự báo 1 ngày | +18 lần huấn luyện | Bước H |
 
 ### 3.2. Giả thuyết cho phân tích theo lưu vực (Y3)
 
@@ -87,7 +89,7 @@ Ba nguồn độc lập cùng chỉ ra SSM có lợi ở lưu vực có động 
 | Y1, Y11 | Đưa vào | Bước B2–B3 (nhóm Q riêng, che dữ liệu hai mức xác suất); kịch bản S1, S2 |
 | Y2 | Đưa vào, thiết kế lại theo độ trễ riêng từng nguồn | Mục 6.3, kịch bản S3, S4 |
 | Y3 | Đưa vào | Mục 6.4 |
-| Y4 | Chưa đưa vào | Khóa luận hoặc bổ sung nếu còn thời gian |
+| Y4 | Đưa vào | Mục 6.7, bước G |
 | Y5 | Không cho tiểu luận | Mục 11 |
 | Y6 | Đưa vào | Mục 6.2 |
 | Y7 | Đưa vào dạng thí nghiệm kiểm chứng | Bước GV |
@@ -96,4 +98,6 @@ Ba nguồn độc lập cùng chỉ ra SSM có lợi ở lưu vực có động 
 | Y10 | Đưa vào; ngưỡng kép chỉ là phân tích phụ | Mục 6.2 |
 | Y12, Y15 | Dự phòng | Bước E |
 | Y13 | Đưa vào | Bước A3 |
-| Y14 | Chưa đưa vào | Ứng viên bước B nếu còn ngân sách |
+| Y14 | Chưa đưa vào; mã cho thấy lớp nhúng đơn giản (16 chiều) chỉ là một lớp tuyến tính, tanh chỉ có ở lớp nhúng phức 3 lớp, nên Y14 chỉ liên quan khi dùng nhúng phức | Ứng viên bước B nếu còn ngân sách |
+| Y16 | Chưa đưa vào; bằng chứng gần nhất (EA-LSTM) không hơn cách nối thuộc tính | Ứng viên bước B nếu còn ngân sách |
+| Y17 | Đưa vào | Bước H, Mục 4.4, 6.6 |

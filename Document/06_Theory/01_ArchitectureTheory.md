@@ -2,7 +2,7 @@
 
 > File cá nhân để học/ôn lại cơ chế hoạt động của từng kiến trúc deep learning liên quan tới đề tài (LSTM, Transformer, Mamba...). Mỗi phần đi từ công thức chuẩn → giải nghĩa từng ký hiệu → ví dụ số cụ thể (dùng bối cảnh dự báo lưu lượng sông cho dễ hình dung, số liệu là minh họa để hiểu cơ chế, không phải số từ model đã train thật).
 
-> *Phạm vi áp dụng:* đề tài dùng 4 bộ dữ liệu benchmark theo lưu vực (`01_Datasets.md`). Mục 4.7 (Bidirectional), 4.9 (Space-filling curve) và 4.10 là cơ chế riêng của RiverMamba cho **dữ liệu lưới không gian** — có giá trị tham khảo; phần lõi Mamba (4.1–4.6) và LOAN (4.8) vẫn áp dụng trực tiếp.
+> *Phạm vi áp dụng:* đề tài dùng dữ liệu theo lưu vực Extended LamaH-CE (`03_Data/01_LamaHCE.md`). Mục 4.7 (Bidirectional), 4.9 (Space-filling curve) và 4.10 là cơ chế riêng của RiverMamba cho **dữ liệu lưới không gian** — có giá trị tham khảo; phần lõi Mamba (4.1–4.6) và LOAN (4.8) vẫn áp dụng trực tiếp.
 
 ---
 

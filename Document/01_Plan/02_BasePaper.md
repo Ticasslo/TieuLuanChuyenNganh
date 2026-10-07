@@ -10,7 +10,7 @@
 | Tác giả | Oliver Konold, Moritz Feigl, Patrick Podest, Christoph Klingler, Karsten Schulz (BOKU University, Vienna; baseflow AI solutions, Vienna; Johannes Kepler University Linz) |
 | Nơi công bố | Hydrology and Earth System Sciences (HESS), 30, 5067–5096, 2026; bản thảo đăng HESS Discussions 27/11/2025 |
 | Xếp hạng | Scimago 2025: Q1 (Earth and Planetary Sciences; Water Science and Technology), SJR 2,035, H-index 194 |
-| Trích dẫn | 3 (Semantic Scholar, 7/10/2026), trong đó có AIFL — mô hình dự báo lưu lượng toàn cầu của ECMWF (J. Hydrol. 2026); chi tiết Mục 12 |
+| Trích dẫn | 3 (Semantic Scholar, 7/10/2026), trong đó có AIFL — mô hình dự báo lưu lượng toàn cầu của ECMWF (preprint arXiv 2602.16579, 2026); chi tiết Mục 12 |
 | Trang chính thức | https://hess.copernicus.org/articles/30/5067/2026/ |
 | Phản biện | Công khai: https://egusphere.copernicus.org/preprints/2025/egusphere-2025-4978/ |
 | Mã nguồn | https://github.com/conestone/neuralhydrology — thư viện NeuralHydrology do tác giả chỉnh sửa: mô hình (`modelzoo`), bộ đọc dữ liệu (`datasetzoo`), vòng huấn luyện (`training`), đánh giá (`evaluation`), điều khiển bằng tệp cấu hình `config.yml`; https://github.com/conestone/biascast — notebook gọi thư viện để chạy thí nghiệm, mã phân tích kết quả và vẽ hình trong bài (không chứa mô hình) |
@@ -154,16 +154,17 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 1. Tái lập bài gốc bằng trọng số của tác giả; bổ sung mốc persistence, PNSE và mốc tuyến tính DLinear; đo nhiễu giữa các hạt giống.
 2. Cải tiến LSTM của bài (tầng 1): giữ mẫu có dữ liệu thiếu bằng masked mean thay vì bỏ cả mẫu; hoàn thiện đầu vào lưu lượng quan trắc (cùng đơn vị với nhãn, Q các ngày trước, xử lý Q thiếu); huấn luyện có bỏ ngẫu nhiên lưu lượng quan trắc để một mô hình dùng được cả khi trạm mất số liệu (hướng tiếp theo do chính tác giả nêu); tổ hợp nhiều hạt giống.
 3. Thay lõi LSTM bằng GRU, Transformer, S4D và Mamba ở dạng thuần trên quy trình đã cải tiến (tầng 2), cùng dữ liệu, cùng chia tập, cùng số tham số và cùng ngân sách tinh chỉnh, 3 hạt giống, kiểm định Wilcoxon theo lưu vực; sau đó một biến thể cải tiến cho Mamba và một cho Transformer, mỗi biến thể so với bản thuần của chính nó. S4D là đối chứng để phân biệt "Mamba không phù hợp" với "SSM nói chung không phù hợp".
-4. Thử chuỗi quá khứ 730 ngày cho LSTM và Mamba — nơi Mamba được kỳ vọng có lợi thế chi phí.
-5. Đầu ra xác suất (CMAL) trên cấu hình tốt nhất để có xác suất vượt ngưỡng lũ.
-6. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và dữ liệu đến trễ theo đúng độ trễ của từng nguồn (ERA5-Land 5 ngày, E-OBS tới 6 tháng, GLEAM tới 1 năm); đánh giá theo mức lưu lượng và theo sự kiện lũ chu kỳ lặp lại 1, 2, 5, 10 năm; so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
+4. Thử chuỗi quá khứ 730 ngày cho LSTM, Mamba và S4D — nơi Mamba được kỳ vọng có lợi thế chi phí.
+5. Mở rộng sang dự báo 1–7 ngày bằng dữ liệu sẵn có (chỉ ngày đầu có dự báo ECMWF thật), so ba cách cấp đầu vào: chỉ quá khứ, lai, dự báo hoàn hảo làm cận trên — trả lời hạn chế lớn nhất người phản biện nêu.
+6. Đầu ra xác suất (CMAL) trên cấu hình tốt nhất để có xác suất vượt ngưỡng lũ.
+7. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và dữ liệu đến trễ theo đúng độ trễ của từng nguồn (ERA5-Land khoảng 5 ngày, GLEAM phát hành mỗi năm một lần — `03_Pipeline.md` Mục 3.2); đánh giá theo mức lưu lượng và theo sự kiện lũ chu kỳ lặp lại 1, 2, 5, 10 năm; so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
 
 **Phần đáp ứng yêu cầu tiểu luận:**
 
-7. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum): ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
-8. Demo bản đồ dự báo theo ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực.
+8. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum) và dò trạng thái ẩn: ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
+9. Demo (một mục trong trang web của nhóm trên VPS) bản đồ dự báo 1–7 ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực.
 
-**Giai đoạn khóa luận:** dự báo nhiều ngày; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Câu hỏi nghiên cứu, đóng góp, tính mới và ma trận thí nghiệm: `Document/01_Plan/03_Pipeline.md` Mục 1, 7; khóa luận: Mục 11.
+**Giai đoạn khóa luận:** dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Câu hỏi nghiên cứu, đóng góp, tính mới và ma trận thí nghiệm: `Document/01_Plan/03_Pipeline.md` Mục 1, 7; khóa luận: Mục 11.
 
 ## 11. Pipeline và kiến trúc chi tiết của bài (đọc từ mã)
 
@@ -238,6 +239,6 @@ Theo Semantic Scholar (tra 7/10/2026), BiasCast có 3 công trình trích dẫn:
 
 | Công trình | Nội dung | Liên quan tới đề tài |
 |---|---|---|
-| Taccari và cs. — *AIFL: A Global Daily Streamflow Forecasting Model Using a Deterministic LSTM Pre-trained on ERA5-Land and Fine-tuned on IFS*, J. Hydrology 2026 (ECMWF; arXiv 2602.16579) | LSTM toàn cầu dự báo lưu lượng ngày trên 18.588 lưu vực Caravan; huấn luyện trước trên ERA5-Land 1980–2019 rồi tinh chỉnh trên dự báo IFS 2016–2019; test 2021–2024, KGE′ trung vị 0,66 | Cùng vấn đề lệch miền tái phân tích → dự báo. **Kết luận ngược với BiasCast về học chuyển giao:** AIFL thấy huấn luyện hai giai đoạn tốt hơn chỉ dùng IFS và tốt hơn trộn hai nguồn, còn BiasCast thấy học chuyển giao kém Sequential Forecast LSTM (0,44 so với 0,63). Khác biệt có thể do quy mô dữ liệu (18.588 so với 451 lưu vực) và cách tinh chỉnh; cần nêu khi bàn về học chuyển giao |
+| Taccari và cs. — *AIFL: A Global Daily Streamflow Forecasting Model Using a Deterministic LSTM Pre-trained on ERA5-Land and Fine-tuned on IFS*, preprint 2026 (ECMWF; arXiv 2602.16579) | LSTM toàn cầu dự báo lưu lượng ngày trên 18.588 lưu vực Caravan; huấn luyện trước trên ERA5-Land 1980–2019 rồi tinh chỉnh trên dự báo IFS 2016–2019; test 2021–2024, KGE′ trung vị 0,66 | Cùng vấn đề lệch miền tái phân tích → dự báo. **Kết luận ngược với BiasCast về học chuyển giao:** AIFL thấy huấn luyện hai giai đoạn tốt hơn chỉ dùng IFS và tốt hơn trộn hai nguồn, còn BiasCast thấy học chuyển giao kém Sequential Forecast LSTM (0,44 so với 0,63). Khác biệt có thể do quy mô dữ liệu (18.588 so với 451 lưu vực) và cách tinh chỉnh; cần nêu khi bàn về học chuyển giao |
 | Acuña Espinoza và cs. — *Everything everywhere all at once: A single-cell LSTM network unifying multi-frequency, missing data, and discharge assimilation for robust operational flood forecasting*, EGUsphere 2026 (preprint, đang phản biện ở HESS) | MF²LSTM: một LSTM gộp dữ liệu nhiều tần suất, xử lý dữ liệu thiếu và đồng hóa Q thời gian thực; vẫn chạy khi mất Q (hỏng trạm, lưu vực không đo); dự báo giờ, tốt hơn mô hình vận hành LARSIM | Gần nhất với ý tưởng mô hình chịu mất Q (Y1) và hướng dữ liệu giờ của khóa luận; nhóm tác giả gồm Kratzert, Klotz, Gauch. Bài nhắc BiasCast như lưu ý rằng dự báo thời tiết có phân phối khác dữ liệu quan trắc |
 | *Comparing novel backward hydrological models for watershed-scale precipitation estimation…*, Scientific Reports 2026 | Ước lượng mưa từ lưu lượng (thủy văn ngược) | Không liên quan trực tiếp |

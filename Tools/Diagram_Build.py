@@ -31,14 +31,14 @@ SEQUENCE = [
     ("A", "A. Tái lập, persistence, PNSE, DLinear, nhiễu 3 hạt giống (6 lần)"),
     ("B", "B. LSTM cải tiến: Q, masked mean theo nguồn, che dữ liệu (12 lần)"),
     ("C", "C. 5 lõi cùng tham số, tinh chỉnh 8 cấu hình, 3 hạt giống (tối đa 70 lần)"),
-    ("C", "D–F. 730 ngày, biến thể, CMAL, kiểm chứng lấy mẫu lũ (24 lần)"),
+    ("C", "D–H. 730 ngày, dự báo 1–7 ngày, CMAL, biến thể, kiểm chứng lấy mẫu lũ (42 lần)"),
     ("EV", "Đánh giá: mức, sự kiện lũ, kịch bản vận hành, kiểm định"),
-    ("G", "G. Giải thích mô hình, ngưỡng lũ, demo"),
+    ("G", "G. Giải thích mô hình, dò trạng thái ẩn, ngưỡng lũ, demo"),
     ("keep", "BÁO CÁO"),
 ]
 LEGEND = [
     ("keep", "Giữ nguyên"), ("A", "A: tái lập, mốc"), ("B", "B: LSTM cải tiến"),
-    ("C", "C, D, E: lõi, chuỗi dài, biến thể"), ("F", "F: xác suất"),
+    ("C", "C, D, E, H: lõi, chuỗi dài, biến thể, nhiều ngày"), ("F", "F: xác suất"),
     ("EV", "Đánh giá thêm"), ("G", "G: giải thích, ngưỡng lũ, demo"),
 ]
 # Mỗi tầng: (tên, [(khối bài gốc, [(bước, khối sửa đổi), ...]), ...])
@@ -49,7 +49,8 @@ BANDS = [
         ("Q quá khứ: qmean khác đơn vị nhãn, thiếu ngày → mất mẫu",
          [("B", "B1. Q cùng đơn vị mm/ngày, thêm qmax quá khứ, nhóm Q riêng"),
           ("B", "B3. Che dữ liệu khi huấn luyện (0,1/0,12 và 0,05/0,05)")]),
-        ("Forecast ngày t: 5 biến ECMWF HRES", []),
+        ("Forecast ngày t: 5 biến ECMWF HRES",
+         [("C", "H. Dự báo 1–7 ngày: ngày đầu ECMWF thật, các ngày sau để trống; so với chỉ quá khứ và dự báo hoàn hảo")]),
         ("33 thuộc tính tĩnh · nhãn qmax ngày t (mm/ngày theo diện tích)", []),
     ]),
     ("2. Tiền xử lý", [
@@ -63,10 +64,10 @@ BANDS = [
         ("Nhúng tuyến tính, ghép 32 chiều/bước",
          [("B", "B2. Nhúng riêng từng nguồn, masked mean các nguồn có dữ liệu")]),
         ("LSTM 32→128: 364 bước hindcast + 1 bước forecast, trạng thái chạy liên tục",
-         [("C", "C. Mô hình chung nhận lõi bất kỳ: LSTM, GRU, Transformer, S4D, Mamba (cùng tham số ±5%)"),
+         [("C", "C. Mô hình chung nhận lõi bất kỳ: LSTM, GRU, Transformer, S4D, Mamba (cùng tham số, lệch ≤1%)"),
           ("C", "E. Mamba hai chiều, Transformer patch")]),
         ("Dropout 0,3, tuyến tính 128→1 → qmax",
-         [("F", "F. Đầu CMAL → xác suất vượt ngưỡng lũ")]),
+         [("F", "F. Đầu CMAL → xác suất vượt ngưỡng lũ"), ("C", "H. Đầu ra 7 bước: qmax ngày t … t+6")]),
     ]),
     ("4. Huấn luyện", [
         ("Hàm mất mát NSE*: (ŷ−y)² / (σ lưu vực + 0,1)²", []),
@@ -87,13 +88,13 @@ BANDS = [
          [("EV", "ΔNSE SSM so LSTM theo lưu vực: tuyết, động lực chậm, lũ nhanh"),
           ("EV", "Chi phí: tham số, thời gian mỗi epoch, bộ nhớ")]),
         ("Chưa có giải thích mô hình, ngưỡng lũ, ứng dụng",
-         [("G", "G. Integrated Gradients, ngưỡng Gumbel L-moments, bản đồ cảnh báo 451 lưu vực")]),
+         [("G", "G. Integrated Gradients, dò trạng thái ẩn, ngưỡng Gumbel L-moments, demo trên trang web của nhóm (VPS): bản đồ 451 lưu vực, đường Q 7 ngày")]),
     ]),
 ]
 CUT_ORDER = ("Thứ tự cắt khi thiếu thời gian: (1) biến thể dự phòng bước E → (2) kiểm chứng lấy mẫu lũ"
              " → (3) giải thích mô hình → (4) biến thể chính bước E → (5) 730 ngày cho S4D"
-             " → (6) tinh chỉnh 8 → 4 cấu hình mỗi lõi")
-THESIS = ("Khóa luận: dữ liệu giờ, dự báo nhiều ngày, hàm mất mát ưu tiên đỉnh, đồ thị mạng sông,"
+             " → (6) cách dự báo hoàn hảo ở bước H → (7) tinh chỉnh 8 → 4 cấu hình mỗi lõi")
+THESIS = ("Khóa luận: dữ liệu giờ, dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật, hàm mất mát ưu tiên đỉnh, đồ thị mạng sông,"
           " biến thể lai Mamba–Transformer, xLSTM, phần mềm ứng dụng")
 
 # %% Phần 3 — Bố cục tọa độ và ghi tệp

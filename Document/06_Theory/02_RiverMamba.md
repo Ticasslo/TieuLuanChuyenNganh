@@ -8,7 +8,7 @@
 
 - Cả Colab và Kaggle đều là môi trường tạm: Colab ngắt khi không hoạt động khoảng 90 phút hoặc tối đa khoảng 12 giờ liên tục; Kaggle tối đa 12 giờ mỗi phiên GPU, 30 giờ GPU mỗi tuần. Môi trường cài đặt mất sau mỗi phiên trên cả hai nền tảng.
 - Cách xử lý: build `mamba-ssm`, `causal-conv1d` (và `flash-attn` nếu cần) **một lần**, lưu file `.whl` đã biên dịch vào nơi lưu trữ bền (Google Drive với Colab, Kaggle Dataset với Kaggle). Các phiên sau chỉ cần cài từ file wheel trong vài giây thay vì biên dịch lại từ mã nguồn.
-- `mamba-ssm` cần GPU CUDA kiến trúc sm_75 trở lên (T4 chạy được, P100 không).
+- `mamba-ssm` cần GPU CUDA kiến trúc sm_75 trở lên (T4 chạy được, P100 không): `setup.py` của `state-spaces/mamba` và `causal-conv1d` chỉ biên dịch cho `compute_75` trở lên.
 - Mã của dự án viết dạng `.py` chia `# %% Phần X`, mỗi cell dán trực tiếp vào Colab/Kaggle — thuận tiện so sánh thay đổi qua git.
 
 ## 1. Tổng quan repo
