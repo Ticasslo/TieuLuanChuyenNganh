@@ -46,7 +46,7 @@ BANDS = [
     ("1. Dữ liệu đầu vào", [
         ("Hindcast 364 ngày × 31 biến (ERA5-Land, E-OBS, MSWEP, GLEAM), một khối chung",
          [("B", "B2. Chia nhóm theo nguồn dữ liệu"), ("C", "D. Mở rộng 730 ngày (LSTM, Mamba, S4D)")]),
-        ("Q quá khứ: qmean (đơn vị chưa kiểm, kiểm ở A4), thiếu ngày → mất mẫu",
+        ("Q quá khứ: qmean (đơn vị chưa kiểm, kiểm ở A2), thiếu ngày → mất mẫu",
          [("B", "B1. Q cùng đơn vị mm/ngày với nhãn, thêm qmax quá khứ; B2: nhóm Q riêng"),
           ("B", "B3. Che dữ liệu khi huấn luyện (0,1/0,12 và 0,05/0,05)")]),
         ("Forecast ngày t: 5 biến ECMWF HRES",
