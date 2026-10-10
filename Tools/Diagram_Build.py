@@ -88,7 +88,7 @@ BANDS = [
          [("EV", "ΔNSE SSM so LSTM theo lưu vực: tuyết, động lực chậm, lũ nhanh"),
           ("EV", "Chi phí: tham số, thời gian mỗi epoch, bộ nhớ")]),
         ("Chưa có giải thích mô hình, ngưỡng lũ, ứng dụng",
-         [("G", "G. Integrated Gradients, dò trạng thái ẩn, ngưỡng Gumbel L-moments, demo trên trang web của nhóm (VPS): bản đồ 451 lưu vực, đường Q 7 ngày")]),
+         [("G", "G. Integrated Gradients, dò trạng thái ẩn, ngưỡng Gumbel L-moments, demo trên trang web của nhóm (VPS): bản đồ 451 lưu vực, đường Q 7 ngày; chạy CPU: Kaggle GPU → Kaggle CPU → laptop → VPS")]),
     ]),
 ]
 CUT_ORDER = ("Thứ tự cắt khi thiếu thời gian: (1) biến thể dự phòng bước E → (2) kiểm chứng lấy mẫu lũ"

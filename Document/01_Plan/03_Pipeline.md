@@ -69,7 +69,7 @@ Cách nói trước hội đồng: đề tài không khẳng định Mamba tốt
 | 7. Đánh giá | Bộ đánh giá Mục 6 | Bảng, hình, kiểm định | Chưa làm |
 | 8. Giải thích | Integrated Gradients, dò trạng thái ẩn | Hình mức ảnh hưởng | Chưa làm |
 | 9. Ngưỡng lũ | Gumbel L-moments trên qmax năm | Ngưỡng 1, 2, 5, 10 năm mỗi trạm | Chưa làm |
-| 10. Demo | Một mục trong trang web nhiều mục của nhóm, chạy liên tục trên VPS Oracle Cloud miễn phí: bản đồ cảnh báo phát lại kỳ test, đường Q 7 ngày, mức ảnh hưởng của các nhóm nguồn theo lưu vực; đọc kết quả đã tính sẵn nên không cần GPU | Ứng dụng | Chưa làm |
+| 10. Demo | Một mục trong trang web nhiều mục của nhóm, chạy liên tục trên VPS Oracle Cloud miễn phí: bản đồ cảnh báo phát lại kỳ test, đường Q 7 ngày, mức ảnh hưởng của các nhóm nguồn theo lưu vực; mô hình chạy thật trên CPU cho lưu vực và ngày được chọn, có thử "nếu… thì…" với dự báo ECMWF HRES ngày t; huấn luyện trên GPU, demo chạy CPU, làm trên laptop trước rồi đưa lên VPS (Mục 9.6) | Ứng dụng | Chưa làm |
 
 ---
 
@@ -281,7 +281,8 @@ Tổng tối đa 130 lần huấn luyện (A: 6; B: 12; C: 40 + 30; D, E, F, H, 
 | Masked mean, che dữ liệu làm giảm NSE ở S0 | Vẫn báo cáo; chọn B* theo validation; lợi ích ở kịch bản S1–S4 |
 | Ngưỡng lũ 10 năm có ít sự kiện trong 4 năm test | Báo cáo số sự kiện; kết luận chính dựa trên 1 và 2 năm |
 | Thời gian chạy vượt dự kiến | Cắt theo Mục 8.3 |
-| VPS Oracle Always Free bị thu hồi khi rảnh (7 ngày dưới 20% CPU, mạng, bộ nhớ — tài liệu Oracle, cập nhật 12/6/2026) | Đóng gói demo bằng Docker để dựng lại nhanh; giữ một bản sao trên dịch vụ miễn phí khác cho ngày bảo vệ |
+| PyTorch không chạy được trên CPU ARM của VPS, hoặc Mamba bằng `mambapy` trên CPU lệch kết quả hay quá chậm | Kiểm ở bước D2 trên Kaggle, D4 trên VPS (Mục 9.6); Mamba không đạt thì phần chạy trực tiếp chỉ dùng LSTM cải tiến, các lõi khác đọc kết quả tính sẵn; VPS không đạt thì dùng bản laptop (D3) |
+| VPS Oracle Always Free bị thu hồi khi rảnh (7 ngày dưới 20% CPU, mạng, bộ nhớ — tài liệu Oracle, cập nhật 12/6/2026) | Đóng gói demo bằng Docker để dựng lại nhanh; giữ bản chạy trên laptop (Mục 9.6, bước D3) cho ngày bảo vệ |
 
 ### 8.3. Thứ tự cắt nếu thiếu thời gian
 
@@ -342,7 +343,26 @@ Tên thư mục từ `04_` trở đi là đề xuất, đặt khi bắt đầu v
 
 ### 9.5. Đầu ra cho đánh giá và demo
 
-Bộ đánh giá và demo chỉ đọc dự báo đã lưu, không gọi mô hình, nên trang web không phụ thuộc mã huấn luyện. Mỗi cấu hình chính thức xuất một tệp dự báo kỳ test theo định dạng chung: mã lưu vực, ngày phát hành, hạn (1–7), qmax quan trắc, qmax dự báo (mm/ngày và m³/s), phân vị khi dùng CMAL, mã cấu hình và mã commit thư viện. Kết quả giải thích mô hình (Mục 6.7) lưu riêng, tổng hợp theo lưu vực, để demo hiển thị. Định dạng tệp cụ thể chọn khi viết bộ đánh giá. Trang demo công khai phải ghi nguồn dữ liệu (Extended LamaH-CE, LamaH-CE, BiasCast) kèm giấy phép, ghi rõ đây là phát lại kỳ test để minh họa, không phải cảnh báo chính thức (điều kiện CHMI về số liệu lưu lượng Séc, `01_OverallPlan.md` Mục 9), và không thu phí, không quảng cáo (giấy phép phi thương mại).
+Bộ đánh giá chỉ đọc dự báo đã lưu, không gọi mô hình. Demo dùng các tệp này cho bản đồ và đường Q, còn phần chạy mô hình trực tiếp theo Mục 9.6. Mỗi cấu hình chính thức xuất một tệp dự báo kỳ test theo định dạng chung: mã lưu vực, ngày phát hành, hạn (1–7), qmax quan trắc, qmax dự báo (mm/ngày và m³/s), phân vị khi dùng CMAL, mã cấu hình và mã commit thư viện. Kết quả giải thích mô hình (Mục 6.7) lưu riêng, tổng hợp theo lưu vực, để demo hiển thị. Định dạng tệp cụ thể chọn khi viết bộ đánh giá. Trang demo công khai phải ghi nguồn dữ liệu (Extended LamaH-CE, LamaH-CE, BiasCast) kèm giấy phép, ghi rõ đây là phát lại kỳ test để minh họa, không phải cảnh báo chính thức (điều kiện CHMI về số liệu lưu lượng Séc, `01_OverallPlan.md` Mục 9), và không thu phí, không quảng cáo (giấy phép phi thương mại).
+
+### 9.6. Đưa mô hình vào demo
+
+Demo có hai phần. Phần phát lại đọc tệp dự báo ở Mục 9.5 (bản đồ 451 lưu vực, đường Q, ngưỡng lũ, mức ảnh hưởng của các nhóm nguồn). Phần chạy mô hình trực tiếp nhận lưu vực và ngày t trong kỳ test, lấy cửa sổ hindcast, dự báo ECMWF HRES ngày t và thuộc tính lưu vực từ dữ liệu đã lưu, chuẩn hóa bằng thông số chuẩn hóa lúc huấn luyện, chạy mô hình rồi đổi kết quả sang m³/s; phần thử "nếu… thì…" cho người xem nhân lượng mưa hoặc cộng nhiệt độ của ECMWF HRES ngày t rồi chạy lại. Dữ liệu Extended LamaH-CE chỉ tới 2017 nên đây vẫn là phát lại, không phải dự báo thời gian thực (Mục 11).
+
+Huấn luyện chạy trên GPU (Kaggle); demo chạy trên CPU. Mỗi lần dự báo một lưu vực, một ngày là một lượt chạy xuôi của mô hình khoảng 85 nghìn tham số trên chuỗi 365 bước, nên CPU đủ dùng. GPU miễn phí để phục vụ web không phù hợp: Hugging Face ZeroGPU tính hạn mức GPU theo tài khoản người xem (tài khoản miễn phí 5 phút mỗi ngày) và chỉ chạy Gradio; Space Gradio hoặc Docker trên CPU Basic cần gói trả phí mới tạo được (tài liệu Hugging Face *Spaces ZeroGPU*, *Using GPU Spaces*). Giao diện chạy trong notebook Kaggle không dùng làm demo vì chỉ sống trong phiên notebook (tối đa 12 giờ).
+
+`mamba-ssm` chỉ chạy trên GPU CUDA, nên khi chạy trên CPU, khối Mamba thay bằng `mambapy` (PyTorch thuần). README của `mambapy` ghi cách cài đặt tương đương số học với bản gốc và có hàm nạp trọng số `state-spaces/mamba-130m`; việc ánh xạ trọng số cho khối Mamba của đề tài chưa kiểm. LSTM, GRU, Transformer chạy CPU bằng nguyên mã; S4D chạy CPU nếu cài đặt không dùng kernel CUDA riêng (chọn khi viết lõi ở bước C).
+
+Thứ tự thực hiện, bước sau chỉ làm khi bước trước đạt:
+
+| Bước | Nơi chạy | Thiết bị | Việc | Điều kiện đạt |
+|---|---|---|---|---|
+| D1 | Kaggle | GPU | Viết hàm dự báo tách khỏi mã huấn luyện: nạp trọng số và thông số chuẩn hóa, nhận mã lưu vực và ngày t, trả qmax; chạy lại trên toàn kỳ test | Trùng tệp dự báo của bộ đánh giá (Mục 9.5), chỉ lệch ở mức làm tròn số thực; ngưỡng sai khác đặt khi viết mã |
+| D2 | Kaggle | CPU | Chạy cùng hàm trên CPU; Mamba dùng `mambapy` | Trùng kết quả D1; đo thời gian mỗi lần dự báo và bộ nhớ |
+| D3 | Laptop | CPU | Tải trọng số, thông số chuẩn hóa và dữ liệu đầu vào từ Kaggle; dựng giao diện demo (phần phát lại và phần chạy trực tiếp) | Trùng kết quả D2; giao diện chạy đủ hai phần |
+| D4 | VPS Oracle (CPU ARM) | CPU | Chép đúng mã D3 lên VPS, cài PyTorch bản CPU cho ARM, đóng gói Docker (Mục 8.2), đưa ra Internet | Trùng kết quả D3; có đường dẫn công khai |
+
+Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba trên CPU không đạt ở D2 (lệch kết quả hoặc quá chậm), phần chạy trực tiếp chỉ dùng LSTM cải tiến, các lõi khác hiển thị kết quả tính sẵn.
 
 ---
 
@@ -380,7 +400,7 @@ Bộ đánh giá và demo chỉ đọc dự báo đã lưu, không gọi mô hì
 | Việc | Ghi chú |
 |---|---|
 | Tên nội bộ tiểu luận | `01_OverallPlan.md` Mục 1 |
-| Trang web và demo: công nghệ giao diện; cách đưa ra Internet (Cloudflare Tunnel cần tên miền quản lý trên Cloudflare; mở cổng và reverse proxy); chạy liên tục khi VPS Always Free có thể bị thu hồi lúc rảnh (Mục 8.2) | Tra và quyết khi có bản demo chạy thử; mã đề tài chỉ cần xuất dự báo theo định dạng ở Mục 9.5 |
+| Trang web và demo: công nghệ giao diện; cách đưa ra Internet (Cloudflare Tunnel cần tên miền quản lý trên Cloudflare; mở cổng và reverse proxy); chạy liên tục khi VPS Always Free có thể bị thu hồi lúc rảnh (Mục 8.2) | Tra và quyết khi có bản demo chạy thử; mã đề tài xuất dự báo theo định dạng ở Mục 9.5 và hàm dự báo theo các bước ở Mục 9.6 |
 
 ---
 

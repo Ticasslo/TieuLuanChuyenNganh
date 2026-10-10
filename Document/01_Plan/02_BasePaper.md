@@ -162,7 +162,7 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 **Phần đáp ứng yêu cầu tiểu luận:**
 
 8. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum) và dò trạng thái ẩn: ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
-9. Demo (một mục trong trang web của nhóm trên VPS) bản đồ dự báo 1–7 ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực.
+9. Demo (một mục trong trang web của nhóm trên VPS) bản đồ dự báo 1–7 ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực; mô hình chạy thật trên CPU cho lưu vực và ngày được chọn, có thử "nếu… thì…" với dự báo ECMWF HRES (`03_Pipeline.md` Mục 9.6).
 
 **Giai đoạn khóa luận:** dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Câu hỏi nghiên cứu, đóng góp, tính mới và ma trận thí nghiệm: `Document/01_Plan/03_Pipeline.md` Mục 1, 7; khóa luận: Mục 11.
 

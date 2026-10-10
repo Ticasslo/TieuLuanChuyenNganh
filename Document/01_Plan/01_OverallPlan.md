@@ -43,7 +43,7 @@ Không dùng trực tiếp: checkpoint có lớp đầu vào cố định theo 1
 
 | Thành phần | Mô tả |
 |---|---|
-| Biến đổi log1p có dấu | `sign(x)*log1p(|x|)` áp lên Δ lưu lượng trước MSE/L1 |
+| Biến đổi log1p có dấu | `sign(x)*log1p(\|x\|)` áp lên Δ lưu lượng trước MSE/L1 |
 | Trọng số chu kỳ lặp lại trong hàm mất mát | Ưu tiên thời điểm vượt ngưỡng lũ hiếm |
 | LOAN | `(X−μ)/σ + GELU(Linear(X_static))` — đưa thuộc tính tĩnh vào chuẩn hóa |
 | Mamba hai chiều | Rò rỉ tương lai chỉ khi xuất dự báo tại từng bước của chuỗi; quét hai chiều trong cửa sổ quá khứ rồi dự báo sau cửa sổ thì không rò rỉ (ResBi-Mamba Plus, AISE 2026) — ứng viên biến thể Mamba ở bước E |
@@ -95,7 +95,7 @@ Chi tiết: `Document/01_Plan/03_Pipeline.md` Mục 6.
 - **Tính toán:** Kaggle là chính, từ 3 tài khoản trở lên (mỗi tài khoản GPU 30 giờ/tuần, tối đa 12 giờ/phiên; chỉ dùng T4 vì `setup.py` của `mamba-ssm` chỉ biên dịch cho GPU từ sm_75, P100 là sm_60); dự phòng Mamba bằng `mambapy` (PyTorch thuần), Google Colab miễn phí dự phòng, Lightning AI khi cần. `mamba-ssm` cần GPU CUDA (kernel `selective_scan_cuda`, `causal_conv1d_cuda`); build wheel một lần rồi lưu Kaggle Dataset (`Document/06_Theory/02_RiverMamba.md` Mục 0).
 - **Dữ liệu:** Kaggle Dataset private `lamah-ce-ext` (dữ liệu chính và kết quả thí nghiệm của tác giả); `lamah-ce-core`, `lamah-ce-extra` (LamaH-CE gốc theo giờ, mạng sông) cho khóa luận.
 - **Khung mã:** fork riêng từ bản fork NeuralHydrology của tác giả BiasCast; mô hình chung "Sequential Forecast" nhận lõi thời gian bất kỳ; kiểm thử đơn vị trước khi huấn luyện (`Document/01_Plan/03_Pipeline.md` Mục 9).
-- **Demo (bắt buộc với tiểu luận):** một mục trong trang web nhiều mục của nhóm (giới thiệu, hồ sơ tác giả, các dự án), chạy liên tục trên VPS Oracle Cloud miễn phí; phát lại dự báo đã tính sẵn trên kỳ test (bản đồ 451 lưu vực, đường Q 1–7 ngày, ngưỡng lũ), không cần GPU. Công nghệ giao diện và cách đưa ra Internet chưa chốt (`03_Pipeline.md` Mục 12).
+- **Demo (bắt buộc với tiểu luận):** một mục trong trang web nhiều mục của nhóm (giới thiệu, hồ sơ tác giả, các dự án), chạy liên tục trên VPS Oracle Cloud miễn phí; phát lại kỳ test (bản đồ 451 lưu vực, đường Q 1–7 ngày, ngưỡng lũ) và chạy mô hình thật trên CPU cho lưu vực, ngày được chọn, có thử "nếu… thì…" với dự báo ECMWF HRES ngày t; huấn luyện trên GPU Kaggle, demo chạy CPU, làm trên laptop trước rồi đưa lên VPS, bản laptop giữ dự phòng (`03_Pipeline.md` Mục 9.6). Công nghệ giao diện và cách đưa ra Internet chưa chốt (`03_Pipeline.md` Mục 12).
 
 ---
 
