@@ -1,6 +1,6 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='890' height='340' viewBox='0 0 890 340'>
 <rect width='890' height='340' fill='white'/>
-<text x='445.0' y='24' text-anchor='middle' font-size='15' font-weight='bold' font-family='Arial, sans-serif'>Ba dự báo cùng NSE khoảng 0,5 nhưng sai theo ba kiểu (minh họa)</text>
+<text x='445.0' y='24' text-anchor='middle' font-size='15' font-weight='bold' font-family='Arial, sans-serif'>Three forecasts with NSE ≈ 0.5 but three kinds of error (illustration)</text>
 <rect x='40.0' y='55' width='250' height='190' fill='none' stroke='#bbbbbb'/>
 <text x='35.0' y='249.0' text-anchor='end' font-size='10' fill='#666' font-family='Arial, sans-serif'>0</text>
 <text x='35.0' y='185.66666666666669' text-anchor='end' font-size='10' fill='#666' font-family='Arial, sans-serif'>5</text>
@@ -18,9 +18,9 @@
 <text x='290.0' y='259' text-anchor='middle' font-size='10' fill='#666' font-family='Arial, sans-serif'>10</text>
 <polyline points='40.0,219.7 67.8,219.7 95.6,207.0 123.3,143.7 151.1,93.0 178.9,156.3 206.7,194.3 234.4,207.0 262.2,219.7 290.0,219.7' fill='none' stroke='black' stroke-width='2.5'/>
 <polyline points='40.0,191.8 67.8,191.8 95.6,179.1 123.3,115.8 151.1,65.1 178.9,128.5 206.7,166.5 234.4,179.1 262.2,191.8 290.0,191.8' fill='none' stroke='#1f77b4' stroke-width='2.5'/>
-<text x='165.0' y='47' text-anchor='middle' font-size='13' font-weight='bold' fill='#1f77b4' font-family='Arial, sans-serif'>Lệch đều: luôn cao hơn 2,2</text>
-<text x='165.0' y='279' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>NSE 0,54</text>
-<text x='165.0' y='295' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>r = 1,00   α = 1,00   β = 1,49</text>
+<text x='165.0' y='47' text-anchor='middle' font-size='13' font-weight='bold' fill='#1f77b4' font-family='Arial, sans-serif'>Constant offset: always +2.2</text>
+<text x='165.0' y='279' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>NSE 0.54</text>
+<text x='165.0' y='295' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>r = 1.00   α = 1.00   β = 1.49</text>
 <rect x='330.0' y='55' width='250' height='190' fill='none' stroke='#bbbbbb'/>
 <text x='325.0' y='249.0' text-anchor='end' font-size='10' fill='#666' font-family='Arial, sans-serif'>0</text>
 <text x='325.0' y='185.66666666666669' text-anchor='end' font-size='10' fill='#666' font-family='Arial, sans-serif'>5</text>
@@ -38,9 +38,9 @@
 <text x='580.0' y='259' text-anchor='middle' font-size='10' fill='#666' font-family='Arial, sans-serif'>10</text>
 <polyline points='330.0,219.7 357.8,219.7 385.6,207.0 413.3,143.7 441.1,93.0 468.9,156.3 496.7,194.3 524.4,207.0 552.2,219.7 580.0,219.7' fill='none' stroke='black' stroke-width='2.5'/>
 <polyline points='330.0,197.5 357.8,197.5 385.6,193.7 413.3,174.7 441.1,159.5 468.9,178.5 496.7,189.9 524.4,193.7 552.2,197.5 580.0,197.5' fill='none' stroke='#ff7f0e' stroke-width='2.5'/>
-<text x='455.0' y='47' text-anchor='middle' font-size='13' font-weight='bold' fill='#ff7f0e' font-family='Arial, sans-serif'>Biên độ thấp: quá phẳng</text>
-<text x='455.0' y='279' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>NSE 0,51</text>
-<text x='455.0' y='295' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>r = 1,00   α = 0,30   β = 1,00</text>
+<text x='455.0' y='47' text-anchor='middle' font-size='13' font-weight='bold' fill='#ff7f0e' font-family='Arial, sans-serif'>Low amplitude: too flat</text>
+<text x='455.0' y='279' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>NSE 0.51</text>
+<text x='455.0' y='295' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>r = 1.00   α = 0.30   β = 1.00</text>
 <rect x='620.0' y='55' width='250' height='190' fill='none' stroke='#bbbbbb'/>
 <text x='615.0' y='249.0' text-anchor='end' font-size='10' fill='#666' font-family='Arial, sans-serif'>0</text>
 <text x='615.0' y='185.66666666666669' text-anchor='end' font-size='10' fill='#666' font-family='Arial, sans-serif'>5</text>
@@ -58,8 +58,8 @@
 <text x='870.0' y='259' text-anchor='middle' font-size='10' fill='#666' font-family='Arial, sans-serif'>10</text>
 <polyline points='620.0,219.7 647.8,219.7 675.6,207.0 703.3,143.7 731.1,93.0 758.9,156.3 786.7,194.3 814.4,207.0 842.2,219.7 870.0,219.7' fill='none' stroke='black' stroke-width='2.5'/>
 <polyline points='620.0,219.7 647.8,219.7 675.6,217.1 703.3,194.3 731.1,133.5 758.9,105.7 786.7,163.9 814.4,196.9 842.2,209.5 870.0,219.7' fill='none' stroke='#2ca02c' stroke-width='2.5'/>
-<text x='745.0' y='47' text-anchor='middle' font-size='13' font-weight='bold' fill='#2ca02c' font-family='Arial, sans-serif'>Chậm nhịp: đỉnh trễ 1 ngày</text>
-<text x='745.0' y='279' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>NSE 0,52</text>
-<text x='745.0' y='295' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>r = 0,75   α = 0,94   β = 1,00</text>
-<text x='445.0' y='334' text-anchor='middle' font-size='11' fill='#555' font-family='Arial, sans-serif'>đen: qmax đo thật; trục ngang: ngày 1–10; trục dọc: mm/ngày</text>
+<text x='745.0' y='47' text-anchor='middle' font-size='13' font-weight='bold' fill='#2ca02c' font-family='Arial, sans-serif'>Lagged timing: peak 1 day late</text>
+<text x='745.0' y='279' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>NSE 0.52</text>
+<text x='745.0' y='295' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>r = 0.75   α = 0.94   β = 1.00</text>
+<text x='445.0' y='334' text-anchor='middle' font-size='11' fill='#555' font-family='Arial, sans-serif'>black: observed qmax; x-axis: day 1–10; y-axis: mm/day</text>
 </svg>

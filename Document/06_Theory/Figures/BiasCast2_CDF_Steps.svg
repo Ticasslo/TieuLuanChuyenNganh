@@ -1,18 +1,18 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='640' height='420' viewBox='0 0 640 420'>
 <rect width='640' height='420' fill='white'/>
-<text x='320.0' y='22' text-anchor='middle' font-size='15' font-weight='bold' font-family='Arial, sans-serif'>Đường CDF của 5 lưu vực (minh họa)</text>
+<text x='320.0' y='22' text-anchor='middle' font-size='15' font-weight='bold' font-family='Arial, sans-serif'>CDF of 5 basins (illustration)</text>
 <line x1='70' y1='360' x2='610' y2='360' stroke='#e6e6e6'/>
-<text x='62' y='364' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0,0</text>
+<text x='62' y='364' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0.0</text>
 <line x1='70' y1='296.0' x2='610' y2='296.0' stroke='#e6e6e6'/>
-<text x='62' y='300.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0,2</text>
+<text x='62' y='300.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0.2</text>
 <line x1='70' y1='232.0' x2='610' y2='232.0' stroke='#e6e6e6'/>
-<text x='62' y='236.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0,4</text>
+<text x='62' y='236.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0.4</text>
 <line x1='70' y1='168.0' x2='610' y2='168.0' stroke='#e6e6e6'/>
-<text x='62' y='172.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0,6</text>
+<text x='62' y='172.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0.6</text>
 <line x1='70' y1='103.99999999999999' x2='610' y2='103.99999999999999' stroke='#e6e6e6'/>
-<text x='62' y='107.99999999999999' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0,8</text>
+<text x='62' y='107.99999999999999' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0.8</text>
 <line x1='70' y1='40.0' x2='610' y2='40.0' stroke='#e6e6e6'/>
-<text x='62' y='44.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>1,0</text>
+<text x='62' y='44.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>1.0</text>
 <line x1='130.0' y1='40' x2='130.0' y2='360' stroke='#e6e6e6'/>
 <text x='130.0' y='378' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>−3</text>
 <line x1='250.0' y1='40' x2='250.0' y2='360' stroke='#e6e6e6'/>
@@ -22,21 +22,21 @@
 <line x1='490.0' y1='40' x2='490.0' y2='360' stroke='#e6e6e6'/>
 <text x='490.0' y='378' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>0</text>
 <line x1='550.0' y1='40' x2='550.0' y2='360' stroke='#e6e6e6'/>
-<text x='550.0' y='378' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>0,5</text>
+<text x='550.0' y='378' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>0.5</text>
 <line x1='610.0' y1='40' x2='610.0' y2='360' stroke='#e6e6e6'/>
 <text x='610.0' y='378' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>1</text>
 <line x1='70' y1='360' x2='610' y2='360' stroke='black'/>
 <line x1='70' y1='40' x2='70' y2='360' stroke='black'/>
-<text x='340.0' y='405' text-anchor='middle' font-size='13' font-family='Arial, sans-serif'>NSE của lưu vực (trục x)</text>
-<text x='18' y='200.0' text-anchor='middle' font-size='13' font-family='Arial, sans-serif' transform='rotate(-90 18 200.0)'>Tỷ lệ lưu vực có NSE ≤ x (trục y)</text>
+<text x='340.0' y='405' text-anchor='middle' font-size='13' font-family='Arial, sans-serif'>Basin NSE (x-axis)</text>
+<text x='18' y='200.0' text-anchor='middle' font-size='13' font-family='Arial, sans-serif' transform='rotate(-90 18 200.0)'>Fraction of basins with NSE ≤ x (y-axis)</text>
 <path d='M 70.0,360.0 L 130.0,360.0 L 130.0,296.0 L 556.0,296.0 L 556.0,232.0 L 562.0,232.0 L 562.0,168.0 L 568.0,168.0 L 568.0,104.0 L 574.0,104.0 L 574.0,40.0' fill='none' stroke='#1f77b4' stroke-width='2.5'/>
 <circle cx='130.0' cy='296.0' r='4' fill='#1f77b4'/>
 <circle cx='556.0' cy='232.0' r='4' fill='#1f77b4'/>
 <circle cx='562.0' cy='168.0' r='4' fill='#1f77b4'/>
 <circle cx='568.0' cy='103.99999999999999' r='4' fill='#1f77b4'/>
 <circle cx='574.0' cy='40.0' r='4' fill='#1f77b4'/>
-<text x='138.0' y='288.0' font-size='12' font-family='Arial, sans-serif'>lưu vực E: −3,00 → y = 0,2</text>
+<text x='138.0' y='288.0' font-size='12' font-family='Arial, sans-serif'>basin E: −3.00 → y = 0.2</text>
 <line x1='70' y1='200.0' x2='562.0' y2='200.0' stroke='#d62728' stroke-dasharray='5,4'/>
 <line x1='562.0' y1='200.0' x2='562.0' y2='360' stroke='#d62728' stroke-dasharray='5,4'/>
-<text x='556.0' y='192.0' text-anchor='end' font-size='12' fill='#d62728' font-family='Arial, sans-serif'>y = 0,5 cắt đường tại NSE = 0,60 (trung vị)</text>
+<text x='556.0' y='192.0' text-anchor='end' font-size='12' fill='#d62728' font-family='Arial, sans-serif'>y = 0.5 crosses the curve at NSE = 0.60 (median)</text>
 </svg>
