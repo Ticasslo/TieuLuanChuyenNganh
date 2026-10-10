@@ -62,7 +62,7 @@ Cách nói trước hội đồng: đề tài không khẳng định Mamba tốt
 | 0. Hạ tầng | Fork NeuralHydrology riêng, cài `mamba-ssm` trên Kaggle T4, kiểm thử đơn vị, đo thời gian | Môi trường chạy được mọi lõi; bảng thời gian mỗi epoch | Đã lấy 3 bản sửa từ thư viện gốc vào nhánh `research` (commit `dda45fc`); đo thời gian ở đầu A4; `mamba-ssm` và kiểm thử đơn vị ở bước C |
 | 1. Thu thập dữ liệu | Tải Extended LamaH-CE và kết quả của tác giả | Kaggle Dataset `lamah-ce-ext` | Xong (`01_LamaHCE.md` Mục 6) |
 | 2. Khảo sát dữ liệu | Theo khuôn GVHD: dạng cơ bản + thống kê sâu; ngưỡng mức lưu lượng; bảng độ trễ nguồn | Báo cáo khảo sát, tệp ngưỡng | Một phần số liệu đã có; notebook viết lại |
-| 3. Tái lập và mốc | Chạy lại trọng số tác giả; persistence; DLinear; nhiễu hạt giống | Bảng mốc | Persistence xong (NSE trung vị 0,35–0,37, `01_LamaHCE.md` Mục 6.1) |
+| 3. Tái lập và mốc | Chạy lại trọng số tác giả; persistence; DLinear; nhiễu hạt giống | Bảng mốc | Persistence xong (NSE trung vị 0,35–0,37, `01_LamaHCE.md` Mục 6.1); chạy lại trọng số tác giả (A2) khớp NSE trung vị cả 5 cấu hình (`01_LamaHCE.md` Mục 6.3) |
 | 4. Bộ nạp | Sửa bộ lọc mẫu, nhóm biến theo nguồn, Q cùng đơn vị | Cấu hình dữ liệu dùng chung | Chưa làm |
 | 5. Mô hình | Khung hindcast–forecast với lõi thay được | Mô-đun trong fork | Chưa làm |
 | 6. Huấn luyện | Bước B → H (Mục 7) | Trọng số, nhật ký | Chưa làm |
@@ -100,7 +100,7 @@ Hindcast chia thành các nhóm theo nguồn, mỗi nhóm một mạng nhúng; m
 | Việc | Lý do | Cách làm |
 |---|---|---|
 | Sửa `_validate_samples` để giữ mẫu có đầu vào thiếu khi dùng masked mean | Bản gốc loại mẫu nếu bất kỳ cột nào thiếu ở bất kỳ ngày nào trong 365 ngày (`basedataset.py` dòng 861–919), kể cả khi bật `nan_handling_method` | Khi có `nan_handling_method`, chỉ yêu cầu nhãn và thuộc tính tĩnh hợp lệ; vẫn loại mẫu không đủ lịch sử |
-| Dựng thư mục có Q (thay `LamaH_expanded_q_input` không công bố) | Biến thể có Q của bài đọc thư mục này | Bộ nạp đọc `qmean` thẳng từ tệp khí tượng (`datasetzoo/lamah.py` dòng 107–135; chỉ nhãn `qmax` được đọc từ `D_gauges` và đổi sang mm/ngày), nên chép `qmean` từ `D_gauges` vào tệp khí tượng mức A (thêm `qmax` cho B1). Đơn vị tác giả dùng chưa kiểm được (`02_BasePaper.md` Mục 9: suy từ thống kê chuẩn hóa là m³/s); kiểm ở đầu bước A2 bằng cách so trung bình, độ lệch chuẩn của `qmean` trong tệp chuẩn hóa của tác giả (thư mục kết quả trên Zenodo) với Q tính theo m³/s và theo mm/ngày; A2 và A4 dựng đúng đơn vị của tác giả, B1 đổi sang mm/ngày theo `area_gov` như nhãn |
+| Dựng thư mục có Q (thay `LamaH_expanded_q_input` không công bố) | Biến thể có Q của bài đọc thư mục này | Bộ nạp đọc `qmean` thẳng từ tệp khí tượng (`datasetzoo/lamah.py` dòng 107–135; chỉ nhãn `qmax` được đọc từ `D_gauges` và đổi sang mm/ngày), nên chép `qmean` từ `D_gauges` vào tệp khí tượng mức A (thêm `qmax` cho B1). Tác giả dùng `qmean` theo m³/s, ngày thiếu để trống: thống kê chuẩn hóa tính lại từ `D_gauges` khớp tệp chuẩn hóa của tác giả tới chữ số thứ tư, đối chứng `qmax` khớp ở mm/ngày (A2 Phần 3, `03_Data/01_LamaHCE.md` Mục 6.3); A2 và A4 dựng đúng như vậy, B1 đổi sang mm/ngày theo `area_gov` như nhãn |
 | Báo cáo số mẫu hợp lệ từng cấu hình | Biết cải tiến lấy lại bao nhiêu mẫu | Ghi số mẫu train trước và sau sửa bộ lọc, với hindcast 365 và 730 ngày |
 
 ### 3.4. Che dữ liệu khi huấn luyện
@@ -242,8 +242,9 @@ Số lần huấn luyện ghi dạng "cấu hình × hạt giống". Mỗi bư�
 | 0 | Hạ tầng: fork riêng, wheel `mamba-ssm`, kiểm thử đơn vị (Mục 9.2), đo thời gian 1 epoch mỗi lõi | 0 (chạy thử ngắn) | Mọi kiểm thử qua; có bảng thời gian |
 | A1 | Khảo sát dữ liệu; ngưỡng mức và ngưỡng lũ tính trên 1981–2013 | 0 | Có tệp ngưỡng |
 | A2 | Kiểm đơn vị `qmean` và dựng thư mục Q (Mục 3.3); chạy lại trọng số tác giả trên kỳ test cho 5 cấu hình: Sequential Forecast LSTM có và không có lưu lượng quá khứ, Encoder–Decoder LSTM có lưu lượng quá khứ, mốc dưới 𝒟FC, mốc trên 𝒟RA; lưu dự báo cho A3 | 0 | NSE trung vị lệch số của tác giả không quá 0,005 |
-| A3 | Persistence (tính lại), PNSE, KGE (r, α, β) cho 5 cấu hình của A2 và persistence; DLinear bản gốc trên `qmean` quá khứ (Mục 4.2) | DLinear 1 × 3 | |
+| A3 | Persistence (tính lại), PNSE, KGE (r, α, β) cho 5 cấu hình của A2 và persistence; chỉ tính trên dự báo đã lưu ở A2, không huấn luyện | 0 | |
 | A4 | Đo thời gian 1 epoch trên T4 (phần đo thời gian của bước 0) rồi huấn luyện lại Sequential Forecast LSTM có lưu lượng quá khứ theo cấu hình tác giả, giữ nguyên cả lỗi lưu mô hình tốt nhất (sửa ở B1), hạt giống 111 (của tác giả), 222, 333 — đo nhiễu hạt giống (B0) | 1 × 3 | Có độ lệch chuẩn giữa hạt giống; NSE trung vị gần 0,705 của bài |
+| A5 | DLinear bản gốc trên `qmean` quá khứ (Mục 4.2), sau A1: cách chuẩn hóa `qmean` (chung mọi lưu vực hay riêng từng lưu vực) và xử lý ô trống trong 365 ngày quá khứ quyết theo kết quả khảo sát của A1 | 1 × 3 | |
 | B1 | B0 + sửa lỗi lưu mô hình tốt nhất + Q cùng đơn vị mm/ngày với nhãn (nếu A2 xác nhận tác giả dùng đơn vị khác) + thêm `qmax` quá khứ vào nhóm Q | 1 × 3 | |
 | B2 | B1 + nhúng theo nguồn, masked mean + sửa bộ lọc mẫu | 1 × 3 | |
 | B3 | B2 + che dữ liệu khi huấn luyện, hai mức xác suất (0,1/0,12 và 0,05/0,05) | 2 × 3 | |
@@ -274,7 +275,7 @@ Tổng tối đa 130 lần huấn luyện (A: 6; B: 12; C: 40 + 30; D, E, F, H, 
 
 | Rủi ro | Cách xử lý |
 |---|---|
-| Không cài được `mamba-ssm` trên Kaggle | Có gói wheel dựng sẵn cho Kaggle chia sẻ công khai (Kaggle Dataset `nctuan/mamba-ssm`: `mamba_ssm` 2.3.2, `causal_conv1d` 1.6.2, Python 3.12) và cách cài trong issue #668 của `state-spaces/mamba`; wheel phải khớp phiên bản torch, CUDA của Kaggle nên kiểm ở bước 0, hoặc tự build một lần rồi lưu Kaggle Dataset; dự phòng `mambapy` (PyTorch thuần, quét song song, chậm hơn) |
+| Không cài được `mamba-ssm` trên Kaggle | Có gói wheel dựng sẵn cho Kaggle chia sẻ công khai (Kaggle Dataset `nctuan/mamba-ssm`: `mamba_ssm` 2.3.2, `causal_conv1d` 1.6.2, Python 3.12) và cách cài trong issue #668 của `state-spaces/mamba`; wheel phải khớp phiên bản torch, CUDA của Kaggle nên kiểm ở bước 0, hoặc tự build một lần rồi lưu Kaggle Dataset; dự phòng `mambapy` (PyTorch thuần, quét song song, chậm hơn); môi trường Kaggle đo ngày 11/10/2026 là Python 3.13.15, torch 2.11.0+cu128, NumPy 2.1.3 (A2 Phần 1), nên wheel dựng cho Python 3.12 có thể không cài được — kiểm ở bước C |
 | Mamba quá khớp sớm (như Shahriar 2026) | Dừng sớm theo validation, dropout, theo dõi NSE validation và test mỗi epoch |
 | Không đạt chênh lệch tham số ≤1% vì số chiều chỉ chỉnh theo bước nguyên (mô hình nhỏ, khoảng 85 nghìn tham số) | Đo ở bước 0; nếu không đạt, chỉnh thêm số chiều lớp nhúng hoặc đầu ra, ghi rõ chênh lệch thực tế |
 | Lõi mới học kém do siêu tham số của LSTM | Tinh chỉnh cùng ngân sách có learning rate (Mục 5.2) |
@@ -327,13 +328,13 @@ Cắt từ trên xuống; RQ1–RQ4 giữ nguyên, RQ5 và RQ6 chỉ thu hẹp: 
 
 ### 9.4. Thư mục mã
 
-Mã đặt trong `Workspace/`, mỗi thư mục con một việc, tệp đánh số theo thứ tự chạy; mỗi notebook một tệp `.py` tự đủ, có mục lục, chia cell theo "Phần".
+Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook một tệp `.py` tự đủ, có mục lục, chia cell theo "Phần". Tên tệp (cũng là tên notebook Kaggle) dạng `NN_<Bước>_<BộDữLiệu>_<Việc>.py`: `NN` là thứ tự chạy trong thư mục, `<Bước>` là mã bước ở Mục 7 (VD `03_Baseline/01_A2_LamaHCEExt_Reproduce.py`); tệp không thuộc bước nào (tải dữ liệu) bỏ phần `<Bước>`. Thứ tự thực hiện bước A: A2 → A3 → A4 trước để có kết quả ban đầu, rồi A1 đầy đủ, rồi A5, xong trước bước B (B cần số liệu thiếu và số mẫu hợp lệ của A1; A5 cần A1 để quyết cách chuẩn hóa và xử lý ô trống của `qmean`); các thông tin dữ liệu A2–A4 cần đã có ở `03_Data/01_LamaHCE.md` Mục 6 hoặc được kiểm ngay trong A2.
 
 | Thư mục | Việc | Trạng thái |
 |---|---|---|
 | `01_Download/` | Tải dữ liệu | Xong |
-| `02_Exploration/` | Khảo sát dữ liệu, ngưỡng | Chưa viết |
-| `03_Baseline/` | Tái lập, persistence, DLinear, nhiễu hạt giống | Chưa viết |
+| `02_Exploration/` | Khảo sát dữ liệu (A1), ngưỡng | Có nháp Phần 1 của `01_A1_LamaHCEExt_Explore.py` |
+| `03_Baseline/` | A2 tái lập (`01_A2_LamaHCEExt_Reproduce.py`), A3 mốc so sánh (`02_A3_LamaHCEExt_Benchmarks.py`), A4 huấn luyện lại và nhiễu hạt giống (`03_A4_LamaHCEExt_Retrain.py`), A5 DLinear (`04_A5_LamaHCEExt_DLinear.py`) | A2 đã chạy, tái lập đạt (`03_Data/01_LamaHCE.md` Mục 6.3) |
 | `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Chưa viết |
 | `05_Training/` | Notebook huấn luyện theo bước B–H | Chưa viết |
 | `06_Evaluation/` | Bộ đánh giá Mục 6 | Chưa viết |
@@ -371,7 +372,7 @@ Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba
 | Giai đoạn | BiasCast | Đề tài | Giống / khác |
 |---|---|---|---|
 | Dữ liệu | ERA5-Land, E-OBS, MSWEP, GLEAM, ECMWF HRES theo lưu vực | Cùng dữ liệu Zenodo | Giống |
-| Bộ nạp | Loại mẫu có bất kỳ giá trị thiếu nào; đơn vị Q đầu vào chưa công bố (nhiều khả năng m³/s, khác nhãn) | Sửa bộ lọc; nhóm theo nguồn; Q cùng đơn vị với nhãn | Sửa, mở rộng |
+| Bộ nạp | Loại mẫu có bất kỳ giá trị thiếu nào; Q đầu vào `qmean` theo m³/s, khác đơn vị nhãn mm/ngày (A2 Phần 3) | Sửa bộ lọc; nhóm theo nguồn; Q cùng đơn vị với nhãn | Sửa, mở rộng |
 | Mô hình | Chỉ LSTM (tác giả tự nêu hạn chế, Mục 3.7) | LSTM, GRU, Transformer, S4D, Mamba trong khung chung | Khoảng trống chính |
 | Huấn luyện | NSE*, tối ưu Bayes, 1 hạt giống | Giữ NSE* và lịch học; tinh chỉnh cùng ngân sách; 3 hạt giống | Khác số hạt giống, giao thức tinh chỉnh |
 | Đánh giá | NSE, KGE; cận trên, cận dưới | Thêm persistence, PNSE, theo mức, theo sự kiện lũ, kịch bản vận hành, kiểm định | Mở rộng |
