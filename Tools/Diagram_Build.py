@@ -79,7 +79,7 @@ BANDS = [
     ]),
     ("5. Đánh giá và sản phẩm", [
         ("Kiểm tra 2014–2017: NSE, KGE, CDF (tốt nhất NSE≈0,705)",
-         [("A", "A3. Persistence (NSE≈0,35–0,37), PNSE, KGE; A5. DLinear"),
+         [("A", "A3. Persistence (NSE≈0,35–0,37), PNSE, KGE, DLinear"),
           ("EV", "Wilcoxon theo lưu vực + Cohen's d, hiệu chỉnh Holm")]),
         ("Mốc: chỉ dự báo (0,387) so tái phân tích (≈0,69)",
          [("EV", "Theo 4 mức lưu lượng; sự kiện lũ chu kỳ 1, 2, 5, 10 năm (POD, FAR, F1)"),

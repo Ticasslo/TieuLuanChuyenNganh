@@ -9,7 +9,7 @@
 #
 # MỤC LỤC
 #   Phần 1 - Cài thư viện NeuralHydrology từ fork của nhóm, kiểm môi trường và GPU
-#   Phần 2 - Tìm dữ liệu, xác định 5 thư mục run của tác giả, kiểm cấu trúc tệp
+#   Phần 2 - Tìm dữ liệu, xác định 6 thư mục run của tác giả, kiểm cấu trúc tệp
 #   Phần 3 - Kiểm đơn vị qmean tác giả dùng (so với tệp chuẩn hóa của tác giả)
 #   Phần 4 - Dựng thư mục dữ liệu có cột qmean
 #   Phần 5 - Chép thư mục run, sửa đường dẫn trong config.yml
@@ -76,7 +76,7 @@ importlib.import_module("neuralhydrology.nh_run")  # thử nạp module chạy c
 print("Nạp neuralhydrology.nh_run: OK")
 
 
-# %% Phần 2 - Tìm dữ liệu, xác định 5 thư mục run của tác giả, kiểm cấu trúc tệp
+# %% Phần 2 - Tìm dữ liệu, xác định 6 thư mục run của tác giả, kiểm cấu trúc tệp
 # Chỉ đọc, không sửa gì. In 4 khối: (1) đường dẫn và danh sách lưu vực, (2) bảng 24 run rút gọn, đánh dấu run dùng cho A2,
 # (3) các trường config ghi cứng đường dẫn máy tác giả (sửa ở Phần 5), (4) cột của 1 tệp khí tượng và 1 tệp trạm.
 # Tự đủ: chạy lại được sau Restart mà không cần chạy lại Phần 1.
@@ -96,12 +96,13 @@ IS_KAGGLE = Path("/kaggle/working").exists()
 SEARCH_ROOT = Path(os.environ.get("LAMAH_ROOT", "/kaggle/input" if IS_KAGGLE else "."))
 WORK_DIR = Path("/kaggle/working") if IS_KAGGLE else Path("a2_output")
 
-# Run dùng cho A2: đúng các run tác giả dùng vẽ hình mục 3.4 của bài (tệp mã tác giả
-# Inspect_Experiments/config/Role_of_integrating_discharge.yml dòng 9, 24, 32, 40, 47); EncDec có Q là bản Complex.
+# Run dùng cho A2: đúng 6 run tác giả dùng vẽ Hình 7, mục 3.4 của bài (tệp mã tác giả
+# Inspect_Experiments/config/Role_of_integrating_discharge.yml dòng 9, 16, 24, 32, 40, 47); hai run EncDec là bản Complex.
 A2_RUNS = {
     "Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_with_q/Sequential_Forecast_LSTM_RA_with_q_Simple_Embedding": "SeqLSTM có Q",
     "Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_without_q/Sequential_Forecast_LSTM_RA_without_q_Simple_Embedding": "SeqLSTM không Q",
     "Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_with_q/Encoder_Decoder_LSTM_with_q_Complex_Embedding": "EncDec có Q",
+    "Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Complex_Embedding": "EncDec không Q",
     "Baseline/Forecast": "D_FC (mốc dưới)",
     "Baseline/Reanalysis/Reanalysis_Simple_Embedding": "D_RA (mốc trên)",
 }
@@ -406,7 +407,7 @@ plt.show()
 caption(f"chuỗi qmean (m³/s) của lưu vực {plot_basin} đọc từ thư mục vừa dựng, khoảng tính thống kê chuẩn hóa"
         " 2002-2009; vạch đỏ ở đáy = ngày trống, đường đứt = ngày bắt đầu train. Dùng để thấy ô trống được giữ là trống.")
 
-# %% Phần 5 - Chép 5 run của tác giả sang thư mục làm việc, sửa đường dẫn trong config
+# %% Phần 5 - Chép 6 run của tác giả sang thư mục làm việc, sửa đường dẫn trong config
 # /kaggle/input chỉ đọc, còn khi đánh giá thư viện ghi kết quả vào run_dir/test/ (tester.py dòng 399) => chép run sang
 # WORK_DIR/a2_runs. Bỏ test/ (kết quả gốc của tác giả để nguyên ở input cho Phần 7 so), validation/, model_epoch*.pt,
 # optimizer (bài đánh giá bằng best_model.pt). Config: đổi đường dẫn máy tác giả sang Kaggle; run có qmean đọc Q_DIR.
@@ -424,11 +425,11 @@ BASIN_FILE = EXP_DIR / "basins_filtered.txt"
 PAPER_TOL = 0.005  # bài làm tròn 2 chữ số => lệch tới 0,005 vẫn khớp
 RUN_SHORT = {  # nhãn ở A2_RUNS => tên thư mục ngắn trong a2_runs
     "SeqLSTM có Q": "SeqLSTM_Q", "SeqLSTM không Q": "SeqLSTM_noQ", "EncDec có Q": "EncDec_Q",
-    "D_FC (mốc dưới)": "D_FC", "D_RA (mốc trên)": "D_RA",
+    "EncDec không Q": "EncDec_noQ", "D_FC (mốc dưới)": "D_FC", "D_RA (mốc trên)": "D_RA",
 }
 PAPER_NSE = {  # NSE trung vị trong bài: (giá trị, vị trí)
     "SeqLSTM có Q": (0.71, "mục 3.4"), "SeqLSTM không Q": (0.63, "mục 3.2"), "EncDec có Q": (0.66, "mục 3.4"),
-    "D_FC (mốc dưới)": (0.39, "Bảng F1"), "D_RA (mốc trên)": (0.69, "mục 3.4, Bảng F1"),
+    "EncDec không Q": (0.57, "mục 3.2, 3.4"), "D_FC (mốc dưới)": (0.39, "Bảng F1"), "D_RA (mốc trên)": (0.69, "mục 3.4, Bảng F1"),
 }
 COPY_IGNORE = shutil.ignore_patterns("test", "validation", "model_epoch*.pt", "optimizer_state*")
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -540,7 +541,7 @@ display(pd.DataFrame(check_rows))
 A2_READY = all(r["đường dẫn thiếu"] == "không" and r["nạp trọng số"] == "có" for r in check_rows)
 print("=> A2_READY =", A2_READY, "(sang Phần 6 khi True)")
 
-# %% Phần 6 - Chạy đánh giá tập test cho 5 run bằng best_model.pt
+# %% Phần 6 - Chạy đánh giá tập test cho 6 run bằng best_model.pt
 # eval_run(..., epoch="best") nạp best_model.pt (tester.py dòng 137-139), dự báo kỳ test 2014-2017 cho 451 lưu vực,
 # ghi a2_runs/<run>/test/best_model/test_metrics.csv (chỉ số theo lưu vực) và test_results.p (chuỗi quan trắc, dự báo
 # theo ngày - A3 dùng). Run đã có test_metrics.csv (Persistence giữ lại) thì bỏ qua. Đo thời gian từng run.
@@ -652,7 +653,12 @@ section("(3) So chuỗi dự báo qmax_sim từng ngày (mm/ngày) với test_re
 display(pd.DataFrame(res_rows))
 
 # (4) Hình: scatter NSE từng lưu vực và CDF
-fig, axes = plt.subplots(1, len(pairs), figsize=(4 * len(pairs), 4), sharex=True, sharey=True)
+n_cols = 3
+n_rows = -(-len(pairs) // n_cols)  # chia làm tròn lên
+fig, axes = plt.subplots(n_rows, n_cols, figsize=(4 * n_cols, 3.8 * n_rows), sharex=True, sharey=True, squeeze=False)
+axes = axes.ravel()
+for ax in axes[len(pairs):]:
+    ax.set_visible(False)
 for ax, (name, (new_nse, old_nse)) in zip(axes, pairs.items()):
     both = pd.concat([new_nse.rename("new"), old_nse.rename("old")], axis=1).dropna()
     inside = both[(both >= NSE_CLIP[0]).all(axis=1)]
@@ -664,7 +670,8 @@ for ax, (name, (new_nse, old_nse)) in zip(axes, pairs.items()):
     ax.set_xlabel("NSE author")
     ax.text(0.03, 0.97, f"n = {len(inside)}\nbelow -1: {len(both) - len(inside)}", transform=ax.transAxes,
             va="top", fontsize=8)
-axes[0].set_ylabel("NSE rerun")
+for ax in axes[::n_cols]:
+    ax.set_ylabel("NSE rerun")
 fig.suptitle("Per-basin test NSE 2014-2017: rerun (y) vs author (x), one dot per basin, dashed line y = x")
 plt.tight_layout()
 plt.show()
@@ -685,14 +692,14 @@ ax.grid(alpha=0.3)
 ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1), fontsize=8)
 plt.tight_layout()
 plt.show()
-caption("đường CDF NSE của 5 run (như Hình 7 của bài): trục dọc = tỷ lệ lưu vực có NSE nhỏ hơn giá trị trục ngang;"
+caption(f"đường CDF NSE của {len(pairs)} run (như Hình 7 của bài): trục dọc = tỷ lệ lưu vực có NSE nhỏ hơn giá trị trục ngang;"
         " đường càng lệch phải càng tốt. Nét liền (chạy lại) trùng nét đứt (tác giả) => tái lập khớp.")
 
 # (5) Kết luận
 nse_rows = COMPARE[COMPARE["chỉ số"] == "NSE"]
 REPRO_OK = bool((eval_df["khớp"] == "có").all() and (nse_rows[f"> {REPRO_TOL}"] == 0).all())
 section("(5) Kết luận")
-print(f"Điều kiện: cả 5 run |Δ NSE trung vị| <= {PAPER_TOL} và không lưu vực nào lệch NSE > {REPRO_TOL}")
+print(f"Điều kiện: cả {len(pairs)} run |Δ NSE trung vị| <= {PAPER_TOL} và không lưu vực nào lệch NSE > {REPRO_TOL}")
 print("=> TÁI LẬP ĐẠT" if REPRO_OK else "=> CHƯA ĐẠT theo tiêu chí sơ bộ - xem chẩn đoán và kết luận cuối ở Phần 7.2",
       f"(REPRO_OK = {REPRO_OK})")
 
@@ -789,10 +796,10 @@ SIM_TOL = 0.05  # |Δ qmax_sim| ở mức 99,9% tối đa (mm/ngày)
 dist = pd.DataFrame(dist_rows)
 big = flags[flags["Δ NSE"].abs() > REPRO_TOL]
 checks = {
-    "quan trắc trùng tác giả ở cả 5 run (|Δ obs| = 0, ô trống giống nhau)":
+    f"quan trắc trùng tác giả ở cả {len(pairs)} run (|Δ obs| = 0, ô trống giống nhau)":
         bool((dist["|Δ obs| lớn nhất"] == 0).all() and (dist["ô trống obs khác nhau"] == 0).all()),
-    f"|Δ NSE trung vị| <= {PAPER_TOL} ở cả 5 run": bool((eval_df["khớp"] == "có").all()),
-    f"|Δ qmax_sim| mức 99.9% <= {SIM_TOL} mm/ngày ở cả 5 run": bool((dist["99.9%"] <= SIM_TOL).all()),
+    f"|Δ NSE trung vị| <= {PAPER_TOL} ở cả {len(pairs)} run": bool((eval_df["khớp"] == "có").all()),
+    f"|Δ qmax_sim| mức 99.9% <= {SIM_TOL} mm/ngày ở cả {len(pairs)} run": bool((dist["99.9%"] <= SIM_TOL).all()),
     f"mọi lưu vực lệch NSE > {REPRO_TOL} đều có NSE < -1 (NSE nhạy do phương sai obs gần 0)":
         bool((big["NSE tác giả"] < -1).all()),
 }
