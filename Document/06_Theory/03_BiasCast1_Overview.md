@@ -80,7 +80,7 @@ Cách mô hình dùng các thành phần trên:
 - f là mạng LSTM (học ở Phần 4). Mỗi lần tính f cho ra một giá trị: một trạm, một ngày.
 - Một mô hình f (một bộ trọng số) dùng chung cho 451 lưu vực Trung Âu ít hoặc không chịu tác động của con người ([Bài] dòng 84–86; [Cơ sở] Mục 3).
 - **365 bước, không phải 365 lớp.** Mỗi mẫu đưa vào là cả bảng 364 ngày × 32 biến cộng 1 ngày dự báo. Một lớp LSTM duy nhất (một bộ trọng số) đọc lần lượt từng ngày: mỗi bước nhận dữ liệu của một ngày và trạng thái nhớ của bước trước; sau 364 bước quá khứ là bước thứ 365 đọc dự báo ECMWF HRES ngày t, và chỉ bước cuối này cho ra qmax ([Cơ sở] Mục 11.2). Mô hình không lấy dự báo của chính nó làm đầu vào cho bước sau. Cơ chế trạng thái nhớ học ở Phần 4.
-- **Xử lý trước khi vào mạng:** đọc tệp, đổi −999 thành NaN, đổi nhãn sang mm/ngày; cắt theo kỳ; chuẩn hóa z-score mọi biến và thuộc tính bằng trung bình, độ lệch chuẩn của kỳ train; cắt cửa sổ và loại mẫu thiếu dữ liệu khi huấn luyện. Bên trong mạng, lớp nhúng đổi 32 biến quá khứ, 5 biến dự báo và 33 thuộc tính thành các vectơ 16 chiều trước khi vào LSTM ([Cơ sở] Mục 11.1 bước 1–4, Mục 11.2). Chi tiết ở Phần 3 và Phần 4.
+- **Xử lý trước khi vào mạng:** đọc tệp, ô trống thành NaN (giá trị âm của nhãn cũng đổi thành NaN), đổi nhãn sang mm/ngày; cắt theo kỳ; chuẩn hóa z-score mọi biến và thuộc tính bằng trung bình, độ lệch chuẩn của kỳ train; cắt cửa sổ và loại mẫu thiếu dữ liệu khi huấn luyện. Bên trong mạng, lớp nhúng đổi 32 biến quá khứ, 5 biến dự báo và 33 thuộc tính thành các vectơ 16 chiều trước khi vào LSTM ([Cơ sở] Mục 11.1 bước 1–4, Mục 11.2). Chi tiết ở Phần 3 và Phần 4.
 
 Mục 1.3 giải thích trạm và lưu vực; Mục 1.4 giải thích giá trị trả về; Mục 1.5–1.7 giải thích từng đầu vào.
 
@@ -156,9 +156,9 @@ Bộ dữ liệu có 859 lưu vực; bài chỉ dùng 451 lưu vực "no and low
 |---|---|---|---|---|---|---|
 | 2016 | 05 | 14 | 12,3 | 10,1 | 15,8 | ngày bình thường |
 | 2016 | 05 | 15 | 30,7 | 14,2 | 61,5 | ngày mưa lớn, đỉnh vọt lên |
-| 2016 | 05 | 16 | −999 | −999 | −999 | trạm không có số đo |
+| 2016 | 05 | 16 | | | | trạm không có số đo: ô để trống |
 
-- Giá trị thiếu ghi −999; khi đọc, mọi giá trị âm của cột nhãn được đổi thành NaN ([Mã] dòng 229). Nếu giữ −999, mô hình sẽ học một "lưu lượng âm" không có thật.
+- Ngày thiếu trong tệp trạm của bản mở rộng là ô để trống hoặc thiếu cả dòng, không có ô nào ghi −999 (Phần 3, Mục 3.4); pandas đọc ô trống thành NaN. Bộ LamaH-CE gốc thì ghi giá trị thiếu là −999, nên bộ nạp còn đổi mọi giá trị âm của cột nhãn thành NaN ([Mã] dòng 229); nếu giữ −999, mô hình sẽ học một "lưu lượng âm" không có thật.
 - `qmean`, `qmin`, `qmax` là lưu lượng trung bình, nhỏ nhất, lớn nhất trong ngày. Bản LamaH-CE theo ngày gốc chỉ có lưu lượng trung bình; tác giả trích cực tiểu và cực đại ngày từ dữ liệu theo giờ của LamaH-CE ([Bài] dòng 80). Mã thực hiện bước trích này không công khai; về ý tưởng, mỗi ngày lấy giá trị nhỏ nhất và lớn nhất trong các giá trị giờ của ngày đó. LamaH-CE tính `qmean` ngày từ các giá trị giờ trong khoảng 00:00–23:59 GMT (Klingler và cs., ESSD 2021, mục 4.1, tr. 4533); tác giả BiasCast có dùng cùng ranh giới ngày khi trích `qmin`, `qmax` hay không thì chưa kiểm được vì mã trích không công khai ([Cơ sở] Mục 3).
 - **Vì sao dự báo qmax:** lũ gây thiệt hại tại thời điểm đỉnh; trung bình ngày làm phẳng đỉnh. Trong ví dụ trên, ngày 15/05 có qmean 30,7 nhưng qmax 61,5 m³/s.
 
@@ -486,7 +486,7 @@ Ví dụ (minh họa): mô hình học trên tái phân tích rằng 20 mm mưa 
    Đáp án: có, vì ở mức A lưu vực Y bao trọn lưu vực X; nhưng hai lần dự báo cho X và Y tách biệt (Mục 1.3).
 3. Khi vận hành, muốn dự báo qmax ngày mai, trong ba loại dữ liệu thời tiết loại nào có giá trị cho ngày mai?
    Đáp án: chỉ dự báo số trị. Quan trắc chỉ có sau khi sự việc xảy ra; tái phân tích trễ khoảng 5 ngày (Mục 1.5).
-4. Trạm ghi qmax = −999 cho một ngày. Mã xử lý thế nào?
+4. Một tệp theo quy ước của bộ LamaH-CE gốc ghi qmax = −999 cho một ngày. Mã xử lý thế nào?
    Đáp án: đổi thành NaN ([Mã] dòng 229). Mẫu có nhãn NaN không được dùng để tính hàm mất mát.
 5. Lưu vực 200 km² có qmax 20 m³/s. Bằng bao nhiêu mm/ngày?
    Đáp án: 20 / (2 × 10⁸) × 1000 × 86400 = 8,64 mm/ngày.

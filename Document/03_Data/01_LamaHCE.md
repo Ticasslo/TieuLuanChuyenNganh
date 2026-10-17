@@ -184,7 +184,7 @@ Số trong bài lấy từ Bảng F1 (Phụ lục F, trang 5093 của tạp chí
 | 𝒟FC | 136 giây | 451 | 0,3864 | 0,3867 | −0,0002 |
 | 𝒟RA | 233 giây | 451 | 0,6923 | 0,6923 | +0,0001 |
 
-Ở hai run có Q, lưu vực 55 không có giá trị dự báo nào trong kỳ test (thư viện báo mọi giá trị dự báo là NaN), nên chỉ còn 450 lưu vực; kết quả của tác giả cũng có 450 lưu vực. Lưu vực 55 chỉ có `qmean` ở 1025 trên 1825 ngày của kỳ test cộng 364 ngày khởi động, nên mọi mẫu (cần đủ 365 ngày `qmean`) bị bỏ.
+Ở hai run có Q, lưu vực 55 không có giá trị dự báo nào trong kỳ test (thư viện báo mọi giá trị dự báo là NaN), nên chỉ còn 450 lưu vực; kết quả của tác giả cũng có 450 lưu vực. Lưu vực 55 chỉ có `qmean` ở 1025 trên 1825 ngày của kỳ test cộng 364 ngày khởi động, nên cửa sổ 365 ngày của mọi mẫu đều chứa ô `qmean` trống; ở kỳ test mẫu không bị lọc mà vẫn chạy, nhưng đầu vào có ô trống nên dự báo ra NaN.
 
 **So từng lưu vực và từng ngày (Phần 7).** So với `test_metrics.csv` và `test_results.p` của tác giả (có trên Zenodo):
 
