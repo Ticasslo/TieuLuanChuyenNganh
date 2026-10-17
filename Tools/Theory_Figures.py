@@ -618,11 +618,11 @@ def fig_period_timeline():
                                (2014, 2018, "#c00000", "test|2014-2017")],
          ["train: the model learns its weights.  val: used to pick the best epoch.  test: final score, model vs observed qmax.",
           "Years before 2003 are never targets; they only serve as the 364-day input history."]),
-        (["ECMWF HRES", "model grid"], [(2002, 2010.07, "#d9d9d9", "25 km or coarser|2002 - Jan 2010"),
+        (["ECMWF HRES", "model grid"], [(2002, 2006.08, "#eeeeee", "~40 km|2002-2006"), (2006.08, 2010.07, "#d9d9d9", "25 km|2006-2010"),
                                         (2010.07, 2016.19, "#b7b7b7", "16 km|Jan 2010 - Mar 2016"),
                                         (2016.19, 2018, "#7f7f7f", "9 km")],
-         ["Archived operational forecasts: each year was made by the model version running that year (grid refined Jan 2010 and 8 Mar 2016).",
-          "Train sees only the coarse grid, half of test uses the 9 km grid. The data is not adjusted for these jumps."]),
+         ["Archived operational forecasts: each year was made by the model version running that year (grid refined 1 Feb 2006, Jan 2010, 8 Mar 2016).",
+          "Train sees only the coarse grids (~40 then 25 km); about half of test uses 9 km. The data is not adjusted for these jumps."]),
     ]
     bottom = top + row_h * len(rows)
     el = [f"<rect width='{width}' height='{height}' fill='white'/>",

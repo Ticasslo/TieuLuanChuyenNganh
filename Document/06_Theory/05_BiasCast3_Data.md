@@ -15,6 +15,7 @@ Ký hiệu nguồn giữ như Phần 1, 2:
 - **[AIFL]**: Taccari và cs., AIFL, Journal of Hydrology 678, 136064, 2026; số trang theo bản arXiv 2602.16579 ở `PaperResearch/PaperResearchPDF/Related/Taccari2026_arXiv_AIFL.pdf`.
 - **[lmomco]**: tài liệu gói R `lmomco` 2.5.1 (W. H. Asquith), các trang `pargum`, `lmomgum`, `quagum` trên `search.r-project.org/CRAN/refmans/lmomco/`, dẫn Hosking, JRSS B 52:105–124 (1990).
 - **[Kiểm định]**: trang *Forecast Verification* của nhóm công tác chung WWRP/WGNE, `jwgfvr.github.io/forecastverification` (trước ở `cawcr.gov.au/projects/verification`).
+- **[ECMWF-2006]**: ECMWF, *Towards global meso-scale models: the high-resolution system T799L91 and T399L62 EPS* (ECMWF Newsletter, 2006), `ecmwf.int/sites/default/files/elibrary/2006/17954-towards-global-meso-scale-model-high-resolution-system-t799l91-and-t399l62-eps.pdf`: ngày 1/2/2006 (chu kỳ 30r1) HRES từ T511 lên T799.
 - **[ECMWF-2010]**: tin ECMWF *Horizontal resolution increase* (2010), `ecmwf.int/en/about/media-centre/news/2010/horizontal-resolution-increase`: HRES từ T799 (lưới 25 km) lên T1279 (16 km).
 - **[ECMWF-2016]**: ECMWF Newsletter 147, *New model cycle brings higher resolution*, `ecmwf.int/en/newsletter/147/meteorology/new-model-cycle-brings-higher-resolution`: chu kỳ 41r2 đưa vào vận hành 8/3/2016, lưới HRES 9 km.
 
@@ -873,7 +874,7 @@ Mô hình **học** từ các năm 2003–2009, được **chọn** (dừng sớ
 - **Hàng 1 (xanh đậm)** — số đo `qmax` tại trạm ("observed" = quan trắc, tức số đo thật, đối lập với số mô hình dự báo) có từ 1981 tới hết 2017 ([LamaH] Mục 6.1). Kỳ test cũng có số đo, thiếu 0,23%: đó chính là "đáp án" để chấm dự báo của mô hình.
 - **Hàng 2 (xanh nhạt)** — riêng việc **tính ngưỡng** bốn mức (Mục 3.5) và ngưỡng lũ (Mục 3.6) chỉ dùng 33 năm 1981–2013, cố ý dừng trước kỳ test để ngưỡng không nhìn thấy dữ liệu cần chấm. Số đo 2014–2017 vẫn có, chỉ không đưa vào tính ngưỡng.
 - **Hàng 3** — ba kỳ của mô hình nối nhau, không chồng: train 7 năm (2003–2009, xanh lá), validation 4 năm (2010–2013, cam), test 4 năm (2014–2017, đỏ). Các năm 1981–2002 có số liệu nhưng không làm nhãn; chúng chỉ là quá khứ đầu vào (364 ngày trước mỗi mẫu) hoặc chỉ dùng tính ngưỡng.
-- **Hàng 4 (xám)** — lưới của mô hình thời tiết ECMWF HRES vào năm dự báo được tạo: từ 2002 tới đầu 2010 lưới 25 km hoặc thô hơn, đầu 2010 tới 8/3/2016 lưới 16 km, sau đó 9 km. Xám càng đậm, lưới càng mịn. Đặt hàng 4 dưới hàng 3: **cả kỳ train nằm dưới thanh xám nhạt nhất, còn gần nửa sau của kỳ test (3/2016–2017) nằm dưới thanh đậm nhất**.
+- **Hàng 4 (xám)** — lưới của mô hình thời tiết ECMWF HRES vào năm dự báo được tạo: từ 2002 tới 1/2/2006 lưới T511 (khoảng 40 km), tới đầu 2010 lưới 25 km, tới 8/3/2016 lưới 16 km, sau đó 9 km. Xám càng đậm, lưới càng mịn. Đặt hàng 4 dưới hàng 3: **kỳ train nằm dưới hai thanh nhạt nhất (khoảng 40 km rồi 25 km), còn gần nửa sau của kỳ test (3/2016–2017) nằm dưới thanh đậm nhất**.
 - **Hai đường đứt xanh** — trận lũ 8/2002 cắt hàng 3 ở chỗ trống trước kỳ train (không thành nhãn), trận lũ 6/2013 cắt hàng 3 trong kỳ validation và cắt hàng 2 (nằm trong số liệu tính ngưỡng).
 
 **Cùng nội dung, xếp theo từng khoảng năm:**
@@ -881,8 +882,8 @@ Mô hình **học** từ các năm 2003–2009, được **chọn** (dừng sớ
 | Năm | Có số đo `qmax`? | Dùng tính ngưỡng? | Vai trò với mô hình | ECMWF HRES |
 |---|---|---|---|---|
 | 1981–2001 | có | có | không dùng: mẫu sớm nhất (1/1/2003) chỉ nhìn lại 364 ngày, tức tới đầu 2002 | chưa có |
-| 2002 | có | có | quá khứ đầu vào 364 ngày của các mẫu đầu năm 2003, không làm nhãn | có, lưới thô |
-| 2003–2009 | có | có | **train**: nhãn để mô hình học | lưới 25 km hoặc thô hơn |
+| 2002 | có | có | quá khứ đầu vào 364 ngày của các mẫu đầu năm 2003, không làm nhãn | có, khoảng 40 km |
+| 2003–2009 | có | có | **train**: nhãn để mô hình học | khoảng 40 km tới 1/2/2006, sau đó 25 km |
 | 2010–2013 | có | có | **validation**: chọn epoch tốt nhất | lưới 16 km |
 | 2014–2017 | có (thiếu 0,23%) | **không** | **test**: so dự báo với số đo để ra điểm | 16 km tới 8/3/2016, sau đó 9 km |
 
@@ -911,15 +912,16 @@ Lưu ý nhỏ: mẫu đầu tiên của kỳ test (ngày 1/1/2014) nhìn lại 3
 
 Kỳ test 2014–2017 có trận lớn cỡ đó không thì **chưa kiểm**; bước A1 đếm số trận ở mỗi mức T của từng kỳ.
 
-*(c) Cách làm ra đầu vào đổi theo thời gian.* ECMWF HRES là dự báo vận hành lưu trữ lại, nên mỗi năm được tạo bằng phiên bản mô hình thời tiết **đang chạy năm đó**. ECMWF đã hai lần làm mịn lưới trong khoảng dữ liệu:
+*(c) Cách làm ra đầu vào đổi theo thời gian.* ECMWF HRES là dự báo vận hành lưu trữ lại, nên mỗi năm được tạo bằng phiên bản mô hình thời tiết **đang chạy năm đó**. ECMWF đã ba lần làm mịn lưới trong khoảng dữ liệu:
 
 | Từ | Lưới ECMWF HRES | Nguồn |
 |---|---|---|
-| trước 2010 | 25 km (các năm đầu có thể thô hơn — chưa kiểm) | [ECMWF-2010] |
+| 2002 (đầu dữ liệu) | T511, khoảng 40 km (quy đổi thường dùng cho T511; tài liệu nguồn chỉ ghi T511) | [ECMWF-2006] |
+| 1/2/2006 (chu kỳ 30r1) | T799, 25 km | [ECMWF-2006], [ECMWF-2010] |
 | tháng 1/2010 | 16 km | [ECMWF-2010] |
 | 8/3/2016 (chu kỳ 41r2) | 9 km | [ECMWF-2016] |
 
-Bài lấy ECMWF HRES từ kho lưu trữ vận hành của ECMWF (*operational archive*, [Bài] dòng 486) rồi gộp theo lưu vực ([Bài] dòng 80); bài không nêu bước hiệu chỉnh nào để các năm làm bằng phiên bản khác nhau trở nên đồng nhất, nên dữ liệu giữ nguyên các bước nhảy này. Toàn bộ kỳ train dùng lưới 25 km, còn gần nửa kỳ test (3/2016–2017) dùng lưới 9 km. Lưới mịn hơn mô tả núi rõ hơn, nên mưa và nhiệt độ ở lưu vực núi có thể khác đi **dù thời tiết thật y hệt**. Nói cách khác, ngay trong ECMWF HRES đã có một lệch miền nhỏ giữa train và test, bên cạnh lệch miền giữa tái phân tích và dự báo mà bài nghiên cứu (Phần 1). Tái phân tích thì khác: ERA5 chạy lại toàn bộ kỳ bằng **một** phiên bản mô hình cố định (Hersbach và cs., QJRMS 146, 1999–2049, 2020), ERA5-Land dựng từ ERA5, nên không có bước nhảy kiểu này. Bài BiasCast không nhắc tới các lần nâng lưới (đã tìm "resolution" trong [Bài]: chỉ có câu chung dòng 64 rằng sai lệch dự báo một phần do độ phân giải mô hình).
+Bài lấy ECMWF HRES từ kho lưu trữ vận hành của ECMWF (*operational archive*, [Bài] dòng 486) rồi gộp theo lưu vực ([Bài] dòng 80); bài không nêu bước hiệu chỉnh nào để các năm làm bằng phiên bản khác nhau trở nên đồng nhất, nên dữ liệu giữ nguyên các bước nhảy này. Kỳ train dùng lưới khoảng 40 km (tới 1/2/2006) rồi 25 km, tức chính kỳ train đã có một bước nhảy; còn gần nửa kỳ test (3/2016–2017) dùng lưới 9 km. Lưới mịn hơn mô tả núi rõ hơn, nên mưa và nhiệt độ ở lưu vực núi có thể khác đi **dù thời tiết thật y hệt**. Nói cách khác, ngay trong ECMWF HRES đã có một lệch miền nhỏ giữa train và test, bên cạnh lệch miền giữa tái phân tích và dự báo mà bài nghiên cứu (Phần 1). Tái phân tích thì khác: ERA5 chạy lại toàn bộ kỳ bằng **một** phiên bản mô hình cố định (Hersbach và cs., QJRMS 146, 1999–2049, 2020), ERA5-Land dựng từ ERA5, nên không có bước nhảy kiểu này. Bài BiasCast không nhắc tới các lần nâng lưới (đã tìm "resolution" trong [Bài]: chỉ có câu chung dòng 64 rằng sai lệch dự báo một phần do độ phân giải mô hình).
 
 **Bước 3 — Khác nhau thì điểm số bị ảnh hưởng thế nào.**
 
@@ -974,7 +976,7 @@ Mô hình không tệ đi, chỉ là kỳ test "khó ghi điểm" hơn. Lưu v�
 | 3.4 Chất lượng, dữ liệu thiếu | ngày thiếu là ô trống hoặc thiếu dòng; một ngày thiếu `qmean` làm mất tới 365 mẫu của mô hình có `qmean` đầu vào; đáng ngờ: đứng giá trị, ngoại lai, số chưa kiểm; lưu vực 742, 758 gần như hằng số |
 | 3.5 Đường duy trì, bốn mức | sắp số từ lớn tới nhỏ, p = thứ hạng / n; bốn mức rất cao (p ≤ 0,02), cao, trung bình, thấp, ngưỡng tính từ quan trắc 1981–2013; chấm như bài toán phân loại (recall, precision từng mức); %BiasFHV đo hụt đỉnh, %BiasFMS, %BiasFLV đo hình dạng |
 | 3.6 Lũ, chu kỳ lặp lại | lũ T năm = mức mà đỉnh năm có 1/T khả năng vượt; khớp Gumbel L-moments trên đỉnh năm thủy văn 1981–2013; mức 1,5; 2; 5; 10 năm; trận = lần vượt ngưỡng từ dưới lên, gộp theo USWRC; ghép trong ±1 ngày; POD, precision, FAR, CSI từ bảng 2×2 |
-| 3.7 Kỳ train và kỳ test | chia theo năm để không rò rỉ; mỗi kỳ có thời tiết, trận lũ, phiên bản ECMWF HRES riêng (lưới 25 → 16 → 9 km); NSE phụ thuộc độ dao động của kỳ test, nên so mô hình trên cùng kỳ, theo từng lưu vực |
+| 3.7 Kỳ train và kỳ test | chia theo năm để không rò rỉ; mỗi kỳ có thời tiết, trận lũ, phiên bản ECMWF HRES riêng (lưới khoảng 40 → 25 → 16 → 9 km); NSE phụ thuộc độ dao động của kỳ test, nên so mô hình trên cùng kỳ, theo từng lưu vực |
 
 #### Bước A1: danh sách kiểm gộp từ Phần 3
 
