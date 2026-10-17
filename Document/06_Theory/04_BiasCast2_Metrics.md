@@ -5,6 +5,7 @@ Phần 2 của ghi chú học BiasCast (Phần 1: `03_BiasCast1_Overview.md`). K
 - **[Bài]**: bản chữ `PaperResearch/PaperResearchPDF/BasePaper/Konold2026_HESS_BiasCast_FullText.md`, kèm số dòng.
 - **[Mã]**: mã NeuralHydrology trong bản fork của tác giả, thư mục `PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/`, ghi tên tệp và số dòng.
 - **[Cơ sở]**: `01_Plan/02_BasePaper.md`, kèm mục.
+- **[LamaH]**: `03_Data/01_LamaHCE.md` (ghi chú dữ liệu của đề tài), kèm mục.
 
 Nội dung Phần 2: chỉ số NSE; cách bài tổng hợp NSE của 451 lưu vực; mốc trên và mốc dưới; độ suy giảm khi đổi miền dữ liệu; chênh lệch NSE theo lưu vực; giới hạn của NSE và các chỉ số đề tài thêm (KGE, persistence và PNSE, kiểm định Wilcoxon). Mỗi mục có ví dụ số tự đặt, ghi rõ "minh họa".
 
@@ -330,7 +331,7 @@ Thứ tự cột trên trục ngang là Q, R, P: bên trái là lưu vực các 
 | Học chuyển giao, chỉ lớp nhúng | 275 / 451 | phần còn lại |
 | Học chuyển giao, mọi trọng số | 273 / 451 | phần còn lại |
 
-Ô "suy ra" là số bài không ghi trực tiếp, tính bằng 451 trừ số bài ghi, với giả định không có lưu vực ΔNSE đúng bằng 0. Với Sequential có lưu lượng, 445 + 5 = 450, thiếu 1 lưu vực; bài không giải thích (có thể một lưu vực có ΔNSE đúng bằng 0 hoặc không tính được — chưa kiểm).
+Ô "suy ra" là số bài không ghi trực tiếp, tính bằng 451 trừ số bài ghi, với giả định không có lưu vực ΔNSE đúng bằng 0. Với Sequential có lưu lượng, 445 + 5 = 450, thiếu 1 lưu vực: lưu vực 55 không có dự báo nào trong kỳ test ở các run có lưu lượng vì thiếu `qmean`, nên kết quả của tác giả chỉ có 450 lưu vực; chạy lại trọng số tác giả cho cùng kết quả ([LamaH] Mục 6.3).
 
 Đọc ra:
 

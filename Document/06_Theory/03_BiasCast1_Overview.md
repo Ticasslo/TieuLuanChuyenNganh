@@ -73,7 +73,7 @@ Ghi chú cho từng thành phần:
 - **Vì sao pha quá khứ không có ECMWF HRES:** bài theo thiết kế của Nearing và cs. (2024) — pha quá khứ dùng tái phân tích, pha dự báo dùng dự báo thời tiết ([Bài] dòng 132). Bài có thử thêm dự báo ECMWF HRES lưu trữ vào pha quá khứ nhưng không cải thiện và làm mô hình kém ổn định hơn ([Bài] dòng 244–258; chi tiết ở Phần 6).
 - **Thí nghiệm có đủ dữ liệu tới hôm qua, vận hành thật thì không:** trong thí nghiệm, pha quá khứ có tái phân tích sát tới ngày t − 1; khi vận hành, tái phân tích trễ khoảng 5 ngày nên mấy ngày gần nhất chưa có. Bài chỉ thảo luận, không thí nghiệm tình huống này (Mục 1.5).
 - **Mốc giờ lần chạy:** 00 UTC là 1 giờ sáng giờ Trung Âu mùa đông, 2 giờ sáng mùa hè, 7 giờ sáng giờ Việt Nam. Nhiệt độ, điểm sương (và áp suất mực biển, không dùng) là trung bình 8 giá trị cách nhau 3 giờ tính từ 00 UTC; mưa, bốc hơi là tổng ngày ([Bài] dòng 80).
-- **Căn ngày:** cách căn ngày t của dữ liệu lưu lượng (giờ địa phương hay UTC) với ngày UTC của bản dự báo chưa kiểm được vì mã tạo bộ dữ liệu không công khai ([Cơ sở] Mục 3).
+- **Căn ngày:** LamaH-CE tính giá trị ngày từ chuỗi theo giờ trong khoảng 00:00–23:59 GMT, cho cả lưu lượng và các biến khí tượng gốc (Klingler và cs., ESSD 2021, mục 3, tr. 4533), nên ngày của nhãn qmax trùng ngày UTC của bản dự báo phát 00 UTC. Bài không nêu cách căn ngày của các biến tác giả thêm vào (ECMWF HRES, E-OBS, MSWEP, GLEAM) khi gộp theo lưu vực; phần này chưa kiểm được vì mã tạo bộ dữ liệu không công khai ([Cơ sở] Mục 3).
 
 Cách mô hình dùng các thành phần trên:
 
@@ -319,7 +319,7 @@ Ba cột ECMWF HRES còn lại trong tệp (`ECMWF_msl` áp suất mực biển,
 **Cách mô hình dùng.** Thuộc tính tĩnh được chuẩn hóa z-score như các đầu vào khác, rồi **ghép vào từng bước thời gian**: ở mỗi bước trong 365 bước, vectơ đầu vào gồm các biến thời tiết của ngày đó nối thêm 33 thuộc tính của lưu vực (lớp đầu vào của NeuralHydrology mặc định "concatenate the static inputs to each dynamic time step", `modelzoo/inputlayer.py` dòng 200). Ví dụ lưu vực X có `elev_mean` = 1500 m: con số 1500 (sau chuẩn hóa) xuất hiện lặp lại ở cả 365 bước.
 
 **Ghi chú.**
-- Thuộc tính khí hậu (`p_mean`, `frac_snow`…) là trung bình nhiều năm, tính sẵn trong bộ dữ liệu; kỳ năm dùng để tính chưa kiểm (cần xem tài liệu LamaH-CE, Klingler và cs., 2021) — nếu kỳ đó chồng lên kỳ test 2014–2017 thì thuộc tính chứa một phần thông tin của kỳ test.
+- Thuộc tính khí hậu (`p_mean`, `frac_snow`…) là trung bình nhiều năm, tính sẵn trong bộ dữ liệu, chủ yếu từ chuỗi ERA5-Land kỳ 01/10/1989–30/09/2009; riêng `et0_mean` lấy từ cơ sở dữ liệu GCD v2, tính cho kỳ 1970–2000 (Klingler và cs., ESSD 2021, mục 5.2, tr. 4536). Cả hai kỳ kết thúc trước kỳ test 2014–2017, nên thuộc tính tĩnh không chứa thông tin của kỳ test; kỳ 1989–2009 có chồng lên kỳ train 2003–2009.
 - Bài dùng thuộc tính địa hình để giải thích sai lệch do độ phân giải: khoảng cách Wasserstein giữa ECMWF HRES và tái phân tích tương quan với độ cao trung bình (r = 0,19–0,67) và với độ dốc (r = 0,63 cho lượng mưa) ([Bài] dòng 214, 222, 224; Mục 1.11).
 
 ### 1.8. Biến và ngày — hai chiều của dữ liệu
@@ -377,7 +377,7 @@ Mẫu cho trạm X, ngày t = 15/05/2016 ([Cơ sở] Mục 3):
 | Thuộc tính | thuộc tính của lưu vực X | 33 |
 | Nhãn | qmax ngày 15/05/2016 đo tại X, mm/ngày | 1 |
 
-Theo lô B mẫu (B = 256), kích thước tensor là (B, 364, 32), (B, 1, 5), (B, 33) ([Cơ sở] Mục 11.2); tensor thuộc tính (B, 33) được lớp đầu vào nhân bản theo trục thời gian rồi ghép vào từng bước (Mục 1.7). Đơn vị của `qmean` đầu vào chưa kiểm được vì thư mục dữ liệu có lưu lượng của tác giả không công khai; thống kê chuẩn hóa của tác giả gợi ý vẫn là m³/s, khác đơn vị mm/ngày của nhãn ([Cơ sở] Mục 9); kiểm ở bước A4 (`01_Plan/03_Pipeline.md` Mục 7).
+Theo lô B mẫu (B = 256), kích thước tensor là (B, 364, 32), (B, 1, 5), (B, 33) ([Cơ sở] Mục 11.2); tensor thuộc tính (B, 33) được lớp đầu vào nhân bản theo trục thời gian rồi ghép vào từng bước (Mục 1.7). `qmean` đầu vào theo m³/s, ngày thiếu để trống, khác đơn vị mm/ngày của nhãn: trung bình và độ lệch chuẩn của `qmean` tính lại từ tệp trạm theo m³/s khớp tệp chuẩn hóa của tác giả (4,5778 và 16,1461), tính theo mm/ngày thì lệch xa ([LamaH] Mục 6.3).
 
 Ranh giới thời gian: mọi dữ liệu quá khứ dừng ở hôm trước ngày t; thông tin duy nhất về chính ngày t là bản dự báo của lần chạy 00 UTC, nhìn trước ngày đó. Lần chạy 00 UTC mang mốc giờ 00 UTC nhưng tệp dự báo được phát ra sau đó vài giờ; thời điểm phát thực tế chưa kiểm, cần khi tính kịch bản vận hành.
 
