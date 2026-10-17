@@ -157,7 +157,7 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 4. Thử chuỗi quá khứ 730 ngày cho LSTM, Mamba và S4D — nơi Mamba được kỳ vọng có lợi thế chi phí.
 5. Mở rộng sang dự báo 1–7 ngày bằng dữ liệu sẵn có (chỉ ngày đầu có dự báo ECMWF thật), so ba cách cấp đầu vào: chỉ quá khứ, lai, dự báo hoàn hảo làm cận trên — trả lời hạn chế lớn nhất người phản biện nêu.
 6. Đầu ra xác suất (CMAL) trên cấu hình tốt nhất để có xác suất vượt ngưỡng lũ.
-7. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và dữ liệu đến trễ theo đúng độ trễ của từng nguồn (ERA5-Land khoảng 5 ngày, GLEAM phát hành mỗi năm một lần — `03_Pipeline.md` Mục 3.2); đánh giá theo mức lưu lượng và theo sự kiện lũ chu kỳ lặp lại 1, 2, 5, 10 năm; so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
+7. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và dữ liệu đến trễ theo đúng độ trễ của từng nguồn (ERA5-Land khoảng 5 ngày, GLEAM phát hành mỗi năm một lần — `03_Pipeline.md` Mục 3.2); đánh giá theo mức lưu lượng và theo sự kiện lũ chu kỳ lặp lại 1,5; 2; 5; 10 năm; so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
 
 **Phần đáp ứng yêu cầu tiểu luận:**
 

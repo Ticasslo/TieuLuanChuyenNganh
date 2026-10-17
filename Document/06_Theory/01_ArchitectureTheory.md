@@ -96,10 +96,7 @@ LSTM đọc tuần tự từng ngày, dựa vào trí nhớ cộng dồn `C_t`. 
 
 ### 2.2 Q, K, V là gì — gốc thuật ngữ từ dictionary/hash map
 
-```python
-my_dict = {"key1": "value1", "key2": "value2"}
-result = my_dict["key2"]   # Query = "key2", so khớp Key, lấy đúng Value
-```
+Ví dụ từ điển (dict) trong lập trình: từ điển có hai cặp `"key1"` → `"value1"`, `"key2"` → `"value2"`; tra `"key2"` thì `"key2"` là **Query**, nó được so khớp với các **Key** và trả về đúng **Value** `"value2"`.
 
 - **K (Key)** — nhãn gắn với mỗi vị trí, dùng để so khớp.
 - **V (Value)** — nội dung thật gắn với Key đó, cái thực sự muốn lấy ra.

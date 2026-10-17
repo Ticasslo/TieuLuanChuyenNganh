@@ -1,10 +1,10 @@
 # =============================================================================
-# Extended LamaH-CE (BiasCast, HESS 2026) — tải dữ liệu và kết quả thí nghiệm của tác giả
+# Extended LamaH-CE (BiasCast, HESS 2026) - tải dữ liệu và kết quả thí nghiệm của tác giả
 # Bài: Konold và cs., "BiasCast: learning and adjusting real time biases from meteorological forecasts
 #      to enhance runoff predictions", HESS 30:5067–5096 (2026). Dữ liệu Zenodo 17119635 (CC BY-NC 4.0),
 #      kết quả thí nghiệm Zenodo 17292895.
 # Notebook Kaggle: Accelerator = None, bật Internet, dán Phần 1–2 vào 2 cell (hoặc cả file vào 1 cell),
-# rồi Run All. Xong: tab Output → New Dataset (Private) "lamah-ce-ext" (giữ cả 2 file ZIP;
+# rồi Run All. Xong: tab Output => New Dataset (Private) "lamah-ce-ext" (giữ cả 2 file ZIP;
 # Kaggle tự giải nén thành thư mục khi tạo dataset). Khám phá dữ liệu: Workspace/02_Exploration/.
 # Chạy được cả trên Colab (lưu vào /content).
 #
@@ -42,7 +42,7 @@ BASE_DIR = Path("/kaggle/working") if IS_KAGGLE else Path("/content") if IS_COLA
 
 
 class CountingReader(io.RawIOBase):
-    """Bọc luồng HTTP để đếm số byte nén đã đọc (theo dõi tiến độ)."""
+    # Bọc luồng HTTP để đếm số byte nén đã đọc (theo dõi tiến độ).
 
     def __init__(self, raw):
         self.raw, self.bytes_read = raw, 0
@@ -59,7 +59,7 @@ class CountingReader(io.RawIOBase):
 
 
 def stream_tar_to_zip(url: str, fallback_gb: float, zip_path: Path) -> None:
-    """Tải .tar.gz theo luồng, ghi mọi file vào zip_path (giữ nguyên đường dẫn gốc), in tiến độ và kiểm tra CRC."""
+    # Tải .tar.gz theo luồng, ghi mọi file vào zip_path (giữ nguyên đường dẫn gốc), in tiến độ và kiểm tra CRC.
     zip_path.parent.mkdir(parents=True, exist_ok=True)
     print(f"\n=== {zip_path.name} ===")
     print(f"Nền tảng: {'Kaggle' if IS_KAGGLE else 'Colab' if IS_COLAB else 'Local'} | "

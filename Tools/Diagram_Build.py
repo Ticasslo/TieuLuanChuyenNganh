@@ -82,7 +82,7 @@ BANDS = [
          [("A", "A3. Persistence (NSE≈0,35–0,37), PNSE, KGE, DLinear"),
           ("EV", "Wilcoxon theo lưu vực + Cohen's d, hiệu chỉnh Holm")]),
         ("Mốc: chỉ dự báo (0,387) so tái phân tích (≈0,69)",
-         [("EV", "Theo 4 mức lưu lượng; sự kiện lũ chu kỳ 1, 2, 5, 10 năm (POD, FAR, F1)"),
+         [("EV", "Theo 4 mức lưu lượng; sự kiện lũ chu kỳ 1,5; 2; 5; 10 năm (POD, FAR, F1)"),
           ("EV", "Kịch bản vận hành: mất Q, độ trễ thực của từng nguồn")]),
         ("ΔNSE theo lưu vực, tương quan thuộc tính",
          [("EV", "ΔNSE SSM so LSTM theo lưu vực: tuyết, động lực chậm, lũ nhanh"),

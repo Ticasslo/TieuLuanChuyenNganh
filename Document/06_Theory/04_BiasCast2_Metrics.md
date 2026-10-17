@@ -553,7 +553,7 @@ Các hình của mục này sinh bằng `Tools/Theory_Figures.py`.
 |---|---|
 | Kiểm định Wilcoxon ghép cặp theo lưu vực, cỡ hiệu ứng, hiệu chỉnh Holm | chênh lệch giữa hai mô hình có phải do ngẫu nhiên không |
 | Đánh giá theo mức lưu lượng (rất cao, cao, trung bình, thấp) | mô hình đúng ở mức nào, sai ở mức nào — yêu cầu của GVHD |
-| Đánh giá theo sự kiện lũ (vượt ngưỡng chu kỳ lặp lại 1, 2, 5, 10 năm): tỉ lệ phát hiện, tỉ lệ báo động nhầm | có báo được lũ không |
+| Đánh giá theo sự kiện lũ (vượt ngưỡng chu kỳ lặp lại 1,5; 2; 5; 10 năm): tỉ lệ phát hiện, tỉ lệ báo động nhầm | có báo được lũ không |
 
 **Kiểm định Wilcoxon (Wilcoxon signed-rank test).** Hai mô hình có NSE trung vị 0,71 và 0,70: chênh 0,01 là thật hay do may rủi? Kiểm định ghép cặp theo lưu vực: cùng một lưu vực, lấy NSE của A trừ NSE của B; nếu A thật sự tốt hơn thì hiệu số phần lớn dương và các hiệu dương lớn hơn các hiệu âm. Ví dụ 6 lưu vực (minh họa, tính đủ 2⁶ = 64 cách gán dấu bằng Python):
 

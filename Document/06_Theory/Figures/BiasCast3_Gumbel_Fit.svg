@@ -1,0 +1,59 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='680' height='460' viewBox='0 0 680 460'>
+<rect width='680' height='460' fill='white'/>
+<text x='340.0' y='22' text-anchor='middle' font-size='15' font-weight='bold' font-family='Arial, sans-serif'>Return period thresholds from 10 annual maxima (illustration)</text>
+<text x='340.0' y='42' text-anchor='middle' font-size='11' fill='#555' font-family='Arial, sans-serif'>Gumbel fitted with L-moments: xi = 10.58, alpha = 3.67</text>
+<line x1='70' y1='400.0' x2='650' y2='400.0' stroke='#e6e6e6'/>
+<text x='62' y='404.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>0</text>
+<line x1='70' y1='334.0' x2='650' y2='334.0' stroke='#e6e6e6'/>
+<text x='62' y='338.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>5</text>
+<line x1='70' y1='268.0' x2='650' y2='268.0' stroke='#e6e6e6'/>
+<text x='62' y='272.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>10</text>
+<line x1='70' y1='202.0' x2='650' y2='202.0' stroke='#e6e6e6'/>
+<text x='62' y='206.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>15</text>
+<line x1='70' y1='136.0' x2='650' y2='136.0' stroke='#e6e6e6'/>
+<text x='62' y='140.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>20</text>
+<line x1='70' y1='70.0' x2='650' y2='70.0' stroke='#e6e6e6'/>
+<text x='62' y='74.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>25</text>
+<line x1='70.0' y1='70' x2='70.0' y2='400' stroke='#e6e6e6'/>
+<text x='70.0' y='418' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>1</text>
+<line x1='148.50159534574877' y1='70' x2='148.50159534574877' y2='400' stroke='#e6e6e6'/>
+<text x='148.50159534574877' y='418' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>1.5</text>
+<line x1='204.19936363266032' y1='70' x2='204.19936363266032' y2='400' stroke='#e6e6e6'/>
+<text x='204.19936363266032' y='418' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>2</text>
+<line x1='381.6012727346794' y1='70' x2='381.6012727346794' y2='400' stroke='#e6e6e6'/>
+<text x='381.6012727346794' y='418' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>5</text>
+<line x1='515.8006363673396' y1='70' x2='515.8006363673396' y2='400' stroke='#e6e6e6'/>
+<text x='515.8006363673396' y='418' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>10</text>
+<line x1='650.0' y1='70' x2='650.0' y2='400' stroke='#e6e6e6'/>
+<text x='650.0' y='418' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>20</text>
+<rect x='70' y='70' width='580' height='330' fill='none' stroke='black'/>
+<text x='360.0' y='445' text-anchor='middle' font-size='13' font-family='Arial, sans-serif'>Return period T (years, log scale)</text>
+<text x='18' y='235.0' text-anchor='middle' font-size='13' font-family='Arial, sans-serif' transform='rotate(-90 18 235.0)'>Annual maximum qmax (mm/day)</text>
+<polyline points='71.9,334.4 74.8,323.8 77.7,317.3 80.6,312.5 83.5,308.4 86.4,305.0 89.3,301.9 92.2,299.1 95.0,296.5 97.9,294.1 100.8,291.8 103.7,289.7 106.6,287.7 109.5,285.7 112.4,283.9 115.3,282.1 118.2,280.4 121.1,278.7 124.0,277.1 126.8,275.5 129.7,274.0 132.6,272.5 135.5,271.1 138.4,269.6 141.3,268.2 144.2,266.9 147.1,265.5 150.0,264.2 152.9,262.9 155.7,261.7 158.6,260.4 161.5,259.2 164.4,257.9 167.3,256.7 170.2,255.6 173.1,254.4 176.0,253.2 178.9,252.1 181.8,251.0 184.7,249.8 187.5,248.7 190.4,247.6 193.3,246.6 196.2,245.5 199.1,244.4 202.0,243.4 204.9,242.3 207.8,241.3 210.7,240.3 213.6,239.2 216.4,238.2 219.3,237.2 222.2,236.2 225.1,235.2 228.0,234.2 230.9,233.3 233.8,232.3 236.7,231.3 239.6,230.4 242.5,229.4 245.3,228.5 248.2,227.5 251.1,226.6 254.0,225.6 256.9,224.7 259.8,223.8 262.7,222.9 265.6,221.9 268.5,221.0 271.4,220.1 274.3,219.2 277.1,218.3 280.0,217.4 282.9,216.5 285.8,215.6 288.7,214.7 291.6,213.9 294.5,213.0 297.4,212.1 300.3,211.2 303.2,210.4 306.0,209.5 308.9,208.6 311.8,207.8 314.7,206.9 317.6,206.0 320.5,205.2 323.4,204.3 326.3,203.5 329.2,202.6 332.1,201.8 334.9,201.0 337.8,200.1 340.7,199.3 343.6,198.4 346.5,197.6 349.4,196.8 352.3,196.0 355.2,195.1 358.1,194.3 361.0,193.5 363.9,192.7 366.7,191.8 369.6,191.0 372.5,190.2 375.4,189.4 378.3,188.6 381.2,187.8 384.1,187.0 387.0,186.1 389.9,185.3 392.8,184.5 395.6,183.7 398.5,182.9 401.4,182.1 404.3,181.3 407.2,180.5 410.1,179.7 413.0,178.9 415.9,178.1 418.8,177.3 421.7,176.6 424.6,175.8 427.4,175.0 430.3,174.2 433.2,173.4 436.1,172.6 439.0,171.8 441.9,171.0 444.8,170.3 447.7,169.5 450.6,168.7 453.5,167.9 456.3,167.1 459.2,166.4 462.1,165.6 465.0,164.8 467.9,164.0 470.8,163.3 473.7,162.5 476.6,161.7 479.5,160.9 482.4,160.2 485.2,159.4 488.1,158.6 491.0,157.8 493.9,157.1 496.8,156.3 499.7,155.5 502.6,154.8 505.5,154.0 508.4,153.2 511.3,152.5 514.2,151.7 517.0,151.0 519.9,150.2 522.8,149.4 525.7,148.7 528.6,147.9 531.5,147.2 534.4,146.4 537.3,145.6 540.2,144.9 543.1,144.1 545.9,143.4 548.8,142.6 551.7,141.9 554.6,141.1 557.5,140.3 560.4,139.6 563.3,138.8 566.2,138.1 569.1,137.3 572.0,136.6 574.9,135.8 577.7,135.1 580.6,134.3 583.5,133.6 586.4,132.8 589.3,132.1 592.2,131.3 595.1,130.6 598.0,129.8 600.9,129.1 603.8,128.3 606.6,127.6 609.5,126.8 612.4,126.1 615.3,125.3 618.2,124.6 621.1,123.8 624.0,123.1 626.9,122.4 629.8,121.6 632.7,120.9 635.5,120.1 638.4,119.4 641.3,118.6 644.2,117.9 647.1,117.1 650.0,116.4' fill='none' stroke='#1f4e79' stroke-width='2.5'/>
+<circle cx='534.2535217518293' cy='109.6' r='5' fill='black'/>
+<circle cx='400.054158119169' cy='162.4' r='5' fill='black'/>
+<circle cx='321.55256277342016' cy='202.0' r='5' fill='black'/>
+<circle cx='265.8547944865087' cy='228.4' r='5' fill='black'/>
+<circle cx='222.65224901714998' cy='241.6' r='5' fill='black'/>
+<circle cx='187.3531991407599' cy='254.8' r='5' fill='black'/>
+<circle cx='157.50827772068214' cy='268.0' r='5' fill='black'/>
+<circle cx='131.65543085384837' cy='281.20000000000005' r='5' fill='black'/>
+<circle cx='108.85160379501119' cy='281.20000000000005' r='5' fill='black'/>
+<circle cx='88.45288538448968' cy='294.4' r='5' fill='black'/>
+<line x1='70' y1='264.88628561577343' x2='148.50159534574877' y2='264.88628561577343' stroke='#7f6000' stroke-dasharray='5,4'/>
+<circle cx='148.50159534574877' cy='264.88628561577343' r='5' fill='white' stroke='#7f6000' stroke-width='2.5'/>
+<text x='156.50159534574877' y='280.88628561577343' font-size='12' fill='#7f6000' font-family='Arial, sans-serif'>T = 1.5: 10.2</text>
+<line x1='70' y1='242.56966836142215' x2='204.19936363266032' y2='242.56966836142215' stroke='#38761d' stroke-dasharray='5,4'/>
+<circle cx='204.19936363266032' cy='242.56966836142215' r='5' fill='white' stroke='#38761d' stroke-width='2.5'/>
+<text x='212.19936363266032' y='258.56966836142215' font-size='12' fill='#38761d' font-family='Arial, sans-serif'>T = 2: 11.9</text>
+<line x1='70' y1='187.6491000746971' x2='381.6012727346794' y2='187.6491000746971' stroke='#e69138' stroke-dasharray='5,4'/>
+<circle cx='381.6012727346794' cy='187.6491000746971' r='5' fill='white' stroke='#e69138' stroke-width='2.5'/>
+<text x='389.6012727346794' y='203.6491000746971' font-size='12' fill='#e69138' font-family='Arial, sans-serif'>T = 5: 16.1</text>
+<line x1='70' y1='151.28690507255692' x2='515.8006363673396' y2='151.28690507255692' stroke='#c00000' stroke-dasharray='5,4'/>
+<circle cx='515.8006363673396' cy='151.28690507255692' r='5' fill='white' stroke='#c00000' stroke-width='2.5'/>
+<text x='523.8006363673396' y='167.28690507255692' font-size='12' fill='#c00000' font-family='Arial, sans-serif'>T = 10: 18.8</text>
+<circle cx='440' cy='348' r='5' fill='black'/>
+<text x='450' y='352' font-size='12' font-family='Arial, sans-serif'>annual maximum (10 years)</text>
+<line x1='428' y1='368' x2='444' y2='368' stroke='#1f4e79' stroke-width='2.5'/>
+<text x='450' y='372' font-size='12' font-family='Arial, sans-serif'>fitted Gumbel curve</text>
+</svg>

@@ -1,10 +1,10 @@
 # =============================================================================
-# LamaH-CE gốc theo giờ — Notebook 1: tải phần lõi (B + D theo giờ, mạng sông)
+# LamaH-CE gốc theo giờ - Notebook 1: tải phần lõi (B + D theo giờ, mạng sông)
 # Dùng cho hướng khóa luận (dữ liệu giờ, mạng sông); bài cơ sở của đề tài là BiasCast, dữ liệu chính tải ở
 # 01_LamaHCEExt_Download.py. Cách chọn tệp theo mã của Kirschstein & Sun (ICML 2024), "The Merit of River
-# Network Topology for Neural Flood Forecasting" — LamaH-CE theo giờ, 358 trạm; github.com/nkirschi/neural-flood-forecasting
+# Network Topology for Neural Flood Forecasting" - LamaH-CE theo giờ, 358 trạm; github.com/nkirschi/neural-flood-forecasting
 # Notebook Kaggle: Accelerator = None, bật Internet, dán Phần 1 vào cell 1, Phần 2 vào cell 2,
-# rồi Save Version → Save & Run All (chạy nền). Xong: tab Output → New Dataset (Private) "lamah-ce-core".
+# rồi Save Version => Save & Run All (chạy nền). Xong: tab Output => New Dataset (Private) "lamah-ce-core".
 # Phần 1 giống hệt Phần 1 của 03_LamaHCE_Download_Extra.py (mỗi notebook phải tự đủ code).
 #
 # MỤC LỤC
@@ -18,7 +18,7 @@
 # ghi thẳng vào MỘT file ZIP trong /kaggle/working (tránh giới hạn ~500 file của output notebook Kaggle;
 # ZIP giữ nguyên tên file gốc .csv nên đọc bằng zipfile/pandas hoặc giải nén là dùng được code của Kirschstein & Sun).
 # Vượt ngưỡng dung lượng thì bỏ qua phần còn lại thay vì dừng. Nếu lỗi mạng giữa chừng: ZIP không có dòng
-# "Kiểm tra ZIP" ở cuối log là chưa đủ — chạy lại cả notebook (không tải tiếp được từ chỗ đứt).
+# "Kiểm tra ZIP" ở cuối log là chưa đủ - chạy lại cả notebook (không tải tiếp được từ chỗ đứt).
 # Log mỗi 60 giây: % đã tải, tốc độ, thời gian còn lại dự kiến (ETA), thư mục đang duyệt.
 # % tính theo số byte nén đã đọc nên vẫn tăng đều kể cả khi đang duyệt qua các file bị bỏ qua.
 import io
@@ -46,7 +46,7 @@ BASE_DIR = Path("/kaggle/working") if IS_KAGGLE else Path("/content") if IS_COLA
 
 
 class CountingReader(io.RawIOBase):
-    """Bọc luồng HTTP để đếm số byte nén đã đọc (theo dõi tiến độ)."""
+    # Bọc luồng HTTP để đếm số byte nén đã đọc (theo dõi tiến độ).
 
     def __init__(self, raw):
         self.raw, self.bytes_read = raw, 0
@@ -63,7 +63,7 @@ class CountingReader(io.RawIOBase):
 
 
 def progress_line(read_bytes, total_bytes, elapsed_s, seen, kept, raw_bytes, saved_bytes, name):
-    """Một dòng tiến độ: % đã tải, tốc độ trung bình, thời gian còn lại dự kiến, thư mục đang duyệt."""
+    # Một dòng tiến độ: % đã tải, tốc độ trung bình, thời gian còn lại dự kiến, thư mục đang duyệt.
     frac = read_bytes / total_bytes if total_bytes else 0.0
     speed_mb_s = read_bytes / 1e6 / elapsed_s if elapsed_s > 0 else 0.0
     eta_min = elapsed_s * (1 - frac) / frac / 60 if frac > 0 else float("nan")
@@ -74,7 +74,7 @@ def progress_line(read_bytes, total_bytes, elapsed_s, seen, kept, raw_bytes, sav
 
 
 def stream_lamah(zip_path: Path, keep, max_output_gb: float = MAX_OUTPUT_GB) -> None:
-    """Tải LamaH-CE theo luồng, ghi các file có keep(name) == True vào zip_path (giữ nguyên đường dẫn gốc)."""
+    # Tải LamaH-CE theo luồng, ghi các file có keep(name) == True vào zip_path (giữ nguyên đường dẫn gốc).
     zip_path.parent.mkdir(parents=True, exist_ok=True)
     print(f"Nền tảng: {'Kaggle' if IS_KAGGLE else 'Colab' if IS_COLAB else 'Local'} | Lưu vào: {zip_path}")
     print(f"Ổ đĩa trống: {shutil.disk_usage(zip_path.parent).free / 1e9:.1f} GB")

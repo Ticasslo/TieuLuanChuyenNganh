@@ -68,7 +68,7 @@ Cách nói trước hội đồng: đề tài không khẳng định Mamba tốt
 | 6. Huấn luyện | Bước B → H (Mục 7) | Trọng số, nhật ký | Chưa làm |
 | 7. Đánh giá | Bộ đánh giá Mục 6 | Bảng, hình, kiểm định | Chưa làm |
 | 8. Giải thích | Integrated Gradients, dò trạng thái ẩn | Hình mức ảnh hưởng | Chưa làm |
-| 9. Ngưỡng lũ | Gumbel L-moments trên qmax năm | Ngưỡng 1, 2, 5, 10 năm mỗi trạm | Chưa làm |
+| 9. Ngưỡng lũ | Gumbel L-moments trên qmax năm | Ngưỡng 1,5; 2; 5; 10 năm mỗi trạm | Chưa làm |
 | 10. Demo | Một mục trong trang web nhiều mục của nhóm, chạy liên tục trên VPS Oracle Cloud miễn phí: bản đồ cảnh báo phát lại kỳ test, đường Q 7 ngày, mức ảnh hưởng của các nhóm nguồn theo lưu vực; mô hình chạy thật trên CPU cho lưu vực và ngày được chọn, có thử "nếu… thì…" với dự báo ECMWF HRES ngày t; huấn luyện trên GPU, demo chạy CPU, làm trên laptop trước rồi đưa lên VPS (Mục 9.6) | Ứng dụng | Chưa làm |
 
 ---
@@ -196,12 +196,12 @@ Theo cấu hình của tác giả (BiasCast Mục 2.2; `02_BasePaper.md` Mục 1
 | Bước | Nội dung |
 |---|---|
 | Ngưỡng mức | Riêng từng lưu vực, tính trên qmax 1981–2013 (trước kỳ test): bốn mức theo xác suất vượt của đường duy trì lưu lượng — rất cao (0–0,02), cao (0,02–0,2), trung bình (0,2–0,7), thấp (0,7–1). Yilmaz, Gupta, Wagener (WRR 2008) chia ba đoạn: cao 0–0,02, giữa 0,2–0,7, thấp 0,7–1; khoảng 0,02–0,2 nằm giữa hai đoạn của Yilmaz, đề tài tách thành mức riêng để bốn mức phủ hết đường duy trì |
-| Chỉ số theo mức | Ma trận nhầm lẫn 4 mức, độ chính xác, recall từng mức; %BiasFHV, %BiasFMS, %BiasFLV |
-| Ngưỡng lũ | Chu kỳ lặp lại 1, 2, 5, 10 năm (như Nearing và cs., Nature 2024), Gumbel fit bằng L-moments (Hosking, JRSS B 1990) trên qmax năm 1981–2013, như AIFL. Số năm có Q khác nhau giữa các trạm (3 trạm chỉ có Q từ 2010 — `01_LamaHCE.md` Mục 6.1), nên ghi số năm dùng để fit cho từng lưu vực; lưu vực dưới 10 năm báo cáo riêng (ngưỡng 10 năm là lựa chọn của đề tài) |
-| Sự kiện | Một sự kiện tính là phát hiện đúng nếu dự báo và quan trắc cùng vượt ngưỡng trong cửa sổ ±1 ngày — lựa chọn của đề tài cho hạn 1 ngày; Nearing và cs. (2024) tính đúng khi hai bên vượt ngưỡng "within two days of each other" với dự báo nhiều ngày; bước H dùng ±2 ngày như Nearing |
-| Chỉ số sự kiện | Tỉ lệ phát hiện (POD/recall), tỉ lệ báo động nhầm (FAR), precision, F1, CSI; sai số thời điểm đỉnh |
+| Chỉ số theo mức | Ma trận nhầm lẫn 4 mức, độ chính xác, recall và precision từng mức; %BiasFHV, %BiasFMS, %BiasFLV |
+| Ngưỡng lũ | Chu kỳ lặp lại 1,5; 2; 5; 10 năm (mức thấp nhất 1,5 năm như AIFL; Nearing và cs., Nature 2024 ghi "1 năm" nhưng mã dùng T = 1,01, ngưỡng thấp hơn khoảng 99% đỉnh năm, trùng vai trò với mức "rất cao"), đỉnh năm theo năm thủy văn 1/10 – 30/9 như mã Nearing, bỏ năm thiếu quá nửa số ngày; Gumbel fit bằng L-moments (Hosking, JRSS B 1990) trên qmax năm 1981–2013, như AIFL. Số năm có Q khác nhau giữa các trạm (3 trạm chỉ có Q từ 2010 — `01_LamaHCE.md` Mục 6.1), nên ghi số năm dùng để fit cho từng lưu vực; lưu vực dưới 10 năm báo cáo riêng (ngưỡng 10 năm là lựa chọn của đề tài) |
+| Sự kiện | Một trận lũ quan trắc tính là phát hiện đúng nếu chuỗi dự báo có trận bắt đầu trong vòng ±1 ngày quanh ngày bắt đầu của trận đó — lựa chọn của đề tài cho hạn 1 ngày; Nearing và cs. (2024) tính đúng khi hai bên vượt ngưỡng "within two days of each other" với dự báo nhiều ngày; bước H dùng ±2 ngày như Nearing. Trận lũ bắt đầu ở ngày vượt ngưỡng từ dưới lên (như mã Nearing); hai lần vượt liên tiếp gộp làm một trận nếu đỉnh cách nhau dưới 5 + ln(A dặm vuông) ngày hoặc lưu lượng giữa hai đỉnh không tụt dưới 3/4 đỉnh nhỏ hơn (tiêu chí độc lập USWRC 1976, theo tổng quan Pan và cs., SERRA 36:2419–2435, 2022), áp như nhau cho quan trắc và dự báo; kết quả không gộp báo cáo kèm để so với Nearing |
+| Chỉ số sự kiện | Tỉ lệ phát hiện (POD/recall), tỉ lệ báo động nhầm (FAR), precision, F1, CSI; sai số thời điểm đỉnh. Kết quả chính cộng dồn số trận bắt được, bỏ sót, báo nhầm của cả 451 lưu vực ở mỗi mức T; theo lưu vực thì POD chỉ tính ở lưu vực có trận thật, precision chỉ ở lưu vực có trận báo, ghi kèm số lưu vực được tính (không dùng quy ước gán 1 khi không có trận như mã Nearing) |
 | Ngưỡng kép (phân tích độ nhạy) | Ngưỡng của mô hình tính trên chính chuỗi dự báo của mô hình (Nearing 2024, AIFL); vì mô hình chỉ có dự báo 2003–2017 (gồm cả kỳ train), chỉ dùng làm phân tích phụ, nêu rõ hạn chế |
-| Cách đọc | Ưu tiên bỏ sót ít ở mức lũ và mức rất thấp, chấp nhận báo động nhầm nhiều hơn (GVHD); so các lõi ở từng mức |
+| Cách đọc | Ưu tiên bỏ sót ít ở mức lũ và mức rất thấp (GVHD; "rất thấp" ứng với mức thấp, xác suất vượt 0,7–1), tức đọc recall/POD trước ở mức rất cao, mức thấp và các mức lũ, chấp nhận báo động nhầm nhiều hơn; so các lõi ở từng mức |
 
 ### 6.3. Kịch bản vận hành (chỉ suy luận)
 
@@ -412,7 +412,7 @@ Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba
 | Độ trễ từng nguồn | Copernicus (ERA5-Land khoảng 5 ngày; E-OBS hằng ngày trễ 1 ngày, bản đầy đủ 2 lần/năm); UCAR Climate Data Guide (MSWEP NRT 2–3 giờ); ICDC Hamburg (GLEAM mỗi năm); BiasCast Mục 3.7 (eHYD khoảng 2 giờ) |
 | Giao thức cùng tham số | Shahriar (SSRN 2026); Liu và cs. (J. Hydrol. 2024) |
 | PNSE | Kitanidis & Bras, WRR 16:1034–1044 (1980); MF²LSTM (preprint EGUsphere 2026) |
-| Chu kỳ lặp lại 1, 2, 5, 10 năm; precision, recall, F1; cửa sổ thời gian | Nearing và cs., Nature 627 (2024) |
+| Chu kỳ lặp lại; precision, recall, F1; cửa sổ thời gian; năm thủy văn cho đỉnh năm | Nearing và cs., Nature 627 (2024) và mã công bố kèm (`google-research-datasets/global_streamflow_model_paper`) |
 | Gumbel L-moments | Hosking, JRSS B 52:105–124 (1990); AIFL (Taccari và cs., J. Hydrol. 678, 2026) |
 | Đoạn đường duy trì lưu lượng | Yilmaz, Gupta, Wagener, WRR 44 (2008) |
 | Wilcoxon signed-rank + Cohen's d | Kratzert và cs. (2019, 2024); Gauch và cs. (2025); Nearing và cs. (2024) |

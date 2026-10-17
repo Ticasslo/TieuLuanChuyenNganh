@@ -1,6 +1,6 @@
 # =============================================================================
-# Chuyển giọng nói buổi họp (video .webm) thành văn bản có mốc thời gian — faster-whisper large-v3
-# Notebook Kaggle: Accelerator = GPU T4, Internet = On; Add Input → dataset chứa file .webm.
+# Chuyển giọng nói buổi họp (video .webm) thành văn bản có mốc thời gian - faster-whisper large-v3
+# Notebook Kaggle: Accelerator = GPU T4, Internet = On; Add Input => dataset chứa file .webm.
 # Chạy được trên Colab (GPU) nếu đặt file vào /content.
 #
 # MỤC LỤC
@@ -57,13 +57,13 @@ TERMS = ("Mamba, LSTM, GRU, Transformer, dataset, BiasCast, LamaH-CE, NSE, atten
 
 
 def hms(t: float) -> str:
-    """Giây → hh:mm:ss."""
+    # Giây => hh:mm:ss.
     t = int(t)
     return f"{t // 3600:02d}:{t % 3600 // 60:02d}:{t % 60:02d}"
 
 
 def load_audio(path: Path) -> np.ndarray:
-    """Đọc luồng âm thanh đầu tiên, đổi sang 16 kHz mono float32 trong [-1, 1]."""
+    # Đọc luồng âm thanh đầu tiên, đổi sang 16 kHz mono float32 trong [-1, 1].
     resampler = av.AudioResampler(format="s16", layout="mono", rate=SAMPLE_RATE)
     chunks = []
     with av.open(str(path)) as f:

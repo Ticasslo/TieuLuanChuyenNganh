@@ -1,0 +1,70 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='680' height='560' viewBox='0 0 680 560'>
+<rect width='680' height='560' fill='white'/>
+<text x='340.0' y='24' text-anchor='middle' font-size='15' font-weight='bold' font-family='Arial, sans-serif'>Event scoring is a 2x2 table (illustration)</text>
+<text x='420' y='64' text-anchor='middle' font-size='12' font-weight='bold' font-family='Arial, sans-serif'>Model</text>
+<text x='315.0' y='80' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>warns (event)</text>
+<text x='525.0' y='80' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>silent (no event)</text>
+<text x='200' y='119.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>Observed: flood</text>
+<rect x='210' y='84' width='210' height='62' fill='#d9ead3' stroke='black'/>
+<text x='315.0' y='111' text-anchor='middle' font-size='14' font-weight='bold' font-family='Arial, sans-serif'>B = hit</text>
+<text x='315.0' y='130' text-anchor='middle' font-size='11' fill='#444' font-family='Arial, sans-serif'>caught</text>
+<rect x='420' y='84' width='210' height='62' fill='#f4cccc' stroke='black'/>
+<text x='525.0' y='111' text-anchor='middle' font-size='14' font-weight='bold' font-family='Arial, sans-serif'>S = miss</text>
+<text x='525.0' y='130' text-anchor='middle' font-size='11' fill='#444' font-family='Arial, sans-serif'>flood not warned</text>
+<text x='200' y='181.0' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>Observed: no flood</text>
+<rect x='210' y='146' width='210' height='62' fill='#fce5cd' stroke='black'/>
+<text x='315.0' y='173' text-anchor='middle' font-size='14' font-weight='bold' font-family='Arial, sans-serif'>N = false alarm</text>
+<text x='315.0' y='192' text-anchor='middle' font-size='11' fill='#444' font-family='Arial, sans-serif'>warned, no flood</text>
+<rect x='420' y='146' width='210' height='62' fill='#eeeeee' stroke='black'/>
+<text x='525.0' y='173' text-anchor='middle' font-size='14' font-weight='bold' font-family='Arial, sans-serif'>quiet days</text>
+<text x='525.0' y='192' text-anchor='middle' font-size='11' fill='#444' font-family='Arial, sans-serif'>not counted</text>
+<text x='340.0' y='234' text-anchor='middle' font-size='13' font-family='Arial, sans-serif'>POD (recall) = B / (B + S)  |  precision = B / (B + N)</text>
+<text x='340.0' y='252' text-anchor='middle' font-size='13' font-family='Arial, sans-serif'>FAR = N / (B + N)  |  CSI = B / (B + S + N)</text>
+<text x='20' y='292' font-size='13' font-weight='bold' font-family='Arial, sans-serif'>Window ±1 day</text>
+<rect x='199.0' y='302' width='98.0' height='54' fill='#d9ead3' opacity='0.7'/>
+<rect x='493.0' y='302' width='98.0' height='54' fill='#d9ead3' opacity='0.7'/>
+<text x='136' y='318' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>observed</text>
+<line x1='150' y1='314' x2='640' y2='314' stroke='#999'/>
+<circle cx='248.0' cy='314' r='7' fill='black'/>
+<circle cx='542.0' cy='314' r='7' fill='black'/>
+<text x='136' y='348' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>model</text>
+<line x1='150' y1='344' x2='640' y2='344' stroke='#999'/>
+<circle cx='346.0' cy='344' r='7' fill='#ff7f0e'/>
+<circle cx='542.0' cy='344' r='7' fill='#ff7f0e'/>
+<text x='150.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>1</text>
+<text x='199.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>2</text>
+<text x='248.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>3</text>
+<text x='297.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>4</text>
+<text x='346.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>5</text>
+<text x='395.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>6</text>
+<text x='444.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>7</text>
+<text x='493.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>8</text>
+<text x='542.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>9</text>
+<text x='591.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>10</text>
+<text x='640.0' y='372' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>11</text>
+<text x='150' y='394' font-size='12' font-family='Arial, sans-serif'>B = 1, S = 1, N = 1 =&gt; POD = 0.50, precision = 0.50, CSI = 0.33</text>
+<text x='20' y='432' font-size='13' font-weight='bold' font-family='Arial, sans-serif'>Window ±2 days</text>
+<rect x='150.0' y='442' width='196.0' height='54' fill='#d9ead3' opacity='0.7'/>
+<rect x='444.0' y='442' width='196.0' height='54' fill='#d9ead3' opacity='0.7'/>
+<text x='136' y='458' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>observed</text>
+<line x1='150' y1='454' x2='640' y2='454' stroke='#999'/>
+<circle cx='248.0' cy='454' r='7' fill='black'/>
+<circle cx='542.0' cy='454' r='7' fill='black'/>
+<text x='136' y='488' text-anchor='end' font-size='12' font-family='Arial, sans-serif'>model</text>
+<line x1='150' y1='484' x2='640' y2='484' stroke='#999'/>
+<circle cx='346.0' cy='484' r='7' fill='#ff7f0e'/>
+<circle cx='542.0' cy='484' r='7' fill='#ff7f0e'/>
+<text x='150.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>1</text>
+<text x='199.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>2</text>
+<text x='248.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>3</text>
+<text x='297.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>4</text>
+<text x='346.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>5</text>
+<text x='395.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>6</text>
+<text x='444.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>7</text>
+<text x='493.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>8</text>
+<text x='542.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>9</text>
+<text x='591.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>10</text>
+<text x='640.0' y='512' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>11</text>
+<text x='150' y='534' font-size='12' font-family='Arial, sans-serif'>B = 2, S = 0, N = 0 =&gt; POD = 1.00, precision = 1.00, CSI = 1.00</text>
+<text x='340.0' y='550' text-anchor='middle' font-size='11' fill='#555' font-family='Arial, sans-serif'>Green band = days around an observed event start where a model start counts as a hit</text>
+</svg>

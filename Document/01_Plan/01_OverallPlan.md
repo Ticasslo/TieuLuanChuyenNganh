@@ -82,7 +82,7 @@ Câu hỏi nghiên cứu, đóng góp, tính mới, giao thức so sánh và ma 
 - **Chính:** NSE, KGE, PNSE (NSE lấy persistence làm mốc) theo từng lưu vực trên test 2014–2017; trung vị, phân vị, đường CDF, số lưu vực tốt lên / kém đi.
 - **Kiểm định:** Wilcoxon signed-rank ghép cặp theo lưu vực kèm Cohen's d, hiệu chỉnh Holm khi so nhiều cặp.
 - **Theo mức lưu lượng (yêu cầu GVHD):** bốn mức theo xác suất vượt của đường duy trì lưu lượng (dựa trên ba đoạn của Yilmaz 2008, thêm mức 0,02–0,2 nằm giữa), ngưỡng riêng từng lưu vực tính trước kỳ test; ma trận nhầm lẫn, %BiasFHV/FMS/FLV.
-- **Theo sự kiện lũ:** ngưỡng chu kỳ lặp lại 1, 2, 5, 10 năm (Gumbel, L-moments); POD, FAR, precision, F1, CSI trong cửa sổ ±1 ngày (±2 ngày cho dự báo nhiều ngày, như Nearing và cs. 2024); sai số thời điểm đỉnh.
+- **Theo sự kiện lũ:** ngưỡng chu kỳ lặp lại 1,5; 2; 5; 10 năm (Gumbel, L-moments); POD, FAR, precision, F1, CSI trong cửa sổ ±1 ngày (±2 ngày cho dự báo nhiều ngày, như Nearing và cs. 2024); sai số thời điểm đỉnh.
 - **Kịch bản vận hành:** mất Q, độ trễ thực tế của từng nguồn dữ liệu.
 - **Độ tin cậy và chi phí:** 3 hạt giống mỗi cấu hình; chọn checkpoint theo validation, NSE test ghi mỗi epoch chỉ để theo dõi; số tham số, thời gian, bộ nhớ.
 
