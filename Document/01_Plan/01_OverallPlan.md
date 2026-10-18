@@ -9,7 +9,7 @@
 | | Tên | Trạng thái |
 |---|---|---|
 | Tên đăng ký với GVHD | *"Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy"* | Giữ nguyên |
-| Tên nội bộ tiểu luận | — | Chưa chốt |
+| Tên tiểu luận | Dùng tên đăng ký với GVHD | Giữ nguyên |
 | Tên nội bộ khóa luận | — | Chưa chốt |
 
 Ràng buộc: tên không có chữ "lũ lụt" — đầu ra là lưu lượng Q, không phải vùng ngập hay mực nước. "Nguy cơ lũ" chỉ suy ra gián tiếp qua ngưỡng chu kỳ lặp lại trên Q.
@@ -84,7 +84,7 @@ Câu hỏi nghiên cứu, đóng góp, tính mới, giao thức so sánh và ma 
 - **Theo mức lưu lượng (yêu cầu GVHD):** bốn mức theo xác suất vượt của đường duy trì lưu lượng (dựa trên ba đoạn của Yilmaz 2008, thêm mức 0,02–0,2 nằm giữa), ngưỡng riêng từng lưu vực tính trước kỳ test; ma trận nhầm lẫn, %BiasFHV/FMS/FLV.
 - **Theo sự kiện lũ:** ngưỡng chu kỳ lặp lại 1,5; 2; 5; 10 năm (Gumbel, L-moments); POD, FAR, precision, F1, CSI trong cửa sổ ±1 ngày (±2 ngày cho dự báo nhiều ngày, như Nearing và cs. 2024); sai số thời điểm đỉnh.
 - **Kịch bản vận hành:** mất Q, độ trễ thực tế của từng nguồn dữ liệu.
-- **Độ tin cậy và chi phí:** 3 hạt giống mỗi cấu hình; chọn checkpoint theo validation, NSE test ghi mỗi epoch chỉ để theo dõi; số tham số, thời gian, bộ nhớ.
+- **Độ tin cậy và chi phí:** 3 hạt giống mỗi cấu hình; chọn checkpoint, cấu hình và mô hình demo chỉ theo NSE trung vị validation, các chỉ số còn lại dùng để so sánh và giải thích (ba tầng chỉ số, `03_Pipeline.md` Mục 6.1); NSE test ghi mỗi epoch chỉ để theo dõi; số tham số, thời gian, bộ nhớ.
 
 Chi tiết: `Document/01_Plan/03_Pipeline.md` Mục 6.
 

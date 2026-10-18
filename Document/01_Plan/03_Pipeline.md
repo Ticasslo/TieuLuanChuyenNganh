@@ -190,6 +190,15 @@ Theo cấu hình của tác giả (BiasCast Mục 2.2; `02_BasePaper.md` Mục 1
 - **Theo lưu vực trên test 2014–2017:** NSE, KGE (và ba thành phần r, α, β), **PNSE** (NSE lấy qmax ngày t−1 quan sát làm mốc, tức hệ số persistence của Kitanidis & Bras, WRR 1980; MF²LSTM dùng tên PNSE).
 - **Tổng hợp:** trung vị, trung bình, P10/P25/P75/P90, đường CDF, số lưu vực tốt lên / kém đi.
 - **Kiểm định:** Wilcoxon signed-rank hai phía, ghép cặp theo lưu vực, kèm cỡ hiệu ứng Cohen's d dạng ghép cặp (trung bình chênh lệch chia độ lệch chuẩn của chênh lệch) — cách của Kratzert và cs. (2019, 2024), Gauch và cs. (2025), Nearing và cs. (2024); hiệu chỉnh Holm khi so nhiều cặp.
+- **Ba tầng chỉ số.** Mọi chỉ số tính từ cùng một tệp dự báo; chia tầng để chỉ một chỉ số dùng cho việc chọn, các chỉ số còn lại dùng để so sánh và giải thích:
+
+| Tầng | Chỉ số | Vai trò |
+|---|---|---|
+| 1. Chọn | NSE trung vị trên validation | Chọn checkpoint (dừng sớm), cấu hình khi tinh chỉnh, B* (Mục 7), mô hình chạy trong demo (Mục 9.6) — như BiasCast dừng sớm theo NSE trung vị validation |
+| 2. Kết quả chính | Trên test: NSE, KGE, PNSE (trung vị, CDF) kèm Wilcoxon, Cohen's d, Holm; recall mức rất cao và mức thấp (Mục 6.2); POD, FAR sự kiện lũ chu kỳ 2 năm | So sánh các lõi (RQ3), đáp yêu cầu đánh giá theo mức của GVHD |
+| 3. Phân tích | r, α, β; %BiasFHV, %BiasFMS, %BiasFLV (trung vị có dấu và trung vị trị tuyệt đối); ma trận nhầm lẫn 4 mức đầy đủ; precision, F1, CSI; các ngưỡng 1,5, 5, 10 năm; P10–P90; theo thuộc tính lưu vực (Mục 6.4) | Giải thích chênh lệch ở tầng 2 đến từ đâu (thời điểm, biên độ, thể tích, dải lưu lượng, loại lưu vực) |
+
+Trung vị có dấu của %BiasFHV có thể gần 0 khi các lưu vực lệch theo hai chiều triệt tiêu nhau, nên báo cáo kèm trung vị của trị tuyệt đối.
 
 ### 6.2. Theo mức lưu lượng và theo sự kiện (yêu cầu GVHD)
 
@@ -250,7 +259,7 @@ Số lần huấn luyện ghi dạng "cấu hình × hạt giống". Mỗi bư�
 | B* | Chọn "LSTM cải tiến" bằng luật cố định, chỉ dùng kỳ validation: trong các cấu hình B1–B3 có NSE trung vị S0 kém cấu hình tốt nhất không quá độ lệch chuẩn giữa hạt giống của NSE trung vị validation (đo ở A4), chọn cấu hình có NSE trung vị trung bình qua S1–S4 cao nhất; hòa thì chọn cấu hình đơn giản hơn. Kết quả trên test của mọi cấu hình B vẫn báo cáo đủ | 0 | Luật chọn ghi trước khi chạy để tránh chọn theo test |
 | C1 | Tinh chỉnh 5 lõi (LSTM, GRU, Transformer, S4D, Mamba) trên quy trình B* | 5 × 8 × 1 | |
 | C2 | Chạy chính thức: cấu hình cùng tham số và cấu hình tốt nhất của mỗi lõi | tối đa 5 × 2 × 3 | |
-| D | Hindcast 730 ngày cho LSTM, Mamba, S4D (cấu hình tốt nhất) | 3 × 3 | ECMWF HRES chỉ có từ 01/01/2002; bộ lọc mẫu gốc kiểm mọi cột trên cả khung nên với 730 ngày bỏ gần hết mẫu train năm 2003 (`01_LamaHCE.md` Mục 6.1); bộ lọc đã sửa ở B2 không bị ảnh hưởng. Nếu cấu hình tốt nhất không gồm B2 thì so 365 và 730 ngày trên cùng tập mẫu (chưa chốt cách xử lý) |
+| D | Hindcast 730 ngày cho LSTM, Mamba, S4D (cấu hình tốt nhất) | 3 × 3 | ECMWF HRES chỉ có từ 01/01/2002; bộ lọc mẫu gốc kiểm mọi cột trên cả khung nên với 730 ngày bỏ gần hết mẫu train năm 2003 (`01_LamaHCE.md` Mục 6.1); bộ lọc đã sửa ở B2 không bị ảnh hưởng. Cả hai độ dài 365 và 730 ngày luôn dùng bộ lọc đã sửa, để hai bên học cùng tập mẫu và chỉ khác độ dài khung; nếu cấu hình tốt nhất không gồm B2 thì bản 365 ngày chạy lại với bộ lọc đã sửa (thêm tối đa 3 × 3 lần ngoài tổng ở dưới) |
 | E | Mamba hai chiều; Transformer patch (dự phòng: Transformer tích chập, S5D) | 2 × 3 (+2 × 3) | Chỉ làm nếu C xong |
 | F | CMAL cho LSTM cải tiến và lõi SSM tốt nhất | 2 × 3 | |
 | H | Dự báo 1–7 ngày cho LSTM cải tiến và lõi SSM tốt nhất: cách (a), (b), (c) | 2 × 3 × 3 | Làm ngay sau C; ưu tiên hơn E |
@@ -258,7 +267,7 @@ Số lần huấn luyện ghi dạng "cấu hình × hạt giống". Mỗi bư�
 | Đánh giá | Mục 6.1–6.6 cho mọi cấu hình chính thức | 0 | |
 | G | Giải thích mô hình, demo (tô màu theo ngưỡng lũ tính ở A1) | 0 | |
 
-Tổng tối đa 130 lần huấn luyện (A: 6; B: 12; C: 40 + 30; D, E, F, H, GV: 9 + 6 + 6 + 18 + 3), ít hơn nếu cấu hình tốt nhất của một lõi trùng cấu hình cùng tham số, thêm 6 nếu làm biến thể dự phòng.
+Tổng tối đa 130 lần huấn luyện (A: 6; B: 12; C: 40 + 30; D, E, F, H, GV: 9 + 6 + 6 + 18 + 3), ít hơn nếu cấu hình tốt nhất của một lõi trùng cấu hình cùng tham số, thêm 6 nếu làm biến thể dự phòng, thêm 9 nếu bước D phải chạy lại bản 365 ngày với bộ lọc đã sửa.
 
 ---
 
@@ -325,6 +334,8 @@ Cắt từ trên xuống; RQ1–RQ4 giữ nguyên, RQ5 và RQ6 chỉ thu hẹp: 
 
 Điểm nối giữa hai mảng: bộ nạp (người 1) phải xong trước bước B2; đầu ra dự báo của người 2 lưu theo một định dạng chung để bộ đánh giá đọc được.
 
+Việc cụ thể của từng người theo từng bước, điểm bàn giao và quy ước làm việc chung: `ASSIGNMENT.md` ở gốc repo.
+
 ### 9.4. Thư mục mã
 
 Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook một tệp `.py` tự đủ, có mục lục, chia cell theo "Phần". Tên tệp (cũng là tên notebook Kaggle) dạng `NN_<Bước>_<BộDữLiệu>_<Việc>.py`: `NN` là thứ tự chạy trong thư mục, `<Bước>` là mã bước ở Mục 7 (VD `03_Baseline/01_A2_LamaHCEExt_Reproduce.py`); tệp không thuộc bước nào (tải dữ liệu) bỏ phần `<Bước>`. Thứ tự thực hiện bước A: A2 → A1 → A3 → A4, xong trước bước B. A2 chạy trước để kiểm môi trường; A1 trước A3 vì DLinear trong A3 cần A1 để quyết cách chuẩn hóa và xử lý ô trống của `qmean`, và persistence cần biết trước các lưu vực bất thường; B cần số liệu thiếu và số mẫu hợp lệ của A1.
@@ -349,6 +360,8 @@ Bộ đánh giá chỉ đọc dự báo đã lưu, không gọi mô hình. Demo 
 
 Demo có hai phần. Phần phát lại đọc tệp dự báo ở Mục 9.5 (bản đồ 451 lưu vực, đường Q, ngưỡng lũ, mức ảnh hưởng của các nhóm nguồn). Phần chạy mô hình trực tiếp nhận lưu vực và ngày t trong kỳ test, lấy cửa sổ hindcast, dự báo ECMWF HRES ngày t và thuộc tính lưu vực từ dữ liệu đã lưu, chuẩn hóa bằng thông số chuẩn hóa lúc huấn luyện, chạy mô hình rồi đổi kết quả sang m³/s; phần thử "nếu… thì…" cho người xem nhân lượng mưa hoặc cộng nhiệt độ của ECMWF HRES ngày t rồi chạy lại. Dữ liệu Extended LamaH-CE chỉ tới 2017 nên đây vẫn là phát lại, không phải dự báo thời gian thực (Mục 11).
 
+Mô hình chạy trong demo chọn theo tầng 1 của Mục 6.1: trong các lần chạy chính thức (bước C2 và các bước mở rộng có dự báo hạn 1 ngày), lấy lần chạy có NSE trung vị validation cao nhất; kết quả test của mô hình này báo cáo như mọi mô hình khác, không dùng để chọn lại.
+
 Huấn luyện chạy trên GPU (Kaggle); demo chạy trên CPU. Mỗi lần dự báo một lưu vực, một ngày là một lượt chạy xuôi của mô hình khoảng 85 nghìn tham số trên chuỗi 365 bước, nên CPU đủ dùng. GPU miễn phí để phục vụ web không phù hợp: Hugging Face ZeroGPU tính hạn mức GPU theo tài khoản người xem (tài khoản miễn phí 5 phút mỗi ngày) và chỉ chạy Gradio; Space Gradio hoặc Docker trên CPU Basic cần gói trả phí mới tạo được (tài liệu Hugging Face *Spaces ZeroGPU*, *Using GPU Spaces*). Giao diện chạy trong notebook Kaggle không dùng làm demo vì chỉ sống trong phiên notebook (tối đa 12 giờ).
 
 `mamba-ssm` chỉ chạy trên GPU CUDA, nên khi chạy trên CPU, khối Mamba thay bằng `mambapy` (PyTorch thuần). README của `mambapy` ghi cách cài đặt tương đương số học với bản gốc và có hàm nạp trọng số `state-spaces/mamba-130m`; việc ánh xạ trọng số cho khối Mamba của đề tài chưa kiểm. LSTM, GRU, Transformer chạy CPU bằng nguyên mã; S4D chạy CPU nếu cài đặt không dùng kernel CUDA riêng (chọn khi viết lõi ở bước C).
@@ -363,6 +376,50 @@ Thứ tự thực hiện, bước sau chỉ làm khi bước trước đạt:
 | D4 | VPS Oracle (CPU ARM) | CPU | Chép đúng mã D3 lên VPS, cài PyTorch bản CPU cho ARM, đóng gói Docker (Mục 8.2), đưa ra Internet | Trùng kết quả D3; có đường dẫn công khai |
 
 Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba trên CPU không đạt ở D2 (lệch kết quả hoặc quá chậm), phần chạy trực tiếp chỉ dùng LSTM cải tiến, các lõi khác hiển thị kết quả tính sẵn.
+
+### 9.7. Lịch theo hai luồng
+
+Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu khi điều kiện chuyển bước ở Mục 7 đạt. Ngày cụ thể gắn sau bước A4, khi đã đo thời gian một lần huấn luyện trên T4 (Mục 8.1); mốc đã có: báo cáo tiến độ gửi GVHD khoảng 25/10/2026.
+
+| Thứ tự | Người 1 (dữ liệu, đánh giá, demo) | Người 2 (mô hình, huấn luyện, XAI) |
+|---|---|---|
+| 1 | A1 khảo sát dữ liệu, tệp ngưỡng; báo cáo tiến độ (A2, A1, persistence) | Bước 0: `mamba-ssm` trên T4, mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) |
+| 2 | A3 mốc so sánh (persistence, PNSE, KGE, DLinear) | A4 nhiễu hạt giống, đo thời gian 1 epoch để gắn ngày cho lịch |
+| 3 | Bộ nạp B2 (nhóm theo nguồn, sửa bộ lọc, Q), cách (b) của bước H; bộ đánh giá Mục 6 | B1 → B3, B*; gắn mốc `freeze-C` |
+| 4 | Đánh giá bước B (gồm kịch bản S0–S4 trên validation cho B*) | C1, C2 |
+| 5 | Đánh giá bước C; demo D1, D2 (Mục 9.6) | H, D, E, F, GV theo thứ tự ưu tiên ở Mục 7, 8.3 |
+| 6 | Đánh giá bước mở rộng; demo D3, D4 | Giải thích mô hình (Mục 6.7) |
+| 7 | Báo cáo, slide (Mục 9.8) | Báo cáo, slide (Mục 9.8) |
+
+Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.
+
+| Nội dung học | Nguồn | Học trước bước |
+|---|---|---|
+| BiasCast Phần 6 — theo lưu vực: lớp nhúng đơn giản và phức tạp, khoảng cách Wasserstein tái phân tích – dự báo, ΔNSE theo lưu vực tương quan với 33 thuộc tính | BiasCast Mục 2.3, 3.1.1, 3.5, 3.6; mã `Inspect_Experiments/` | Phân tích theo lưu vực (Mục 6.4) |
+| BiasCast Phần 7 — hạn chế, hướng tương lai, phản biện; khoảng trống đề tài lấp | BiasCast Mục 3.7, 4; thư trả lời phản biện | Viết báo cáo (Mục 9.8) |
+| DLinear | Zeng và cs. (AAAI 2023) | A3 |
+| Masked mean, che dữ liệu khi huấn luyện | Gauch và cs. (HESS 2025) | B2, B3 |
+| Đọc hình các chỉ số đánh giá, Cohen's d, hiệu chỉnh Holm, ba tầng chỉ số | `06_Theory/08_EvaluationFigures.md`; Mục 6.1 | Đánh giá bước B |
+| S4D, Mamba trong mã (`mamba_ssm`) | `06_Theory/01_ArchitectureTheory.md` Mục 4 | C |
+| CMAL và chỉ số cho dự báo xác suất | Klotz và cs. (HESS 2022) | F |
+| Integrated Gradients, dò trạng thái ẩn | Captum; Hu và cs. (2025) | G |
+
+### 9.8. Báo cáo và bảo vệ
+
+Báo cáo tiểu luận viết tiếng Việt; chữ trong hình và sơ đồ viết tiếng Anh, chú thích dưới hình tiếng Việt. Dàn ý:
+
+| Chương | Nội dung | Nguồn trong repo |
+|---|---|---|
+| 1. Mở đầu | Bài toán dự báo qmax, câu hỏi nghiên cứu RQ1–RQ6, đóng góp C1–C6 | Mục 1 |
+| 2. Cơ sở lý thuyết | LSTM, GRU, Transformer, SSM, S4D, Mamba; NSE, KGE, PNSE, chỉ số theo mức và theo sự kiện | `06_Theory/` |
+| 3. Công trình liên quan | BiasCast; các công trình so sánh tính mới (Mục 1.3); khảo sát theo yêu cầu GVHD | `02_BasePaper.md`, `05_Survey/` |
+| 4. Dữ liệu | Liệt kê bộ dữ liệu theo năm phát hành, rồi đoạn thảo luận thống kê từ A1 (khuôn GVHD, biên bản 27/9/2026 Mục 3.1) | `03_Data/01_LamaHCE.md` |
+| 5. Phương pháp | Khung chung, khối giữ nguyên và khối sửa đổi (sơ đồ), giao thức so sánh cùng tham số | Mục 3–5, `Diagrams/ProjectDiagram.drawio` |
+| 6. Thí nghiệm và kết quả | Bước A, B, C, mở rộng; đánh giá Mục 6; giải thích mô hình | Mục 6, 7 |
+| 7. Demo | Kiến trúc demo, hai phần phát lại và chạy trực tiếp | Mục 9.5, 9.6 |
+| 8. Kết luận | Trả lời RQ1–RQ6, hạn chế, hướng khóa luận | Mục 11 |
+
+Slide bảo vệ làm sau khi có kết quả bước C; phần hỏi đáp chuẩn bị từ `05_Survey/02_LiteratureReview.md`. Bản demo trên laptop (bước D3) mang theo ngày bảo vệ.
 
 ---
 
@@ -399,7 +456,6 @@ Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba
 
 | Việc | Ghi chú |
 |---|---|
-| Tên nội bộ tiểu luận | `01_OverallPlan.md` Mục 1 |
 | Trang web và demo: công nghệ giao diện; cách đưa ra Internet (Cloudflare Tunnel cần tên miền quản lý trên Cloudflare; mở cổng và reverse proxy); chạy liên tục khi VPS Always Free có thể bị thu hồi lúc rảnh (Mục 8.2) | Tra và quyết khi có bản demo chạy thử; mã đề tài xuất dự báo theo định dạng ở Mục 9.5 và hàm dự báo theo các bước ở Mục 9.6 |
 
 ---

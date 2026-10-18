@@ -1,4 +1,4 @@
-# Sinh hình minh họa cho ghi chú lý thuyết Document/06_Theory/ (SVG, chỉ dùng thư viện chuẩn).
+# Sinh hình minh họa cho ghi chú lý thuyết Document/06_Theory/ (SVG; Phần 1-5 chỉ dùng thư viện chuẩn, Phần 6 dùng matplotlib).
 # Chạy: python Tools/Theory_Figures.py (từ gốc repo). Hình CDF dùng số tự đặt để minh họa; hình thước NSE dùng số thật của bài.
 # Quy ước: mọi chữ hiển thị trong hình viết tiếng Anh (số dùng dấu chấm thập phân); chú thích hình trong ghi chú .md viết tiếng Việt.
 #
@@ -15,6 +15,8 @@
 #            thuộc tính nhúng một lần rồi lặp theo ngày, kích thước tensor của một lô thật
 #   Phần 5 - Hình của Phần 5 BiasCast: dữ liệu từng thí nghiệm đọc trong khung 365 ngày (một pha hay hai pha),
 #            Sequential Forecast LSTM so với Encoder-Decoder LSTM (cách nối pha quá khứ và ngày t)
+#   Phần 6 - Hình các thang đo đánh giá (matplotlib, dữ liệu tự tạo): mỗi thang đo xem ở một lưu vực và 451 lưu vực,
+#            dùng cho ghi chú 08_EvaluationFigures.md
 
 import math
 from pathlib import Path
@@ -915,6 +917,518 @@ def fig_seq_vs_encdec():
     save("BiasCast5_Seq_vs_EncDec.svg", el, height=height, width=width)
 
 
+# %% Phần 6 - Hình các thang đo đánh giá: mỗi thang đo xem ở hai tầng, một lưu vực và 451 lưu vực
+# Dữ liệu tự tạo (451 lưu vực giả, mỗi lưu vực 30 năm "lịch sử" để tính ngưỡng và 4 năm "kiểm tra"), hai mô hình
+# giả A (hụt đỉnh đều ở mọi lưu vực) và B (đỉnh lúc cao lúc thấp tùy lưu vực); mọi chỉ số tính đúng công thức thật.
+# Dùng matplotlib (hình số liệu); chữ SVG giữ dạng chữ để kiểm đè chữ trong trình duyệt.
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.rcParams.update({"svg.fonttype": "none", "font.family": "Arial", "font.size": 9,
+                     "axes.titlesize": 10, "axes.spines.top": False, "axes.spines.right": False})
+N_BASINS, HIST_YEARS, TEST_DAYS, YEAR = 451, 30, 1461, 365
+LEVEL_NAMES = ["low", "medium", "high", "very high"]
+RETURN_T = [1.5, 2, 5, 10]
+COL_OBS, COL_A, COL_B, COL_P = "black", "tab:orange", "tab:blue", "tab:gray"
+SYN_NOTE = "Illustrative synthetic data: 451 made-up basins, made-up models A and B"
+
+
+def gen_obs(rng, n, base, rate, scale, recess):
+    # Chuỗi qmax ngày tự tạo: nền theo mùa + các trận mưa ngẫu nhiên rút dần theo hàm mũ.
+    t = np.arange(n)
+    seasonal = base * (1 + 0.5 * np.sin(2 * np.pi * t / YEAR))
+    storms = rng.exponential(scale, n) * (rng.random(n) < rate)
+    kernel = np.exp(-np.arange(int(5 * recess)) / recess)
+    return seasonal + np.convolve(storms, kernel)[:n] + rng.normal(0, 0.03 * base, n).clip(-0.02 * base)
+
+
+def gen_sim(rng, obs, damp, noise):
+    # Mô hình giả: co giãn biên độ quanh trung bình (damp < 1 => hụt đỉnh) + nhiễu nhân.
+    m = obs.mean()
+    sim = (m + (obs - m) * damp) * rng.lognormal(0, noise, obs.size)
+    return sim.clip(0.01)
+
+
+def nse(o, s):
+    return 1 - np.sum((s - o) ** 2) / np.sum((o - o.mean()) ** 2)
+
+
+def pnse(o, s):
+    # Mốc là quan trắc ngày trước (persistence); bỏ ngày đầu.
+    return 1 - np.sum((s[1:] - o[1:]) ** 2) / np.sum((o[1:] - o[:-1]) ** 2)
+
+
+def kge_parts(o, s):
+    r, a, b = np.corrcoef(o, s)[0, 1], s.std() / o.std(), s.mean() / o.mean()
+    return r, a, b, 1 - np.sqrt((r - 1) ** 2 + (a - 1) ** 2 + (b - 1) ** 2)
+
+
+def fdc_bias(o, s):
+    # %BiasFHV (2% lớn nhất), %BiasFMS (p 0.2-0.7, log), %BiasFLV (30% nhỏ nhất, log) như metrics.py của NeuralHydrology.
+    os_, ss = np.sort(o)[::-1], np.sort(s)[::-1]
+    n = o.size
+    k = int(round(0.02 * n))
+    fhv = (ss[:k].sum() - os_[:k].sum()) / os_[:k].sum() * 100
+    i2, i7 = int(round(0.2 * n)), int(round(0.7 * n))
+    lo, ls = np.log(os_), np.log(ss)
+    fms = ((ls[i2] - ls[i7]) - (lo[i2] - lo[i7])) / (lo[i2] - lo[i7]) * 100
+    ol, sl = lo[i7:], ls[i7:]
+    qol, qsl = np.sum(ol - ol.min()), np.sum(sl - sl.min())
+    flv = -1 * (qsl - qol) / qol * 100
+    return fhv, fms, flv
+
+
+def level_of(x, thr):
+    # thr = (q30, q80, q98) của lịch sử quan trắc => mức 0 thấp, 1 trung bình, 2 cao, 3 rất cao.
+    return np.searchsorted(thr, x, side="right")
+
+
+def gumbel_thresholds(hist):
+    # Đỉnh năm của 30 năm lịch sử, Gumbel bằng L-moments (Hosking 1990).
+    ann = np.sort(hist[: HIST_YEARS * YEAR].reshape(HIST_YEARS, YEAR).max(axis=1))
+    n = ann.size
+    b0, b1 = ann.mean(), np.sum(np.arange(n) / (n - 1) * ann) / n
+    l2 = 2 * b1 - b0
+    alpha = l2 / math.log(2)
+    xi = b0 - 0.5772156649 * alpha
+    return {t: xi - alpha * math.log(-math.log(1 - 1 / t)) for t in RETURN_T}
+
+
+def onsets(x, thr):
+    return np.where((x[1:] >= thr) & (x[:-1] < thr))[0] + 1
+
+
+def match_floods(o, s, thr, win=1):
+    # Trận bắt đầu ở ngày vượt ngưỡng từ dưới lên; trúng nếu bên kia có trận bắt đầu trong ±win ngày.
+    eo, es = onsets(o, thr), onsets(s, thr)
+    hit = np.array([np.any(np.abs(es - d) <= win) for d in eo], bool)
+    fa = np.array([not np.any(np.abs(eo - d) <= win) for d in es], bool)
+    return eo, es, hit, fa
+
+
+def scores(h, m, f):
+    pod = h / (h + m) if h + m else np.nan
+    far = f / (h + f) if h + f else np.nan
+    prec = 1 - far if h + f else np.nan
+    csi = h / (h + m + f) if h + m + f else np.nan
+    f1 = 2 * prec * pod / (prec + pod) if (prec + pod) > 0 else np.nan
+    return {"POD": pod, "FAR": far, "precision": prec, "F1": f1, "CSI": csi}
+
+
+def cdf_line(ax, v, color, label, ls="-"):
+    v = np.sort(np.asarray(v, float)[np.isfinite(np.asarray(v, float))])
+    ax.step(v, np.arange(1, v.size + 1) / v.size, where="post", color=color, ls=ls, lw=1.4,
+            label=f"{label} (median {np.median(v):.2f})")
+    ax.set_ylabel("Share of basins with score <= x")
+    ax.set_ylim(0, 1)
+
+
+def wilcoxon_p(d):
+    # Wilcoxon signed-rank hai phía, xấp xỉ chuẩn (n lớn), bỏ hiệu bằng 0.
+    d = d[d != 0]
+    n = d.size
+    ranks = np.empty(n)
+    ranks[np.argsort(np.abs(d))] = np.arange(1, n + 1)
+    w = ranks[d > 0].sum()
+    z = (w - n * (n + 1) / 4) / math.sqrt(n * (n + 1) * (2 * n + 1) / 24)
+    return 2 * (1 - NormalDist().cdf(abs(z)))
+
+
+def spearman(x, y):
+    rx, ry = np.argsort(np.argsort(x)), np.argsort(np.argsort(y))
+    return np.corrcoef(rx, ry)[0, 1]
+
+
+def build_dataset(seed=7):
+    # Sinh 451 lưu vực, tính mọi chỉ số cho hai mô hình; lưu vực mẫu = lưu vực có NSE của A gần trung vị.
+    rng = np.random.default_rng(seed)
+    out = {"A": [], "B": []}
+    basins = []
+    for _ in range(N_BASINS):
+        p = dict(base=rng.uniform(0.5, 3), rate=rng.uniform(0.03, 0.12), scale=rng.lognormal(1.2, 0.4),
+                 recess=rng.uniform(2, 15))
+        obs_all = gen_obs(rng, HIST_YEARS * YEAR + TEST_DAYS, **p)
+        hist, obs = obs_all[: HIST_YEARS * YEAR], obs_all[HIST_YEARS * YEAR:]
+        slow = (p["recess"] - 2) / 13                              # chỉ số "dòng chảy chậm" giả, 0..1
+        noise_a = rng.uniform(0.05, 0.2)
+        sims = {"A": gen_sim(rng, obs, rng.normal(0.75, 0.05), noise_a),
+                "B": gen_sim(rng, obs, rng.normal(0.95, 0.3), noise_a * (1.25 - 0.6 * slow) + rng.normal(0, 0.02))}
+        b = dict(obs=obs, hist=hist, slow=slow, sims=sims,
+                 thr_lv=np.quantile(hist, [0.30, 0.80, 0.98]), thr_ev=gumbel_thresholds(hist))
+        basins.append(b)
+        for m, s in sims.items():
+            r, a, be, kg = kge_parts(obs, s)
+            fhv, fms, flv = fdc_bias(obs, s)
+            conf = np.zeros((4, 4), int)
+            np.add.at(conf, (level_of(obs, b["thr_lv"]), level_of(s, b["thr_lv"])), 1)
+            ev = {}
+            for t, thr in b["thr_ev"].items():
+                eo, es, hit, fa = match_floods(obs, s, thr)
+                ev[t] = (int(hit.sum()), int((~hit).sum()), int(fa.sum()))
+            out[m].append(dict(NSE=nse(obs, s), PNSE=pnse(obs, s), r=r, alpha=a, beta=be, KGE=kg,
+                               FHV=fhv, FMS=fms, FLV=flv, conf=conf, ev=ev))
+    pers = np.array([nse(b["obs"][1:], b["obs"][:-1]) for b in basins])
+    nse_a = np.array([x["NSE"] for x in out["A"]])
+    pick = int(np.argmin(np.abs(nse_a - np.median(nse_a))))
+    return basins, out, pers, pick
+
+
+def col(out, m, key):
+    return np.array([x[key] for x in out[m]])
+
+
+def finish(fig, name, title):
+    fig.suptitle(title, fontsize=11, fontweight="bold")
+    fig.text(0.5, 0.005, SYN_NOTE, ha="center", fontsize=8, color="#666")
+    fig.tight_layout(rect=(0, 0.03, 1, 0.95))
+    fig.savefig(OUT_DIR / name, format="svg")
+    plt.close(fig)
+    print("Đã ghi", OUT_DIR / name)
+
+
+def fig_m_nse(D):
+    # NSE: (a) chuỗi một lưu vực, (b) CDF 451 lưu vực cho A, B, persistence.
+    basins, out, pers, k = D
+    b = basins[k]
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.2), gridspec_kw={"width_ratios": [1.6, 1]})
+    d = slice(0, YEAR)
+    ax1.plot(b["obs"][d], color=COL_OBS, lw=1, label="observed")
+    for m, c in [("A", COL_A), ("B", COL_B)]:
+        ax1.plot(b["sims"][m][d], color=c, lw=0.9, alpha=0.85, label=f"model {m}: NSE = {out[m][k]['NSE']:.2f}")
+    ax1.set_title("(a) One basin: one NSE per model (first test year shown, NSE over 4 years)")
+    ax1.set_xlabel("Day of test period")
+    ax1.set_ylabel("qmax (mm/day)")
+    ax1.legend(loc="upper right", fontsize=8)
+    for m, c in [("A", COL_A), ("B", COL_B)]:
+        cdf_line(ax2, col(out, m, "NSE"), c, f"model {m}")
+    cdf_line(ax2, pers, COL_P, "persistence", ls="--")
+    ax2.axvline(out["A"][k]["NSE"], color=COL_A, ls=":", lw=1)
+    ax2.annotate("basin in (a), model A", xy=(out["A"][k]["NSE"], 0.03), xytext=(0.15, 0.55), color=COL_A, fontsize=8,
+                 arrowprops=dict(arrowstyle="->", color=COL_A, lw=0.8))
+    ax2.set_xlim(-0.2, 1)
+    ax2.set_xlabel("NSE (right = better)")
+    ax2.set_title("(b) All 451 basins: 451 NSE values -> CDF and median")
+    ax2.legend(loc="upper left", fontsize=8)
+    finish(fig, "Metrics_NSE.svg", "NSE: one score per basin, then 451 scores summarised")
+
+
+def fig_m_pnse(D):
+    # PNSE: (a) sai số mô hình so với sai số persistence ở một lưu vực, (b) CDF PNSE, vạch 0.
+    basins, out, pers, k = D
+    b = basins[k]
+    o, s = b["obs"], b["sims"]["A"]
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.2), gridspec_kw={"width_ratios": [1.6, 1]})
+    days = np.arange(1, 121)
+    ax1.plot(days, (s - o)[days], color=COL_A, lw=0.9, label="model A error: sim(t) - obs(t)")
+    ax1.plot(days, (o[days - 1] - o[days]), color=COL_P, lw=0.9, ls="--", label="persistence error: obs(t-1) - obs(t)")
+    ax1.axhline(0, color="#999", lw=0.6)
+    ax1.set_title(f"(a) One basin: PNSE = 1 - sum(model err^2) / sum(persistence err^2) = {out['A'][k]['PNSE']:.2f}")
+    ax1.set_xlabel("Day of test period (first 120 days)")
+    ax1.set_ylabel("Error (mm/day)")
+    ax1.legend(loc="upper right", fontsize=8)
+    for m, c in [("A", COL_A), ("B", COL_B)]:
+        cdf_line(ax2, col(out, m, "PNSE"), c, f"model {m}")
+    ax2.axvline(0, color="black", lw=0.8)
+    ax2.text(0.03, 0.55, "PNSE > 0:\nbeats persistence", fontsize=8)
+    ax2.text(-0.03, 0.55, "PNSE < 0:\nworse than\npersistence", fontsize=8, ha="right")
+    ax2.set_xlim(-1, 1)
+    ax2.set_xlabel("PNSE")
+    ax2.set_title("(b) All 451 basins: CDF of PNSE")
+    ax2.legend(loc="upper left", fontsize=8)
+    finish(fig, "Metrics_PNSE.svg", "PNSE: NSE with yesterday's observation as the reference instead of the mean")
+
+
+def fig_m_kge(D):
+    # KGE và ba thành phần: (a) một lưu vực, (b) phân bố 451 lưu vực.
+    basins, out, pers, k = D
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.2))
+    keys = ["r", "alpha", "beta", "KGE"]
+    x = np.arange(4)
+    for j, (m, c) in enumerate([("A", COL_A), ("B", COL_B)]):
+        vals = [out[m][k][q] for q in keys]
+        ax1.bar(x + (j - 0.5) * 0.35, vals, 0.35, color=c, label=f"model {m}")
+        for xi, v in zip(x, vals):
+            ax1.text(xi + (j - 0.5) * 0.35, v + 0.02, f"{v:.2f}", ha="center", fontsize=7.5)
+    ax1.axhline(1, color="black", lw=0.8, ls="--")
+    ax1.text(3.6, 1.03, "ideal = 1", fontsize=8, ha="right")
+    ax1.set_xticks(x, ["r (timing)", "alpha (spread)", "beta (volume)", "KGE"])
+    ax1.set_ylim(0, 1.35)
+    ax1.set_title("(a) One basin: three parts and KGE")
+    ax1.legend(loc="upper left", fontsize=8)
+    data, pos, cols = [], [], []
+    for i, q in enumerate(keys):
+        for j, (m, c) in enumerate([("A", COL_A), ("B", COL_B)]):
+            data.append(col(out, m, q))
+            pos.append(i + (j - 0.5) * 0.35)
+            cols.append(c)
+    bp = ax2.boxplot(data, positions=pos, widths=0.3, patch_artist=True, showfliers=False)
+    for patch, c in zip(bp["boxes"], cols):
+        patch.set_facecolor(c)
+        patch.set_alpha(0.6)
+    ax2.axhline(1, color="black", lw=0.8, ls="--")
+    ax2.set_xticks(x, ["r\nhigher = better", "alpha\ncloser to 1 = better", "beta\ncloser to 1 = better",
+                       "KGE\nhigher = better"], fontsize=8)
+    ax2.set_title("(b) All 451 basins: box = middle 50% of basins, line = median\n"
+                  "good box: short and close to the dashed line 1", fontsize=10)
+    finish(fig, "Metrics_KGE.svg", "KGE: timing (r), spread (alpha), volume (beta) in one score")
+
+
+def fig_m_fdc(D):
+    # %BiasFHV/FMS/FLV: (a) đường duy trì một lưu vực, (b) CDF %BiasFHV có dấu, (c) CDF |%BiasFHV|.
+    basins, out, pers, k = D
+    b = basins[k]
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.3), gridspec_kw={"width_ratios": [1.3, 1, 1]})
+    ax1 = axes[0]
+    p = np.arange(1, b["obs"].size + 1) / (b["obs"].size + 1)
+    ax1.semilogy(p, np.sort(b["obs"])[::-1], color=COL_OBS, lw=1.3, label="observed")
+    ax1.semilogy(p, np.sort(b["sims"]["A"])[::-1], color=COL_A, lw=1.1, label="model A")
+    for (lo, hi), c in [((0, 0.02), "#f4cccc"), ((0.2, 0.7), "#d9ead3"), ((0.7, 1), "#cfe2f3")]:
+        ax1.axvspan(lo, hi, color=c, zorder=0)
+    f = out["A"][k]
+    ax1.set_title(f"(a) One basin, model A: FHV {f['FHV']:+.0f}%, FMS {f['FMS']:+.0f}%, FLV {f['FLV']:+.0f}%")
+    ax1.set_xlabel("Exceedance probability p (each series sorted on its own)")
+    ax1.set_ylabel("qmax (mm/day, log)")
+    ax1.legend(loc="upper right", fontsize=8)
+    for m, c in [("A", COL_A), ("B", COL_B)]:
+        cdf_line(axes[1], col(out, m, "FHV"), c, f"model {m}")
+        cdf_line(axes[2], np.abs(col(out, m, "FHV")), c, f"model {m}")
+    axes[1].axvline(0, color="black", lw=0.8)
+    axes[1].set_xlabel("%BiasFHV (< 0 peaks too low, > 0 too high)")
+    axes[1].set_title("(b) 451 basins, signed")
+    axes[2].set_xlabel("|%BiasFHV| (size of the peak error)")
+    axes[2].set_title("(c) 451 basins, absolute")
+    for ax in axes[1:]:
+        ax.legend(loc="lower right", fontsize=8)
+    axes[1].set_xlim(-80, 80)
+    axes[2].set_xlim(0, 80)
+    finish(fig, "Metrics_FDC.svg", "%BiasFHV (also FMS, FLV): one value per basin; report signed and absolute medians")
+
+
+def fig_m_levels(D):
+    # Bốn mức: (a) ma trận nhầm lẫn một lưu vực, (b) ma trận cộng dồn 451 lưu vực, (c) CDF recall mức rất cao.
+    basins, out, pers, k = D
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.5))
+    pooled = sum(x["conf"] for x in out["A"])
+    for ax, conf, ttl in [(axes[0], out["A"][k]["conf"], "(a) One basin, model A (days)"),
+                          (axes[1], pooled, "(b) 451 basins added up, model A (days)")]:
+        rowp = conf / np.maximum(conf.sum(axis=1, keepdims=True), 1)
+        ax.imshow(rowp, cmap="Oranges", vmin=0, vmax=1)
+        for i in range(4):
+            for j in range(4):
+                ax.text(j, i, f"{conf[i, j]:,}\n{rowp[i, j]:.0%}", ha="center", va="center", fontsize=7,
+                        color="white" if rowp[i, j] > 0.6 else "black")
+        ax.set_xticks(range(4), LEVEL_NAMES, fontsize=8)
+        ax.set_yticks(range(4), LEVEL_NAMES, fontsize=8)
+        ax.set_xlabel("Predicted level")
+        ax.set_ylabel("Observed level")
+        ax.set_title(ttl)
+        for s in ax.spines.values():
+            s.set_visible(True)
+    for m, c in [("A", COL_A), ("B", COL_B)]:
+        rec = [x["conf"][3, 3] / x["conf"][3].sum() if x["conf"][3].sum() else np.nan for x in out[m]]
+        cdf_line(axes[2], rec, c, f"model {m}")
+    axes[2].set_xlabel("Recall of 'very high' days in a basin")
+    axes[2].set_title("(c) 451 basins: one recall per basin -> CDF")
+    axes[2].legend(loc="upper left", fontsize=8)
+    finish(fig, "Metrics_Levels.svg", "Four flow levels: diagonal = right level; row % = recall of that level")
+
+
+def fig_m_events(D):
+    # Sự kiện lũ: (a) một lưu vực, T = 2 năm, (b) chỉ số cộng dồn 451 lưu vực theo T, (c) CDF POD theo lưu vực.
+    basins, out, pers, k = D
+    # lưu vực mẫu có cả trúng, sót và báo nhầm ở T = 2 năm, ít trận nhất để dễ nhìn
+    cand = [i for i in range(N_BASINS) if all(v > 0 for v in out["A"][i]["ev"][2])]
+    k2 = min(cand, key=lambda i: sum(out["A"][i]["ev"][2])) if cand else k
+    b = basins[k2]
+    o, s, thr = b["obs"], b["sims"]["A"], b["thr_ev"][2]
+    eo, es, hit, fa = match_floods(o, s, thr)
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4.4), gridspec_kw={"width_ratios": [1.6, 1, 1]})
+    ax = axes[0]
+    ax.plot(o, color=COL_OBS, lw=0.8, label="observed")
+    ax.plot(s, color=COL_A, lw=0.8, alpha=0.8, label="model A")
+    ax.axhline(thr, color="red", ls="--", lw=0.9, label="2-year threshold")
+    ymax = max(o.max(), s.max())
+    ax.plot(eo[hit], [ymax * 1.06] * int(hit.sum()), "v", color="green", ms=7, label="hit")
+    ax.plot(eo[~hit], [ymax * 1.06] * int((~hit).sum()), "v", color="red", ms=7, label="miss")
+    ax.plot(es[fa], [ymax * 1.14] * int(fa.sum()), "x", color="purple", ms=7, label="false alarm")
+    ax.set_ylim(0, ymax * 1.4)
+    ax.set_title(f"(a) One basin, T = 2 years: {int(hit.sum())} hit, {int((~hit).sum())} miss, "
+                 f"{int(fa.sum())} false alarm")
+    ax.set_xlabel("Day of test period (4 years)")
+    ax.set_ylabel("qmax (mm/day)")
+    ax.legend(loc="upper left", fontsize=7, ncol=3)
+    width = 0.18
+    names = ["POD", "precision", "F1", "CSI"]
+    for j, t in enumerate(RETURN_T):
+        h = sum(x["ev"][t][0] for x in out["A"])
+        m = sum(x["ev"][t][1] for x in out["A"])
+        f = sum(x["ev"][t][2] for x in out["A"])
+        sc = scores(h, m, f)
+        axes[1].bar(np.arange(4) + (j - 1.5) * width, [sc[q] for q in names], width,
+                    label=f"T = {t} y ({h + m} events)", color=plt.cm.Reds(0.35 + 0.17 * j))
+    axes[1].set_xticks(range(4), names)
+    axes[1].set_ylim(0, 1.25)
+    axes[1].set_title("(b) 451 basins: counts added up, model A")
+    axes[1].legend(loc="upper center", fontsize=7, ncol=2)
+    for m, c in [("A", COL_A), ("B", COL_B)]:
+        pod = [x["ev"][2][0] / (x["ev"][2][0] + x["ev"][2][1]) for x in out[m] if x["ev"][2][0] + x["ev"][2][1]]
+        cdf_line(axes[2], pod, c, f"model {m}")
+    n_with = sum(1 for x in out["A"] if x["ev"][2][0] + x["ev"][2][1])
+    axes[2].set_xlabel("POD of 2-year events in a basin")
+    axes[2].set_title(f"(c) Per basin: {n_with} of 451 basins had a 2-year event")
+    axes[2].legend(loc="upper left", fontsize=8)
+    finish(fig, "Metrics_Events.svg", "Flood events: counted per basin, main result adds counts over 451 basins")
+
+
+def fig_m_test(D):
+    # Wilcoxon, Cohen's d: (a) một lưu vực chỉ có một hiệu, (b) scatter A-B, (c) histogram hiệu.
+    basins, out, pers, k = D
+    a, bb = col(out, "A", "NSE"), col(out, "B", "NSE")
+    diff = bb - a
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.3))
+    axes[0].bar(["model A", "model B"], [a[k], bb[k]], color=[COL_A, COL_B])
+    axes[0].set_ylim(0, 1)
+    axes[0].set_ylabel("NSE")
+    axes[0].set_title(f"(a) One basin: a single difference ({diff[k]:+.3f}),\nno test possible")
+    axes[1].scatter(a, bb, s=6, alpha=0.6, color="tab:purple")
+    axes[1].plot([-0.2, 1], [-0.2, 1], color="black", lw=0.8, ls="--")
+    axes[1].set_xlim(-0.2, 1)
+    axes[1].set_ylim(-0.2, 1)
+    axes[1].set_xlabel("NSE model A")
+    axes[1].set_ylabel("NSE model B")
+    axes[1].set_title(f"(b) 451 basins paired:\nB better in {int((diff > 0).sum())}, worse in {int((diff < 0).sum())}")
+    p, dval = wilcoxon_p(diff), diff.mean() / diff.std(ddof=1)
+    axes[2].hist(diff, bins=40, color="tab:purple", alpha=0.7)
+    axes[2].axvline(0, color="black", lw=0.8)
+    axes[2].axvline(np.median(diff), color="red", lw=1)
+    axes[2].set_xlabel("NSE(B) - NSE(A) per basin")
+    axes[2].set_ylabel("Number of basins")
+    axes[2].set_title(f"(c) Median diff {np.median(diff):+.3f} (red);\nWilcoxon p = {p:.1e}, Cohen's d = {dval:.2f}")
+    finish(fig, "Metrics_Test.svg", "Comparing two models: paired by basin; Wilcoxon = real or chance, d = how big")
+
+
+def degrade(rng, b, m, extra):
+    # Dự báo kém đi giả lập (mất dữ liệu, hạn xa): thêm nhiễu nhân và hụt đỉnh theo mức extra.
+    s = b["sims"][m]
+    mu = s.mean()
+    return ((mu + (s - mu) * (1 - 0.4 * extra)) * rng.lognormal(0, 0.35 * extra, s.size)).clip(0.01)
+
+
+def fig_m_scenarios(D):
+    # Kịch bản S0-S4: (a) một lưu vực, (b) trung vị và khoảng giữa 50% của 451 lưu vực.
+    basins, out, pers, k = D
+    rng = np.random.default_rng(11)
+    sc = {"S0": 0, "S1-1d": 0.12, "S1-3d": 0.25, "S1-7d": 0.4, "S2": 0.8, "S3": 0.35, "S4": 0.55}
+    vals = {m: np.array([[nse(b["obs"], degrade(rng, b, m, e * (0.8 if m == "B" else 1))) for e in sc.values()]
+                         for b in basins]) for m in ["A", "B"]}
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 4.6))
+    x = np.arange(len(sc))
+    for j, (m, c) in enumerate([("A", COL_A), ("B", COL_B)]):
+        ax1.bar(x + (j - 0.5) * 0.35, vals[m][k], 0.35, color=c, label=f"model {m}")
+        med = np.median(vals[m], axis=0)
+        q1, q3 = np.quantile(vals[m], [0.25, 0.75], axis=0)
+        ax2.plot(x, med, "o-", color=c, label=f"model {m} median")
+        ax2.fill_between(x, q1, q3, color=c, alpha=0.15)
+    labels = ["S0\nall data", "S1-1d\nno Q\nlast 1 day", "S1-3d\nno Q\nlast 3 days", "S1-7d\nno Q\nlast 7 days",
+              "S2\nno Q in\nwhole window", "S3\nreal publish\ndelays", "S4\nS3 + no Q\nlast 1 day"]
+    for ax in (ax1, ax2):
+        ax.set_xticks(x, labels, fontsize=7.5)
+        ax.set_ylabel("NSE")
+        ax.legend(loc="lower left", fontsize=8)
+    ax1.set_title("(a) One basin: NSE in each scenario")
+    ax2.set_title("(b) 451 basins: median, band = middle 50%")
+    finish(fig, "Metrics_Scenarios.svg", "Operational scenarios: how much skill is lost when data are missing or late")
+
+
+def fig_m_leadtime(D):
+    # Theo hạn 1-7 ngày: (a) một lưu vực, (b) trung vị 451 lưu vực.
+    basins, out, pers, k = D
+    rng = np.random.default_rng(12)
+    leads = np.arange(1, 8)
+    vals = {m: np.array([[nse(b["obs"], degrade(rng, b, m, (L - 1) * (0.13 if m == "A" else 0.11)))
+                          for L in leads] for b in basins]) for m in ["A", "B"]}
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.2))
+    for m, c in [("A", COL_A), ("B", COL_B)]:
+        ax1.plot(leads, vals[m][k], "o-", color=c, label=f"model {m}")
+        med = np.median(vals[m], axis=0)
+        q1, q3 = np.quantile(vals[m], [0.25, 0.75], axis=0)
+        ax2.plot(leads, med, "o-", color=c, label=f"model {m} median")
+        ax2.fill_between(leads, q1, q3, color=c, alpha=0.15)
+    for ax in (ax1, ax2):
+        ax.set_xlabel("Lead time (days ahead)")
+        ax.set_ylabel("NSE")
+        ax.legend(loc="lower left", fontsize=8)
+    ax1.set_title("(a) One basin: one NSE per lead time")
+    ax2.set_title("(b) 451 basins: median, band = middle 50%")
+    finish(fig, "Metrics_LeadTime.svg", "Skill by lead time (step H): each lead time scored like a separate forecast")
+
+
+def fig_m_attributes(D):
+    # Theo lưu vực: ΔNSE (B - A) so với 6 thuộc tính giả lập (mỗi chấm một lưu vực) + tổng hợp Spearman.
+    basins, out, pers, k = D
+    rng = np.random.default_rng(13)
+    diff = col(out, "B", "NSE") - col(out, "A", "NSE")
+    slow = np.array([b["slow"] for b in basins])
+    snow = np.clip(0.7 * slow + rng.normal(0, 0.15, slow.size), 0, 1)
+    attrs = [
+        ("Baseflow index (0 = flashy, 1 = slow)", slow, False),
+        ("Snow fraction of precipitation", snow, False),
+        ("Mean elevation (m)", np.clip(200 + 2200 * snow + rng.normal(0, 250, slow.size), 150, 3000), False),
+        ("Catchment area (km2, log scale)", np.exp(rng.normal(5 + 2 * slow, 1)), True),
+        ("Mean flow (mm/day)", np.array([b["obs"].mean() for b in basins]), False),
+        ("Aridity index", rng.uniform(0.3, 1.2, slow.size), False),
+    ]
+    fig = plt.figure(figsize=(15, 7.6))
+    gs = fig.add_gridspec(2, 4, width_ratios=[1, 1, 1, 0.9])
+    rhos = []
+    for n, (name, x, logx) in enumerate(attrs):
+        ax = fig.add_subplot(gs[n // 3, n % 3])
+        ax.scatter(x, diff, s=6, alpha=0.45, color="tab:purple")
+        ax.scatter([x[k]], [diff[k]], s=50, facecolor="none", edgecolor="red", lw=1.3)
+        edges = np.quantile(x, np.linspace(0, 1, 9))
+        idx = np.clip(np.searchsorted(edges, x, side="right") - 1, 0, 7)
+        cx = [np.median(x[idx == g]) for g in range(8)]
+        cy = [np.median(diff[idx == g]) for g in range(8)]
+        ax.plot(cx, cy, "o-", color="black", lw=1.4, ms=4)
+        ax.axhline(0, color="#999", lw=0.8)
+        if logx:
+            ax.set_xscale("log")
+        ax.set_ylim(-0.6, 0.3)
+        rho = spearman(x, diff)
+        rhos.append(rho)
+        ax.set_title(f"{name}\nSpearman rho = {rho:+.2f}", fontsize=9)
+        if n % 3 == 0:
+            ax.set_ylabel("NSE(B) - NSE(A)")
+    ax.text(0.98, 0.04, "dot = one basin\nblack line = median of 8 bins\nred ring = example basin",
+            transform=ax.transAxes, ha="right", va="bottom", fontsize=7.5,
+            bbox=dict(facecolor="white", edgecolor="#ccc"))
+    axs = fig.add_subplot(gs[:, 3])
+    yy = np.arange(len(attrs))[::-1]
+    axs.barh(yy, rhos, color=["tab:green" if r > 0 else "tab:red" for r in rhos])
+    for y, r in zip(yy, rhos):
+        axs.text(r + (0.01 if r >= 0 else -0.01), y, f"{r:+.2f}", va="center",
+                 ha="left" if r >= 0 else "right", fontsize=8)
+    axs.set_yticks(yy, [a[0].split(" (")[0] for a in attrs], fontsize=8)
+    axs.axvline(0, color="black", lw=0.8)
+    axs.set_xlim(-0.45, 0.45)
+    axs.set_xlabel("Spearman rho with NSE(B) - NSE(A)")
+    axs.set_title("Summary: one bar per attribute\n> 0: B gains more where attribute is high", fontsize=9)
+    finish(fig, "Metrics_Attributes.svg",
+           "Per-basin analysis: where does B beat A? One dot = one basin; repeat for every attribute (33 in LamaH-CE)")
+
+
+def metric_figures():
+    D = build_dataset()
+    for f in (fig_m_nse, fig_m_pnse, fig_m_kge, fig_m_fdc, fig_m_levels, fig_m_events, fig_m_test,
+              fig_m_scenarios, fig_m_leadtime, fig_m_attributes):
+        f(D)
+    return D
+
+
+
 if __name__ == "__main__":
     fig_cdf_steps()
     fig_cdf_compare()
@@ -932,3 +1446,4 @@ if __name__ == "__main__":
     fig_tensor_static()
     fig_input_layout()
     fig_seq_vs_encdec()
+    metric_figures()
