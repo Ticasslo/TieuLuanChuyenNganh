@@ -329,8 +329,8 @@ Cắt từ trên xuống; RQ1–RQ4 giữ nguyên, RQ5 và RQ6 chỉ thu hẹp: 
 
 | Thành viên | Mảng | Việc chính |
 |---|---|---|
-| Người 1 | Dữ liệu và đánh giá | Khảo sát dữ liệu, ngưỡng mức và ngưỡng lũ, bộ nạp (nhóm theo nguồn, sửa bộ lọc, Q, cách b của bước H), bộ đánh giá Mục 6, demo |
-| Người 2 | Mô hình và huấn luyện | Fork thư viện, mô hình chung và các lõi, kiểm thử đơn vị, cài `mamba-ssm`, tệp cấu hình, huấn luyện trên Kaggle, giải thích mô hình |
+| Người 1 | Dữ liệu và đánh giá | Khảo sát dữ liệu, ngưỡng mức và ngưỡng lũ, bộ nạp (nhóm theo nguồn, sửa bộ lọc, Q, cách b của bước H), bộ đánh giá Mục 6, demo D1–D3 (hàm dự báo, chạy CPU, bản trên laptop) |
+| Người 2 | Mô hình và huấn luyện | Fork thư viện, mô hình chung và các lõi, kiểm thử đơn vị, cài `mamba-ssm`, tệp cấu hình, huấn luyện trên Kaggle, giải thích mô hình, đưa demo lên VPS (D4; VPS và trang web chứa demo do người 2 quản lý) |
 
 Điểm nối giữa hai mảng: bộ nạp (người 1) phải xong trước bước B2; đầu ra dự báo của người 2 lưu theo một định dạng chung để bộ đánh giá đọc được.
 
@@ -381,14 +381,14 @@ Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba
 
 Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu khi điều kiện chuyển bước ở Mục 7 đạt. Ngày cụ thể gắn sau bước A4, khi đã đo thời gian một lần huấn luyện trên T4 (Mục 8.1); mốc đã có: báo cáo tiến độ gửi GVHD khoảng 25/10/2026.
 
-| Thứ tự | Người 1 (dữ liệu, đánh giá, demo) | Người 2 (mô hình, huấn luyện, XAI) |
+| Thứ tự | Người 1 (dữ liệu, đánh giá, demo D1–D3) | Người 2 (mô hình, huấn luyện, XAI, VPS) |
 |---|---|---|
 | 1 | A1 khảo sát dữ liệu, tệp ngưỡng; báo cáo tiến độ (A2, A1, persistence) | Bước 0: `mamba-ssm` trên T4, mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) |
 | 2 | A3 mốc so sánh (persistence, PNSE, KGE, DLinear) | A4 nhiễu hạt giống, đo thời gian 1 epoch để gắn ngày cho lịch |
 | 3 | Bộ nạp B2 (nhóm theo nguồn, sửa bộ lọc, Q), cách (b) của bước H; bộ đánh giá Mục 6 | B1 → B3, B*; gắn mốc `freeze-C` |
 | 4 | Đánh giá bước B (gồm kịch bản S0–S4 trên validation cho B*) | C1, C2 |
 | 5 | Đánh giá bước C; demo D1, D2 (Mục 9.6) | H, D, E, F, GV theo thứ tự ưu tiên ở Mục 7, 8.3 |
-| 6 | Đánh giá bước mở rộng; demo D3, D4 | Giải thích mô hình (Mục 6.7) |
+| 6 | Đánh giá bước mở rộng; demo D3 | Giải thích mô hình (Mục 6.7); demo D4 trên VPS |
 | 7 | Báo cáo, slide (Mục 9.8) | Báo cáo, slide (Mục 9.8) |
 
 Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.

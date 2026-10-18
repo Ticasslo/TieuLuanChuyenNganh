@@ -4,8 +4,8 @@
 
 | | Thành viên | Mảng |
 |---|---|---|
-| Người 1 | *(điền tên)* | Dữ liệu, bộ nạp, đánh giá, demo |
-| Người 2 | *(điền tên)* | Thư viện, các lõi mô hình, huấn luyện, giải thích mô hình |
+| Người 1 | *(điền tên)* | Dữ liệu, bộ nạp, đánh giá, demo D1–D3 (hàm dự báo, chạy CPU, bản trên laptop) |
+| Người 2 | *(điền tên)* | Thư viện, các lõi mô hình, huấn luyện, giải thích mô hình, đưa demo lên VPS (D4) |
 
 ## 1. Trạng thái hiện tại
 
@@ -21,7 +21,7 @@
 
 Thứ tự trong bảng là thứ tự làm. Cột "Cần trước" là thứ phải có trước khi bắt đầu.
 
-### Người 1 — dữ liệu, bộ nạp, đánh giá, demo
+### Người 1 — dữ liệu, bộ nạp, đánh giá, demo D1–D3
 
 | # | Bước | Việc | Ra | Cần trước |
 |---|---|---|---|---|
@@ -31,10 +31,10 @@ Thứ tự trong bảng là thứ tự làm. Cột "Cần trước" là thứ ph
 | 4 | B2 (bộ nạp) | Nhóm biến theo nguồn, sửa `_validate_samples`, nhóm Q (`qmean`, `qmax` quá khứ theo mm/ngày), cách (b) của bước H (ngày t+1…t+6 không nhận ECMWF HRES); kiểm thử đơn vị phần bộ nạp | Mã trong fork, nhánh `research` | A1 (số mẫu), B1 của người 2 |
 | 5 | Bộ đánh giá | Mục 6 của pipeline: NSE, KGE, PNSE, Wilcoxon + Cohen's d + Holm; 4 mức; sự kiện lũ; kịch bản S0–S4; theo lưu vực; theo hạn; đọc tệp dự báo định dạng chung (Mục 9.5) | Notebook `Workspace/06_Evaluation/` | Tệp ngưỡng A1, định dạng tệp dự báo |
 | 6 | Đánh giá | Chạy bộ đánh giá cho bước B (cả S0–S4 trên validation để chọn B*), bước C, các bước mở rộng | Bảng, hình kết quả | Dự báo do người 2 xuất |
-| 7 | Demo D1–D4 | Hàm dự báo tách khỏi mã huấn luyện → chạy CPU → giao diện trên laptop → VPS Oracle (Mục 9.6) | Trang demo; bản laptop dự phòng | Trọng số mô hình chính thức, kết quả XAI |
+| 7 | Demo D1–D3 | Hàm dự báo tách khỏi mã huấn luyện → chạy CPU → giao diện trên laptop, đóng gói thành một khối độc lập (mã, trọng số, dữ liệu, hướng dẫn chạy) để đưa lên VPS (Mục 9.6) | Khối demo chạy được trên laptop, dùng làm bản dự phòng ngày bảo vệ | Trọng số mô hình chính thức, kết quả XAI |
 | 8 | Báo cáo | Chương Dữ liệu, Đánh giá, Demo; slide phần tương ứng | | Kết quả các bước |
 
-### Người 2 — thư viện, mô hình, huấn luyện, giải thích mô hình
+### Người 2 — thư viện, mô hình, huấn luyện, giải thích mô hình, VPS
 
 | # | Bước | Việc | Ra | Cần trước |
 |---|---|---|---|---|
@@ -44,13 +44,15 @@ Thứ tự trong bảng là thứ tự làm. Cột "Cần trước" là thứ ph
 | 4 | C | C1 tinh chỉnh 5 lõi × 8 cấu hình; C2 chạy chính thức 3 hạt giống | Tệp dự báo mọi cấu hình chính thức | `freeze-C` |
 | 5 | Mở rộng | H (dự báo 1–7 ngày) → D (730 ngày) → E (biến thể) → F (CMAL) → GV, cắt theo `03_Pipeline.md` Mục 8.3 khi thiếu thời gian | Tệp dự báo | C xong |
 | 6 | G | Integrated Gradients (Captum), dò trạng thái ẩn; xuất kết quả theo lưu vực cho demo | Hình, tệp kết quả XAI | Mô hình chính thức |
-| 7 | Báo cáo | Chương Cơ sở lý thuyết, Phương pháp, Thí nghiệm; slide phần tương ứng | | Kết quả các bước |
+| 7 | Demo D4 | Đưa khối demo D3 vào trang web trên VPS Oracle (CPU ARM): cài PyTorch bản CPU cho ARM, Docker, tên miền và cách đưa ra Internet (Mục 9.6, 12); giữ máy chạy liên tục (VPS rảnh 7 ngày có thể bị thu hồi) | Đường dẫn công khai của demo | Khối demo D3 của người 1 |
+| 8 | Báo cáo | Chương Cơ sở lý thuyết, Phương pháp, Thí nghiệm; slide phần tương ứng | | Kết quả các bước |
 
 ### Cả hai
 
 - Học BiasCast Phần 6 (theo lưu vực) và Phần 7 (hạn chế, phản biện), cùng các nội dung học trước từng bước theo bảng ở `03_Pipeline.md` Mục 9.7 (DLinear trước A3, masked mean trước B2, đọc hình các chỉ số, Cohen's d và Holm trước đánh giá — `Document/06_Theory/08_EvaluationFigures.md`, CMAL trước F, Integrated Gradients trước G).
 - Chương Mở đầu, Công trình liên quan, Kết luận; slide và hỏi đáp bảo vệ (`Document/05_Survey/02_LiteratureReview.md`).
 - Xem lại kết quả của nhau trước khi ghi vào báo cáo.
+- Khi bước C và các bước mở rộng cần nhiều GPU, người 1 chạy một phần thí nghiệm trên tài khoản Kaggle của mình bằng tệp cấu hình và mã commit do người 2 cung cấp (mỗi tài khoản một nhóm thí nghiệm).
 
 ## 3. Điểm bàn giao
 
@@ -61,6 +63,7 @@ Thứ tự trong bảng là thứ tự làm. Cột "Cần trước" là thứ ph
 | Người 1 | Người 2 | Bộ nạp B2 đã qua kiểm thử | Trước B2 |
 | Người 2 | Người 1 | Tệp dự báo theo định dạng chung (`03_Pipeline.md` Mục 9.5), kèm mã cấu hình và mã commit thư viện | Sau mỗi bước huấn luyện |
 | Người 2 | Người 1 | Trọng số, thông số chuẩn hóa, kết quả XAI cho demo | Trước demo D1 |
+| Người 1 | Người 2 | Khối demo D3 đã chạy trên laptop | Trước demo D4 |
 
 ## 4. Quy ước làm việc chung
 
