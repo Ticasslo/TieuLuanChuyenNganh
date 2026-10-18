@@ -27,14 +27,14 @@
 | Quy mô | **859** lưu vực có trạm đo | **671** lưu vực | 35+ điểm đo (đập, trạm USGS) | **125** lưu vực |
 | Thời gian | **1981–2017** | **1980–2014** | Lưu lượng từ **1878**; chất lượng nước theo giờ từ **1995** | **10/2011 – 9/2018** |
 | Độ phân giải | **Ngày + giờ** | **Ngày** (bản gốc) · **giờ** ở bản mở rộng 516 lưu vực (Gauch et al., 2021) | **Ngày** cho lưu lượng và vận hành đập · **giờ** chỉ cho chất lượng nước | **Chỉ giờ** |
-| Biến đầu vào | **15** biến khí tượng (ERA5-Land) | **5** biến × 3 bộ forcing | Không có forcing khí tượng đóng gói | **7** đặc trưng |
+| Biến đầu vào | **15** biến khí tượng (ERA5-Land; 21 cột trong tệp) | **5** biến × 3 bộ forcing | Không có forcing khí tượng đóng gói | **7** đặc trưng |
 | Thuộc tính lưu vực | **>60** thuộc tính | 6 nhóm thuộc tính | Không có | Có (gộp trong 7 đặc trưng) |
 | Topology mạng lưới sông | ✅ **Có sẵn** (`HIERARCHY`, `NEXTUPID`, `NEXTDOWNID`) | ❌ Không (lưu vực độc lập) | Có quan hệ thực tế nhưng không có tệp topology | ✅ Dựng được từ DEM + hướng dòng chảy (mã nguồn HydroGAT) |
 | **Số công trình huấn luyện mô hình** | **4** | **11** | **1** | **3** |
 | Có công trình Mamba/SSM | ❌ | ✅ (S4D-FT, S4D/S5D, HydroDiffusion; Mamba trong Zhang et al. và Demiray & Demir) | ✅ (ResBi-Mamba Plus) | ✅ (Mamba của Demiray & Demir, bản preprint) |
 | Có công trình mô hình đồ thị | ✅ 2 công trình, **kết luận trái ngược** | ❌ | ❌ | ✅ (HydroGAT) |
 | Venue CNTT hạng cao nhất | **ICML 2024 (CORE A\*)** | Expert Systems with Applications | AI Science and Engineering (IEEE) | **ACM SIGSPATIAL 2025 (CORE A)** |
-| Kết quả mốc để đối chiếu | LSTM NSE 0,46 → LSTM-GAT 0,61 | S4D NSE 0,756 · S5D 0,763 | — | NSE trung vị 0,74 · KGE trung vị 0,79 (benchmark gốc, 120 giờ) |
+| Kết quả mốc để đối chiếu | LSTM NSE 0,46 → LSTM-GAT 0,61; BiasCast (Extended LamaH-CE, `qmax` ngày, 451 lưu vực): NSE trung vị 0,71 | S4D NSE 0,756 · S5D 0,763 | — | NSE trung vị 0,74 · KGE trung vị 0,79 (benchmark gốc, 120 giờ) |
 | Mã nguồn công khai | ✅ Mô hình GNN của ICML 2024 + bộ đọc dữ liệu (neuralhydrology) | Bộ đọc dữ liệu (thư viện neuralhydrology, gồm `camelsus` và `hourlycamelsus`) | — | ✅ Dataset + mô hình HydroGAT |
 | Giấy phép | CC BY-SA 4.0 (bản gốc); Extended LamaH-CE: CC BY-NC 4.0 | Công khai (NCAR/UCAR) | Công khai (cơ quan chính phủ Mỹ) | Công khai (FAIR) |
 | Dung lượng | 1,5 GB (ngày) · 14,8 GB (ngày + giờ) | ~15 GB nén · ~130 GB giải nén | Theo truy vấn (CSV) | Repo GitHub ~7,6 GB (gồm dữ liệu thô và dữ liệu đã xử lý) |
@@ -86,7 +86,7 @@ Kiểu B phù hợp để xây dựng đồ thị vì các lưu vực trung gian
 
 ### 2.5 Dữ liệu khí tượng
 
-- **15 biến** từ ECMWF ERA5-Land, có cả bản ngày và giờ, đã tính trung bình theo lưu vực
+- **15 biến** từ ECMWF ERA5-Land, có cả bản ngày và giờ, đã tính trung bình theo lưu vực; trong tệp ngày thành 21 cột vì một số biến có thêm giá trị lớn nhất trong ngày (VD `2m_temp_mean`, `2m_temp_max`)
 - Gồm các nhóm: giáng thủy, nhiệt độ, gió, bức xạ, độ ẩm, độ dày tuyết, độ ẩm đất, bốc thoát hơi. Danh sách chi tiết ở Bảng A2 của bài báo gốc
 
 ### 2.6 Thuộc tính lưu vực (hơn 60 thuộc tính)
@@ -304,7 +304,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 
 | # | Công trình | Bộ dữ liệu | Mô hình | Venue | Năm | Hạng | CNTT/AI | Trích dẫn |
 |---|---|---|---|---|---|---|---|---|
-| 1 | The Merit of River Network Topology for Neural Flood Forecasting | LamaH-CE | GNN | **ICML** | 2024 | **CORE A\*** | ✅ | 1 (bản arXiv) |
+| 1 | The Merit of River Network Topology for Neural Flood Forecasting | LamaH-CE | GNN | **ICML** | 2024 | **CORE A\*** | ✅ | 22 (Google Scholar, 18/10/2026) |
 | 2 | A GNN routing module is all you need for LSTM rainfall–runoff models | LamaH-CE | LSTM + GNN | HESS | 2026 | Q1\* | ❌ | 4 |
 | 3 | Global Daily Discharge Estimation Based on Grid LSTM and River Routing | LamaH-CE (một phần) | Grid LSTM | Water Resources Research | 2025 | Q1\* | ❌ | 49 |
 | 4 | BiasCast | LamaH-CE | LSTM | HESS | 2026 | Q1\* | ❌ | 3 (bản preprint) |
@@ -347,6 +347,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | Kết quả trọng số vật lý (xuôi dòng) | ResGCN: chiều dài dòng 81,64% ± 1,45 · chênh lệch độ cao 82,16% ± 1,85<br>ResGAT: chiều dài dòng 80,21% ± 4,85 · chênh lệch độ cao 80,58% ± 5,00 |
 | Kết luận | Mọi cấu hình đồ thị đều **không vượt rõ** MLP không dùng đồ thị; chênh lệch nằm trong khoảng dao động giữa các fold |
 | Kết luận | *"the model fails to benefit from the river network topology information, both on the entire network and small subgraphs"*. Trọng số cạnh học được không tương quan với các định nghĩa tĩnh; GNN gặp khó khi dự báo **đỉnh lưu lượng đột ngột và hẹp** |
+| Lưu ý về mã | Mã công bố tính NSE sai mẫu số, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train (`Document/01_Plan/02_BasePaper.md` Mục 8); các con số trên nên đọc kèm lưu ý này |
 | Ý nghĩa với đề tài | Là bằng chứng ở venue hạng cao cho thấy đồ thị mạng lưới sông **dạng thô** không tự động cải thiện dự báo. Cần tính đến khi thiết kế mô hình kết hợp đồ thị (xem Mục 7.2) |
 
 #### 6.1.2 A GNN routing module is all you need for LSTM rainfall–runoff models
@@ -653,7 +654,7 @@ Cả SSM và GNN đều yếu ở loại sự kiện quan trọng nhất với c
 
 Trong phạm vi tra cứu, **chưa tìm thấy công trình nào kết hợp GNN với Mamba** cho dự báo lưu lượng dòng chảy.
 
-Ở bài toán tổng quát, có kiến trúc kết hợp GNN + Mamba ở bài toán **tổng quát** — G-Mamba (Xiaojian Chen, Qiusheng Tang, *"Graph-enhanced Mamba: Efficient spatiotemporal sequence modeling with selective state space and graph neural networks"*, Neurocomputing vol 680, 2026, DOI [10.1016/j.neucom.2026.133280](https://doi.org/10.1016/j.neucom.2026.133280)): tiêm ngữ cảnh láng giềng từ đồ thị (tĩnh + động) vào bước cập nhật trạng thái của selective SSM, thử trên benchmark giao thông, điện, khí tượng, tỷ giá, nhiệt độ máy biến áp — **không có dữ liệu dòng chảy** (đã đọc trang abstract + phần mở đầu). Vì vậy nhận định trên vẫn đúng với riêng bài toán dòng chảy; G-Mamba dùng làm tham khảo kiến trúc.
+Ở bài toán tổng quát có kiến trúc kết hợp GNN + Mamba: G-Mamba (Xiaojian Chen, Qiusheng Tang, *"Graph-enhanced Mamba: Efficient spatiotemporal sequence modeling with selective state space and graph neural networks"*, Neurocomputing vol 680, 2026, DOI [10.1016/j.neucom.2026.133280](https://doi.org/10.1016/j.neucom.2026.133280)): tiêm ngữ cảnh láng giềng từ đồ thị (tĩnh + động) vào bước cập nhật trạng thái của selective SSM, thử trên benchmark giao thông, điện, khí tượng, tỷ giá, nhiệt độ máy biến áp — **không có dữ liệu dòng chảy** (theo tóm tắt và phần mở đầu của bài). Vì vậy nhận định trên vẫn đúng với riêng bài toán dòng chảy; G-Mamba dùng làm tham khảo kiến trúc.
 
 ### 7.5 Gợi ý phương pháp rút ra
 

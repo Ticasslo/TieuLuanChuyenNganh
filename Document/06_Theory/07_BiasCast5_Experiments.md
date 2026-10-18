@@ -153,7 +153,7 @@ Lưu ý: bài không chạy thí nghiệm "chỉ ngày t là ECMWF HRES" với �
 
 #### Điều 3 — Đề tài dùng lại ở đâu
 
-Ở bước H (dự báo 1–7 ngày), cách (c) "dự báo hoàn hảo" dùng đúng 5 biến tái phân tích này cho các ngày tương lai, để làm cận trên (`03_Pipeline.md` Mục 4.4). Cross-Domain cho thấy trước: khoảng cách giữa "thời tiết đúng" và "thời tiết dự báo" có thể lớn cỡ 0,25 NSE.
+Ở bước H (dự báo 1–7 ngày), cách (c) "dự báo hoàn hảo" dùng 5 biến tái phân tích này cho các ngày tương lai để làm cận trên, riêng cặp bức xạ đổi sang `EOBS_qq` (bức xạ tới mặt đất, cùng đại lượng với `ECMWF_ssrd`) (`03_Pipeline.md` Mục 4.4). Cross-Domain cho thấy trước: khoảng cách giữa "thời tiết đúng" và "thời tiết dự báo" có thể lớn cỡ 0,25 NSE.
 
 Câu hỏi "lưu vực nào bị hại nhiều nhất và vì sao" (khoảng cách phân phối, địa hình) để ở Phần 6.
 
@@ -191,6 +191,10 @@ Cả hai mô hình đều chia hai pha: quá khứ dùng tái phân tích, ngày
 | Sang ngày t thế nào | trí nhớ (h, c) cuối ngày t − 1 đi **thẳng** vào ngày t | trí nhớ (h, c) cuối ngày t − 1 đi **qua mạng chuyển trạng thái** rồi mới vào LSTM thứ hai |
 | LSTM xử lý ngày t | chính LSTM đã đọc 364 ngày | LSTM khác, chỉ thấy 1 ngày mỗi mẫu |
 
+![Sequential Forecast LSTM so với Encoder–Decoder LSTM](Figures/BiasCast5_Seq_vs_EncDec.svg)
+
+*Hình: hàng trên là Sequential Forecast LSTM — một LSTM đọc 364 ngày quá khứ rồi đọc tiếp ngày t, trí nhớ (h, c) đi thẳng. Hàng dưới là Encoder–Decoder LSTM — LSTM 1 đọc quá khứ, trí nhớ của nó qua mạng chuyển trạng thái (hai lớp tuyến tính 256 → 128 → 256) thành trí nhớ ban đầu của LSTM 2, LSTM 2 chỉ đọc ngày t. Ô đỏ là chỗ hai mô hình khác nhau; xanh dương là tái phân tích, xanh lá là 5 biến ECMWF HRES của ngày t. Số tham số của Encoder–Decoder là tự tính (Điều 3).*
+
 Mạng chuyển trạng thái (đọc từ mã, [Mã] `handoff_forecast_lstm.py`; [Cơ sở] Mục 11.2):
 
 1. Ghép h (128 số) và c (128 số) cuối ngày t − 1 thành 256 số.
@@ -221,13 +225,13 @@ Encoder–Decoder có hai LSTM và thêm mạng chuyển trạng thái nên nhi�
 
 | Thành phần | Sequential Forecast LSTM | Encoder–Decoder LSTM |
 |---|---|---|
-| Lớp nhúng (4 lớp) | 1.712 | 1.712 |
+| Lớp nhúng (4 lớp; nhúng quá khứ 31 × 16 + 16 = 512) | 1.696 | 1.696 |
 | LSTM | 82.944 | 2 × 82.944 = 165.888 |
 | Mạng chuyển trạng thái | 0 | 32.896 + 33.024 = 65.920 |
 | Lớp đầu ra | 129 | 2 × 129 = 258 |
-| **Tổng** | **84.785** | **233.778** (khoảng 2,8 lần) |
+| **Tổng** | **84.769** | **233.762** (khoảng 2,8 lần) |
 
-Bản Encoder–Decoder có `qmean`, nhúng phức tạp (run tái lập ở A2) đếm được 341.436 tham số ([LamaH] Mục 6.3). Mô hình to hơn mà vẫn kém cho thấy cái hơn của Sequential đến từ **cách nối hai pha**, không phải từ kích thước. Đây cũng là lý do đề tài so các lõi ở bước C với số tham số lệch không quá 1% (Phần 4, Mục 4.8): không cho mô hình nào thắng nhờ to hơn.
+Có `qmean` (32 biến quá khứ, nhúng quá khứ 528) thì mỗi mô hình thêm 16 tham số: 84.785 (con số ở Phần 4) và 233.778. Cùng cách đếm cho bản Encoder–Decoder có `qmean`, nhúng phức tạp ra 341.436, khớp số đếm từ trọng số của run tái lập ở A2 ([LamaH] Mục 6.3). Mô hình to hơn mà vẫn kém cho thấy cái hơn của Sequential đến từ **cách nối hai pha**, không phải từ kích thước. Đây cũng là lý do đề tài so các lõi ở bước C với số tham số lệch không quá 1% (Phần 4, Mục 4.8): không cho mô hình nào thắng nhờ to hơn.
 
 #### Chi tiết kỹ thuật (đọc sau, không bắt buộc)
 

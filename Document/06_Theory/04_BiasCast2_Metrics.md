@@ -138,7 +138,7 @@ Hai hình trên sinh bằng `Tools/Theory_Figures.py`.
 **Hai cách đưa dữ liệu vào LSTM.** Mọi mô hình trong bài đều đọc chuỗi 365 ngày, từ t − 364 tới ngày t, và chỉ cho ra qmax của ngày t. Khác nhau ở chỗ mỗi ngày trong chuỗi nhận dữ liệu gì:
 
 - **LSTM tiêu chuẩn** (bài gọi là CUDA LSTM, dùng cho các mốc): cả 365 ngày nhận cùng một bộ biến, qua cùng một lớp nhúng. Không phân biệt "quá khứ" và "ngày cần dự báo".
-- **Sequential Forecast LSTM** (mô hình chính của bài, học kỹ ở Phần 5): chuỗi chia hai pha. Pha quá khứ (364 ngày, t − 364 tới t − 1) nhận 31 biến tái phân tích; pha dự báo (ngày t) nhận 5 biến ECMWF HRES. Mỗi pha có lớp nhúng riêng đổi số biến khác nhau về cùng kích thước, rồi cùng một LSTM đọc liền mạch từ ngày đầu tới ngày t ([Bài] dòng 146).
+- **Sequential Forecast LSTM** (mô hình chính của bài, học kỹ ở Phần 4): chuỗi chia hai pha. Pha quá khứ (364 ngày, t − 364 tới t − 1) nhận 31 biến tái phân tích; pha dự báo (ngày t) nhận 5 biến ECMWF HRES. Mỗi pha có lớp nhúng riêng đổi số biến khác nhau về cùng kích thước, rồi cùng một LSTM đọc liền mạch từ ngày đầu tới ngày t ([Bài] dòng 146).
 
 **Dữ liệu từng ngày của mỗi mô hình** (biến cụ thể: Phần 1, Mục 1.5 và 1.6):
 
@@ -164,7 +164,7 @@ Ba mốc đều không dùng lưu lượng quá khứ. Nguồn: [Bài] dòng 104
 | Encoder–Decoder LSTM | Hai LSTM nối tiếp: LSTM thứ nhất (encoder — bộ mã hóa) đọc 364 ngày quá khứ bằng tái phân tích; trạng thái nhớ của nó đi qua một mạng nhỏ (handoff) sang LSTM thứ hai (decoder — bộ giải mã) đọc dự báo ngày t | Kiến trúc của Nearing và cs. (2024) ([Bài] dòng 132–134) | 0,57 |
 | Sequential Forecast LSTM | Một LSTM duy nhất đọc liền mạch cả hai pha | Như bảng trên ([Bài] dòng 146) | 0,63; có lưu lượng quá khứ 0,71 |
 
-Encoder–Decoder và Sequential nhận cùng dữ liệu (tái phân tích cho quá khứ, ECMWF HRES cho ngày t); khác nhau ở chỗ dùng hai LSTM hay một LSTM.
+Encoder–Decoder và Sequential nhận cùng dữ liệu (tái phân tích cho quá khứ, ECMWF HRES cho ngày t); khác nhau ở chỗ dùng hai LSTM hay một LSTM. Hai số 0,57 và 0,63 không cùng loại lớp nhúng: 0,57 là Encoder–Decoder lớp nhúng phức tạp, 0,63 là Sequential lớp nhúng đơn giản; Encoder–Decoder lớp nhúng đơn giản đạt 0,59 (Bảng F1; Phần 5, Mục 5.5).
 
 **Đặt tất cả lên thước NSE** (NSE trung vị, Bảng F1 của bài, PDF trang 27):
 

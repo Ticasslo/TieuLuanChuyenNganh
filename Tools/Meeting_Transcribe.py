@@ -4,12 +4,12 @@
 # Chạy được trên Colab (GPU) nếu đặt file vào /content.
 #
 # MỤC LỤC
-#   Phần 1 — Cài đặt, tìm file, kiểm tra GPU
-#   Phần 2 — Chuyển giọng nói thành văn bản, lưu .txt
+#   Phần 1 - Cài đặt, tìm file, kiểm tra GPU
+#   Phần 2 - Chuyển giọng nói thành văn bản, lưu .txt
 # =============================================================================
 
 
-# %% Phần 1 — Cài đặt, tìm file, kiểm tra GPU
+# %% Phần 1 - Cài đặt, tìm file, kiểm tra GPU
 # Cài faster-whisper, tìm file âm thanh/video trong thư mục đầu vào, in thời lượng; thử nạp mô hình nhỏ trên GPU
 # để phát hiện sớm lỗi thư viện CUDA trước khi chạy mô hình lớn.
 import subprocess
@@ -33,14 +33,14 @@ for p in media:
         n_audio = len(f.streams.audio)
     print(f"{p}  |  {p.stat().st_size / 1e6:,.0f} MB  |  {dur / 60:.1f} phút  |  luồng âm thanh: {n_audio}")
 if not media:
-    print("Không thấy file âm thanh/video nào — kiểm tra Add Input.")
+    print("Không thấy file âm thanh/video nào - kiểm tra Add Input.")
 
 print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "KHÔNG CÓ")
 WhisperModel("tiny", device="cuda", compute_type="float16")
 print("Nạp mô hình thử trên GPU: OK")
 
 
-# %% Phần 2 — Chuyển giọng nói thành văn bản, lưu .txt
+# %% Phần 2 - Chuyển giọng nói thành văn bản, lưu .txt
 # large-v3 tiếng Việt; VAD bỏ đoạn im lặng (giảm câu bịa), không nối ngữ cảnh câu trước (tránh lặp vòng);
 # gợi ý thuật ngữ chuyên ngành để nhận đúng từ tiếng Anh. Mỗi dòng: [giờ:phút:giây] câu nói. In tiến độ.
 # Tự giải mã âm thanh thành mảng 16 kHz mono vì decode_audio của faster-whisper lỗi với bản PyAV trên Kaggle.

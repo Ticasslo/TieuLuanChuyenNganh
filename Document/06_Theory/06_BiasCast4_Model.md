@@ -159,7 +159,7 @@ Ví dụ (thống kê của `qmax` ở đây là số giả định; số thật
 
 #### Chi tiết kỹ thuật
 
-*(a) Một bộ thống kê chung cho mọi lưu vực.* Chuẩn hóa không theo từng lưu vực: lưu vực lớn vẫn có z lớn, lưu vực nhỏ vẫn có z nhỏ. Thông tin "lưu vực này to hay nhỏ, ướt hay khô" nhờ vậy còn nằm trong số liệu, và mô hình chung cho 451 lưu vực cần nó. Mặt trái là biến có thang lệch giữa các lưu vực như `qmean` theo m³/s bị dồn về một khoảng hẹp ở đa số lưu vực nhỏ (Phần 3, Mục 3.4, bảng hai lưu vực).
+*(a) Một bộ thống kê chung cho mọi lưu vực.* Chuẩn hóa không theo từng lưu vực: lưu vực lớn vẫn có z lớn, lưu vực nhỏ vẫn có z nhỏ. Thông tin "lưu vực này to hay nhỏ, ướt hay khô" nhờ vậy còn nằm trong số liệu, và mô hình chung cho 451 lưu vực cần nó. Mặt trái là biến có thang lệch giữa các lưu vực như `qmean` theo m³/s bị dồn về một khoảng hẹp ở đa số lưu vực nhỏ (Phần 3, Mục 3.3, bảng hai lưu vực).
 
 *(b) Nhãn `qmax` cũng được chuẩn hóa.* Hàm mất mát so ŷ với nhãn `qmax` **đã chuẩn hóa**; vì sao điều này không làm sai NSE* là việc của Mục 4.5.
 

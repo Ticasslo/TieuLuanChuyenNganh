@@ -8,12 +8,12 @@
 # Phần 1 giống hệt Phần 1 của 02_LamaHCE_Download_Core.py (mỗi notebook phải tự đủ code).
 #
 # MỤC LỤC
-#   Phần 1 — Thư viện, hằng số, hàm tải theo luồng dùng chung
-#   Phần 2 — Tải phần bổ sung (A theo giờ, thuộc tính, shapefile, mạng sông, COSERO) → lamah_ce_extra.zip
+#   Phần 1 - Thư viện, hằng số, hàm tải theo luồng dùng chung
+#   Phần 2 - Tải phần bổ sung (A theo giờ, thuộc tính, shapefile, mạng sông, COSERO) => lamah_ce_extra.zip
 # =============================================================================
 
 
-# %% Phần 1 — Thư viện, hằng số, hàm tải theo luồng dùng chung
+# %% Phần 1 - Thư viện, hằng số, hàm tải theo luồng dùng chung
 # Đọc file 14,8 GB từ Zenodo theo luồng (không lưu file nén gốc), giữ file theo điều kiện truyền vào và
 # ghi thẳng vào MỘT file ZIP trong /kaggle/working (tránh giới hạn ~500 file của output notebook Kaggle;
 # ZIP giữ nguyên tên file gốc .csv nên đọc bằng zipfile/pandas hoặc giải nén là dùng được code của Kirschstein & Sun).
@@ -70,7 +70,7 @@ def progress_line(read_bytes, total_bytes, elapsed_s, seen, kept, raw_bytes, sav
     folder = "/".join(name.split("/")[:3])
     return (f"[{elapsed_s / 60:6.1f} phút | {frac:6.1%} | {speed_mb_s:5.1f} MB/s | còn ~{eta_min:5.0f} phút] "
             f"đọc {read_bytes / 1e9:5.2f}/{total_bytes / 1e9:.2f} GB nén | duyệt {seen} file, giữ {kept} "
-            f"({raw_bytes / 1e9:.2f} GB gốc → {saved_bytes / 1e9:.2f} GB lưu) | đang ở: {folder}")
+            f"({raw_bytes / 1e9:.2f} GB gốc => {saved_bytes / 1e9:.2f} GB lưu) | đang ở: {folder}")
 
 
 def stream_lamah(zip_path: Path, keep, max_output_gb: float = MAX_OUTPUT_GB) -> None:
@@ -114,7 +114,7 @@ def stream_lamah(zip_path: Path, keep, max_output_gb: float = MAX_OUTPUT_GB) -> 
         zf.writestr("manifest.csv", "\n".join(manifest))
 
     print(f"\nXONG sau {(time.time() - t0) / 60:.1f} phút | đọc {counter.bytes_read / 1e9:.2f} GB nén | "
-          f"duyệt {seen} file | giữ {kept} file | gốc {raw_bytes / 1e9:.2f} GB → ZIP {zip_path.stat().st_size / 1e9:.2f} GB")
+          f"duyệt {seen} file | giữ {kept} file | gốc {raw_bytes / 1e9:.2f} GB => ZIP {zip_path.stat().st_size / 1e9:.2f} GB")
     for key in sorted(groups):
         print(f"  {key}: {groups[key]} file")
     if skipped_over_cap:
@@ -124,7 +124,7 @@ def stream_lamah(zip_path: Path, keep, max_output_gb: float = MAX_OUTPUT_GB) -> 
         print(f"Kiểm tra ZIP: {len(zf.namelist())} mục, lỗi CRC: {zf.testzip()}")
 
 
-# %% Phần 2 — Tải phần bổ sung → Kaggle Dataset "lamah-ce-extra"
+# %% Phần 2 - Tải phần bổ sung => Kaggle Dataset "lamah-ce-extra"
 # Giữ mọi thứ gói lõi (02_LamaHCE_Download_Core.py) chưa lấy, trừ chuỗi theo ngày và chuỗi thời gian của C:
 #   A theo giờ (lượng mưa trên toàn lưu vực thượng nguồn - baseline không đồ thị công bằng),
 #   thuộc tính >60 biến (LOAN/EA-LSTM), shapefile lưu vực/trạm/mạng sông (demo bản đồ),

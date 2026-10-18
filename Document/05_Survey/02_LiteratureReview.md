@@ -55,7 +55,7 @@ Lưu ý khi tra cứu: "Jamba" trùng tên tạp chí *Jàmbá*; "Hyena" trùng 
 
 **Nếu có công trình Transformer tương đương thì sao?** Đó là tiến bộ khoa học bình thường, không phủ nhận giá trị kết quả so sánh tại thời điểm thực hiện.
 
-**Mamba có nhớ kém hơn Transformer không?** Có một đánh đổi thật: Mamba nén lịch sử vào trạng thái kích thước cố định; trên bài kiểm tra "needle-in-a-haystack", Transformer nhớ chi tiết đơn lẻ chính xác hơn. Tuy nhiên dự báo lưu lượng cần thông tin tổng hợp và xu hướng tích lũy (độ ẩm đất, giai đoạn mùa mưa) hơn là chi tiết đơn lẻ, nên phù hợp với cách nén của Mamba (chi tiết ở `01_ArchitectureTheory.md` Mục 4.2).
+**Mamba có nhớ kém hơn Transformer không?** Có một đánh đổi thật: Mamba nén lịch sử vào trạng thái kích thước cố định; ở các bài kiểm tra truy xuất chi tiết đơn lẻ, Transformer chính xác hơn — sao chép chuỗi (Jelassi và cs., ICML 2024, arXiv 2402.01032), tra số điện thoại Phonebook và MMLU 5-shot (Waleffe và cs., 2024, arXiv 2406.07887). Tuy nhiên dự báo lưu lượng cần thông tin tổng hợp và xu hướng tích lũy (độ ẩm đất, giai đoạn mùa mưa) hơn là chi tiết đơn lẻ, nên phù hợp với cách nén của Mamba (chi tiết ở `01_ArchitectureTheory.md` Mục 4.2).
 
 ---
 

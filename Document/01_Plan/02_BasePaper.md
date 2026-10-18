@@ -32,9 +32,9 @@ Kết quả chính: mô hình học trên tái phân tích rồi chạy với d�
 Dự báo cho từng lưu vực, một mô hình chung cho cả 451 lưu vực.
 
 - **Đầu vào:** 364 ngày quá khứ (hindcast) gồm 31 biến khí tượng tái phân tích, có hoặc không có lưu lượng trung bình ngày quan trắc; dự báo thời tiết ECMWF HRES cho ngày cần dự báo (5 biến); 33 thuộc tính tĩnh của lưu vực.
-- **Đầu ra:** lưu lượng cực đại trong ngày t (qmax), trích từ dữ liệu giờ của LamaH-CE. Căn chỉnh giữa ngày của LamaH-CE và ngày UTC của dự báo ECMWF chưa kiểm được vì mã tạo bộ dữ liệu không công khai.
+- **Đầu ra:** lưu lượng cực đại trong ngày t (qmax), trích từ dữ liệu giờ của LamaH-CE. Căn chỉnh giữa ngày của LamaH-CE và ngày UTC của dự báo ECMWF HRES chưa kiểm được vì mã tạo bộ dữ liệu không công khai.
 
-Ví dụ một mẫu: dự báo cho ngày 15/05/2016 dùng khí tượng và lưu lượng từ 17/05/2015 tới 14/05/2016, dự báo ECMWF phát hành 00 UTC ngày 15/05/2016, và cho ra lưu lượng lớn nhất trong ngày 15/05/2016.
+Ví dụ một mẫu: dự báo cho ngày 15/05/2016 dùng khí tượng và lưu lượng từ 17/05/2015 tới 14/05/2016, dự báo ECMWF HRES phát hành 00 UTC ngày 15/05/2016, và cho ra lưu lượng lớn nhất trong ngày 15/05/2016.
 
 Đây là bài toán **dự báo**: dùng dữ liệu tới thời điểm phát hành, có lưu lượng quan trắc quá khứ và dự báo thời tiết thật cho tương lai. Bài toán **mô phỏng** chỉ dùng khí tượng để ước lượng lưu lượng của chính thời điểm đó, không dùng lưu lượng quan trắc. Dự báo khớp với tên đề tài.
 
@@ -57,7 +57,7 @@ Mọi mô hình dùng thư viện NeuralHydrology, gồm mạng nhúng đầu v�
 | Mô hình | Cách hoạt động |
 |---|---|
 | CUDA LSTM (baseline) | LSTM chuẩn; ba biến thể dữ liệu: chỉ dự báo (cận dưới), chỉ tái phân tích với thời tiết của chính ngày dự báo (cận trên, không vận hành được), tái phân tích + dự báo |
-| CrossDomain | Huấn luyện trên 5 biến tái phân tích (`ERA5L_2m_temp_mean`, `ERA5L_2m_dp_temp_mean`, `ERA5L_surf_net_solar_rad_mean`, `MSWEP_RR`, `GLEAM_ETA` — theo thư trả lời phản biện 2), chạy với 5 biến dự báo ECMWF tương ứng — mô phỏng cách làm truyền thống. Cặp bức xạ ghép bức xạ thuần (ERA5-Land) với bức xạ tới (`ssrd`), hai đại lượng khác nhau |
+| CrossDomain | Huấn luyện trên 5 biến tái phân tích (`ERA5L_2m_temp_mean`, `ERA5L_2m_dp_temp_mean`, `ERA5L_surf_net_solar_rad_mean`, `MSWEP_RR`, `GLEAM_ETA` — theo thư trả lời phản biện 2), chạy với 5 biến dự báo ECMWF HRES tương ứng — mô phỏng cách làm truyền thống. Cặp bức xạ ghép bức xạ thuần (ERA5-Land) với bức xạ tới (`ssrd`), hai đại lượng khác nhau |
 | Học chuyển giao | Huấn luyện trên tái phân tích, tinh chỉnh trên dự báo: toàn bộ trọng số hoặc chỉ mạng nhúng |
 | Encoder–Decoder LSTM | Hai LSTM: một cho hindcast, một cho forecast, nối bằng mạng handoff — kiến trúc của mô hình dự báo lũ Google (Nearing và cs., Nature 2024) |
 | Sequential Forecast LSTM | Một LSTM chạy liên tục qua 364 ngày hindcast rồi ngày forecast, mỗi pha có mạng nhúng riêng |
@@ -128,7 +128,7 @@ Vị trí trong bài: Mục 3.1–3.6, Hình 3–10, Phụ lục F.
 7. **Tái lập được, dữ liệu nhẹ:** cấu hình, trọng số và kết quả theo lưu vực của mọi thí nghiệm công khai; dữ liệu 0,95 GB; chạy được trên GPU miễn phí (Kaggle, Google Colab).
 8. **Hỗ trợ demo:** 451 lưu vực có ranh giới, tọa độ; dữ liệu trạm có từ 1981 để tính ngưỡng lũ.
 
-**So với Kirschstein & Sun (ICML 2024), ứng viên đã cân nhắc:** Kirschstein & Sun hơn về uy tín nơi công bố (hội nghị A* ngành học máy, 21 trích dẫn) và có dữ liệu theo giờ, mạng sông; nhưng công thức NSE trong mã tính sai, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train, mô hình không có thành phần học chuỗi thời gian và bài toán không dùng dự báo thời tiết.
+**So với Kirschstein & Sun (ICML 2024), ứng viên đã cân nhắc:** Kirschstein & Sun hơn về uy tín nơi công bố (hội nghị A* ngành học máy, 22 trích dẫn theo Google Scholar ngày 18/10/2026) và có dữ liệu theo giờ, mạng sông; nhưng công thức NSE trong mã tính sai, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train, mô hình không có thành phần học chuỗi thời gian và bài toán không dùng dự báo thời tiết.
 
 ## 9. Hạn chế phát hiện khi đọc mã nguồn và phản biện
 
@@ -139,6 +139,8 @@ Vị trí trong bài: Mục 3.1–3.6, Hình 3–10, Phụ lục F.
 - **Thiếu dữ liệu cho biến thể có Q:** mã đọc thư mục `LamaH_expanded_q_input` không có trên Zenodo; phải tự dựng.
 - **Đơn vị lưu lượng không đồng nhất:** nhãn qmax được đổi sang mm/ngày, còn lưu lượng quan trắc đầu vào `qmean` giữ m³/s. Kiểm bằng cách tính lại thống kê chuẩn hóa từ tệp trạm và so với tệp chuẩn hóa của tác giả: `qmean` khớp ở m³/s (trung bình 4,5778, độ lệch chuẩn 16,1461, lệch 0,00%), đối chứng `qmax` khớp ở mm/ngày; ngày thiếu `qmean` để trống (`Document/03_Data/01_LamaHCE.md` Mục 6.3).
 - **Sai khác nhỏ giữa bài và mã:** mạng nhúng đơn giản được mô tả có hàm kích hoạt tanh nhưng trong mã là một lớp tuyến tính; phương trình (7), (8), (10), (11) ghi Q quá khứ là q_max trong khi phần chữ của bài và mã dùng lưu lượng trung bình ngày; hàm lưu mô hình tốt nhất không tính ngưỡng cải thiện tối thiểu của dừng sớm.
+- **So sánh lẫn hai loại lớp nhúng** (đối chiếu tệp cấu hình vẽ hình của tác giả, `Inspect_Experiments/config/`, với Bảng F1): Encoder–Decoder LSTM 0,57 là bản lớp nhúng phức tạp, Sequential Forecast LSTM 0,63 là bản đơn giản (Encoder–Decoder bản đơn giản đạt 0,59). Ở thí nghiệm thêm dự báo lưu trữ vào hindcast (mục 3.3 của bài), Encoder–Decoder được so giữa bản phức tạp (không dự báo lưu trữ, 0,57) và bản đơn giản (có dự báo lưu trữ, 0,57); so cùng bản đơn giản thì trung vị giảm 0,59 → 0,57. Phần chữ mô tả thí nghiệm này là mở rộng của biến thể có Q, nhưng các run trong hình nằm trong thư mục `..._without_q` (`Document/06_Theory/07_BiasCast5_Experiments.md` Mục 5.5).
+- **Đuôi trái nặng ở mô hình tốt nhất:** Sequential Forecast LSTM có Q, bản lớp nhúng đơn giản, có NSE trung vị 0,71 nhưng trung bình 0,40, độ lệch chuẩn 4,27 (bản phức tạp: 0,70; 0,63; 0,73), tức vài lưu vực có NSE âm rất lớn; bài không bàn (Bảng F1).
 - **Phạm vi hẹp do tác giả tự nêu:** chỉ Trung Âu, chỉ dự báo 1 ngày, chỉ kiến trúc LSTM, chỉ dữ liệu ngày.
 - **Ý kiến phản biện 2 (vòng 1):** hạn chế lớn nhất là chỉ dự báo trước 1 ngày trong khi kiến trúc và dữ liệu cho phép dài hơn; lớp nhúng dùng tanh có thể làm bão hòa đầu vào trước LSTM, đề nghị thử ReLU — liên quan tới kết quả nhúng phức tạp kém hơn (Mục 3.5 của bài).
 - **Bộ dữ liệu bản 1.0:** trang Zenodo ghi chưa phải bản sửa cuối; giấy phép phi thương mại.
@@ -155,7 +157,7 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 2. Cải tiến LSTM của bài (tầng 1): giữ mẫu có dữ liệu thiếu bằng masked mean thay vì bỏ cả mẫu; hoàn thiện đầu vào lưu lượng quan trắc (cùng đơn vị với nhãn, Q các ngày trước, xử lý Q thiếu); huấn luyện có bỏ ngẫu nhiên lưu lượng quan trắc để một mô hình dùng được cả khi trạm mất số liệu (hướng tiếp theo do chính tác giả nêu); tổ hợp nhiều hạt giống.
 3. Thay lõi LSTM bằng GRU, Transformer, S4D và Mamba ở dạng thuần trên quy trình đã cải tiến (tầng 2), cùng dữ liệu, cùng chia tập, cùng số tham số và cùng ngân sách tinh chỉnh, 3 hạt giống, kiểm định Wilcoxon theo lưu vực; sau đó một biến thể cải tiến cho Mamba và một cho Transformer, mỗi biến thể so với bản thuần của chính nó. S4D là đối chứng để phân biệt "Mamba không phù hợp" với "SSM nói chung không phù hợp".
 4. Thử chuỗi quá khứ 730 ngày cho LSTM, Mamba và S4D — nơi Mamba được kỳ vọng có lợi thế chi phí.
-5. Mở rộng sang dự báo 1–7 ngày bằng dữ liệu sẵn có (chỉ ngày đầu có dự báo ECMWF thật), so ba cách cấp đầu vào: chỉ quá khứ, lai, dự báo hoàn hảo làm cận trên — trả lời hạn chế lớn nhất người phản biện nêu.
+5. Mở rộng sang dự báo 1–7 ngày bằng dữ liệu sẵn có (chỉ ngày đầu có dự báo ECMWF HRES thật), so ba cách cấp đầu vào: chỉ quá khứ, lai, dự báo hoàn hảo làm cận trên — trả lời hạn chế lớn nhất người phản biện nêu.
 6. Đầu ra xác suất (CMAL) trên cấu hình tốt nhất để có xác suất vượt ngưỡng lũ.
 7. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và dữ liệu đến trễ theo đúng độ trễ của từng nguồn (ERA5-Land khoảng 5 ngày, GLEAM phát hành mỗi năm một lần — `03_Pipeline.md` Mục 3.2); đánh giá theo mức lưu lượng và theo sự kiện lũ chu kỳ lặp lại 1,5; 2; 5; 10 năm; so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
 
@@ -174,7 +176,7 @@ Nguồn: bản fork NeuralHydrology của tác giả (`datasetzoo/basedataset.py
 
 | Bước | Việc | Chi tiết trong mã |
 |---|---|---|
-| 1. Đọc dữ liệu | Mỗi lưu vực một tệp CSV ngày | Khí tượng mức A (31 biến tái phân tích + 5 biến ECMWF; `qmean` ở biến thể có Q đọc từ thư mục riêng của tác giả); nhãn `qmax` đọc từ tệp trạm (m³/s) và chia theo diện tích `area_gov` thành mm/ngày; 33 thuộc tính tĩnh |
+| 1. Đọc dữ liệu | Mỗi lưu vực một tệp CSV ngày | Khí tượng mức A (31 biến tái phân tích + 5 biến ECMWF HRES; `qmean` ở biến thể có Q đọc từ thư mục riêng của tác giả); nhãn `qmax` đọc từ tệp trạm (m³/s) và chia theo diện tích `area_gov` thành mm/ngày; 33 thuộc tính tĩnh |
 | 2. Cắt theo kỳ | Train 2003–2009, validation 2010–2013, test 2014–2017 | Mỗi kỳ nạp thêm 364 ngày khởi động trước ngày bắt đầu; nhãn trong giai đoạn khởi động bị đặt thành NaN (ô trống), đầu vào giữ số thật; kỳ train có khởi động 2/1/2002–31/12/2002 |
 | 3. Thống kê chuẩn hóa | Tính trên kỳ train, lưu `train_data_scaler.yml` | z-score toàn cục mỗi biến (trung bình, độ lệch chuẩn qua mọi lưu vực và ngày); thuộc tính tĩnh chuẩn hóa qua 451 lưu vực; riêng hàm mất mát cần độ lệch chuẩn `qmax` của từng lưu vực, tính trên dữ liệu chưa chuẩn hóa |
 | 4. Lọc mẫu | Mỗi mẫu = một lưu vực × một ngày t | Khi huấn luyện, mẫu bị loại nếu **bất kỳ biến động nào trong 37 cột có giá trị thiếu ở bất kỳ ngày nào của cửa sổ 365 ngày** (kể cả các cột ECMWF ở những ngày mô hình không dùng tới), hoặc nhãn thiếu, hoặc thuộc tính thiếu; khi validation và test, giữ mọi mẫu đủ lịch sử |
@@ -192,7 +194,7 @@ B là kích thước batch (256).
 | Khối | Đầu vào | Đầu ra | Tham số |
 |---|---|---|---|
 | Nhúng hindcast | 364 ngày × 32 biến (31 tái phân tích + `qmean`) | 364 × 16 | Lớp tuyến tính 32 → 16 |
-| Nhúng forecast | 1 ngày × 5 biến ECMWF | 1 × 16 | Lớp tuyến tính 5 → 16 |
+| Nhúng forecast | 1 ngày × 5 biến ECMWF HRES | 1 × 16 | Lớp tuyến tính 5 → 16 |
 | Nhúng thuộc tính | 33 thuộc tính | 16, lặp lại cho mọi bước và nối vào sau nhúng động → mỗi bước 32 chiều | Hai lớp tuyến tính 33 → 16 (một cho hindcast, một cho forecast) |
 | LSTM pha hindcast | [364, B, 32] | Chuỗi đầu ra [B, 364, 128] và trạng thái (h, c) | LSTM 32 → 128, khởi tạo forget bias 3 |
 | LSTM pha forecast | [1, B, 32], khởi tạo bằng (h, c) của pha hindcast | [B, 1, 128] | Cùng một LSTM với pha hindcast |
@@ -219,7 +221,7 @@ Mọi cấu hình dùng hạt giống 111.
 - Mạng handoff của Encoder–Decoder LSTM gồm hai lớp tuyến tính liên tiếp không có hàm kích hoạt (lớp `FC` của NeuralHydrology không áp kích hoạt cho lớp cuối), trong khi bài mô tả là mạng handoff phi tuyến; tác giả xác nhận khi trả lời phản biện là "một lớp 128".
 - Mạng nhúng "đơn giản" là một lớp tuyến tính, không có tanh như Mục 2.2.6 mô tả.
 - Mọi cấu hình Sequential Forecast LSTM và Encoder–Decoder LSTM dùng cùng một bộ siêu tham số (128, 256, 0,3), trong khi các baseline có bộ khác nhau; bài không nêu rõ tối ưu Bayes được chạy riêng cho từng kiến trúc hay không.
-- Quy tắc lọc mẫu ở bước 4 khiến mẫu huấn luyện bị loại khi thiếu `qmean` hoặc thiếu dữ liệu ECMWF ở bất kỳ ngày nào trong 365 ngày trước đó — dữ liệu ECMWF có từ năm 2002 (`Document/03_Data/01_LamaHCE.md` Mục 6.1), nên năm 2003 không bị loại vì ECMWF; mẫu huấn luyện bị loại chủ yếu ở năm đầu của 27 trạm bắt đầu đo muộn và các ngày thiếu `qmean`.
+- Quy tắc lọc mẫu ở bước 4 khiến mẫu huấn luyện bị loại khi thiếu `qmean` hoặc thiếu dữ liệu ECMWF HRES ở bất kỳ ngày nào trong 365 ngày trước đó — dữ liệu ECMWF HRES có từ năm 2002 (`Document/03_Data/01_LamaHCE.md` Mục 6.1), nên năm 2003 không bị loại vì ECMWF; mẫu huấn luyện bị loại chủ yếu ở năm đầu của 27 trạm bắt đầu đo muộn và các ngày thiếu `qmean`.
 
 ### 11.5. Ghi chú mã cho việc chạy lại và cải tiến
 

@@ -25,7 +25,7 @@ Nội dung Phần 3: (3.1) LamaH-CE và dữ liệu lưu lượng trong đó; (3
 
 ### 3.1. LamaH-CE và dữ liệu lưu lượng trong đó
 
-**Bộ dữ liệu gốc.** LamaH-CE do nhóm Viện Thủy văn và Quản lý nước, Đại học BOKU Wien (Áo) công bố năm 2021, dựng theo khuôn của bộ CAMELS (Mỹ). Vùng phủ là toàn bộ thượng lưu sông Danube tới biên giới Áo – Slovakia cùng mọi lưu vực của Áo kể cả phần thượng nguồn nằm ở nước ngoài: khoảng 170 000 km², chín nước, từ đồng bằng khí hậu lục địa tới vùng núi cao có tuyết và băng hà ([LamaH-CE] tóm tắt, tr. 4529). Bộ gồm 859 lưu vực có trạm đo, hơn 60 thuộc tính lưu vực, chuỗi khí tượng và chuỗi lưu lượng theo ngày và theo giờ. Chuỗi khí tượng của bộ gốc chỉ gồm 21 biến ERA5-Land, tức ERA5-Land là một phần của LamaH-CE ([Bài] dòng 80: *"the original version of LamaH only contains meteorological ERA5-Land data"*).
+**Bộ dữ liệu gốc.** LamaH-CE do nhóm Viện Thủy văn và Quản lý nước, Đại học BOKU Wien (Áo) công bố năm 2021, dựng theo khuôn của bộ CAMELS (Mỹ). Vùng phủ là toàn bộ thượng lưu sông Danube tới biên giới Áo – Slovakia cùng mọi lưu vực của Áo kể cả phần thượng nguồn nằm ở nước ngoài: khoảng 170 000 km², chín nước, từ đồng bằng khí hậu lục địa tới vùng núi cao có tuyết và băng hà ([LamaH-CE] tóm tắt, tr. 4529). Bộ gồm 859 lưu vực có trạm đo, hơn 60 thuộc tính lưu vực, chuỗi khí tượng và chuỗi lưu lượng theo ngày và theo giờ. Chuỗi khí tượng của bộ gốc chỉ lấy từ ERA5-Land: 15 biến khí tượng ([LamaH-CE] mục 4.2, Bảng A2), trong tệp ngày thành 21 cột vì một số biến có thêm giá trị lớn nhất trong ngày (VD `ERA5L_2m_temp_mean`, `ERA5L_2m_temp_max`); tức ERA5-Land là một phần của LamaH-CE ([Bài] dòng 80: *"the original version of LamaH only contains meteorological ERA5-Land data"*).
 
 Bộ gốc chia thành bảy phần ([LamaH-CE] mục 7, tr. 4547):
 
@@ -585,7 +585,7 @@ Số nhỏ hơn hình cho dễ theo.
 - Dự báo: ln = −0,105; −0,223; −0,357; trừ −0,357 được 0,251; 0,134; 0 → tổng 0,385.
 - %BiasFLV = −1 × (0,385 − 1,163) / 1,163 × 100 ≈ **+67%**: mô hình không xuống thấp như sông thật (nhỏ nhất 0,7 so với 0,5), đoạn thấp phẳng hơn.
 
-Mã thay giá trị 0 bằng 10⁻⁶ trước khi lấy log ([Mã] dòng 404–406, 518–520); ln 10⁻⁶ ≈ −13,8, nên một lưu vực có vài ngày `qmax` = 0 làm %BiasFLV vọt lên rất lớn. LamaH-CE có ngày lưu lượng bằng 0 hay không thì chưa kiểm.
+Mã thay giá trị 0 của quan trắc, giá trị 0 và giá trị âm của dự báo bằng 10⁻⁶ trước khi lấy log ([Mã] dòng 404–406, 518–520); ln 10⁻⁶ ≈ −13,8, nên một lưu vực có vài ngày `qmax` = 0 làm %BiasFLV vọt lên rất lớn. LamaH-CE có ngày lưu lượng bằng 0 hay không thì chưa kiểm.
 
 #### Bước A1 kiểm gì
 

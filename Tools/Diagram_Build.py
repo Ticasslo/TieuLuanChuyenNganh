@@ -2,14 +2,14 @@
 # Chạy: python Tools/Diagram_Build.py (từ gốc repo). Nội dung khớp Document/01_Plan/03_Pipeline.md.
 #
 # Mục lục:
-#   Phần 1 — Màu theo bước và kiểu hình
-#   Phần 2 — Nội dung: trình tự, kiến trúc (bài gốc / sửa đổi), thứ tự cắt và khóa luận
-#   Phần 3 — Bố cục tọa độ và ghi tệp
+#   Phần 1 - Màu theo bước và kiểu hình
+#   Phần 2 - Nội dung: trình tự, kiến trúc (bài gốc / sửa đổi), thứ tự cắt và khóa luận
+#   Phần 3 - Bố cục tọa độ và ghi tệp
 
 from html import escape
 from pathlib import Path
 
-# %% Phần 1 — Màu theo bước và kiểu hình
+# %% Phần 1 - Màu theo bước và kiểu hình
 COLORS = {
     "keep": ("#ffffff", "#666666"),
     "0": ("#eeeeee", "#666666"),
@@ -25,7 +25,7 @@ BAND = "rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor
 TEXT = "text;html=1;align={a};verticalAlign=middle;fontSize={fs};fontStyle=1;"
 EDGE = "endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;{dash}strokeWidth={w};exitX={ex};exitY={ey};exitDx=0;exitDy=0;entryX={nx};entryY={ny};entryDx=0;entryDy=0;"
 
-# %% Phần 2 — Nội dung
+# %% Phần 2 - Nội dung
 SEQUENCE = [
     ("0", "0. Hạ tầng: fork riêng, mamba-ssm trên T4, kiểm thử đơn vị, đo thời gian"),
     ("A", "A. Tái lập, persistence, PNSE, DLinear, nhiễu 3 hạt giống (6 lần)"),
@@ -33,13 +33,13 @@ SEQUENCE = [
     ("C", "C. 5 lõi cùng tham số, tinh chỉnh 8 cấu hình, 3 hạt giống (tối đa 70 lần)"),
     ("C", "D–H. 730 ngày, dự báo 1–7 ngày, CMAL, biến thể, kiểm chứng lấy mẫu lũ (42 lần)"),
     ("EV", "Đánh giá: mức, sự kiện lũ, kịch bản vận hành, kiểm định"),
-    ("G", "G. Giải thích mô hình, dò trạng thái ẩn, ngưỡng lũ, demo"),
+    ("G", "G. Giải thích mô hình, dò trạng thái ẩn, demo (dùng ngưỡng lũ của A1)"),
     ("keep", "BÁO CÁO"),
 ]
 LEGEND = [
     ("keep", "Giữ nguyên"), ("A", "A: tái lập, mốc"), ("B", "B: LSTM cải tiến"),
     ("C", "C, D, E, H: lõi, chuỗi dài, biến thể, nhiều ngày"), ("F", "F: xác suất"),
-    ("EV", "Đánh giá thêm"), ("G", "G: giải thích, ngưỡng lũ, demo"),
+    ("EV", "Đánh giá thêm"), ("G", "G: giải thích, demo"),
 ]
 # Mỗi tầng: (tên, [(khối bài gốc, [(bước, khối sửa đổi), ...]), ...])
 BANDS = [
@@ -50,7 +50,7 @@ BANDS = [
          [("B", "B1. Q cùng đơn vị mm/ngày với nhãn, thêm qmax quá khứ; B2: nhóm Q riêng"),
           ("B", "B3. Che dữ liệu khi huấn luyện (0,1/0,12 và 0,05/0,05)")]),
         ("Forecast ngày t: 5 biến ECMWF HRES",
-         [("C", "H. Dự báo 1–7 ngày: ngày đầu ECMWF thật, các ngày sau để trống; so với chỉ quá khứ và dự báo hoàn hảo")]),
+         [("C", "H. Dự báo 1–7 ngày: ngày đầu ECMWF HRES thật, các ngày sau để trống; so với chỉ quá khứ và dự báo hoàn hảo")]),
         ("33 thuộc tính tĩnh · nhãn qmax ngày t (mm/ngày theo diện tích)", []),
     ]),
     ("2. Tiền xử lý", [
@@ -88,7 +88,7 @@ BANDS = [
          [("EV", "ΔNSE SSM so LSTM theo lưu vực: tuyết, động lực chậm, lũ nhanh"),
           ("EV", "Chi phí: tham số, thời gian mỗi epoch, bộ nhớ")]),
         ("Chưa có giải thích mô hình, ngưỡng lũ, ứng dụng",
-         [("G", "G. Integrated Gradients, dò trạng thái ẩn, ngưỡng Gumbel L-moments, demo trên trang web của nhóm (VPS): bản đồ 451 lưu vực, đường Q 7 ngày; chạy CPU: Kaggle GPU → Kaggle CPU → laptop → VPS")]),
+         [("G", "G. Integrated Gradients, dò trạng thái ẩn, demo trên trang web của nhóm (VPS): bản đồ 451 lưu vực tô màu theo ngưỡng lũ của A1, đường Q 7 ngày; chạy CPU: Kaggle GPU → Kaggle CPU → laptop → VPS")]),
     ]),
 ]
 CUT_ORDER = ("Thứ tự cắt khi thiếu thời gian: (1) biến thể dự phòng bước E → (2) kiểm chứng lấy mẫu lũ"
@@ -98,7 +98,7 @@ THESIS = ("Khóa luận: đồ thị mạng sông, tiền huấn luyện trên t
           " dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật, hàm mất mát ưu tiên đỉnh,"
           " biến thể lai Mamba–Transformer, xLSTM, phần mềm ứng dụng")
 
-# %% Phần 3 — Bố cục tọa độ và ghi tệp
+# %% Phần 3 - Bố cục tọa độ và ghi tệp
 cells = []
 
 

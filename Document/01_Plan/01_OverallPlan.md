@@ -122,5 +122,5 @@ SOICT (mời mở rộng sang *Multimedia Tools and Applications* / *Informatica
 - Kirschstein, N., & Sun, Y. (2024). The Merit of River Network Topology for Neural Flood Forecasting. *ICML 2024*, PMLR 235, 24713–24725 — tham khảo cho hướng đồ thị.
 - RiverMamba — NeurIPS 2025, DOI `10.52202/085713-4446`, arXiv 2505.22535.
 - Mamba — Gu & Dao, COLM 2024, arXiv 2312.00752.
-- Yilmaz, K. K., Gupta, H. V., & Wagener, T. (2008). A process-based diagnostic approach to model evaluation. *Water Resources Research* — chia đoạn đường duy trì lưu lượng.
+- Yilmaz, K. K., Gupta, H. V., & Wagener, T. (2008). A process-based diagnostic approach to model evaluation: Application to the NWS distributed hydrologic model. *Water Resources Research*, 44, W09417. https://doi.org/10.1029/2007WR006716 — chia đoạn đường duy trì lưu lượng.
 - Khảo sát tài liệu: `Document/05_Survey/02_LiteratureReview.md`, `Document/05_Survey/01_Datasets.md`.

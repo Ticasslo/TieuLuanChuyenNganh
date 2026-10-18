@@ -1,0 +1,53 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='480' viewBox='0 0 1000 480'>
+<rect width='1000' height='480' fill='white'/>
+<defs><marker id='arr' markerWidth='10' markerHeight='8' refX='9' refY='4' orient='auto'><path d='M0,0 L10,4 L0,8 z' fill='#444'/></marker></defs>
+<text x='500.0' y='24' text-anchor='middle' font-size='15' font-weight='bold' font-family='Arial, sans-serif'>How the past (days t-364 ... t-1) is handed to day t: one LSTM vs two LSTMs</text>
+<text x='18' y='50' font-size='14' font-weight='bold' font-family='Arial, sans-serif'>Sequential Forecast LSTM (best model of the paper): 84,769 parameters (simple embedding, no qmean)</text>
+<text x='18' y='67' font-size='11' fill='#555' font-family='Arial, sans-serif'>The same LSTM keeps running: its memory (h, c) at the end of day t-1 goes straight into day t</text>
+<rect x='18' y='150' width='175' height='40' rx='5' fill='#dbe9f6' stroke='#666'/>
+<text x='105.5' y='166' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>Hindcast embedding</text>
+<text x='105.5' y='181' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>31 reanalysis vars -> 16 (+16)</text>
+<line x1='193' y1='170' x2='213' y2='170' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<rect x='215' y='150' width='175' height='40' rx='5' fill='#dbe9f6' stroke='#666'/>
+<text x='302.5' y='166' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>LSTM, days t-364 ... t-1</text>
+<text x='302.5' y='181' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>hidden size 128</text>
+<line x1='390' y1='170' x2='410' y2='170' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<rect x='412' y='150' width='175' height='40' rx='5' fill='#f8d7da' stroke='#666'/>
+<text x='499.5' y='166' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>Same LSTM, day t</text>
+<text x='499.5' y='181' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>starts from (h, c) of day t-1</text>
+<line x1='587' y1='170' x2='607' y2='170' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<rect x='609' y='150' width='175' height='40' rx='5' fill='#eeeeee' stroke='#666'/>
+<text x='696.5' y='166' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>Linear 128 -> 1</text>
+<text x='696.5' y='181' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>qmax of day t</text>
+<rect x='412' y='82' width='175' height='40' rx='5' fill='#dff0d8' stroke='#666'/>
+<text x='499.5' y='98' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>Forecast embedding</text>
+<text x='499.5' y='113' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>5 ECMWF HRES vars -> 16 (+16)</text>
+<line x1='499.5' y1='122' x2='499.5' y2='148' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<text x='18' y='250' font-size='14' font-weight='bold' font-family='Arial, sans-serif'>Encoder-Decoder LSTM: 233,762 parameters (own count, simple embedding, no qmean)</text>
+<text x='18' y='267' font-size='11' fill='#555' font-family='Arial, sans-serif'>Two separate LSTMs: the memory of the first passes through a handoff network and becomes the starting memory of the second</text>
+<rect x='18' y='350' width='175' height='40' rx='5' fill='#dbe9f6' stroke='#666'/>
+<text x='105.5' y='366' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>Hindcast embedding</text>
+<text x='105.5' y='381' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>31 reanalysis vars -> 16 (+16)</text>
+<line x1='193' y1='370' x2='213' y2='370' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<rect x='215' y='350' width='175' height='40' rx='5' fill='#dbe9f6' stroke='#666'/>
+<text x='302.5' y='366' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>LSTM 1, days t-364 ... t-1</text>
+<text x='302.5' y='381' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>hidden size 128</text>
+<line x1='390' y1='370' x2='410' y2='370' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<rect x='412' y='350' width='175' height='40' rx='5' fill='#f8d7da' stroke='#666'/>
+<text x='499.5' y='366' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>Handoff network</text>
+<text x='499.5' y='381' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>(h, c) 256 -> 128 -> 256, linear</text>
+<line x1='587' y1='370' x2='607' y2='370' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<rect x='609' y='350' width='175' height='40' rx='5' fill='#f8d7da' stroke='#666'/>
+<text x='696.5' y='366' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>LSTM 2, day t only</text>
+<text x='696.5' y='381' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>starts from handoff output</text>
+<line x1='784' y1='370' x2='804' y2='370' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<rect x='806' y='350' width='175' height='40' rx='5' fill='#eeeeee' stroke='#666'/>
+<text x='893.5' y='366' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>Linear 128 -> 1</text>
+<text x='893.5' y='381' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>qmax of day t</text>
+<rect x='609' y='282' width='175' height='40' rx='5' fill='#dff0d8' stroke='#666'/>
+<text x='696.5' y='298' text-anchor='middle' font-size='11' font-weight='bold' font-family='Arial, sans-serif'>Forecast embedding</text>
+<text x='696.5' y='313' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>5 ECMWF HRES vars -> 16 (+16)</text>
+<line x1='696.5' y1='322' x2='696.5' y2='348' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>
+<text x='18' y='445' font-size='11' fill='#555' font-family='Arial, sans-serif'>(+16) = 16-dim embedding of the 33 basin attributes, appended at every day. Blue = reanalysis input, green = ECMWF HRES forecast of day t, red = where the two models differ.</text>
+<text x='18' y='463' font-size='11' fill='#555' font-family='Arial, sans-serif'>Median NSE (Table F1): Sequential 0.63 (simple embedding), Encoder-Decoder 0.57 (complex) / 0.59 (simple); with past discharge qmean: 0.71 vs 0.66.</text>
+</svg>

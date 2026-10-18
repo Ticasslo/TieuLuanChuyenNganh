@@ -3,23 +3,24 @@
 # Quy ước: mọi chữ hiển thị trong hình viết tiếng Anh (số dùng dấu chấm thập phân); chú thích hình trong ghi chú .md viết tiếng Việt.
 #
 # Mục lục:
-#   Phần 1 — Hằng số và hàm vẽ SVG dùng chung
-#   Phần 2 — Hình của Phần 2 BiasCast: đường CDF bậc thang 5 lưu vực, so sánh hai mô hình 451 lưu vực,
+#   Phần 1 - Hằng số và hàm vẽ SVG dùng chung
+#   Phần 2 - Hình của Phần 2 BiasCast: đường CDF bậc thang 5 lưu vực, so sánh hai mô hình 451 lưu vực,
 #            thước NSE trung vị giữa mốc dưới và mốc trên (số thật từ Bảng F1 của bài),
 #            ba kiểu sai cùng NSE (lệch đều, biên độ thấp, chậm nhịp) và persistence
-#   Phần 3 — Hình của Phần 3 BiasCast: cách dựng đường duy trì lưu lượng từ 10 ngày, bốn mức lưu lượng
+#   Phần 3 - Hình của Phần 3 BiasCast: cách dựng đường duy trì lưu lượng từ 10 ngày, bốn mức lưu lượng
 #            trên đường duy trì của một lưu vực, ba chỉ số %BiasFHV, %BiasFMS, %BiasFLV,
 #            ngưỡng chu kỳ lặp lại từ đỉnh năm (Gumbel, L-moments), ghép sự kiện lũ trong cửa sổ ±1 ngày,
 #            bảng 2x2 chấm theo trận và ví dụ cửa sổ ±1/±2 ngày, trục năm của các kỳ dữ liệu
-#   Phần 4 — Hình của Phần 4 BiasCast: ghép biến và đổi trục trên một lô thu nhỏ,
+#   Phần 4 - Hình của Phần 4 BiasCast: ghép biến và đổi trục trên một lô thu nhỏ,
 #            thuộc tính nhúng một lần rồi lặp theo ngày, kích thước tensor của một lô thật
-#   Phần 5 — Hình của Phần 5 BiasCast: dữ liệu từng thí nghiệm đọc trong khung 365 ngày (một pha hay hai pha)
+#   Phần 5 - Hình của Phần 5 BiasCast: dữ liệu từng thí nghiệm đọc trong khung 365 ngày (một pha hay hai pha),
+#            Sequential Forecast LSTM so với Encoder-Decoder LSTM (cách nối pha quá khứ và ngày t)
 
 import math
 from pathlib import Path
 from statistics import NormalDist
 
-# %% Phần 1 — Hằng số và hàm vẽ SVG dùng chung
+# %% Phần 1 - Hằng số và hàm vẽ SVG dùng chung
 OUT_DIR = Path(__file__).resolve().parent.parent / "Document" / "06_Theory" / "Figures"
 W, H = 640, 420                      # kích thước hình (px)
 LEFT, RIGHT, TOP, BOTTOM = 70, 30, 40, 60
@@ -75,7 +76,7 @@ def save(name, elements, height=H, width=W):
     print("Đã ghi", OUT_DIR / name)
 
 
-# %% Phần 2 — Hình của Phần 2 BiasCast
+# %% Phần 2 - Hình của Phần 2 BiasCast
 def fig_cdf_steps():
     # 5 lưu vực, NSE −3,00; 0,55; 0,60; 0,65; 0,70: mỗi lưu vực làm đường nhảy lên 0,2.
     nse = sorted([0.70, 0.65, 0.60, 0.55, -3.00])
@@ -212,7 +213,7 @@ def fig_persistence():
     ])
 
 
-# %% Phần 3 — Hình của Phần 3 BiasCast
+# %% Phần 3 - Hình của Phần 3 BiasCast
 QMAX_10 = [1.2, 0.8, 5.0, 2.1, 1.0, 0.9, 3.4, 1.5, 0.7, 1.1]   # 10 ngày qmax của ví dụ Mục 3.5 (mm/ngày)
 LEVELS = [  # (tên, p đầu, p cuối, màu nền, số ngày trung bình mỗi năm) - bốn mức của 03_Pipeline.md Mục 6.2
     ("Very high", 0.0, 0.02, "#f4cccc", 7),
@@ -557,7 +558,7 @@ def fig_event_table():
     el = [f"<rect width='{width}' height='{height}' fill='white'/>",
           f"<text x='{width / 2}' y='24' text-anchor='middle' font-size='15' font-weight='bold' {FONT}>"
           f"Event scoring is a 2x2 table (illustration)</text>"]
-    x0, y0, cw, ch, hw, hh = 210, 50, 210, 62, 120, 34
+    x0, y0, cw, ch, hh = 210, 50, 210, 62, 34
     el.append(f"<text x='{x0 + cw}' y='{y0 + 14}' text-anchor='middle' font-size='12' font-weight='bold' {FONT}>Model</text>")
     for j, head in enumerate(("warns (event)", "silent (no event)")):
         el.append(f"<text x='{x0 + cw * j + cw / 2}' y='{y0 + hh - 4}' text-anchor='middle' font-size='12' {FONT}>{head}</text>")
@@ -669,7 +670,7 @@ def fig_period_timeline():
               f"One grid column = one year (darker line every 5 years); each bar starts on 1 January of its first year</text>")
     save("BiasCast3_Periods.svg", el, height=height, width=width)
 
-# %% Phần 4 — Hình của Phần 4 BiasCast
+# %% Phần 4 - Hình của Phần 4 BiasCast
 RAIN = {"A": [5, 0, 12], "B": [2, 8, 1]}     # lô thu nhỏ: 2 mẫu x 3 ngày, biến mưa (số tự đặt)
 TEMP = {"A": [10, 11, 9], "B": [3, 4, 6]}    # biến nhiệt độ của cùng lô
 VAR_FILL = {"rain": "#dbe9f6", "temp": "#fde4cf", "e1": "#e2efda", "e2": "#e2efda", "s1": "#ead1dc"}
@@ -795,7 +796,7 @@ def fig_tensor_static():
     save("BiasCast4_Tensor_Static.svg", el, height=height, width=width)
 
 
-# %% Phần 5 — Hình của Phần 5 BiasCast
+# %% Phần 5 - Hình của Phần 5 BiasCast
 SRC_FILL = {"FC": "#a9d18e", "RA": "#9dc3e6"}   # xanh lá: ECMWF HRES; xanh dương: tái phân tích, quan trắc
 
 
@@ -865,6 +866,55 @@ def fig_input_layout():
         el.append(f"<text x='20' y='{ly + 36 + 18 * k}' font-size='11' fill='#555' {FONT}>{line}</text>")
     save("BiasCast5_Input_Layout.svg", el, height=height, width=width)
 
+
+def fig_seq_vs_encdec():
+    # Hai cách nối pha quá khứ và ngày t: một LSTM chạy liền (Sequential) và hai LSTM nối bằng mạng chuyển trạng thái (Encoder-Decoder).
+    width, height = 1000, 480
+    bw, gap = 175, 22
+    blue, green, grey, red = "#dbe9f6", "#dff0d8", "#eeeeee", "#f8d7da"
+    el = [f"<rect width='{width}' height='{height}' fill='white'/>", ARROW,
+          f"<text x='{width / 2}' y='24' text-anchor='middle' font-size='15' font-weight='bold' {FONT}>"
+          f"How the past (days t-364 ... t-1) is handed to day t: one LSTM vs two LSTMs</text>"]
+
+    def box(x, y, top, bottom, fill):
+        el.append(f"<rect x='{x}' y='{y}' width='{bw}' height='40' rx='5' fill='{fill}' stroke='#666'/>")
+        el.append(f"<text x='{x + bw / 2}' y='{y + 16}' text-anchor='middle' font-size='11' font-weight='bold' {FONT}>{top}</text>")
+        el.append(f"<text x='{x + bw / 2}' y='{y + 31}' text-anchor='middle' font-size='11' {FONT}>{bottom}</text>")
+
+    def row(y0, title, sub, boxes, fc_col):
+        el.append(f"<text x='18' y='{y0}' font-size='14' font-weight='bold' {FONT}>{title}</text>")
+        el.append(f"<text x='18' y='{y0 + 17}' font-size='11' fill='#555' {FONT}>{sub}</text>")
+        y = y0 + 100
+        for k, (top, bottom, fill) in enumerate(boxes):
+            x = 18 + (bw + gap) * k
+            box(x, y, top, bottom, fill)
+            if k < len(boxes) - 1:
+                arrow(el, x + bw, y + 20, x + bw + gap - 2, y + 20)
+        fx = 18 + (bw + gap) * fc_col
+        box(fx, y0 + 32, "Forecast embedding", "5 ECMWF HRES vars -> 16 (+16)", green)
+        arrow(el, fx + bw / 2, y0 + 72, fx + bw / 2, y - 2)
+
+    row(50, "Sequential Forecast LSTM (best model of the paper): 84,769 parameters (simple embedding, no qmean)",
+        "The same LSTM keeps running: its memory (h, c) at the end of day t-1 goes straight into day t",
+        [("Hindcast embedding", "31 reanalysis vars -> 16 (+16)", blue),
+         ("LSTM, days t-364 ... t-1", "hidden size 128", blue),
+         ("Same LSTM, day t", "starts from (h, c) of day t-1", red),
+         ("Linear 128 -> 1", "qmax of day t", grey)], 2)
+    row(250, "Encoder-Decoder LSTM: 233,762 parameters (own count, simple embedding, no qmean)",
+        "Two separate LSTMs: the memory of the first passes through a handoff network and becomes the starting memory of the second",
+        [("Hindcast embedding", "31 reanalysis vars -> 16 (+16)", blue),
+         ("LSTM 1, days t-364 ... t-1", "hidden size 128", blue),
+         ("Handoff network", "(h, c) 256 -> 128 -> 256, linear", red),
+         ("LSTM 2, day t only", "starts from handoff output", red),
+         ("Linear 128 -> 1", "qmax of day t", grey)], 3)
+    for k, line in enumerate(("(+16) = 16-dim embedding of the 33 basin attributes, appended at every day. Blue = reanalysis input, green = ECMWF HRES forecast of day t, "
+                              "red = where the two models differ.",
+                              "Median NSE (Table F1): Sequential 0.63 (simple embedding), Encoder-Decoder 0.57 (complex) / 0.59 (simple); "
+                              "with past discharge qmean: 0.71 vs 0.66.")):
+        el.append(f"<text x='18' y='{445 + 18 * k}' font-size='11' fill='#555' {FONT}>{line}</text>")
+    save("BiasCast5_Seq_vs_EncDec.svg", el, height=height, width=width)
+
+
 if __name__ == "__main__":
     fig_cdf_steps()
     fig_cdf_compare()
@@ -881,3 +931,4 @@ if __name__ == "__main__":
     fig_tensor_concat()
     fig_tensor_static()
     fig_input_layout()
+    fig_seq_vs_encdec()

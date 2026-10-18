@@ -9,7 +9,7 @@ Ký hiệu nguồn dùng trong tệp:
 - **[LamaH]**: `03_Data/01_LamaHCE.md` (ghi chú dữ liệu của đề tài), kèm số dòng.
 - **[Cơ sở]**: `01_Plan/02_BasePaper.md` (giới thiệu bài cơ sở), kèm mục.
 
-Ghi chú học chia thành bảy phần, mỗi phần một tệp trong `06_Theory/`, đánh số tiếp theo thứ tự đọc: (1) BiasCast nói về gì — tệp này; (2) đo chất lượng dự báo — NSE và độ suy giảm khi đổi miền dữ liệu; (3) dữ liệu Extended LamaH-CE; (4) LSTM và hàm mất mát NSE*; (5) ba kiến trúc; (6) thêm lưu lượng quan trắc, dự báo lưu trữ, mạng nhúng; (7) kết quả theo lưu vực và hạn chế.
+Ghi chú học chia thành bảy phần, mỗi phần một tệp trong `06_Theory/`, đánh số tiếp theo thứ tự đọc: (1) BiasCast nói về gì — tệp này; (2) đo chất lượng dự báo — NSE và độ suy giảm khi đổi miền dữ liệu; (3) dữ liệu Extended LamaH-CE; (4) mô hình tốt nhất: LSTM, hàm mất mát NSE*, huấn luyện; (5) mọi thí nghiệm của bài: baseline, Cross-Domain, Encoder–Decoder, học chuyển giao, thêm dự báo lưu trữ, thêm `qmean`; (6) lệch miền và kết quả theo lưu vực (khoảng cách Wasserstein, địa hình, ΔNSE theo thuộc tính); (7) hạn chế của bài và phản biện.
 
 ---
 
@@ -70,7 +70,7 @@ Nguồn mô tả cách làm: trang ERA5-Land (Copernicus Climate Data Store), Mu
 
 Ghi chú cho từng thành phần:
 
-- **Vì sao pha quá khứ không có ECMWF HRES:** bài theo thiết kế của Nearing và cs. (2024) — pha quá khứ dùng tái phân tích, pha dự báo dùng dự báo thời tiết ([Bài] dòng 132). Bài có thử thêm dự báo ECMWF HRES lưu trữ vào pha quá khứ nhưng không cải thiện và làm mô hình kém ổn định hơn ([Bài] dòng 244–258; chi tiết ở Phần 6).
+- **Vì sao pha quá khứ không có ECMWF HRES:** bài theo thiết kế của Nearing và cs. (2024) — pha quá khứ dùng tái phân tích, pha dự báo dùng dự báo thời tiết ([Bài] dòng 132). Bài có thử thêm dự báo ECMWF HRES lưu trữ vào pha quá khứ nhưng không cải thiện và làm mô hình kém ổn định hơn ([Bài] dòng 244–258; chi tiết ở Phần 5, Mục 5.5).
 - **Thí nghiệm có đủ dữ liệu tới hôm qua, vận hành thật thì không:** trong thí nghiệm, pha quá khứ có tái phân tích sát tới ngày t − 1; khi vận hành, tái phân tích trễ khoảng 5 ngày nên mấy ngày gần nhất chưa có. Bài chỉ thảo luận, không thí nghiệm tình huống này (Mục 1.5).
 - **Mốc giờ lần chạy:** 00 UTC là 1 giờ sáng giờ Trung Âu mùa đông, 2 giờ sáng mùa hè, 7 giờ sáng giờ Việt Nam. Nhiệt độ, điểm sương (và áp suất mực biển, không dùng) là trung bình 8 giá trị cách nhau 3 giờ tính từ 00 UTC; mưa, bốc hơi là tổng ngày ([Bài] dòng 80).
 - **Căn ngày:** LamaH-CE tính giá trị ngày từ chuỗi theo giờ trong khoảng 00:00–23:59 GMT, cho cả lưu lượng và các biến khí tượng gốc (Klingler và cs., ESSD 2021, mục 4.1, tr. 4533), nên ngày của nhãn qmax trùng ngày UTC của bản dự báo phát 00 UTC. Bài không nêu cách căn ngày của các biến tác giả thêm vào (ECMWF HRES, E-OBS, MSWEP, GLEAM) khi gộp theo lưu vực; phần này chưa kiểm được vì mã tạo bộ dữ liệu không công khai ([Cơ sở] Mục 3).
@@ -210,7 +210,7 @@ Lý do đổi: lưu lượng tính bằng m³/s phụ thuộc mạnh vào diện
 
 Bài không ghi phiên bản cụ thể của E-OBS, MSWEP, GLEAM được dùng; độ phân giải ở bảng là của các bản được mô tả trong nguồn, chưa chắc trùng với bản tác giả dùng.
 
-**31 biến thời tiết quá khứ** (Bảng A1 của bài, PDF trang 20–21; tên biến đúng như tên cột trong tệp). Ở mô hình tốt nhất, phần quá khứ **không chứa ECMWF HRES**: chú thích Bảng A1 ghi mọi biến tái phân tích là đầu vào động ở tất cả thí nghiệm, trừ thí nghiệm CrossDomain (chỉ 5 biến có biến tương ứng trong ECMWF HRES) và Baseline Forecast (chỉ 5 biến ECMWF HRES); thí nghiệm thêm dự báo lưu trữ vào phần quá khứ học ở Phần 6 ([Bài] dòng 248, 354).
+**31 biến thời tiết quá khứ** (Bảng A1 của bài, PDF trang 20–21; tên biến đúng như tên cột trong tệp). Ở mô hình tốt nhất, phần quá khứ **không chứa ECMWF HRES**: chú thích Bảng A1 ghi mọi biến tái phân tích là đầu vào động ở tất cả thí nghiệm, trừ thí nghiệm CrossDomain (chỉ 5 biến có biến tương ứng trong ECMWF HRES) và Baseline Forecast (chỉ 5 biến ECMWF HRES); thí nghiệm thêm dự báo lưu trữ vào phần quá khứ học ở Phần 5, Mục 5.5 ([Bài] dòng 248, 354).
 
 | Nguồn | Biến | Nghĩa | Đơn vị |
 |---|---|---|---|
@@ -230,7 +230,7 @@ Bài không ghi phiên bản cụ thể của E-OBS, MSWEP, GLEAM được dùng
 | E-OBS | `EOBS_rr` | tổng lượng mưa | mm |
 | E-OBS | `EOBS_pp` | áp suất mực biển trung bình | hPa |
 | E-OBS | `EOBS_fg` | tốc độ gió trung bình ở 10 m | m/s |
-| E-OBS | `EOBS_qq` | bức xạ mặt trời ở mặt đất | W/m² |
+| E-OBS | `EOBS_qq` | bức xạ mặt trời toàn phần tới mặt đất (*global radiation*, trực tiếp cộng khuếch tán; cùng đại lượng với `ECMWF_ssrd`) | W/m² |
 | MSWEP | `MSWEP_RR` | tổng lượng mưa | mm |
 | GLEAM | `GLEAM_ETA`, `GLEAM_ETP` | bốc thoát hơi thực tế, bốc thoát hơi tiềm năng | mm |
 
@@ -441,7 +441,7 @@ Kết quả của bài:
 | Với mưa còn tương quan với độ dốc, r = 0,63 | [Bài] dòng 222 |
 | Lưu vực càng cao, càng dốc thì ECMWF HRES càng lệch so với tái phân tích | [Bài] dòng 224 |
 
-Bài không hiệu chỉnh riêng sai lệch do độ phân giải; mô hình học ngầm phần bù (Mục 1.12), có độ cao và độ dốc trong 33 thuộc tính đầu vào (Mục 1.7). Kết quả: lưu vực núi cao, nhiều tuyết lệch nhiều nhất nhưng cải thiện ít; lưu vực khô hạn cải thiện nhiều nhất. Tác giả giải thích (dùng chữ *likely*, chưa kiểm chứng) là trạng thái nhớ của LSTM giữ tín hiệu tuyết tan theo mùa nên mô hình mốc vốn đã tốt ở vùng núi ([Bài] dòng 51, 322, 328). Chi tiết ở Phần 7.
+Bài không hiệu chỉnh riêng sai lệch do độ phân giải; mô hình học ngầm phần bù (Mục 1.12), có độ cao và độ dốc trong 33 thuộc tính đầu vào (Mục 1.7). Kết quả: lưu vực núi cao, nhiều tuyết lệch nhiều nhất nhưng cải thiện ít; lưu vực khô hạn cải thiện nhiều nhất. Tác giả giải thích (dùng chữ *likely*, chưa kiểm chứng) là trạng thái nhớ của LSTM giữ tín hiệu tuyết tan theo mùa nên mô hình mốc vốn đã tốt ở vùng núi ([Bài] dòng 51, 322, 328). Chi tiết ở Phần 6.
 
 **Lệch miền (domain shift).** Mô hình thường được huấn luyện bằng dữ liệu quá khứ chất lượng cao, nhưng khi vận hành chỉ có dự báo thời tiết cho ngày cần dự báo. Dữ liệu lúc chạy thật có phân phối khác dữ liệu lúc huấn luyện, nên chất lượng giảm ([Bài] dòng 51: *"performance degradation when transitioning from high quality reanalysis to meteorological forecast data with lower accuracy"*).
 
@@ -465,7 +465,7 @@ Ví dụ (minh họa): mô hình học trên tái phân tích rằng 20 mm mưa 
 - **Huấn luyện bằng tái phân tích, chạy bằng dự báo (lệch miền; bài dựng lại tình huống này ở thí nghiệm Cross-Domain, [Bài] dòng 116, 200).** Huấn luyện cho w = 0,5. Khi vận hành chỉ có mưa dự báo: ngày 1 dự đoán 0,5 × 7 = 3,5 trong khi thật là 5; ngày 4 dự đoán 10,5 trong khi thật là 15 — thiếu đều 30%, đúng bằng sai lệch của dự báo.
 - **Huấn luyện thẳng bằng dự báo, nhãn là lưu lượng đo (cách của BiasCast).** w tối ưu theo bình phương tối thiểu qua gốc tọa độ: w = Σxy / Σx² = (7·5 + 14·10 + 0·0 + 21·15) / (49 + 196 + 0 + 441) = 490 / 686 ≈ 0,714. Chạy với mưa dự báo: ngày 1 cho 0,714 × 7 = 5,0; ngày 4 cho 0,714 × 21 = 15,0 — khớp. Phân tích: 0,714 = 0,5 × (1 / 0,7), tức w gộp cả quy luật của sông (0,5) và phần bù sai lệch thiếu 30% của dự báo (1 / 0,7), dù mô hình không được cho biết dự báo thiếu bao nhiêu.
 
-**Từ ví dụ tới bài thật.** Trong bài, sai lệch không phải một hệ số cố định mà thay đổi theo vùng, theo mùa, theo biến ([Bài] dòng 64); mô hình là LSTM khoảng 85 nghìn tham số ([Cơ sở] Mục 11.2) nhận thêm 33 thuộc tính lưu vực và 364 ngày quá khứ, nên về nguyên tắc có thể học cách bù khác nhau cho từng nơi và từng mùa. Mức bù thực tế đạt được ở từng loại lưu vực là kết quả của bài (Phần 7). Cách này đòi hỏi kho dự báo lưu trữ đủ nhiều năm để huấn luyện; bộ dữ liệu có ECMWF HRES từ 2002 ([LamaH] dòng 101).
+**Từ ví dụ tới bài thật.** Trong bài, sai lệch không phải một hệ số cố định mà thay đổi theo vùng, theo mùa, theo biến ([Bài] dòng 64); mô hình là LSTM khoảng 85 nghìn tham số ([Cơ sở] Mục 11.2) nhận thêm 33 thuộc tính lưu vực và 364 ngày quá khứ, nên về nguyên tắc có thể học cách bù khác nhau cho từng nơi và từng mùa. Mức bù thực tế đạt được ở từng loại lưu vực là kết quả của bài (Phần 6). Cách này đòi hỏi kho dự báo lưu trữ đủ nhiều năm để huấn luyện; bộ dữ liệu có ECMWF HRES từ 2002 ([LamaH] dòng 101).
 
 ### 1.13. Tóm tắt Phần 1
 

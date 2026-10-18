@@ -55,8 +55,8 @@ h_t = output_gate × tanh(C_t)                                ← công bố out
 | Thông tin mới | 0,2 | 0,9 | 0,1 |
 | **C_t** = quên×C_(t-1) + nạp×mới | 0,9×0 + 0,5×0,2 = **0,10** | 0,9×0,10 + 0,95×0,9 = **0,945** | 0,7×0,945 + 0,2×0,1 = **0,6815** |
 | Cổng output | 0,6 | 0,9 | 0,8 |
-| tanh(C_t) | 0,0997 | 0,7377 | 0,5923 |
-| **h_t** = output × tanh(C_t) | 0,6×0,0997 = **0,06** | 0,9×0,7377 = **0,66** | 0,8×0,5923 = **0,47** |
+| tanh(C_t) | 0,0997 | 0,7375 | 0,5925 |
+| **h_t** = output × tanh(C_t) | 0,6×0,0997 = **0,06** | 0,9×0,7375 = **0,66** | 0,8×0,5925 = **0,47** |
 
 ### 1.5 Từ h_t ra số m³/s thật — 1 lớp cuối cùng
 
@@ -158,7 +158,9 @@ Dự_báo = 50×5,736 + 50 = 336,8 m³/s
 
 ### 2.4 Vì sao cần chia cho √d_k (scaling) — vấn đề thật khi tính full ma trận
 
-Nếu tính đủ ma trận 2×2 (Q của cả A lẫn B, so với K của cả A lẫn B), ô `(B,B)` sẽ rất lớn (VD 64,0 trong 1 ví dụ minh họa) so với các ô còn lại — vì K_B tự nhân với chính Q_B (đều xuất phát từ 80mm, số lớn). Đưa thẳng số lớn này vào softmax sẽ ra gần 100% dồn vào đúng 1 ô, các ô khác gần 0% — model "cứng đờ". Công thức thật luôn có `÷ √d_k` (d_k = số chiều của Q/K, thực tế 64 hoặc hơn) để giữ điểm số ở mức vừa phải trước khi vào softmax, tránh 1 giá trị áp đảo hoàn toàn. Ví dụ trên dùng d_k=1 nên chưa thấy rõ vấn đề này, nhưng d_k thật (64+) thì bước chia này bắt buộc phải có.
+Công thức thật là softmax(Q·Kᵀ / √d_k)·V, với d_k là số chiều của Q và K (Vaswani và cs., *Attention Is All You Need*, NeurIPS 2017, mục 3.2.1). Lý do theo bài gốc: score là tổng của d_k tích; nếu mỗi thành phần của Q và K có trung bình 0, phương sai 1 thì score có phương sai d_k, tức độ lệch chuẩn √d_k. Số chiều càng lớn, score càng xa nhau, softmax dồn gần 100% vào một vị trí và gradient qua softmax gần bằng 0, mô hình khó học.
+
+Ví dụ: d_k = 64 thì độ lệch chuẩn của score là √64 = 8. Hai score 8 và 0 cho softmax 99,97% / 0,03%. Chia cho √64 = 8 được 1 và 0, softmax còn 73% / 27%: vị trí khớp hơn vẫn được chú ý nhiều hơn nhưng không áp đảo hoàn toàn. Ví dụ ở Mục 2.3 dùng d_k = 1 nên √d_k = 1, bước chia không đổi gì.
 
 ### 2.5 Ví dụ số — bản vector thật (Q,K,V là vector 2 chiều), vẫn 2 ngày A/B
 
@@ -325,7 +327,7 @@ Input (mưa mỗi ngày)
 | W_1, W_2 (feed-forward) | ✅ (mục 2.7) |
 | W_final (lớp output cuối) | ✅ (mục 2.3/2.5) |
 
-Tổng ước lượng cho model thật: `(6 ma trận × số head × số lớp) + 1 W_final` — VD 8 head × 6 lớp ≈ 288 ma trận, mỗi ma trận chứa hàng nghìn/triệu con số (không phải 1 số như ví dụ minh họa — xem 2.5 để thấy bản vector thật gần hơn quy mô thật, thực tế còn lớn hơn nữa: d_model thật thường 512, không phải 2).
+Đếm cho model thật: mỗi lớp có 3 ma trận W_Q, W_K, W_V cho **từng** head, cộng 3 ma trận dùng chung cho cả lớp (W_O, W_1, W_2); cả mô hình thêm 1 W_final. Tổng = số lớp × (3 × số head + 3) + 1 — VD 6 lớp, 8 head: 6 × (24 + 3) + 1 = 163 ma trận (cài đặt thực tế thường gộp W_Q của mọi head thành một ma trận lớn, nhưng số tham số không đổi), mỗi ma trận chứa hàng nghìn/triệu con số (không phải 1 số như ví dụ minh họa — xem 2.5 để thấy bản vector thật gần hơn quy mô thật, thực tế còn lớn hơn nữa: d_model thật thường 512, không phải 2).
 
 ### 2.12 So sánh cốt lõi với LSTM
 
@@ -436,7 +438,7 @@ Về công thức thì đúng chỉ là 1 bước trước, nhưng vì `h_(t-1)`
 
 ### 3.10 Kiểm tra lại
 
-- Công thức khớp chuẩn GRU gốc (Cho et al. 2014, "Learning Phrase Representations using RNN Encoder-Decoder").
+- Cấu trúc giống GRU gốc (Cho et al. 2014, "Learning Phrase Representations using RNN Encoder-Decoder"), khác cách viết cổng update: bài gốc và PyTorch (`nn.GRU`) viết h_t = z_t × h_(t-1) + (1 − z_t) × h̃_t, tức z là phần **giữ** bộ nhớ cũ; file này viết ngược lại (z là phần lấy nội dung mới). Hai cách tương đương khi đổi z thành 1 − z; đọc mã PyTorch thì dùng cách viết của bài gốc.
 - Đã tự tính tay lại toàn bộ số liệu ở bảng 3.4/3.5 — khớp đúng, không có lỗi tính toán.
 - Số liệu là ví dụ minh họa để hiểu cơ chế, không phải số từ model đã train thật.
 
@@ -444,13 +446,13 @@ Về công thức thì đúng chỉ là 1 bước trước, nhưng vì `h_(t-1)`
 
 ## Phần 4 — Mamba (State Space Model)
 
-> Phần 4 gồm: động lực (4.1–4.2), SSM (4.3), rời rạc hóa (4.4), Selective SSM (4.5), Selective Scan (4.6), Bidirectional Mamba (4.7), LOAN (4.8), Space-filling curve serialization (4.9) và ví dụ tổng hợp một lớp Hindcast (4.10).
+> Phần 4 gồm: động lực (4.1–4.2), SSM (4.3), rời rạc hóa (4.4), Selective SSM (4.5), Selective Scan (4.6), Bidirectional Mamba (4.7), LOAN (4.8), Space-filling curve serialization (4.9) và ví dụ tổng hợp một khối Hindcast (4.10).
 
 ### 4.1 Vấn đề Mamba giải quyết — 3 mục tiêu cùng lúc
 
 Đã biết 2 kiến trúc trước:
 - **LSTM/GRU:** đọc **tuần tự từng bước** — nhớ tốt, nhưng **không tính song song được** (phải xong bước 1 mới tính bước 2) → chuỗi dài thì train rất chậm.
-- **Transformer:** nhìn **toàn bộ chuỗi cùng lúc**, tính song song được (nhanh) — nhưng độ phức tạp **O(n²)**, chuỗi càng dài càng tốn RAM/thời gian theo cấp số nhân.
+- **Transformer:** nhìn **toàn bộ chuỗi cùng lúc**, tính song song được (nhanh) — nhưng độ phức tạp **O(n²)**, chuỗi càng dài càng tốn RAM/thời gian theo bình phương độ dài (chuỗi dài gấp đôi thì tốn gấp bốn).
 
 **Mamba muốn có cả 3 cái tốt cùng lúc:**
 1. Tính **song song được** (nhanh như Transformer, không phải đọc tuần tự như LSTM).
@@ -494,8 +496,8 @@ Mamba **nén toàn bộ lịch sử vào 1 trạng thái kích thước CỐ Đ�
 
 Tra thêm literature xác nhận đúng cả 2 chiều, cần nói thẳng cả ưu lẫn nhược, không chỉ nói phần có lợi cho Mamba:
 
-- **Xác nhận đúng phần "nén mất chi tiết":** SSM (họ của Mamba) nén toàn bộ quá khứ vào 1 trạng thái kích thước cố định — đây là hạn chế **thật, đã được chính literature Mamba thừa nhận**, không phải suy diễn riêng của tôi.
-- **Phát hiện quan trọng cần biết:** có 1 loại benchmark riêng gọi là **"needle-in-the-haystack"** (tìm đúng 1 chi tiết cụ thể được giấu ở đâu đó trong 1 chuỗi rất dài) — trên loại benchmark này, **Transformer có khả năng nhớ chính xác cao hơn Mamba rõ rệt**, vì Transformer tra được đúng vị trí gốc (không nén), còn Mamba phải dựa vào bản đã nén (có thể đã mất chi tiết đó).
+- **Xác nhận phần "nén mất chi tiết":** SSM (họ của Mamba) nén toàn bộ quá khứ vào 1 trạng thái kích thước cố định; Jelassi và cs. (*Repeat After Me: Transformers are Better than State Space Models at Copying*, ICML 2024, arXiv 2402.01032) chứng minh trên lý thuyết rằng mô hình trạng thái cố định không chép lại được chuỗi dài hơn dung lượng trạng thái, và đo được Transformer chép, tra lại chuỗi tốt hơn hẳn.
+- **Các bài cần tra đúng một chi tiết trong chuỗi dài** (kiểu "needle-in-the-haystack": tìm một thông tin được giấu ở đâu đó trong chuỗi rất dài): Waleffe và cs. (*An Empirical Study of Mamba-based Language Models*, arXiv 2406.07887, 2024) thấy Mamba, Mamba-2 thuần kém Transformer cùng cỡ ở các tác vụ tra thông tin trong ngữ cảnh (VD tác vụ "danh bạ điện thoại"), vì Transformer tra được đúng vị trí gốc (không nén), còn Mamba phải dựa vào bản đã nén.
 - **Kết luận đúng, cân bằng:** Mamba **không phải lúc nào cũng thắng** Transformer về khả năng nhớ — cụ thể là **thua** ở bài toán cần nhớ chính xác 1 chi tiết nhỏ giữa chuỗi cực dài. Mamba chỉ có lợi thế rõ trong bối cảnh cần xử lý chuỗi dài hơn mức Transformer có thể kham nổi (do ràng buộc tính toán), và cho bài toán cần thông tin **tổng hợp/xu hướng** hơn là **chi tiết đơn lẻ chính xác**.
 - **Ý nghĩa cho đề tài — cần nói thật khi bảo vệ:** dự báo lưu lượng gần với dạng "thông tin tổng hợp" (xu hướng mưa, độ bão hòa đất) hơn là "tìm đúng 1 chi tiết nhỏ" — nên đây là lý do hợp lý để dùng Mamba, nhưng **không nên khẳng định tuyệt đối** "Mamba nhớ tốt hơn Transformer" — chỉ nên nói "phù hợp hơn cho đúng dạng bài toán và ràng buộc tính toán của đề tài này".
 
@@ -662,13 +664,13 @@ h(t+1) = 0,9×2 + 0,3×1 = 1,8+0,3 = 2,1
 ```
 Khớp chính xác kết quả tính 2 bước ở mục 4.3.6 (`h(t+1)=2,1`) — chứng minh rời rạc hóa chỉ là gộp lại bằng đại số, không đổi kết quả.
 
-#### 4.4.3 Lưu ý kỹ thuật — đã tra xác nhận lại (14/8/2026, không suy đoán)
+#### 4.4.3 Lưu ý kỹ thuật — Mamba thật rời rạc hóa thế nào
 
 Cách `Ā=1+A·Δt` ở trên (xấp xỉ Euler) là bản đơn giản để hiểu. Công thức Mamba/SSM thật dùng `Ā=exp(A·Δt)` ("Zero-Order Hold" — ZOH) — ổn định hơn về số học khi `Δt` hoặc `A` lớn.
 
 **Còn `B̄` thì sao — chi tiết dễ hiểu nhầm, đã tra rõ:** công thức ZOH chính xác cho `B̄` thật ra phức tạp hơn nhiều: `B̄ = A⁻¹(exp(A·Δt)−I)·B` (không đơn giản như `Ā`). Nhưng **Mamba KHÔNG dùng công thức chính xác này cho `B̄`** — code gốc của Mamba **cố tình dùng hỗn hợp**: `Ā` theo đúng ZOH (`exp(AΔt)`), còn `B̄` vẫn giữ kiểu Euler đơn giản (`B̄=Δt·B`, đúng như đã học ở 4.4.1). Đây là lựa chọn **có chủ đích** của tác giả Mamba (dễ cài đặt hơn hẳn, không cần nghịch đảo ma trận `A⁻¹` tốn kém) — đã xác nhận qua nhiều phân tích kỹ thuật: cách làm này **không ảnh hưởng đáng kể tới hiệu năng thực nghiệm**, vì về bản chất Euler là 1 xấp xỉ hợp lý của ZOH khi `Δt` nhỏ (`exp(x)≈1+x`).
 
-Tóm lại: `Ā,B̄` trong toàn bộ ví dụ số ở file này (4.4-4.6) dùng đúng kiểu Euler đơn giản cho cả 2 — khớp đúng cách Mamba thật cài đặt cho `B̄` (dù không khớp hoàn toàn cách Mamba thật tính `Ā`, vốn dùng `exp()`). Nguồn: phân tích kỹ thuật Mamba (bài "Mamba: SSM, Theory and Implementation") và paper Mamba-3 (ICLR 2026, arxiv 2603.15569) — chính thức gọi tên cách làm này là "exponential-Euler discretization".
+Tóm lại: `Ā,B̄` trong toàn bộ ví dụ số ở file này (4.4-4.6) dùng đúng kiểu Euler đơn giản cho cả 2 — khớp đúng cách Mamba thật cài đặt cho `B̄` (dù không khớp hoàn toàn cách Mamba thật tính `Ā`, vốn dùng `exp()`). Nguồn: mã tham chiếu `selective_scan_ref` của kho `state-spaces/mamba` (`mamba_ssm/ops/selective_scan_interface.py`: `deltaA = exp(delta·A)`, `deltaB_u = delta·B·u`), phân tích kỹ thuật Mamba (bài "Mamba: SSM, Theory and Implementation") và paper Mamba-3 (ICLR 2026, arxiv 2603.15569) — chính thức gọi tên cách làm này là "exponential-Euler discretization".
 
 ---
 
@@ -732,9 +734,9 @@ y(2) = C_2×h(2) = 1,6×0,018 = 0,0288
 | Mưa 80mm | 0,01×80=0,8 | (0,001×80)×80=6,4 |
 | **Tỷ lệ tăng** | **16 lần** (đúng tỷ lệ mưa) | **256 lần** (=16², vì x_t nhân 2 lần) |
 
-→ Mưa càng to, model "để ý" theo cấp số nhân, không chỉ tỷ lệ thường — đúng đặc tính lũ thật (mưa vượt ngưỡng thì ảnh hưởng bùng nổ).
+→ Mưa càng to, model "để ý" theo bình phương, không chỉ tỷ lệ thường — gợi nhớ đặc tính lũ (mưa vượt ngưỡng thì ảnh hưởng tăng vọt). Đây là ví dụ thu nhỏ một chiều; trong Mamba thật `B_t` là một lớp tuyến tính trên cả vector đầu vào đã nhúng, nên quan hệ không đúng là bình phương của lượng mưa.
 
-#### 4.5.6 Vì sao `A` KHÔNG được làm chọn lọc trực tiếp — đã tra xác nhận, không suy đoán
+#### 4.5.6 Vì sao `A` KHÔNG được làm chọn lọc trực tiếp
 
 Theo bài gốc: `A` giữ cố định **để đơn giản hóa tính toán**, nhưng ảnh hưởng của nó vẫn thay đổi theo input **gián tiếp qua `Δ_t`** (vì `Ā_t = 1+A×Δ_t`, và `Δ_t` đã chọn lọc). Không cần làm `A` tự thay đổi trực tiếp (phức tạp thêm không cần thiết) — `Δ` chọn lọc là đủ để "mượn" luôn tính chọn lọc gián tiếp cho `A`.
 
@@ -751,7 +753,7 @@ Theo bài gốc: `A` giữ cố định **để đơn giản hóa tính toán**,
 
 #### 4.5.8 Tóm lại
 
-SSM cổ điển: bộ lọc cố định, áp dụng y hệt mọi input. Mamba (Selective): bộ lọc tự điều chỉnh theo từng input — input quan trọng thì được khuếch đại mạnh hơn hẳn (theo cấp số nhân qua `B_t`, và gián tiếp qua `A` nhờ `Δ_t`) — đúng khả năng LSTM có qua cổng, giờ SSM có thêm mà vẫn giữ cách tính nhanh.
+SSM cổ điển: bộ lọc cố định, áp dụng y hệt mọi input. Mamba (Selective): bộ lọc tự điều chỉnh theo từng input — input quan trọng thì được khuếch đại mạnh hơn hẳn (theo bình phương qua `B_t`, và gián tiếp qua `A` nhờ `Δ_t`) — đúng khả năng LSTM có qua cổng, giờ SSM có thêm mà vẫn giữ cách tính nhanh.
 
 ---
 
@@ -819,13 +821,15 @@ Kiểm chứng: h_3=0,504×h_0+2,46=0,504×0+2,46=2,46 ✓
 
 **Kiểm chứng bằng đúng số ở 4.6.3:** `b_gộp(1,2,3) = a_gộp(2,3) × b_1 + b_gộp(2,3) = 0,56×1+1,9 = 2,46`. Số `0,56` (chính là `a_gộp(2,3)`) **nằm ngay trong phép tính ra `2,46`** — nếu dùng sai `a` (VD lỡ dùng `a=1` thay vì `0,56`) sẽ ra `1×1+1,9=2,9` — sai. Vậy `a_gộp` không hề vô dụng — nó vẫn quyết định đúng `b_gộp`, chỉ là phần nhân trực tiếp với `h_0` mới bằng 0 do đúng ví dụ này bắt đầu từ ngày 1 (`h_0=0`).
 
-#### 4.6.3c So sánh với LSTM/GRU — vì sao CHÚNG không dùng được mẹo gộp này (đã tra xác nhận, không chỉ suy luận riêng)
+#### 4.6.3c So sánh với LSTM/GRU — vì sao chúng không dùng thẳng được mẹo gộp này
 
 Nhắc lại mẹo gộp ở 4.6.3: `h_t=a_t·h_(t-1)+b_t`, gộp được vì `a_t, b_t` **tính trước được chỉ từ `x_t`, không cần biết `h_(t-1)`**.
 
 **Ở LSTM, hệ số đóng vai trò `a_t` chính là `forget_gate`:** `forget_gate=sigmoid(W_f·[h_(t-1),x_t])` (đã học ở 1.3). Nhìn kỹ: `forget_gate` **cần biết `h_(t-1)` mới tính được** (không chỉ `x_t`) — mà `h_(t-1)` lại chính là thứ đang muốn "gộp trước khi biết". Đây là vòng lặp logic khiến LSTM **không thể tính trước hệ số**, không áp dụng được mẹo gộp/vòng. GRU tương tự: `z_t=sigmoid(W_z·[h_(t-1),x_t])` (3.3) — cũng cần `h_(t-1)`.
 
-**Đã tra web xác nhận lại (không chỉ suy luận riêng):** *"vanilla GRU and LSTM cells include mixing among hidden state components, which causes their Jacobians to be dense in general"* — về mặt toán học, phép biến đổi trạng thái của LSTM/GRU là **phi tuyến/phức tạp** theo `h_(t-1)` (không đơn giản dạng affine `a×h_(t-1)+b` như Mamba) — không thỏa điều kiện cần cho phép "gộp kết hợp được" (associative, đã học ở 4.6.9 — Blelloch scan). **Đây là lý do gốc rễ** vì sao chỉ Mamba (và họ SSM tuyến tính) song song hóa được theo kiểu "vòng", còn LSTM/GRU thì không — dù công thức bề ngoài (`h_t` phụ thuộc `h_(t-1)`) trông khá giống nhau.
+Về mặt toán học, phép biến đổi trạng thái của LSTM/GRU là **phi tuyến** theo `h_(t-1)` (không có dạng affine `a×h_(t-1)+b` như Mamba), nên không thỏa điều kiện "gộp kết hợp được" (associative, Mục 4.6.9 — Blelloch scan). Đó là lý do LSTM/GRU **thường** phải chạy tuần tự, còn Mamba (và họ SSM tuyến tính) dùng thẳng được phép gộp theo vòng — dù công thức bề ngoài (`h_t` phụ thuộc `h_(t-1)`) trông giống nhau.
+
+Không phải "không bao giờ song song được": ParaRNN của Apple (ICLR 2026, oral; trang *ParaRNN: Large-Scale Nonlinear RNNs, Trainable in Parallel*, `machinelearning.apple.com/research/large-scale-rnns`) giải chuỗi phi tuyến bằng phép lặp Newton, mỗi lần lặp tuyến tính hóa thành đúng dạng SSM tuyến tính rồi dùng phép gộp song song. Để cách này rẻ, nhóm tác giả phải **sửa** ô GRU/LSTM cho ma trận chỉ có đường chéo, vì ô GRU/LSTM gốc trộn các thành phần của trạng thái ẩn với nhau nên Jacobian dày đặc (Hình 6 của trang). LSTM của thư viện PyTorch mà đề tài dùng vẫn chạy tuần tự.
 
 #### 4.6.4 "Vòng" (round) là gì — analogy giải đấu loại trực tiếp
 
@@ -911,7 +915,7 @@ Cài đặt bằng **CUDA kernel chuyên dụng** (`selective_scan_cuda`, `causa
 #### 4.6.9 Kiểm tra lại và nguồn
 
 - Đã tự tính tay toàn bộ số liệu ở 4.6.1, 4.6.3, 4.6.5, 4.6.7 (cả tuần tự lẫn gộp theo vòng) — khớp đúng nhau 100%, không có lỗi tính toán.
-- **Đã tra web xác nhận lại nguồn gốc kỹ thuật** (không chỉ suy luận riêng): kỹ thuật "parallel scan" Mamba dùng chính là **Blelloch parallel scan (1990)** — nguyên văn tìm được: *"Mamba can be computed in parallel via the Blelloch parallel scan algorithm... enables efficient computation of all prefix values of a sequence, obtained by repeatedly applying an associative binary operator... arrays storing all hidden states can be computed in parallel in O(log t) time."* — khớp đúng những gì đã học ở đây (tính chất kết hợp được/associative, số vòng theo log). Nguồn: paper gốc "Mamba: Linear-Time Sequence Modeling with Selective State Spaces" (arxiv 2312.00752) và các bài phân tích kỹ thuật liên quan.
+- Nguồn gốc kỹ thuật: bài Mamba gốc (Gu và Dao, *Mamba: Linear-Time Sequence Modeling with Selective State Spaces*, arXiv 2312.00752, mục 3.3.2) viết rằng phép truy hồi chọn lọc tuy không bất biến theo thời gian vẫn song song hóa được bằng thuật toán **parallel scan hiệu quả về khối lượng công việc** (work-efficient parallel scan), dẫn Blelloch (1990), Martin và Cundy (2018), Smith và cs. (2023). Thuật toán này tính mọi giá trị "tiền tố" của chuỗi bằng cách lặp lại một phép gộp **kết hợp được** (associative), số vòng theo log của độ dài — đúng những gì đã học ở đây.
 - Kỹ thuật cụ thể minh họa ở 4.6.7 (mọi vị trí tự cập nhật mỗi vòng) là dạng "Hillis-Steele scan" — 1 cách cài đặt cụ thể của họ thuật toán parallel/associative scan nói chung mà Mamba dùng.
 
 ---
@@ -963,7 +967,7 @@ Giải nghĩa:
 - `y_backward` = kết quả quét ngược (mỗi điểm chỉ biết các điểm "sau" nó trong chuỗi).
 - `z` = nhánh cổng có sẵn trong khối Mamba gốc (2 nhánh song song: 1 nhánh qua SSM ra `y`, 1 nhánh `z` riêng qua Linear rồi SiLU — giống vai trò "cổng output" của LSTM).
 - `SiLU(x) = x×sigmoid(x)` — hàm kích hoạt mượt (không góc gãy cứng như ReLU).
-- **Công thức tổng:** `y = SiLU(z)⊙y_forward + SiLU(z)⊙y_backward` (`⊙` = nhân từng phần tử) — mỗi điểm sông cuối cùng có thông tin từ **cả 2 hướng**, đã qua "cổng" lọc lại trước khi cộng.
+- **Công thức tổng:** `y = SiLU(z)⊙y_forward + SiLU(z)⊙y_backward` (`⊙` = nhân từng phần tử) — mỗi điểm sông cuối cùng có thông tin từ **cả 2 hướng**, đã qua "cổng" lọc lại trước khi cộng. Trong mã RiverMamba, tham số `is_divide_out=True` (mặc định) chia tổng hai chiều cho 2 (`models/encoder/Mamba.py`); ví dụ dưới đây giữ đúng công thức của bài, không chia 2.
 
 #### 4.7.2b Ví dụ số đầy đủ — 4 điểm sông, thấy rõ output dựa trên gì
 
@@ -1098,7 +1102,7 @@ Công thức LOAN và ma trận `W` — **CHỈ CÓ 1 BỘ DUY NHẤT, DÙNG CHU
 
 #### 4.8.7 Dùng ở đâu trong kiến trúc
 
-Đã tra Algorithm 1 (Appendix D): LOAN xuất hiện **2 LẦN mỗi khối Hindcast** — 1 lần ngay sau serialization (trước Mamba), 1 lần sau khối Mamba (trước MLP). Với 3 lớp Hindcast → LOAN chạy **6 lần** trong encoding. Khối Forecast cũng dùng LOAN (nhắc ở caption Figure 4, không chi tiết trong bài chính).
+Theo Algorithm 1 (Appendix D) và Mã RiverMamba (`models/encoder/Mamba.py`, `config.py`, kho `HakamShams/RiverMamba_code`, đọc 18/10/2026): mỗi **khối** Mamba (`MambaBlock`) có **2 LOAN** — `loan1` ngay sau chuẩn hóa đầu khối (trước SSM), `loan2` sau SSM (trước MLP). Encoder có 3 lớp, mỗi lớp 2 khối (`en_depths=[2,2,2]`), tức 6 khối → LOAN chạy **12 lần** trong encoding. Khối Forecast cũng dùng LOAN (nhắc ở caption Figure 4, không chi tiết trong bài chính).
 
 #### 4.8.8 Vì sao GELU — nói thật: paper KHÔNG giải thích lý do chọn
 
@@ -1289,22 +1293,22 @@ Trích nguyên văn: *"a combination of Sweep and Gilbert curves performs best"*
 
 ---
 
-### 4.10 Ví dụ minh họa TOÀN BỘ PIPELINE 1 lớp Hindcast — nối Serialization + LOAN + Selective SSM/Scan + Bidirectional lại với nhau
+### 4.10 Ví dụ minh họa TOÀN BỘ PIPELINE 1 khối Hindcast — nối Serialization + LOAN + Selective SSM/Scan + Bidirectional lại với nhau
 
 #### 4.10.1 RiverMamba có mấy lớp Hindcast, mỗi lớp làm gì
 
-Đã tra xác nhận (Section 3 + Table 8, Appendix): *"we defined 3 layers to encode the input"*, *"Number of hindcast layers: 3"*. **3 lớp KHÔNG phải 3 loại khác nhau về vai trò** — là **3 lớp Mamba xếp CHỒNG lên nhau** (giống xếp nhiều lớp Transformer), mỗi lớp làm đúng 1 việc: nén dần chiều **THỜI GIAN** xuống 1 nửa. Trích nguyên văn: *"Except for the 1st layer which processes the full temporal resolution, the temporal resolution is down-sampled by a factor of 2 with a linear layer at the beginning of each hindcast layer, such that the output of the last hindcast layer... has a temporal resolution of T=1"*.
+Đã tra xác nhận (Section 3 + Table 8, Appendix): *"we defined 3 layers to encode the input"*, *"Number of hindcast layers: 3"*. **3 lớp KHÔNG phải 3 loại khác nhau về vai trò** — là **3 lớp Mamba xếp CHỒNG lên nhau** (giống xếp nhiều lớp Transformer), mỗi lớp gồm **2 khối Mamba** (`en_depths=[2,2,2]` trong `config.py`) và từ lớp 2 trở đi nén chiều **THỜI GIAN** xuống 1 nửa ở đầu lớp. Trích nguyên văn: *"Except for the 1st layer which processes the full temporal resolution, the temporal resolution is down-sampled by a factor of 2 with a linear layer at the beginning of each hindcast layer, such that the output of the last hindcast layer... has a temporal resolution of T=1"*.
 
 ```
-Lớp 1: xử lý ĐỦ số ngày gốc (không nén) — dùng Sweep ngang
-Lớp 2: T giảm 1 nửa (qua 1 lớp Linear ở ĐẦU lớp) — dùng Sweep dọc
-Lớp 3: T giảm tiếp 1 nửa, còn T=1 — dùng Gilbert curve
+Lớp 1: xử lý ĐỦ số ngày gốc (T=4, không nén) — khối 1 Sweep ngang, khối 2 Sweep dọc
+Lớp 2: T giảm 1 nửa còn 2 (qua 1 lớp Linear ở ĐẦU lớp) — khối 3 Gilbert, khối 4 Gilbert xoay
+Lớp 3: T giảm tiếp 1 nửa, còn T=1 — khối 5 Sweep ngang, khối 6 Sweep dọc
 ```
 Cơ chế downsample cụ thể (paper chỉ nói *"a linear layer"*, không cho công thức) — **chưa xác nhận chi tiết**, không suy đoán thêm.
 
-**Về 4 curve đã học ở 4.9.9** (Sweep ngang, Sweep dọc, Gilbert, Gilbert xoay): đó là **QUY LUẬT chung** paper mô tả cho trường hợp có nhiều lớp — nhưng vì model thật chỉ có **3 lớp**, nên trên thực tế chỉ dùng đúng 3 curve đầu của chu kỳ (Sweep ngang, Sweep dọc, Gilbert). Curve thứ 4 ("Gilbert xoay") chỉ được dùng NẾU có lớp thứ 4 trở lên — với config 3 lớp thật, nó không được gọi tới.
+**Về 4 curve đã học ở 4.9.9** (Sweep ngang, Sweep dọc, Gilbert, Gilbert xoay): curve được gán theo **từng khối**, không theo lớp. Mã RiverMamba (`models/encoder/Mamba.py`, `config.py`, kho `HakamShams/RiverMamba_code`, đọc 18/10/2026): danh sách `curves` mặc định là `sweep_h`, `sweep_v`, `gilbert`, `gilbert_trans`, và khối thứ i (đếm từ 0 qua cả 6 khối) dùng curve số i mod 4 — nên cả 4 curve đều được dùng, chu kỳ quay lại Sweep ngang ở khối 5. T=4 ứng với `delta_t=4` ngày quá khứ trong `config.py`.
 
-**Phạm vi ví dụ dưới đây: CHỈ làm đủ LỚP 1** (Sweep ngang, không cần downsample vì downsample xảy ra ở ĐẦU lớp 2). Lớp 2, Lớp 3, khối Forecast, và Loss function KHÔNG nằm trong ví dụ này (xem bảng giới hạn ở 4.10.7).
+**Phạm vi ví dụ dưới đây: CHỈ làm đủ KHỐI ĐẦU TIÊN của lớp 1** (Sweep ngang, không cần downsample vì downsample xảy ra ở ĐẦU lớp 2; ví dụ rút T=4 còn T=2 cho dễ tính). Lớp 2, Lớp 3, khối Forecast, và Loss function KHÔNG nằm trong ví dụ này (xem bảng giới hạn ở 4.10.7).
 
 #### 4.10.2 Bước 1 — Input (T=2 ngày, P=2 điểm, K=3 kênh)
 
@@ -1325,7 +1329,7 @@ X_static_A=[0,2]  X_static_B=[0,7]  (không đổi theo ngày — VD độ dốc
 
 #### 4.10.3 Bước 2 — Serialization (4.9)
 
-Toàn bộ cơ chế Mamba xây dựng từ Phần 4.3 tới giờ đều dựa trên 1 giả định nền tảng: có 1 chuỗi các bước `1,2,3,...`, và trạng thái `h_t` tính từ `h_(t-1)` theo đúng thứ tự đó — bản chất của mọi kiến trúc dạng đệ quy (RNN, LSTM, GRU, Mamba), không có "thứ tự" thì không có gì để đệ quy cả. Nhưng mạng lưới sông là 1 tấm lưới 2 chiều, không tự nhiên có thứ tự "bước 1, bước 2". Vì vậy trước khi vào Mamba, bắt buộc phải biến lưới 2D thành chuỗi 1D — qua hàm song ánh `Φ:ℤ³→ℕ` (3 chiều đầu vào là hàng, cột, ngày — gộp cả không gian lẫn thời gian). Lớp Hindcast đầu tiên dùng Sweep ngang — quét từng hàng, trái sang phải.
+Toàn bộ cơ chế Mamba xây dựng từ Phần 4.3 tới giờ đều dựa trên 1 giả định nền tảng: có 1 chuỗi các bước `1,2,3,...`, và trạng thái `h_t` tính từ `h_(t-1)` theo đúng thứ tự đó — bản chất của mọi kiến trúc dạng đệ quy (RNN, LSTM, GRU, Mamba), không có "thứ tự" thì không có gì để đệ quy cả. Nhưng mạng lưới sông là 1 tấm lưới 2 chiều, không tự nhiên có thứ tự "bước 1, bước 2". Vì vậy trước khi vào Mamba, bắt buộc phải biến lưới 2D thành chuỗi 1D — qua hàm song ánh `Φ:ℤ³→ℕ` (3 chiều đầu vào là hàng, cột, ngày — gộp cả không gian lẫn thời gian). Khối đầu tiên của lớp Hindcast 1 dùng Sweep ngang — quét từng hàng, trái sang phải.
 ```
 Φ(1,1,1)=1 → Vị trí 1 = Ngày1-A
 Φ(1,2,1)=2 → Vị trí 2 = Ngày1-B
@@ -1336,16 +1340,16 @@ Toàn bộ cơ chế Mamba xây dựng từ Phần 4.3 tới giờ đều dựa 
 
 #### 4.10.4 Bước 3 — LOAN₁ (4.8)
 
-Trước khi vào mạng neural, luôn cần chuẩn hóa (`(X-μ)/σ`) để các kênh có cùng thang đo. Nhưng phép chuẩn hóa này tính riêng từng điểm/ngày, hoàn toàn không biết điểm đó nằm ở đâu trên bản đồ — nếu 2 điểm địa hình khác hẳn nhau (núi dốc vs đồng bằng) tình cờ cùng lượng mưa hôm đó, sau chuẩn hóa chúng ra CÙNG 1 con số, model mất khả năng phân biệt (đã chứng minh cụ thể ở 4.8.2/4.8.5). LOAN giữ nguyên phép chuẩn hóa, cộng thêm 1 lượng riêng theo từng điểm, tính từ đặc trưng tĩnh (địa hình) qua 1 lớp `Linear` CHUNG cho mọi điểm rồi qua `GELU`.
+Trước khi vào mạng neural, luôn cần chuẩn hóa (`(X-μ)/σ`) để các kênh có cùng thang đo. Nhưng phép chuẩn hóa này tính riêng từng điểm/ngày, hoàn toàn không biết điểm đó nằm ở đâu trên bản đồ — nếu 2 điểm địa hình khác hẳn nhau (núi dốc vs đồng bằng) tình cờ cùng lượng mưa hôm đó, sau chuẩn hóa chúng ra CÙNG 1 con số, model mất khả năng phân biệt (đã chứng minh cụ thể ở 4.8.2/4.8.5). LOAN giữ nguyên phép chuẩn hóa, cộng thêm 1 lượng riêng theo từng điểm, tính từ đặc trưng tĩnh (địa hình) qua 1 lớp `Linear` CHUNG cho mọi điểm rồi qua `GELU`. Trọng số tự chọn cho ví dụ: `Linear` 1 → 3 chiều, W = [0,6; −0,3; 0,4], không bias; GELU tính bằng bản xấp xỉ x·σ(1,702x) như Mục 4.8 (VD điểm A: GELU(0,6 × 0,2) = GELU(0,12) ≈ 0,066). σ trong chuẩn hóa là độ lệch chuẩn chia cho số kênh (như LayerNorm).
 ```
-A ngày1 (kênh mưa/nhiệt độ/độ ẩm=[10,4,7]): chuẩn hóa=[1,225;-1,225;0] + GELU(Linear(X_static_A))=[0,066;-0,029;0,043]
-  → LOAN₁(1)=[1,291;-1,253;0,043]
-B ngày1 ([5,15,20]): chuẩn hóa=[-1,336;0,267;1,069] + GELU(Linear(X_static_B))=[0,282;-0,086;0,173]
+A ngày1 (kênh mưa/nhiệt độ/độ ẩm=[10,4,7], μ=7, σ=2,449): chuẩn hóa=[1,225;-1,225;0] + GELU(Linear(X_static_A))=[0,066;-0,029;0,043]
+  → LOAN₁(1)=[1,291;-1,254;0,043]
+B ngày1 ([5,15,20], μ=13,333, σ=6,236): chuẩn hóa=[-1,336;0,267;1,069] + GELU(Linear(X_static_B))=[0,282;-0,086;0,173]
   → LOAN₁(2)=[-1,054;0,181;1,242]
-A ngày2 ([8,6,5], μ=6,33,σ=1,25): chuẩn hóa=[1,333;-0,267;-1,067] + cùng GELU(A)
-  → LOAN₁(3)=[1,399;-0,296;-1,024]
-B ngày2 ([12,10,15], μ=12,33,σ=2,05): chuẩn hóa=[-0,163;-1,138;1,301] + cùng GELU(B)
-  → LOAN₁(4)=[0,119;-1,224;1,474]
+A ngày2 ([8,6,5], μ=6,333, σ=1,247): chuẩn hóa=[1,336;-0,267;-1,069] + cùng GELU(A)
+  → LOAN₁(3)=[1,402;-0,296;-1,026]
+B ngày2 ([12,10,15], μ=12,333, σ=2,055): chuẩn hóa=[-0,162;-1,136;1,298] + cùng GELU(B)
+  → LOAN₁(4)=[0,120;-1,222;1,471]
 ```
 
 #### 4.10.5 Bước 4 — Khối Mamba: Selective SSM (4.5) + Selective Scan (4.6) + Bidirectional (4.7)
@@ -1358,63 +1362,63 @@ B ngày2 ([12,10,15], μ=12,33,σ=2,05): chuẩn hóa=[-0,163;-1,138;1,301] + c�
 
 Trọng số dùng cho ví dụ (tự chọn để tính tay, KHÔNG phải trọng số đã train thật): xuôi `A=-0,15,w_B=0,4,w_Δ=0,5,Cf=0,9`; ngược `A_b=-0,2,w_Bb=0,35,w_Δb=0,45,Cb=1,1`; gate `w_z=0,3`.
 
-**Kênh 1 = mưa** (`x: 1,291;-1,054;1,399;0,119`):
+**Kênh 1 = mưa** (`x: 1,291;-1,054;1,402;0,120`):
 ```
-Xuôi: h_1^f=0,712  h_2^f=0,868  h_3^f=1,595  h_4^f=1,425
-Ngược: h_4^b=0,004  h_3^b=0,720  h_2^b=0,838  h_1^b=1,264
-Đọc(Cf=0,9,Cb=1,1): y_fwd=[0,641;0,781;1,436;1,283]  y_bwd=[1,390;0,922;0,792;0,004]
-Gate SiLU(z)=[0,255;-0,117;0,282;0,018]
-y_kênh_mưa = [0,519 ; -0,199 ; 0,628 ; 0,024]
-```
-
-**Kênh 2 = nhiệt độ** (`x: -1,253;0,181;-0,296;-1,224`):
-```
-Xuôi: h_1^f=0,269  h_2^f=0,249  h_3^f=0,248  h_4^f=0,491
-Ngược: h_4^b=0,239  h_3^b=0,228  h_2^b=0,203  h_1^b=0,433
-Đọc: y_fwd=[0,242;0,224;0,223;0,442]  y_bwd=[0,476;0,223;0,251;0,263]
-Gate=[-0,130;0,028;-0,041;-0,128]
-y_kênh_nhiệtđộ = [-0,093 ; 0,013 ; -0,019 ; -0,090]
+Xuôi: h_1^f=0,711  h_2^f=0,868  h_3^f=1,593  h_4^f=1,424
+Ngược: h_4^b=0,004  h_3^b=0,731  h_2^b=0,848  h_1^b=1,272
+Đọc(Cf=0,9,Cb=1,1): y_fwd=[0,640;0,781;1,433;1,281]  y_bwd=[1,399;0,933;0,804;0,004]
+Gate SiLU(z), z=0,3×x: [0,231;-0,133;0,254;0,018]
+y_kênh_mưa = [0,470 ; -0,229 ; 0,568 ; 0,024]
 ```
 
-**Kênh 3 = độ ẩm đất** (`x: 0,043;1,242;-1,024;1,474`):
+**Kênh 2 = nhiệt độ** (`x: -1,254;0,181;-0,296;-1,222`):
 ```
-Xuôi: h_1^f=0,0005  h_2^f=0,649  h_3^f=0,801  h_4^f=1,646
-Ngược: h_4^b=0,820  h_3^b=0,920  h_2^b=1,280  h_1^b=1,101
-Đọc: y_fwd=[0,0005;0,585;0,721;1,481]  y_bwd=[1,211;1,408;1,012;0,902]
-Gate=[0,007;0,244;-0,114;0,301]
-y_kênh_độẩm = [0,008 ; 0,485 ; -0,198 ; 0,716]
+Xuôi: h_1^f=0,269  h_2^f=0,249  h_3^f=0,248  h_4^f=0,490
+Ngược: h_4^b=0,238  h_3^b=0,227  h_2^b=0,202  h_1^b=0,432
+Đọc: y_fwd=[0,242;0,224;0,223;0,441]  y_bwd=[0,475;0,223;0,250;0,262]
+Gate=[-0,153;0,028;-0,042;-0,150]
+y_kênh_nhiệtđộ = [-0,110 ; 0,012 ; -0,020 ; -0,105]
+```
+
+**Kênh 3 = độ ẩm đất** (`x: 0,043;1,242;-1,026;1,471`):
+```
+Xuôi: h_1^f=0,0005  h_2^f=0,649  h_3^f=0,801  h_4^f=1,641
+Ngược: h_4^b=0,816  h_3^b=0,916  h_2^b=1,277  h_1^b=1,098
+Đọc: y_fwd=[0,0005;0,584;0,721;1,477]  y_bwd=[1,208;1,405;1,008;0,898]
+Gate=[0,006;0,221;-0,130;0,269]
+y_kênh_độẩm = [0,008 ; 0,439 ; -0,225 ; 0,638]
 ```
 
 **→ Output Mamba đủ 4 vị trí, đủ 3 kênh (mưa, nhiệt độ, độ ẩm — theo đúng thứ tự):**
 ```
-Ngày1-A=[0,519;-0,093;0,008]    Ngày1-B=[-0,199;0,013;0,485]
-Ngày2-A=[0,628;-0,019;-0,198]   Ngày2-B=[0,024;-0,090;0,716]
+Ngày1-A=[0,470;-0,110;0,008]    Ngày1-B=[-0,229;0,012;0,439]
+Ngày2-A=[0,568;-0,020;-0,225]   Ngày2-B=[0,024;-0,105;0,638]
 ```
 **Phần lược bỏ:** output trên chưa qua `Linear_in` (đầu khối Mamba), `conv1d+SiLU` (trộn cục bộ vài bước liền kề trước SSM), và `Linear_out` (cuối khối Mamba) — 3 lớp bọc quanh SSM mà khối Mamba thật có (đã nêu ở 4.7.2), ví dụ này chỉ tính đúng phần lõi SSM+Scan+Bidirectional.
 
 #### 4.10.6 Bước 5 — LOAN₂ (4.8)
 
-Sau khi qua khối Mamba, dữ liệu đã bị trộn thông tin qua lại giữa các vị trí (đúng mục đích của Selective Scan/Bidirectional) — nhưng vì bị trộn, "thẻ tên địa điểm" gắn ở LOAN₁ có thể đã bị pha loãng. LOAN₂ lặp lại ĐÚNG công thức Equation 2 — chuẩn hóa lại output Mamba, cộng lại đúng `GELU(Linear(X_static))` (không đổi vì static không theo ngày) — đảm bảo thông tin địa điểm vẫn rõ trước bước tiếp theo. Xác nhận từ Algorithm 1: LOAN chạy đúng 2 lần mỗi lớp.
+Sau khi qua khối Mamba, dữ liệu đã bị trộn thông tin qua lại giữa các vị trí (đúng mục đích của Selective Scan/Bidirectional) — nhưng vì bị trộn, "thẻ tên địa điểm" gắn ở LOAN₁ có thể đã bị pha loãng. LOAN₂ lặp lại ĐÚNG công thức Equation 2 — chuẩn hóa lại output Mamba, cộng lại đúng `GELU(Linear(X_static))` (không đổi vì static không theo ngày) — đảm bảo thông tin địa điểm vẫn rõ trước bước tiếp theo. Theo Algorithm 1 và mã (`loan1`, `loan2` trong `MambaBlock`): LOAN chạy đúng 2 lần mỗi khối.
 ```
-Ngày1-A: μ=0,103,σ=0,193 → chuẩn hóa=[1,397;-0,882;-0,515] + GELU(A) → LOAN₂(Ngày1-A)=[1,463;-0,916;-0,467]
-Ngày1-B: μ=0,060,σ=0,169 → chuẩn hóa=[-1,036;-0,315;1,352] + GELU(B) → LOAN₂(Ngày1-B)=[-0,763;-0,389;1,521]
-Ngày2-A: μ=0,137,σ=0,355 → chuẩn hóa=[1,384;-0,440;-0,944] + GELU(A) → LOAN₂(Ngày2-A)=[1,450;-0,469;-0,901]
-Ngày2-B: μ=0,217,σ=0,356 → chuẩn hóa=[-0,541;-0,861;1,402] + GELU(B) → LOAN₂(Ngày2-B)=[-0,259;-0,947;1,575]
+Ngày1-A: μ=0,123,σ=0,250 → chuẩn hóa=[1,388;-0,929;-0,459] + GELU(A) → LOAN₂(Ngày1-A)=[1,454;-0,958;-0,416]
+Ngày1-B: μ=0,074,σ=0,276 → chuẩn hóa=[-1,097;-0,224;1,321] + GELU(B) → LOAN₂(Ngày1-B)=[-0,815;-0,310;1,494]
+Ngày2-A: μ=0,108,σ=0,336 → chuẩn hóa=[1,370;-0,379;-0,990] + GELU(A) → LOAN₂(Ngày2-A)=[1,436;-0,408;-0,947]
+Ngày2-B: μ=0,185,σ=0,324 → chuẩn hóa=[-0,499;-0,897;1,395] + GELU(B) → LOAN₂(Ngày2-B)=[-0,217;-0,983;1,568]
 ```
-**Đây là output của ĐÚNG 1 LỚP HINDCAST (T=2, chưa downsample)** — chưa phải số m³/s cuối.
+**Đây là output của ĐÚNG 1 KHỐI (khối 1 của lớp Hindcast 1, T=2, chưa downsample)** — chưa phải số m³/s cuối.
 
 #### 4.10.7 Bước 6 — Downsample `T=2→T=1` (mô tả, không tính đủ số)
 
 RiverMamba đưa vào nhiều ngày lịch sử nhưng chỉ cần ra 1 dự báo cho hiện tại — cần tóm tắt dần các ngày lại. Cơ chế: ở ĐẦU mỗi lớp Hindcast (trừ lớp 1), 1 lớp Linear gộp từng cặp ngày liền kề thành 1 ngày mới, giảm `T` đi 1 nửa mỗi lần — cùng nguyên lý "giảm 1 nửa mỗi vòng" đã học ở Selective Scan (4.6.6), chỉ khác trục: đây gộp theo THỜI GIAN giữa các LỚP, còn 4.6 gộp theo VỊ TRÍ trong 1 lớp.
 ```
-Ngày_gộp-A (kênh mưa, trọng số 0,5/0,5 tự chọn minh họa) = 0,5×0,519+0,5×0,628 = 0,574
+Ngày_gộp-A (kênh mưa, lấy đầu ra lớp 1 sau LOAN₂, trọng số 0,5/0,5 tự chọn minh họa) = 0,5×1,454+0,5×1,436 = 1,445
 ```
 **Phần lược bỏ:** paper chỉ nói *"a linear layer"*, không cho công thức/trọng số cụ thể — số `0,5/0,5` trên là tự chọn minh họa nguyên lý, không phải cách tính thật.
 
 #### 4.10.8 Bước 7 — Lặp lại Bước 2-6 thêm 2 lần (Lớp 2, Lớp 3) — chỉ mô tả
 
-Toàn bộ chuỗi Serialization→LOAN₁→Mamba→LOAN₂→Downsample chạy lại 2 lần nữa, đổi curve theo chu kỳ đã học (4.9.9): Lớp 2 dùng Sweep dọc (lý do: Sweep ngang và Sweep dọc mắc lỗi ở 2 cặp điểm KHÁC nhau — 4.9.6 — đổi hướng giúp "vá" cặp mà lớp trước bỏ sót), Lớp 3 dùng Gilbert (không có cú nhảy nào, tốt nhất trong các curve). Sau Lớp 3, `T` đã giảm hết còn `T=1`.
-**Phần lược bỏ:** không tính số cụ thể cho Lớp 2, Lớp 3 — Gilbert không tự bịa số được (4.9.8); chưa rõ trọng số Mamba có share giữa 3 lớp hay không (paper không nói rõ).
+Chuỗi Serialization→LOAN₁→Mamba→LOAN₂ chạy lại cho khối 2 của lớp 1 (Sweep dọc — Sweep ngang và Sweep dọc mắc lỗi ở 2 cặp điểm KHÁC nhau, 4.9.6, nên đổi hướng giúp "vá" cặp mà khối trước bỏ sót), rồi Downsample và lặp tiếp cho lớp 2 (Gilbert, Gilbert xoay — không có cú nhảy nào) và lớp 3 (Sweep ngang, Sweep dọc). Sau Lớp 3, `T` đã giảm hết còn `T=1`.
+**Phần lược bỏ:** không tính số cụ thể cho Lớp 2, Lớp 3 — Gilbert không tự bịa số được (4.9.8); mỗi lớp là một `BasicLayer` riêng trong `nn.ModuleList`, mỗi khối có SSM và LOAN riêng, nên trọng số **không** dùng chung giữa các lớp, các khối.
 
 #### 4.10.9 Bước 8 — MLP → dự báo m³/s (mô tả, không tính đủ số)
 
@@ -1425,10 +1429,10 @@ Vector tóm tắt cuối cùng (sau `T=1`, sau cả 3 lớp) qua 1 lớp tuyến
 
 | Đã làm ĐỦ, có công thức/nguồn | Chưa làm — ngoài phạm vi ví dụ này |
 |---|---|
-| Serialization (Sweep ngang) — công thức `Φ` tự viết minh họa | Sweep dọc (Lớp 2), Gilbert (Lớp 3) — Gilbert cố tình không bịa số |
+| Serialization (Sweep ngang) — công thức `Φ` tự viết minh họa | Khối 2 (Sweep dọc), lớp 2 (Gilbert, Gilbert xoay), lớp 3 — Gilbert cố tình không bịa số |
 | LOAN₁, LOAN₂ — đúng công thức Equation 2, đủ 4 vị trí | Downsample T=2→1 — paper không cho công thức cụ thể, trọng số tự chọn minh họa |
 | Selective SSM (4.5) + Selective Scan (4.6) + Bidirectional (4.7) — đúng công thức, đủ 3 kênh (mưa/nhiệt độ/độ ẩm) × 4 vị trí | `Linear_in`, `conv1d+SiLU`, `Linear_out` bọc quanh khối Mamba thật |
-| Lớp 1 Hindcast hoàn chỉnh, ý nghĩa vật lý từng kênh rõ ràng | Lớp 2, Lớp 3, khối Forecast (dùng HRES), Embedding đầu vào, Loss function |
+| Khối 1 của lớp Hindcast 1 hoàn chỉnh, ý nghĩa vật lý từng kênh rõ ràng | Lớp 2, Lớp 3, khối Forecast (dùng HRES), Embedding đầu vào, Loss function |
 | Mọi số liệu tự tính tay verify khớp | Mọi trọng số (`A,w_B,W`...) là tự bịa minh họa — KHÔNG phải trọng số đã train thật |
 
 #### 4.10.11 Kiểm tra lại

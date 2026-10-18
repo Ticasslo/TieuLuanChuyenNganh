@@ -1,20 +1,20 @@
 # =============================================================================
 # Extended LamaH-CE (BiasCast, HESS 2026) - tải dữ liệu và kết quả thí nghiệm của tác giả
 # Bài: Konold và cs., "BiasCast: learning and adjusting real time biases from meteorological forecasts
-#      to enhance runoff predictions", HESS 30:5067–5096 (2026). Dữ liệu Zenodo 17119635 (CC BY-NC 4.0),
+#      to enhance runoff predictions", HESS 30:5067-5096 (2026). Dữ liệu Zenodo 17119635 (CC BY-NC 4.0),
 #      kết quả thí nghiệm Zenodo 17292895.
-# Notebook Kaggle: Accelerator = None, bật Internet, dán Phần 1–2 vào 2 cell (hoặc cả file vào 1 cell),
+# Notebook Kaggle: Accelerator = None, bật Internet, dán Phần 1-2 vào 2 cell (hoặc cả file vào 1 cell),
 # rồi Run All. Xong: tab Output => New Dataset (Private) "lamah-ce-ext" (giữ cả 2 file ZIP;
 # Kaggle tự giải nén thành thư mục khi tạo dataset). Khám phá dữ liệu: Workspace/02_Exploration/.
 # Chạy được cả trên Colab (lưu vào /content).
 #
 # MỤC LỤC
-#   Phần 1 — Thư viện, hằng số, hàm tải theo luồng dùng chung
-#   Phần 2 — Tải Extended LamaH-CE (0,95 GB) và kết quả thí nghiệm của tác giả (0,23 GB) → 2 file ZIP
+#   Phần 1 - Thư viện, hằng số, hàm tải theo luồng dùng chung
+#   Phần 2 - Tải Extended LamaH-CE (0,95 GB) và kết quả thí nghiệm của tác giả (0,23 GB) => 2 file ZIP
 # =============================================================================
 
 
-# %% Phần 1 — Thư viện, hằng số, hàm tải theo luồng dùng chung
+# %% Phần 1 - Thư viện, hằng số, hàm tải theo luồng dùng chung
 # Đọc file .tar.gz từ Zenodo theo luồng (không lưu file nén gốc) và ghi thẳng mọi file vào MỘT file ZIP
 # (tránh giới hạn số file của output Kaggle; pandas đọc thẳng CSV trong ZIP được).
 # Log mỗi 60 giây. Thiếu dòng "Kiểm tra ZIP" ở cuối log = tải lỗi, chạy lại cell.
@@ -89,14 +89,14 @@ def stream_tar_to_zip(url: str, fallback_gb: float, zip_path: Path) -> None:
                       f"| {kept} file | đang ở: {'/'.join(member.name.split('/')[:3])}", flush=True)
 
     print(f"XONG sau {(time.time() - t0) / 60:.1f} phút | đọc {counter.bytes_read / 1e9:.2f} GB nén | "
-          f"{kept} file | gốc {raw_bytes / 1e9:.2f} GB → ZIP {zip_path.stat().st_size / 1e9:.2f} GB")
+          f"{kept} file | gốc {raw_bytes / 1e9:.2f} GB => ZIP {zip_path.stat().st_size / 1e9:.2f} GB")
     for key in sorted(groups):
         print(f"  {key}: {groups[key]} file")
     with zipfile.ZipFile(zip_path) as zf:   # kiểm tra ZIP đọc lại được, không hỏng
         print(f"Kiểm tra ZIP: {len(zf.namelist())} mục, lỗi CRC: {zf.testzip()}")
 
 
-# %% Phần 2 — Tải Extended LamaH-CE (0,95 GB) và kết quả thí nghiệm của tác giả (0,23 GB) → 2 file ZIP
+# %% Phần 2 - Tải Extended LamaH-CE (0,95 GB) và kết quả thí nghiệm của tác giả (0,23 GB) => 2 file ZIP
 # lamah_ce_ext.zip: toàn bộ dữ liệu ngày (A_basins_total_upstrm, D_gauges có qmin/qmean/qmax).
 # biascast_experiments.zip: 24 cấu hình thí nghiệm (config.yml, best_model.pt, scaler, test_metrics.csv).
 for zip_name, (url, fallback_gb) in SOURCES.items():
