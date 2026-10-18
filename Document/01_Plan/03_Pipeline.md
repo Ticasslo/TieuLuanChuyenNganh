@@ -127,7 +127,7 @@ Bản fork đã có `nan_step_probability`, `nan_sequence_probability` (`basedat
 | Lõi | Cài đặt | Vai trò |
 |---|---|---|
 | LSTM | `nn.LSTM`, forget bias 3 như bài (`02_BasePaper.md` Mục 11.2) | Mốc chính |
-| GRU | `nn.GRU` | Mốc hồi quy nhẹ hơn |
+| GRU | `nn.GRU` | Mốc hồi quy rút gọn (3 khối cổng so với 4 của LSTM): tách lợi thế của cấu trúc cổng LSTM khỏi lợi thế của họ hồi quy nói chung. Bằng chứng trái chiều: GRU ngang LSTM với ít tham số hơn (Gao và cs., J. Hydrol. 589:125188, 2020), kém LSTM khi cùng độ sâu và số chiều ẩn (Demiray & Demir, Scientific Reports 2026); Demiray & Demir (EarthArXiv) dùng bộ mốc LSTM, GRU, Transformer khi so với Mamba. Ở cùng số tham số GRU được số chiều ẩn lớn hơn nên không kỳ vọng nhanh hơn LSTM; thời gian đo ở Mục 6.5 |
 | Transformer | Bộ mã hóa pre-LayerNorm, mặt nạ nhân quả, mã hóa vị trí sin, lấy đầu ra bước cuối; khởi điểm từ `transformer.py` của NeuralHydrology | Mốc attention; Liu và cs. (2024) cho thấy bản cơ bản thua LSTM |
 | S4D | Khối S4D (Gu và cs., NeurIPS 2022) có kết nối tắt và LayerNorm; siêu tham số khởi điểm theo S4D-FT (d_state, min_dt 0,01, max_dt 0,1, lr riêng cho tham số SSM) | Đối chứng SSM bất biến thời gian — tách "Mamba không hợp" khỏi "SSM không hợp" |
 | Mamba | Khối `mamba_ssm.Mamba` có kết nối tắt và LayerNorm, đầu vào dạng (batch, length, dim); dự phòng `mambapy` (PyTorch thuần) nếu không cài được kernel CUDA | Lõi chính của đề tài |
@@ -295,7 +295,7 @@ Tổng tối đa 130 lần huấn luyện (A: 6; B: 12; C: 40 + 30; D, E, F, H, 
 
 ### 8.3. Thứ tự cắt nếu thiếu thời gian
 
-Cắt từ trên xuống; RQ1–RQ4 giữ nguyên, RQ5 và RQ6 chỉ thu hẹp: (1) biến thể dự phòng ở bước E; (2) thí nghiệm GV; (3) bước F (CMAL; demo khi đó tô màu theo dự báo điểm so với ngưỡng, không có xác suất vượt ngưỡng); (4) giải thích mô hình; (5) biến thể chính ở bước E; (6) 730 ngày cho S4D; (7) cách (c) ở bước H; (8) tinh chỉnh giảm từ 8 xuống 4 cấu hình mỗi lõi.
+Cắt từ trên xuống; RQ1–RQ4 giữ nguyên, RQ5 và RQ6 chỉ thu hẹp: (1) GRU chỉ chạy cấu hình cùng tham số, bỏ tinh chỉnh (bớt 8 lần chạy; GRU là lõi ít giá trị nhất trong 5 lõi, Mục 4.2); (2) biến thể dự phòng ở bước E; (3) thí nghiệm GV; (4) bước F (CMAL; demo khi đó tô màu theo dự báo điểm so với ngưỡng, không có xác suất vượt ngưỡng); (5) giải thích mô hình; (6) biến thể chính ở bước E; (7) 730 ngày cho S4D; (8) cách (c) ở bước H; (9) tinh chỉnh giảm từ 8 xuống 4 cấu hình mỗi lõi.
 
 ---
 
@@ -467,6 +467,7 @@ Slide bảo vệ làm sau khi có kết quả bước C; phần hỏi đáp chu�
 | Masked mean theo nhóm nguồn, che dữ liệu khi huấn luyện | Gauch và cs., HESS 29:6221–6235 (2025); mức che 0,05 lấy theo MF²LSTM (preprint EGUsphere 2026); mã fork (`basedataset.py`, `inputlayer.py`) |
 | Độ trễ từng nguồn | Copernicus (ERA5-Land khoảng 5 ngày; E-OBS hằng ngày trễ 1 ngày, bản đầy đủ 2 lần/năm); UCAR Climate Data Guide (MSWEP NRT 2–3 giờ); ICDC Hamburg (GLEAM mỗi năm); BiasCast Mục 3.4 (eHYD khoảng 2 giờ) |
 | Giao thức cùng tham số | Shahriar (SSRN 2026); Liu và cs. (J. Hydrol. 2024) |
+| GRU làm mốc hồi quy rút gọn | Gao và cs., J. Hydrol. 589:125188 (2020); Demiray & Demir (EarthArXiv; Scientific Reports 2026) |
 | PNSE | Kitanidis & Bras, WRR 16:1034–1044 (1980); MF²LSTM (preprint EGUsphere 2026) |
 | Chu kỳ lặp lại; precision, recall, F1; cửa sổ thời gian; năm thủy văn cho đỉnh năm | Nearing và cs., Nature 627 (2024) và mã công bố kèm (`google-research-datasets/global_streamflow_model_paper`) |
 | Gumbel L-moments | Hosking, JRSS B 52:105–124 (1990); AIFL (Taccari và cs., J. Hydrol. 678, 2026) |

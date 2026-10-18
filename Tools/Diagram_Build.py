@@ -91,9 +91,9 @@ BANDS = [
          [("G", "G. Integrated Gradients, dò trạng thái ẩn, demo trên trang web của nhóm (VPS): bản đồ 451 lưu vực tô màu theo ngưỡng lũ của A1, đường Q 7 ngày; chạy CPU: Kaggle GPU → Kaggle CPU → laptop → VPS")]),
     ]),
 ]
-CUT_ORDER = ("Thứ tự cắt khi thiếu thời gian: (1) biến thể dự phòng bước E → (2) kiểm chứng lấy mẫu lũ"
-             " → (3) CMAL bước F → (4) giải thích mô hình → (5) biến thể chính bước E → (6) 730 ngày cho S4D"
-             " → (7) cách dự báo hoàn hảo ở bước H → (8) tinh chỉnh 8 → 4 cấu hình mỗi lõi")
+CUT_ORDER = ("Thứ tự cắt khi thiếu thời gian: (1) GRU bỏ tinh chỉnh → (2) biến thể dự phòng bước E → (3) kiểm chứng lấy mẫu lũ"
+             " → (4) CMAL bước F → (5) giải thích mô hình → (6) biến thể chính bước E → (7) 730 ngày cho S4D"
+             " → (8) cách dự báo hoàn hảo ở bước H → (9) tinh chỉnh 8 → 4 cấu hình mỗi lõi")
 THESIS = ("Khóa luận: đồ thị mạng sông, tiền huấn luyện trên tái phân tích 1981–2002, so với khung mã nguồn mở của Google, dữ liệu giờ,"
           " dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật, hàm mất mát ưu tiên đỉnh,"
           " biến thể lai Mamba–Transformer, xLSTM, phần mềm ứng dụng")
