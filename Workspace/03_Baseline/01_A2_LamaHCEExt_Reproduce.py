@@ -289,8 +289,9 @@ print("=> QMEAN_UNIT =", QMEAN_UNIT)
 
 # %% Phần 4 - Dựng thư mục dữ liệu có cột qmean
 # Bộ nạp chỉ đọc đầu vào từ tệp khí tượng (lamah.py dòng 116-119), còn qmean nằm ở tệp trạm D_gauges, nên chép cột qmean
-# (m³/s - đã kiểm ở Phần 3) sang tệp khí tượng của 451 lưu vực, ghi vào thư mục cùng tên với tác giả. Tệp trạm ghi ngày thiếu
-# là -999, hàm đọc tệp trạm của thư viện đổi số âm thành ô trống (lamah.py dòng 228-229) và thống kê ở Phần 3 khớp tác giả
+# (m³/s - đã kiểm ở Phần 3) sang tệp khí tượng của 451 lưu vực, ghi vào thư mục cùng tên với tác giả. Quy ước LamaH-CE ghi ngày
+# thiếu là -999 (kỳ 2003-2017 của 451 lưu vực không có ô nào như vậy, năm khác chưa kiểm), hàm đọc tệp trạm của thư viện
+# đổi số âm thành ô trống (lamah.py dòng 228-229) và thống kê ở Phần 3 khớp tác giả
 # theo cách đó, còn hàm đọc tệp khí tượng không đổi => phải tự đổi số âm thành ô trống khi chép, nếu không -999 thành đầu vào.
 # Đọc tệp dưới dạng chữ để các cột cũ giữ nguyên từng ký tự. Thư mục thuộc tính và D_gauges không đổi nên trỏ liên kết.
 # Tệp đã có (Persistence giữ lại) thì bỏ qua. Kiểm: số tệp, 3 lưu vực ngẫu nhiên, thống kê qmean đọc bằng hàm của thư viện.

@@ -175,7 +175,7 @@ Nguồn: bản fork NeuralHydrology của tác giả (`datasetzoo/basedataset.py
 | Bước | Việc | Chi tiết trong mã |
 |---|---|---|
 | 1. Đọc dữ liệu | Mỗi lưu vực một tệp CSV ngày | Khí tượng mức A (31 biến tái phân tích + 5 biến ECMWF; `qmean` ở biến thể có Q đọc từ thư mục riêng của tác giả); nhãn `qmax` đọc từ tệp trạm (m³/s) và chia theo diện tích `area_gov` thành mm/ngày; 33 thuộc tính tĩnh |
-| 2. Cắt theo kỳ | Train 2003–2009, validation 2010–2013, test 2014–2017 | Mỗi kỳ nạp thêm 364 ngày khởi động trước ngày bắt đầu; nhãn trong giai đoạn khởi động bị đặt thành rỗng |
+| 2. Cắt theo kỳ | Train 2003–2009, validation 2010–2013, test 2014–2017 | Mỗi kỳ nạp thêm 364 ngày khởi động trước ngày bắt đầu; nhãn trong giai đoạn khởi động bị đặt thành NaN (ô trống), đầu vào giữ số thật; kỳ train có khởi động 2/1/2002–31/12/2002 |
 | 3. Thống kê chuẩn hóa | Tính trên kỳ train, lưu `train_data_scaler.yml` | z-score toàn cục mỗi biến (trung bình, độ lệch chuẩn qua mọi lưu vực và ngày); thuộc tính tĩnh chuẩn hóa qua 451 lưu vực; riêng hàm mất mát cần độ lệch chuẩn `qmax` của từng lưu vực, tính trên dữ liệu chưa chuẩn hóa |
 | 4. Lọc mẫu | Mỗi mẫu = một lưu vực × một ngày t | Khi huấn luyện, mẫu bị loại nếu **bất kỳ biến động nào trong 37 cột có giá trị thiếu ở bất kỳ ngày nào của cửa sổ 365 ngày** (kể cả các cột ECMWF ở những ngày mô hình không dùng tới), hoặc nhãn thiếu, hoặc thuộc tính thiếu; khi validation và test, giữ mọi mẫu đủ lịch sử |
 | 5. Lấy mẫu | Trộn ngẫu nhiên mẫu của mọi lưu vực | Batch 256 mẫu |

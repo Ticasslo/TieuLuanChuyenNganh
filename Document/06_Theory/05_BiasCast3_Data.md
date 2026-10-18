@@ -271,7 +271,7 @@ Khí tượng gần như không thiếu (cuối phần Thiếu), nên mục này
 
 **Lưu lượng thiếu là gì.** Ngày thiếu lưu lượng là ngày không có số `qmean`, `qmax` trong tệp trạm. Lỗ hổng ngắn ở chuỗi giờ gốc đã được nội suy (Mục 3.1) nên các ngày đó **có số, không tính là thiếu**; ngày thiếu đến từ lỗ dài hơn 6 giờ (chuỗi giờ gốc ghi −999) và từ thời gian trước khi trạm bắt đầu đo. Bài LamaH-CE không nói một ngày có vài giờ −999 thì giá trị ngày được tính thế nào.
 
-**Lưu lượng thiếu trông thế nào trong tệp.** Tệp trạm của bản mở rộng không có ô nào ghi −999. Ngày thiếu có hai dạng: cả dòng của ngày đó không có trong tệp (hay gặp trước ngày trạm bắt đầu đo), hoặc dòng có nhưng ô để trống. `qmax` và `qmean` luôn thiếu cùng ngày ([LamaH] Mục 6.1). Khi đọc, bộ nạp đưa mọi lưu vực về một trục ngày liên tục, ngày không có dòng thành NaN ([Mã] `datasetzoo/basedataset.py` dòng 446–447), giá trị âm cũng thành NaN (Phần 1, Mục 1.4). Tóm lại, dù lưu lượng thiếu kiểu nào, mô hình đều thấy NaN.
+**Lưu lượng thiếu trông thế nào trong tệp.** Trong kỳ 2003–2017 của 451 lưu vực, tệp trạm của bản mở rộng không có ô nào ghi −999 ([LamaH] Mục 6.1; các năm khác, kể cả năm khởi động 2002, chưa kiểm). Ngày thiếu có hai dạng: cả dòng của ngày đó không có trong tệp (hay gặp trước ngày trạm bắt đầu đo), hoặc dòng có nhưng ô để trống. `qmax` và `qmean` luôn thiếu cùng ngày ([LamaH] Mục 6.1). Khi đọc, bộ nạp đưa mọi lưu vực về một trục ngày liên tục, ngày không có dòng thành NaN ([Mã] `datasetzoo/basedataset.py` dòng 446–447), giá trị âm cũng thành NaN (Phần 1, Mục 1.4). Tóm lại, dù lưu lượng thiếu kiểu nào, mô hình đều thấy NaN.
 
 **Lưu lượng thiếu bao nhiêu** — `qmax` của 451 lưu vực ([LamaH] Mục 6.1):
 
@@ -345,6 +345,7 @@ Hai lưu vực này kéo **trung bình** NSE của 451 lưu vực xuống mạnh
 | Câu hỏi | Cách kiểm |
 |---|---|
 | Thiếu ở đâu, khi nào | bản đồ nhiệt lưu vực × năm, độ dài từng đoạn thiếu |
+| Có ô −999 ngoài kỳ 2003–2017 không | đếm ô âm của `qmean`, `qmax` theo năm trên toàn chuỗi 1981–2017 |
 | Mất bao nhiêu mẫu | đếm mẫu còn lại sau bộ lọc của bài, cho từng cấu hình (có/không `qmean`, quá khứ 365 hay 730 ngày) |
 | Đứng giá trị | đếm đoạn từ 10 ngày liền cùng giá trị ở mỗi lưu vực |
 | Ngoại lai | ngày có `qmax` lệch rất xa phần còn lại của chính lưu vực đó, xem từng trường hợp |
@@ -985,7 +986,7 @@ Gộp các bảng "Bước A1 kiểm gì" của từng mục, xếp theo nhóm v
 | Nhóm | Việc kiểm | Từ mục |
 |---|---|---|
 | Nguồn gốc `qmax` | tính lại `qmax` ngày từ chuỗi giờ gốc (`lamah-ce-core`, 00:00–23:59 GMT) và so với bản mở rộng, đặc biệt ở ngày có giờ bị gắn cờ; đếm ngày có `qmax` theo năm ở trạm Séc | 3.1, 3.4 |
-| Dữ liệu thiếu | bản đồ nhiệt lưu vực × năm, độ dài đoạn thiếu; số mẫu còn lại sau bộ lọc cho từng cấu hình (có/không `qmean`, quá khứ 365 hay 730 ngày) | 3.4 |
+| Dữ liệu thiếu | bản đồ nhiệt lưu vực × năm, độ dài đoạn thiếu; ô −999 ngoài kỳ 2003–2017; số mẫu còn lại sau bộ lọc cho từng cấu hình (có/không `qmean`, quá khứ 365 hay 730 ngày) | 3.4 |
 | Số đáng ngờ | đoạn từ 10 ngày liền cùng giá trị; ngoại lai theo từng lưu vực; lưu vực 742, 758 (chuỗi nhiều năm, thuộc tính, cờ) | 3.4 |
 | Ngưỡng bốn mức | phân vị tại p = 0,02; 0,2; 0,7 trên `qmax` 1981–2013; độ ổn định (1981–1997 so với 1998–2013); ngày `qmax` = 0; tỉ lệ ngày thực tế mỗi mức; đường duy trì của vài lưu vực đại diện | 3.5 |
 | Ngưỡng lũ | Gumbel L-moments trên đỉnh năm thủy văn 1981–2013, mức 1,5; 2; 5; 10 năm; số năm đủ số liệu (đánh dấu dưới 10 năm); hình khớp Gumbel; so ngưỡng 1,5 năm với ngưỡng "rất cao" | 3.6 |

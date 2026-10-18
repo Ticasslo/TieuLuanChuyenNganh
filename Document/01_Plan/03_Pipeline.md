@@ -244,13 +244,13 @@ Số lần huấn luyện ghi dạng "cấu hình × hạt giống". Mỗi bư�
 | A2 | Kiểm đơn vị `qmean` và dựng thư mục Q (Mục 3.3); chạy lại trọng số tác giả trên kỳ test cho 6 cấu hình: Sequential Forecast LSTM và Encoder–Decoder LSTM, mỗi loại có và không có lưu lượng quá khứ, mốc dưới 𝒟FC, mốc trên 𝒟RA (đúng sáu run của Hình 7, mục 3.4 của bài, bao trùm 3 kiến trúc, có/không Q, hai loại nhúng, hai nguồn dữ liệu; lý do chọn ở `03_Data/01_LamaHCE.md` Mục 6.3); lưu dự báo cho A3 | 0 | NSE trung vị lệch số của tác giả không quá 0,005 |
 | A3 | Mốc so sánh, sau A1: persistence (tính lại), PNSE, KGE (r, α, β) cho 6 cấu hình của A2 và persistence, tính trên dự báo đã lưu ở A2; DLinear bản gốc trên `qmean` quá khứ (Mục 4.2), cách chuẩn hóa `qmean` (chung mọi lưu vực hay riêng từng lưu vực) và xử lý ô trống trong 365 ngày quá khứ quyết theo kết quả khảo sát của A1 | 1 × 3 | |
 | A4 | Đo thời gian 1 epoch trên T4 (phần đo thời gian của bước 0) rồi huấn luyện lại Sequential Forecast LSTM có lưu lượng quá khứ theo cấu hình tác giả, giữ nguyên cả lỗi lưu mô hình tốt nhất (sửa ở B1), hạt giống 111 (của tác giả), 222, 333 — đo nhiễu hạt giống (B0) | 1 × 3 | Có độ lệch chuẩn giữa hạt giống; NSE trung vị gần 0,705 của bài |
-| B1 | B0 + sửa lỗi lưu mô hình tốt nhất + Q cùng đơn vị mm/ngày với nhãn (nếu A2 xác nhận tác giả dùng đơn vị khác) + thêm `qmax` quá khứ vào nhóm Q | 1 × 3 | |
+| B1 | B0 + sửa lỗi lưu mô hình tốt nhất + Q cùng đơn vị mm/ngày với nhãn (A2 xác nhận tác giả đưa `qmean` theo m³/s, `01_LamaHCE.md` Mục 6.3) + thêm `qmax` quá khứ vào nhóm Q | 1 × 3 | |
 | B2 | B1 + nhúng theo nguồn, masked mean + sửa bộ lọc mẫu | 1 × 3 | |
 | B3 | B2 + che dữ liệu khi huấn luyện, hai mức xác suất (0,1/0,12 và 0,05/0,05) | 2 × 3 | |
 | B* | Chọn "LSTM cải tiến" bằng luật cố định, chỉ dùng kỳ validation: trong các cấu hình B1–B3 có NSE trung vị S0 kém cấu hình tốt nhất không quá độ lệch chuẩn giữa hạt giống của NSE trung vị validation (đo ở A4), chọn cấu hình có NSE trung vị trung bình qua S1–S4 cao nhất; hòa thì chọn cấu hình đơn giản hơn. Kết quả trên test của mọi cấu hình B vẫn báo cáo đủ | 0 | Luật chọn ghi trước khi chạy để tránh chọn theo test |
 | C1 | Tinh chỉnh 5 lõi (LSTM, GRU, Transformer, S4D, Mamba) trên quy trình B* | 5 × 8 × 1 | |
 | C2 | Chạy chính thức: cấu hình cùng tham số và cấu hình tốt nhất của mỗi lõi | tối đa 5 × 2 × 3 | |
-| D | Hindcast 730 ngày cho LSTM, Mamba, S4D (cấu hình tốt nhất) | 3 × 3 | |
+| D | Hindcast 730 ngày cho LSTM, Mamba, S4D (cấu hình tốt nhất) | 3 × 3 | ECMWF HRES chỉ có từ 01/01/2002; bộ lọc mẫu gốc kiểm mọi cột trên cả khung nên với 730 ngày bỏ gần hết mẫu train năm 2003 (`01_LamaHCE.md` Mục 6.1); bộ lọc đã sửa ở B2 không bị ảnh hưởng. Nếu cấu hình tốt nhất không gồm B2 thì so 365 và 730 ngày trên cùng tập mẫu (chưa chốt cách xử lý) |
 | E | Mamba hai chiều; Transformer patch (dự phòng: Transformer tích chập, S5D) | 2 × 3 (+2 × 3) | Chỉ làm nếu C xong |
 | F | CMAL cho LSTM cải tiến và lõi SSM tốt nhất | 2 × 3 | |
 | H | Dự báo 1–7 ngày cho LSTM cải tiến và lõi SSM tốt nhất: cách (a), (b), (c) | 2 × 3 × 3 | Làm ngay sau C; ưu tiên hơn E |
@@ -371,7 +371,7 @@ Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba
 | Giai đoạn | BiasCast | Đề tài | Giống / khác |
 |---|---|---|---|
 | Dữ liệu | ERA5-Land, E-OBS, MSWEP, GLEAM, ECMWF HRES theo lưu vực | Cùng dữ liệu Zenodo | Giống |
-| Bộ nạp | Loại mẫu có bất kỳ giá trị thiếu nào; Q đầu vào `qmean` theo m³/s, khác đơn vị nhãn mm/ngày (A2 Phần 3) | Sửa bộ lọc; nhóm theo nguồn; Q cùng đơn vị với nhãn | Sửa, mở rộng |
+| Bộ nạp | Khi huấn luyện, loại mẫu có bất kỳ giá trị thiếu nào trong khung (kể cả ô mô hình không dùng); Q đầu vào `qmean` theo m³/s, khác đơn vị nhãn mm/ngày (A2 Phần 3) | Sửa bộ lọc; nhóm theo nguồn; Q cùng đơn vị với nhãn | Sửa, mở rộng |
 | Mô hình | Chỉ LSTM (tác giả tự nêu hạn chế, Mục 3.7) | LSTM, GRU, Transformer, S4D, Mamba trong khung chung | Khoảng trống chính |
 | Huấn luyện | NSE*, tối ưu Bayes, 1 hạt giống | Giữ NSE* và lịch học; tinh chỉnh cùng ngân sách; 3 hạt giống | Khác số hạt giống, giao thức tinh chỉnh |
 | Đánh giá | NSE, KGE; cận trên, cận dưới | Thêm persistence, PNSE, theo mức, theo sự kiện lũ, kịch bản vận hành, kiểm định | Mở rộng |

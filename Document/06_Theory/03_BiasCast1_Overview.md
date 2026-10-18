@@ -158,7 +158,7 @@ Bộ dữ liệu có 859 lưu vực; bài chỉ dùng 451 lưu vực "no and low
 | 2016 | 05 | 15 | 30,7 | 14,2 | 61,5 | ngày mưa lớn, đỉnh vọt lên |
 | 2016 | 05 | 16 | | | | trạm không có số đo: ô để trống |
 
-- Ngày thiếu trong tệp trạm của bản mở rộng là ô để trống hoặc thiếu cả dòng, không có ô nào ghi −999 (Phần 3, Mục 3.4); pandas đọc ô trống thành NaN. Bộ LamaH-CE gốc thì ghi giá trị thiếu là −999, nên bộ nạp còn đổi mọi giá trị âm của cột nhãn thành NaN ([Mã] dòng 229); nếu giữ −999, mô hình sẽ học một "lưu lượng âm" không có thật.
+- Ngày thiếu trong tệp trạm của bản mở rộng là ô để trống hoặc thiếu cả dòng; trong kỳ 2003–2017 của 451 lưu vực không có ô nào ghi −999 (Phần 3, Mục 3.4; các năm khác chưa kiểm); pandas đọc ô trống thành NaN. Bộ LamaH-CE gốc thì ghi giá trị thiếu là −999, nên bộ nạp còn đổi mọi giá trị âm của cột nhãn thành NaN ([Mã] dòng 229); nếu giữ −999, mô hình sẽ học một "lưu lượng âm" không có thật.
 - `qmean`, `qmin`, `qmax` là lưu lượng trung bình, nhỏ nhất, lớn nhất trong ngày. Bản LamaH-CE theo ngày gốc chỉ có lưu lượng trung bình; tác giả trích cực tiểu và cực đại ngày từ dữ liệu theo giờ của LamaH-CE ([Bài] dòng 80). Mã thực hiện bước trích này không công khai; về ý tưởng, mỗi ngày lấy giá trị nhỏ nhất và lớn nhất trong các giá trị giờ của ngày đó. LamaH-CE tính `qmean` ngày từ các giá trị giờ trong khoảng 00:00–23:59 GMT (Klingler và cs., ESSD 2021, mục 4.1, tr. 4533); tác giả BiasCast có dùng cùng ranh giới ngày khi trích `qmin`, `qmax` hay không thì chưa kiểm được vì mã trích không công khai ([Cơ sở] Mục 3).
 - **Vì sao dự báo qmax:** lũ gây thiệt hại tại thời điểm đỉnh; trung bình ngày làm phẳng đỉnh. Trong ví dụ trên, ngày 15/05 có qmean 30,7 nhưng qmax 61,5 m³/s.
 

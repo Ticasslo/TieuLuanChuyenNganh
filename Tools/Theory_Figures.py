@@ -11,6 +11,8 @@
 #            trên đường duy trì của một lưu vực, ba chỉ số %BiasFHV, %BiasFMS, %BiasFLV,
 #            ngưỡng chu kỳ lặp lại từ đỉnh năm (Gumbel, L-moments), ghép sự kiện lũ trong cửa sổ ±1 ngày,
 #            bảng 2x2 chấm theo trận và ví dụ cửa sổ ±1/±2 ngày, trục năm của các kỳ dữ liệu
+#   Phần 4 — Hình của Phần 4 BiasCast: ghép biến và đổi trục trên một lô thu nhỏ,
+#            thuộc tính nhúng một lần rồi lặp theo ngày, kích thước tensor của một lô thật
 
 import math
 from pathlib import Path
@@ -665,6 +667,132 @@ def fig_period_timeline():
               f"One grid column = one year (darker line every 5 years); each bar starts on 1 January of its first year</text>")
     save("BiasCast3_Periods.svg", el, height=height, width=width)
 
+# %% Phần 4 — Hình của Phần 4 BiasCast
+RAIN = {"A": [5, 0, 12], "B": [2, 8, 1]}     # lô thu nhỏ: 2 mẫu x 3 ngày, biến mưa (số tự đặt)
+TEMP = {"A": [10, 11, 9], "B": [3, 4, 6]}    # biến nhiệt độ của cùng lô
+VAR_FILL = {"rain": "#dbe9f6", "temp": "#fde4cf", "e1": "#e2efda", "e2": "#e2efda", "s1": "#ead1dc"}
+
+
+def grid(el, x, y, rows, cols, vals, title=None, cw=52, ch=26, lw=62):
+    # Vẽ một bảng nhỏ: nhãn hàng bên trái, nhãn cột ở trên, ô tô màu theo tên cột; trả về đáy bảng.
+    if title:
+        el.append(f"<text x='{x + lw + cw * len(cols) / 2}' y='{y - 6}' text-anchor='middle' font-size='12' font-weight='bold' {FONT}>{title}</text>")
+    for j, c in enumerate(cols):
+        el.append(f"<text x='{x + lw + cw * j + cw / 2}' y='{y + 16}' text-anchor='middle' font-size='11' fill='#444' {FONT}>{c}</text>")
+    for i, r in enumerate(rows):
+        ry = y + 22 + ch * i
+        el.append(f"<text x='{x + lw - 8}' y='{ry + 17}' text-anchor='end' font-size='11' fill='#444' {FONT}>{r}</text>")
+        for j, c in enumerate(cols):
+            el.append(f"<rect x='{x + lw + cw * j}' y='{ry}' width='{cw}' height='{ch}' fill='{VAR_FILL.get(c, '#f2f2f2')}' stroke='#666'/>")
+            el.append(f"<text x='{x + lw + cw * j + cw / 2}' y='{ry + 17}' text-anchor='middle' font-size='12' {FONT}>{vals[i][j]}</text>")
+    return y + 22 + ch * len(rows)
+
+
+def section(el, y, text, sub):
+    # Tiêu đề một bước (đậm) kèm một dòng giải thích.
+    el.append(f"<text x='20' y='{y}' font-size='14' font-weight='bold' {FONT}>{text}</text>")
+    el.append(f"<text x='20' y='{y + 17}' font-size='11' fill='#555' {FONT}>{sub}</text>")
+
+
+def arrow(el, x1, y1, x2, y2, label=None):
+    # Mũi tên thẳng, nhãn (nếu có) đặt phía trên giữa mũi tên.
+    el.append(f"<line x1='{x1}' y1='{y1}' x2='{x2}' y2='{y2}' stroke='#444' stroke-width='1.5' marker-end='url(#arr)'/>")
+    if label:
+        el.append(f"<text x='{(x1 + x2) / 2}' y='{min(y1, y2) - 9}' text-anchor='middle' font-size='11' fill='#444' {FONT}>{label}</text>")
+
+
+def fig_tensor_concat():
+    # Ba bước của lớp đầu vào trên một lô thu nhỏ: mỗi biến một tensor, ghép theo trục cuối, đổi trục lô/ngày.
+    width, height = 860, 640
+    days = ["day 1", "day 2", "day 3"]
+    el = [f"<rect width='{width}' height='{height}' fill='white'/>", ARROW,
+          f"<text x='{width / 2}' y='24' text-anchor='middle' font-size='15' font-weight='bold' {FONT}>"
+          f"From one tensor per variable to LSTM input (toy batch: 2 samples, 3 days, 2 variables)</text>"]
+    section(el, 56, "Step 1. Loader output: one tensor per variable, shape (samples, days, 1) = (2, 3, 1)",
+            "Each variable is a single column of numbers, so its last axis has size 1")
+    for k, (name, data) in enumerate((("rain", RAIN), ("temp", TEMP))):
+        grid(el, 60 + 400 * k, 100, ["sample A", "sample B"], days, [data["A"], data["B"]], title=f"{name}: (2, 3, 1)")
+    section(el, 210, "Step 2. torch.cat(dim=-1): put the variables side by side, (2, 3, 1) + (2, 3, 1) = (2, 3, 2)",
+            "Each day of each sample is now one row of 2 numbers [rain, temp]; in BiasCast 32 columns of size 1 give 32")
+    for k, sm in enumerate(("A", "B")):
+        rows = [[RAIN[sm][d], TEMP[sm][d]] for d in range(3)]
+        grid(el, 60 + 400 * k, 254, days, ["rain", "temp"], rows, title=f"sample {sm}: (3, 2)")
+    section(el, 390, "Step 3. transpose(0, 1): swap the sample and day axes, (2, 3, 2) -> (3, 2, 2)",
+            "Same numbers, regrouped by day: the LSTM reads day 1 for all samples, then day 2, then day 3")
+    for d in range(3):
+        rows = [[RAIN[sm][d], TEMP[sm][d]] for sm in ("A", "B")]
+        x = 40 + 280 * d
+        bottom = grid(el, x, 434, ["sample A", "sample B"], ["rain", "temp"], rows, title=f"{days[d]}: (2, 2)")
+        if d < 2:
+            mid = (434 + 22 + bottom) / 2
+            arrow(el, x + 176, mid, x + 266, mid, "LSTM next step")
+    for k, line in enumerate(("Real BiasCast batch: 32 tensors (256, 364, 1) -> cat -> (256, 364, 32) -> transpose -> (364, 256, 32)",
+                              "ECMWF HRES: 5 tensors (256, 1, 1) -> cat -> (256, 1, 5) -> transpose -> (1, 256, 5)")):
+        el.append(f"<text x='{width / 2}' y='{565 + 22 * k}' text-anchor='middle' font-size='13' {FONT}>{line}</text>")
+    el.append(f"<text x='{width / 2}' y='{height - 14}' text-anchor='middle' font-size='11' fill='#555' {FONT}>"
+              f"Numbers are made up; colours mark the variable (blue = rain, orange = temperature)</text>")
+    save("BiasCast4_Tensor_Concat.svg", el, height=height, width=width)
+
+
+def chain(el, x, y, boxes, fill, bw=190, bh=40, gap=26):
+    # Một chuỗi hộp nối bằng mũi tên theo hàng ngang; mỗi hộp hai dòng chữ; trả về mép phải hộp cuối.
+    for k, (top, bottom) in enumerate(boxes):
+        bx = x + (bw + gap) * k
+        el.append(f"<rect x='{bx}' y='{y}' width='{bw}' height='{bh}' rx='5' fill='{fill}' stroke='#666'/>")
+        el.append(f"<text x='{bx + bw / 2}' y='{y + 16}' text-anchor='middle' font-size='11' font-weight='bold' {FONT}>{top}</text>")
+        el.append(f"<text x='{bx + bw / 2}' y='{y + 31}' text-anchor='middle' font-size='11' {FONT}>{bottom}</text>")
+        if k < len(boxes) - 1:
+            arrow(el, bx + bw, y + bh / 2, bx + bw + gap - 2, y + bh / 2)
+    return x + (bw + gap) * len(boxes) - gap
+
+
+def fig_tensor_static():
+    # Thuộc tính nhúng một lần rồi lặp cho mọi ngày, nối với nhúng động (ví dụ số của Mục 4.2), và kích thước thật của một lô.
+    width, height = 900, 700
+    days = ["day 1", "day 2", "day 3"]
+    dyn = [[0.9, -0.53], [0.4, 0.1], [-0.2, 0.7]]   # nhúng động 2 chiều của mẫu A (ngày 1 là ví dụ Mục 4.2)
+    stat = 0.15                                     # nhúng thuộc tính 1 chiều của mẫu A (ví dụ Mục 4.2)
+
+    def fmt(v):
+        return num(v, "g")
+
+    el = [f"<rect width='{width}' height='{height}' fill='white'/>", ARROW,
+          f"<text x='{width / 2}' y='24' text-anchor='middle' font-size='15' font-weight='bold' {FONT}>"
+          f"Catchment attributes: embedded once, repeated for every day, then concatenated (sample A)</text>"]
+    y0 = 80
+    b = grid(el, 20, y0, days, ["e1", "e2"], [[fmt(v) for v in r] for r in dyn], title="dynamic embedding (3, 2)")
+    el.append(f"<text x='{20 + 62 + 52}' y='{b + 18}' text-anchor='middle' font-size='11' fill='#555' {FONT}>changes every day</text>")
+    grid(el, 200, y0 + 26, ["once"], ["s1"], [[fmt(stat)]], title="attribute embedding (1)")
+    el.append(f"<text x='{200 + 62 + 26}' y='{y0 + 92}' text-anchor='middle' font-size='11' fill='#555' {FONT}>no day axis</text>")
+    arrow(el, 322, y0 + 61, 414, y0 + 61, "repeat")
+    grid(el, 400, y0, days, ["s1"], [[fmt(stat)]] * 3, title="repeated (3, 1)")
+    arrow(el, 522, y0 + 61, 614, y0 + 61, "cat")
+    grid(el, 600, y0, days, ["e1", "e2", "s1"], [[fmt(r[0]), fmt(r[1]), fmt(stat)] for r in dyn], title="LSTM input (3, 3)")
+    section(el, 250, "Real model, one batch of 256 samples: hindcast branch (364 days) and forecast branch (day t)",
+            "Each branch has its own dynamic and attribute embedding; both end with 16 + 16 = 32 numbers per day")
+    branches = (("hindcast", 290, "32 inputs", 32, 364, "#dbe9f6"), ("forecast", 400, "5 ECMWF HRES", 5, 1, "#e2efda"))
+    for name, y, label, nv, nd, fill in branches:
+        # Hàng trên: biến động của nhánh; hàng dưới: thuộc tính tĩnh nhúng riêng cho nhánh đó; hộp phải: ghép.
+        right = chain(el, 20, y, [(label, f"{nv} x (256, {nd}, 1)"), ("cat + transpose", f"({nd}, 256, {nv})"),
+                                  (f"embed {nv} -> 16", f"({nd}, 256, 16)")], fill, bw=180)
+        chain(el, 20, y + 50, [("33 attributes", "(256, 33)"), ("embed 33 -> 16", "(256, 16)"),
+                               ("repeat each day", f"({nd}, 256, 16)")], "#ead1dc", bw=180)
+        arrow(el, right, y + 20, right + 40, y + 40)
+        arrow(el, right, y + 70, right + 40, y + 50)
+        el.append(f"<rect x='{right + 42}' y='{y + 25}' width='190' height='40' rx='5' fill='#f2f2f2' stroke='#666'/>")
+        el.append(f"<text x='{right + 137}' y='{y + 41}' text-anchor='middle' font-size='11' font-weight='bold' {FONT}>{name}: 16 + 16 = 32</text>")
+        el.append(f"<text x='{right + 137}' y='{y + 56}' text-anchor='middle' font-size='11' {FONT}>({nd}, 256, 32)</text>")
+    el.append(f"<text x='{width / 2}' y='522' text-anchor='middle' font-size='12' font-weight='bold' {FONT}>"
+              f"cat along the day axis: 364 + 1 = 365 steps -> one shared LSTM (hidden size 128)</text>")
+    chain(el, 20, 545, [("LSTM output", "(364, 256, 128) + (1, 256, 128)"), ("transpose back + cat", "(256, 365, 128)"),
+                        ("dropout, linear 128 -> 1", "prediction (256, 365, 1)")], "#e2efda", bw=240)
+    chain(el, 20, 615, [("qmax label", "(256, 365, 1), not transposed"), ("loss", "last day only (predict_last_n = 1)")],
+          "#fde4cf", bw=240)
+    el.append(f"<text x='{width / 2}' y='{height - 14}' text-anchor='middle' font-size='11' fill='#555' {FONT}>"
+              f"Two different 32s: 32 input variables before the embedding; 16 + 16 embedding dimensions entering the LSTM</text>")
+    save("BiasCast4_Tensor_Static.svg", el, height=height, width=width)
+
+
 if __name__ == "__main__":
     fig_cdf_steps()
     fig_cdf_compare()
@@ -678,3 +806,5 @@ if __name__ == "__main__":
     fig_event_match()
     fig_event_table()
     fig_period_timeline()
+    fig_tensor_concat()
+    fig_tensor_static()

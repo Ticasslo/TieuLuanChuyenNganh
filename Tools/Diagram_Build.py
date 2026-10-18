@@ -54,9 +54,9 @@ BANDS = [
         ("33 thuộc tính tĩnh · nhãn qmax ngày t (mm/ngày theo diện tích)", []),
     ]),
     ("2. Tiền xử lý", [
-        ("Chia tập: huấn luyện 2003–2009, kiểm định 2010–2013, kiểm tra 2014–2017 · z-score theo tập huấn luyện",
+        ("Chia tập: huấn luyện 2003–2009, kiểm định 2010–2013, kiểm tra 2014–2017; mỗi tập thêm 364 ngày khởi động chỉ làm đầu vào (huấn luyện: 2002) · z-score theo tập huấn luyện",
          [("A", "A1. Ngưỡng mức và ngưỡng lũ tính trên 1981–2013 (trước kỳ kiểm tra)")]),
-        ("Lọc: thiếu 1 biến ở 1 ngày là loại cả mẫu 365 ngày",
+        ("Lọc (chỉ tập huấn luyện): thiếu 1 ô đầu vào ở 1 ngày là loại mọi mẫu có ngày đó trong khung (365 mẫu); tập kiểm tra ra NaN",
          [("B", "B2. Sửa bộ lọc: giữ mẫu thiếu đầu vào, chỉ loại khi thiếu nhãn")]),
         ("Lô 256, trộn giữa các lưu vực", []),
     ]),
