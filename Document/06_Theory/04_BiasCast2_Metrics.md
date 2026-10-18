@@ -160,7 +160,7 @@ Ba mốc đều không dùng lưu lượng quá khứ. Nguồn: [Bài] dòng 104
 
 | Hướng | Ý tưởng cơ bản | Cách bài làm | NSE trung vị |
 |---|---|---|---|
-| Học chuyển giao (*transfer learning*) | Một mô hình đã học xong việc A được dùng làm điểm xuất phát để học tiếp việc B gần giống, thay vì học từ đầu. VD mô hình đã biết quan hệ mưa → dòng chảy trên dữ liệu tốt, chỉ cần học thêm cách đọc dữ liệu dự báo | Lấy trọng số của 𝒟RA, huấn luyện tiếp (tinh chỉnh) trên dữ liệu chỉ có dự báo như 𝒟FC; hai biến thể: cập nhật mọi trọng số (TL AllWeights), hoặc chỉ cập nhật lớp nhúng, giữ nguyên LSTM (TL EmbeddingNet) ([Bài] dòng 158–168) | 0,41 (mọi trọng số); 0,39 (chỉ lớp nhúng) |
+| Học chuyển giao (*transfer learning*) | Một mô hình đã học xong việc A được dùng làm điểm xuất phát để học tiếp việc B gần giống, thay vì học từ đầu. VD mô hình đã biết quan hệ mưa → dòng chảy trên dữ liệu tốt, chỉ cần học thêm cách đọc dữ liệu dự báo | Lấy trọng số của 𝒟RA, huấn luyện tiếp (tinh chỉnh) trên dữ liệu chỉ có dự báo như 𝒟FC; hai biến thể: cập nhật mọi trọng số (TL AllWeights), hoặc chỉ cập nhật lớp nhúng, giữ nguyên LSTM (TL EmbeddingNet) ([Bài] dòng 158–168) | 0,41 (mọi trọng số); 0,44 (chỉ lớp nhúng, lớp nhúng phức tạp — bản bài dùng để kết luận, [Bài] dòng 236); bản chỉ lớp nhúng với lớp nhúng đơn giản 0,39 |
 | Encoder–Decoder LSTM | Hai LSTM nối tiếp: LSTM thứ nhất (encoder — bộ mã hóa) đọc 364 ngày quá khứ bằng tái phân tích; trạng thái nhớ của nó đi qua một mạng nhỏ (handoff) sang LSTM thứ hai (decoder — bộ giải mã) đọc dự báo ngày t | Kiến trúc của Nearing và cs. (2024) ([Bài] dòng 132–134) | 0,57 |
 | Sequential Forecast LSTM | Một LSTM duy nhất đọc liền mạch cả hai pha | Như bảng trên ([Bài] dòng 146) | 0,63; có lưu lượng quá khứ 0,71 |
 
@@ -173,8 +173,8 @@ Encoder–Decoder và Sequential nhận cùng dữ liệu (tái phân tích cho 
 | Mô hình | NSE trung vị |
 |---|---|
 | 𝒟FC — mốc dưới | 0,39 |
-| Học chuyển giao, chỉ lớp nhúng | 0,39 |
 | Học chuyển giao, mọi trọng số | 0,41 |
+| Học chuyển giao, chỉ lớp nhúng (lớp nhúng phức tạp) | 0,44 |
 | Encoder–Decoder LSTM | 0,57 |
 | Sequential Forecast LSTM | 0,63 |
 | 𝒟FCRA | 0,68 |
@@ -188,6 +188,7 @@ tỷ lệ lấp = (NSE mô hình − NSE mốc dưới) / (NSE mốc trên − N
 | Mô hình | Tỷ lệ lấp |
 |---|---|
 | Học chuyển giao, mọi trọng số | (0,41 − 0,39) / 0,30 ≈ 7% |
+| Học chuyển giao, chỉ lớp nhúng | (0,44 − 0,39) / 0,30 ≈ 17% |
 | Encoder–Decoder LSTM | (0,57 − 0,39) / 0,30 = 60% |
 | Sequential Forecast LSTM | (0,63 − 0,39) / 0,30 = 80% |
 | Sequential Forecast LSTM có lưu lượng quá khứ | (0,71 − 0,39) / 0,30 ≈ 107% — vượt mốc trên |

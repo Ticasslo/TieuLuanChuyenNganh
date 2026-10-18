@@ -13,6 +13,7 @@
 #            bảng 2x2 chấm theo trận và ví dụ cửa sổ ±1/±2 ngày, trục năm của các kỳ dữ liệu
 #   Phần 4 — Hình của Phần 4 BiasCast: ghép biến và đổi trục trên một lô thu nhỏ,
 #            thuộc tính nhúng một lần rồi lặp theo ngày, kích thước tensor của một lô thật
+#   Phần 5 — Hình của Phần 5 BiasCast: dữ liệu từng thí nghiệm đọc trong khung 365 ngày (một pha hay hai pha)
 
 import math
 from pathlib import Path
@@ -126,12 +127,13 @@ def fig_benchmark_ruler():
     items = [  # (tên, NSE trung vị, màu, độ lệch dọc của nhãn so với thước, căn chữ)
         ("Lower benchmark: forecast only (𝒟FC)", 0.39, "#757575", 45, "start"),
         ("Transfer learning, all weights", 0.41, "#1f77b4", -75, "start"),
+        ("Transfer learning, embedding only", 0.44, "#17becf", -145, "start"),
         ("Encoder–Decoder LSTM", 0.57, "#9467bd", 80, "middle"),
         ("Sequential Forecast LSTM", 0.63, "#ff7f0e", -40, "end"),
         ("Upper benchmark: reanalysis (𝒟RA)", 0.69, "#424242", 110, "end"),
         ("Sequential + past discharge", 0.71, "#d62728", -110, "end"),
     ]
-    x_min, x_max, h, yb = 0.35, 0.75, 340, 170
+    x_min, x_max, h, yb = 0.35, 0.75, 375, 205
     pw = W - LEFT - RIGHT
 
     def px(x):
@@ -793,6 +795,76 @@ def fig_tensor_static():
     save("BiasCast4_Tensor_Static.svg", el, height=height, width=width)
 
 
+# %% Phần 5 — Hình của Phần 5 BiasCast
+SRC_FILL = {"FC": "#a9d18e", "RA": "#9dc3e6"}   # xanh lá: ECMWF HRES; xanh dương: tái phân tích, quan trắc
+
+
+def source_box(el, x, y, w, h, srcs, text):
+    # Một ô dữ liệu: tô một màu, hoặc chia đôi trên/dưới khi có hai nguồn; chữ ở giữa ("|" tách dòng cho từng nửa ô).
+    for k, src in enumerate(srcs):
+        hh = h / len(srcs)
+        el.append(f"<rect x='{x}' y='{y + hh * k}' width='{w}' height='{hh}' fill='{SRC_FILL[src]}'/>")
+    el.append(f"<rect x='{x}' y='{y}' width='{w}' height='{h}' fill='none' stroke='#555'/>")
+    lines = text.split("|")   # ô hai nguồn: mỗi dòng chữ nằm gọn trong nửa ô của nguồn đó
+    for k, line in enumerate(lines):
+        cy = y + h * (2 * k + 1) / (2 * len(lines))
+        el.append(f"<text x='{x + w / 2}' y='{cy + 4}' text-anchor='middle' font-size='11' {FONT}>{line}</text>")
+
+
+def fig_input_layout():
+    # Mỗi thí nghiệm: 364 ngày quá khứ và ngày t nhận nguồn nào, một pha hay hai pha, NSE trung vị (Bảng F1 của bài).
+    width, height = 1110, 470
+    rows = [  # tên, vai trò, nguồn quá khứ, nguồn ngày t, chữ quá khứ, chữ ngày t, hai pha?, mô hình, NSE, vận hành
+        ("Baseline D_FC", "forecast only, lower benchmark", ["FC"], ["FC"], "ECMWF HRES forecast (5 vars)",
+         "ECMWF HRES forecast", False, "1 LSTM, 1 embedding", "0.39", "yes"),
+        ("Baseline D_RA", "reanalysis only, upper benchmark", ["RA"], ["RA"], "reanalysis (31 vars)",
+         "reanalysis of day t", False, "1 LSTM, 1 embedding", "0.69", "no"),
+        ("Baseline D_FCRA", "reanalysis + forecast", ["RA", "FC"], ["RA", "FC"], "reanalysis (31 vars)|+ ECMWF HRES forecast (5 vars)",
+         "reanalysis of day t|+ ECMWF HRES forecast", False, "1 LSTM, 1 embedding", "0.68", "no"),
+        ("Encoder-Decoder LSTM", "two LSTMs, two phases", ["RA"], ["FC"], "reanalysis (31 vars)",
+         "ECMWF HRES forecast", True, "2 LSTMs + handoff, 2 embeddings", "0.57", "yes"),
+        ("Sequential Forecast LSTM", "one LSTM, two phases", ["RA"], ["FC"], "reanalysis (31 vars), + qmean in the 0.71 run",
+         "ECMWF HRES forecast", True, "1 LSTM, 2 embeddings", "0.63 / 0.71*", "yes"),
+    ]
+    x_past, w_past, w_t, gap = 220, 290, 160, 14
+    el = [f"<rect width='{width}' height='{height}' fill='white'/>",
+          f"<text x='{width / 2}' y='26' text-anchor='middle' font-size='15' font-weight='bold' {FONT}>"
+          f"What each experiment reads in its 365-day window</text>"]
+    head_y = 62
+    for x, text in ((x_past + w_past / 2, "past 364 days (t-364 ... t-1)"), (x_past + w_past + gap + w_t / 2, "day t (day being forecast)"),
+                    (820, "architecture"), (960, "median|NSE"), (1045, "usable in|operation")):
+        parts = text.split("|")   # tiêu đề cột hẹp viết hai dòng để không chạm cột bên cạnh
+        for k, part in enumerate(parts):
+            el.append(f"<text x='{x}' y='{head_y - 14 * (len(parts) - 1 - k)}' text-anchor='middle' font-size='12' "
+                      f"font-weight='bold' {FONT}>{part}</text>")
+    for i, (name, role, past, day_t, past_txt, t_txt, two, model, nse, op) in enumerate(rows):
+        y = 80 + i * 66
+        if i == 3:
+            el.append(f"<line x1='20' y1='{y - 9}' x2='{width - 20}' y2='{y - 9}' stroke='#999' stroke-dasharray='4,3'/>")
+        el.append(f"<text x='20' y='{y + 18}' font-size='13' font-weight='bold' {FONT}>{name}</text>")
+        el.append(f"<text x='20' y='{y + 35}' font-size='11' fill='#555' {FONT}>{role}</text>")
+        x_t = x_past + w_past + (gap if two else 0)
+        source_box(el, x_past, y, w_past, 44, past, past_txt)
+        source_box(el, x_t, y, w_t, 44, day_t, t_txt)
+        if two:
+            el.append(f"<line x1='{x_past + w_past}' y1='{y + 22}' x2='{x_t}' y2='{y + 22}' stroke='#c00' stroke-width='2'/>")
+        el.append(f"<text x='820' y='{y + 26}' text-anchor='middle' font-size='11' {FONT}>{model}</text>")
+        el.append(f"<text x='960' y='{y + 26}' text-anchor='middle' font-size='12' {FONT}>{nse}</text>")
+        color = "#2e7d32" if op == "yes" else "#c62828"
+        el.append(f"<text x='1045' y='{y + 26}' text-anchor='middle' font-size='12' font-weight='bold' fill='{color}' {FONT}>{op}</text>")
+    ly = 80 + len(rows) * 66 + 6
+    for k, (src, text) in enumerate((("RA", "reanalysis / observations (ERA5-Land, E-OBS, MSWEP, GLEAM)"),
+                                     ("FC", "ECMWF HRES forecast, 1-day lead"))):
+        lx = 20 + k * 470
+        el.append(f"<rect x='{lx}' y='{ly}' width='16' height='12' fill='{SRC_FILL[src]}' stroke='#555'/>")
+        el.append(f"<text x='{lx + 22}' y='{ly + 11}' font-size='11' {FONT}>{text}</text>")
+    for k, line in enumerate(("Single-phase rows (above the dashed line): all 365 days get the same variables through one embedding; "
+                              "red link = two phases with separate embeddings.",
+                              "Usable in operation = needs no reanalysis of day t (day t has not happened yet when the forecast is made). "
+                              "* 0.71 with past discharge qmean in the hindcast. NSE: Table F1 of the paper.")):
+        el.append(f"<text x='20' y='{ly + 36 + 18 * k}' font-size='11' fill='#555' {FONT}>{line}</text>")
+    save("BiasCast5_Input_Layout.svg", el, height=height, width=width)
+
 if __name__ == "__main__":
     fig_cdf_steps()
     fig_cdf_compare()
@@ -808,3 +880,4 @@ if __name__ == "__main__":
     fig_period_timeline()
     fig_tensor_concat()
     fig_tensor_static()
+    fig_input_layout()

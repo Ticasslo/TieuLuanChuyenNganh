@@ -1,0 +1,79 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1110' height='470' viewBox='0 0 1110 470'>
+<rect width='1110' height='470' fill='white'/>
+<text x='555.0' y='26' text-anchor='middle' font-size='15' font-weight='bold' font-family='Arial, sans-serif'>What each experiment reads in its 365-day window</text>
+<text x='365.0' y='62' text-anchor='middle' font-size='12' font-weight='bold' font-family='Arial, sans-serif'>past 364 days (t-364 ... t-1)</text>
+<text x='604.0' y='62' text-anchor='middle' font-size='12' font-weight='bold' font-family='Arial, sans-serif'>day t (day being forecast)</text>
+<text x='820' y='62' text-anchor='middle' font-size='12' font-weight='bold' font-family='Arial, sans-serif'>architecture</text>
+<text x='960' y='48' text-anchor='middle' font-size='12' font-weight='bold' font-family='Arial, sans-serif'>median</text>
+<text x='960' y='62' text-anchor='middle' font-size='12' font-weight='bold' font-family='Arial, sans-serif'>NSE</text>
+<text x='1045' y='48' text-anchor='middle' font-size='12' font-weight='bold' font-family='Arial, sans-serif'>usable in</text>
+<text x='1045' y='62' text-anchor='middle' font-size='12' font-weight='bold' font-family='Arial, sans-serif'>operation</text>
+<text x='20' y='98' font-size='13' font-weight='bold' font-family='Arial, sans-serif'>Baseline D_FC</text>
+<text x='20' y='115' font-size='11' fill='#555' font-family='Arial, sans-serif'>forecast only, lower benchmark</text>
+<rect x='220' y='80.0' width='290' height='44.0' fill='#a9d18e'/>
+<rect x='220' y='80' width='290' height='44' fill='none' stroke='#555'/>
+<text x='365.0' y='106.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>ECMWF HRES forecast (5 vars)</text>
+<rect x='510' y='80.0' width='160' height='44.0' fill='#a9d18e'/>
+<rect x='510' y='80' width='160' height='44' fill='none' stroke='#555'/>
+<text x='590.0' y='106.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>ECMWF HRES forecast</text>
+<text x='820' y='106' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>1 LSTM, 1 embedding</text>
+<text x='960' y='106' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>0.39</text>
+<text x='1045' y='106' text-anchor='middle' font-size='12' font-weight='bold' fill='#2e7d32' font-family='Arial, sans-serif'>yes</text>
+<text x='20' y='164' font-size='13' font-weight='bold' font-family='Arial, sans-serif'>Baseline D_RA</text>
+<text x='20' y='181' font-size='11' fill='#555' font-family='Arial, sans-serif'>reanalysis only, upper benchmark</text>
+<rect x='220' y='146.0' width='290' height='44.0' fill='#9dc3e6'/>
+<rect x='220' y='146' width='290' height='44' fill='none' stroke='#555'/>
+<text x='365.0' y='172.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>reanalysis (31 vars)</text>
+<rect x='510' y='146.0' width='160' height='44.0' fill='#9dc3e6'/>
+<rect x='510' y='146' width='160' height='44' fill='none' stroke='#555'/>
+<text x='590.0' y='172.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>reanalysis of day t</text>
+<text x='820' y='172' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>1 LSTM, 1 embedding</text>
+<text x='960' y='172' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>0.69</text>
+<text x='1045' y='172' text-anchor='middle' font-size='12' font-weight='bold' fill='#c62828' font-family='Arial, sans-serif'>no</text>
+<text x='20' y='230' font-size='13' font-weight='bold' font-family='Arial, sans-serif'>Baseline D_FCRA</text>
+<text x='20' y='247' font-size='11' fill='#555' font-family='Arial, sans-serif'>reanalysis + forecast</text>
+<rect x='220' y='212.0' width='290' height='22.0' fill='#9dc3e6'/>
+<rect x='220' y='234.0' width='290' height='22.0' fill='#a9d18e'/>
+<rect x='220' y='212' width='290' height='44' fill='none' stroke='#555'/>
+<text x='365.0' y='227.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>reanalysis (31 vars)</text>
+<text x='365.0' y='249.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>+ ECMWF HRES forecast (5 vars)</text>
+<rect x='510' y='212.0' width='160' height='22.0' fill='#9dc3e6'/>
+<rect x='510' y='234.0' width='160' height='22.0' fill='#a9d18e'/>
+<rect x='510' y='212' width='160' height='44' fill='none' stroke='#555'/>
+<text x='590.0' y='227.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>reanalysis of day t</text>
+<text x='590.0' y='249.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>+ ECMWF HRES forecast</text>
+<text x='820' y='238' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>1 LSTM, 1 embedding</text>
+<text x='960' y='238' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>0.68</text>
+<text x='1045' y='238' text-anchor='middle' font-size='12' font-weight='bold' fill='#c62828' font-family='Arial, sans-serif'>no</text>
+<line x1='20' y1='269' x2='1090' y2='269' stroke='#999' stroke-dasharray='4,3'/>
+<text x='20' y='296' font-size='13' font-weight='bold' font-family='Arial, sans-serif'>Encoder-Decoder LSTM</text>
+<text x='20' y='313' font-size='11' fill='#555' font-family='Arial, sans-serif'>two LSTMs, two phases</text>
+<rect x='220' y='278.0' width='290' height='44.0' fill='#9dc3e6'/>
+<rect x='220' y='278' width='290' height='44' fill='none' stroke='#555'/>
+<text x='365.0' y='304.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>reanalysis (31 vars)</text>
+<rect x='524' y='278.0' width='160' height='44.0' fill='#a9d18e'/>
+<rect x='524' y='278' width='160' height='44' fill='none' stroke='#555'/>
+<text x='604.0' y='304.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>ECMWF HRES forecast</text>
+<line x1='510' y1='300' x2='524' y2='300' stroke='#c00' stroke-width='2'/>
+<text x='820' y='304' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>2 LSTMs + handoff, 2 embeddings</text>
+<text x='960' y='304' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>0.57</text>
+<text x='1045' y='304' text-anchor='middle' font-size='12' font-weight='bold' fill='#2e7d32' font-family='Arial, sans-serif'>yes</text>
+<text x='20' y='362' font-size='13' font-weight='bold' font-family='Arial, sans-serif'>Sequential Forecast LSTM</text>
+<text x='20' y='379' font-size='11' fill='#555' font-family='Arial, sans-serif'>one LSTM, two phases</text>
+<rect x='220' y='344.0' width='290' height='44.0' fill='#9dc3e6'/>
+<rect x='220' y='344' width='290' height='44' fill='none' stroke='#555'/>
+<text x='365.0' y='370.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>reanalysis (31 vars), + qmean in the 0.71 run</text>
+<rect x='524' y='344.0' width='160' height='44.0' fill='#a9d18e'/>
+<rect x='524' y='344' width='160' height='44' fill='none' stroke='#555'/>
+<text x='604.0' y='370.0' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>ECMWF HRES forecast</text>
+<line x1='510' y1='366' x2='524' y2='366' stroke='#c00' stroke-width='2'/>
+<text x='820' y='370' text-anchor='middle' font-size='11' font-family='Arial, sans-serif'>1 LSTM, 2 embeddings</text>
+<text x='960' y='370' text-anchor='middle' font-size='12' font-family='Arial, sans-serif'>0.63 / 0.71*</text>
+<text x='1045' y='370' text-anchor='middle' font-size='12' font-weight='bold' fill='#2e7d32' font-family='Arial, sans-serif'>yes</text>
+<rect x='20' y='416' width='16' height='12' fill='#9dc3e6' stroke='#555'/>
+<text x='42' y='427' font-size='11' font-family='Arial, sans-serif'>reanalysis / observations (ERA5-Land, E-OBS, MSWEP, GLEAM)</text>
+<rect x='490' y='416' width='16' height='12' fill='#a9d18e' stroke='#555'/>
+<text x='512' y='427' font-size='11' font-family='Arial, sans-serif'>ECMWF HRES forecast, 1-day lead</text>
+<text x='20' y='452' font-size='11' fill='#555' font-family='Arial, sans-serif'>Single-phase rows (above the dashed line): all 365 days get the same variables through one embedding; red link = two phases with separate embeddings.</text>
+<text x='20' y='470' font-size='11' fill='#555' font-family='Arial, sans-serif'>Usable in operation = needs no reanalysis of day t (day t has not happened yet when the forecast is made). * 0.71 with past discharge qmean in the hindcast. NSE: Table F1 of the paper.</text>
+</svg>
