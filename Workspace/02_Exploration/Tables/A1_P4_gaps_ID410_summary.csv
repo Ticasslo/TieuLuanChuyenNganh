@@ -1,0 +1,2 @@
+﻿basin_id,file_start,file_end,unique_gap_hours,short_run_hours,long_run_hours,gap_hours_outside_Q_file_span,missing_qmax_days,blank_qmax_days,long_run_hours_on_valid_qmax_days,long_run_hours_on_missing_qmax_days,assumed_full_calendar_hours,metadata_gaps_pre_permil,metadata_gaps_post_permil,pre_times_assumed_hours,post_times_assumed_hours
+410,2013-01-01,2017-12-31,3421,0,3421,0,141,141,37,3384,43824,78.085,78.062,3421.9970399999997,3420.989088

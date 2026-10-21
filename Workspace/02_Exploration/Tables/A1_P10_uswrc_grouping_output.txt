@@ -1,0 +1,108 @@
+(1) Trước/sau gộp theo quy tắc; bảo toàn ngày vượt, không gộp qua ngày thiếu:
+scope	return_period_years	basins	basins_with_clusters	eligible_valid_days	above_days	raw_runs	clusters	runs_removed	pooled_reduction_pct	median_basin_reduction_pct	clusters_with_observed_onset	clusters_with_both_contexts	unresolved_missing_boundaries
+0	reference_1981_2013	1.5	451	451	4821184	33965	16063	14146	1917	11.934259	9.375000	14146	14145	94
+1	reference_1981_2013	2.0	451	451	4821184	17883	9198	8391	807	8.773646	7.142857	8391	8390	86
+2	reference_1981_2013	5.0	451	449	4821184	4919	3023	2848	175	5.788951	0.000000	2848	2848	53
+3	reference_1981_2013	10.0	451	442	4821184	2352	1520	1456	64	4.210526	0.000000	1456	1456	32
+4	train	1.5	451	446	1112307	7137	3572	3092	480	13.437850	8.333333	3085	3084	22
+5	train	2.0	451	437	1112307	3712	2073	1851	222	10.709117	0.000000	1844	1844	17
+6	train	5.0	451	333	1112307	940	663	630	33	4.977376	0.000000	629	629	3
+7	train	10.0	451	218	1112307	438	325	314	11	3.384615	0.000000	314	314	0
+8	validation	1.5	451	451	656281	5282	2786	2483	303	10.875808	0.000000	2482	2482	4
+9	validation	2.0	451	433	656281	2806	1581	1474	107	6.767868	0.000000	1474	1474	4
+10	validation	5.0	451	324	656281	869	533	511	22	4.127580	0.000000	511	511	1
+11	validation	10.0	451	210	656281	394	285	280	5	1.754386	0.000000	280	280	0
+12	test	1.5	451	410	657366	3509	2093	1869	224	10.702341	0.000000	1869	1867	4
+13	test	2.0	451	368	657366	1773	1157	1073	84	7.260156	0.000000	1073	1073	2
+14	test	5.0	451	214	657366	498	366	345	21	5.737705	0.000000	345	345	0
+15	test	10.0	451	131	657366	220	184	178	6	3.260870	0.000000	178	178	0
+(2) Diện tích và khoảng cách ngày, natural log, 1 mile = 1.609344 km:
+area_gov_km2	area_square_miles	separation_days_real	minimum_peak_distance_days	recession_fraction
+count	451.000000	451.000000	451.000000	451.000000	451.00
+mean	252.582262	97.522556	8.708288	9.210643	0.75
+std	921.122023	355.647201	1.177439	1.199063	0.00
+min	3.900000	1.505798	5.409323	6.000000	0.75
+25%	51.450000	19.864956	7.988957	8.000000	0.75
+50%	101.000000	38.996318	8.663467	9.000000	0.75
+75%	220.800000	85.251357	9.445599	10.000000	0.75
+max	15131.000000	5842.111761	13.672848	14.000000	0.75
+(3) Hồ sơ test cố định:
+basin_id	scope	return_period_years	threshold_mm_day	n_fit_years	below_10_fit_years	minimum_peak_distance_days	eligible_valid_days	above_days	raw_runs	clusters	runs_removed	reduction_pct	clusters_with_observed_onset	clusters_with_both_contexts	unresolved_missing_boundaries
+428	55	test	1.5	74.232492	14	False	7	807	28	14	9	5	35.714286	9	9	2
+429	55	test	2.0	83.286457	14	False	7	807	7	4	3	1	25.000000	3	3	1
+430	55	test	5.0	105.568010	14	False	7	807	0	0	0	0	NaN	0	0	0
+431	55	test	10.0	120.320337	14	False	7	807	0	0	0	0	NaN	0	0	0
+3068	324	test	1.5	2.290832	3	True	10	1461	3	3	3	0	0.000000	3	3	0
+3069	324	test	2.0	2.954233	3	True	10	1461	2	2	2	0	0.000000	2	2	0
+3070	324	test	5.0	4.586845	3	True	10	1461	0	0	0	0	NaN	0	0	0
+3071	324	test	10.0	5.667777	3	True	10	1461	0	0	0	0	NaN	0	0	0
+5452	600	test	1.5	9.328619	4	True	8	1461	25	16	15	1	6.250000	15	15	0
+5453	600	test	2.0	11.468962	4	True	8	1461	13	11	11	0	0.000000	11	11	0
+5454	600	test	5.0	16.736288	4	True	8	1461	4	4	4	0	0.000000	4	4	0
+5455	600	test	10.0	20.223715	4	True	8	1461	4	4	4	0	0.000000	4	4	0
+5500	604	test	1.5	10.569167	17	False	9	1461	14	10	10	0	0.000000	10	10	0
+5501	604	test	2.0	13.201108	17	False	9	1461	5	4	4	0	0.000000	4	4	0
+5502	604	test	5.0	19.678242	17	False	9	1461	1	1	1	0	0.000000	1	1	0
+5503	604	test	10.0	23.966668	17	False	9	1461	0	0	0	0	NaN	0	0	0
+5660	623	test	1.5	38.203094	4	True	10	1461	3	3	3	0	0.000000	3	3	0
+5661	623	test	2.0	41.794352	4	True	10	1461	2	2	2	0	0.000000	2	2	0
+5662	623	test	5.0	50.632336	4	True	10	1461	1	1	1	0	0.000000	1	1	0
+5663	623	test	10.0	56.483851	4	True	10	1461	0	0	0	0	NaN	0	0	0
+6492	742	test	1.5	0.286338	33	False	10	1461	0	0	0	0	NaN	0	0	0
+6493	742	test	2.0	0.414794	33	False	10	1461	0	0	0	0	NaN	0	0	0
+6494	742	test	5.0	0.730921	33	False	10	1461	0	0	0	0	NaN	0	0	0
+6495	742	test	10.0	0.940224	33	False	10	1461	0	0	0	0	NaN	0	0	0
+6636	758	test	1.5	0.239910	33	False	10	1461	0	0	0	0	NaN	0	0	0
+6637	758	test	2.0	0.378036	33	False	10	1461	0	0	0	0	NaN	0	0	0
+6638	758	test	5.0	0.717961	33	False	10	1461	0	0	0	0	NaN	0	0	0
+6639	758	test	10.0	0.943021	33	False	10	1461	0	0	0	0	NaN	0	0	0
+7020	800	test	1.5	124.010896	4	True	8	1461	3	3	3	0	0.000000	3	3	0
+7021	800	test	2.0	136.100546	4	True	8	1461	2	2	2	0	0.000000	2	2	0
+7022	800	test	5.0	165.852832	4	True	8	1461	1	1	1	0	0.000000	1	1	0
+7023	800	test	10.0	185.551435	4	True	8	1461	0	0	0	0	NaN	0	0	0
+(4) Audit test: mọi phép so trung gian khác các ranh giới cuối còn lại:
+return_period_years	decision	comparisons
+0	1.5	merge_both	21
+1	1.5	merge_recession	12
+2	1.5	merge_time	191
+3	1.5	separate	1623
+4	1.5	unresolved_missing	6
+5	2.0	merge_both	6
+6	2.0	merge_recession	3
+7	2.0	merge_time	75
+8	2.0	separate	762
+9	2.0	unresolved_missing	3
+10	5.0	merge_both	1
+11	5.0	merge_recession	1
+12	5.0	merge_time	19
+13	5.0	separate	138
+14	10.0	merge_time	6
+15	10.0	separate	48
+return_period_years	decision	final_boundaries
+0	1.5	separate	1455
+1	1.5	unresolved_missing	4
+2	2.0	separate	703
+3	2.0	unresolved_missing	2
+4	5.0	separate	131
+5	10.0	separate	47
+(5) Tối đa 15 cụm test gộp nhiều đoạn nhất; span có thể chứa ngày không vượt:
+basin_id	scope	return_period_years	threshold_mm_day	n_fit_years	below_10_fit_years	minimum_peak_distance_days	cluster_number	raw_run_numbers	raw_run_count	start_date	end_date	above_days	observed_peak_mm_day	first_peak_date	last_peak_date	days_at_peak	onset_observed	ending_observed	span_days	non_above_days_inside_span	both_contexts_observed
+30949	593	test	2.0	6.233488	17	False	8	5	6|7|8|9	4	2016-08-10	2016-08-23	7	8.640000	2016-08-19	2016-08-19	1	True	True	14	7	True
+35500	697	test	2.0	2.171207	33	False	10	1	1|2|3|4	4	2016-06-19	2016-09-30	88	3.253889	2016-08-05	2016-08-06	2	True	True	104	16	True
+39603	788	test	1.5	4.280645	33	False	10	4	5|6|7|8	4	2016-05-29	2016-06-13	7	7.200000	2016-06-04	2016-06-04	1	True	True	16	9	True
+39608	788	test	2.0	5.251455	33	False	10	4	5|6|7|8	4	2016-05-29	2016-06-13	5	7.200000	2016-06-04	2016-06-04	1	True	True	16	11	True
+39734	791	test	1.5	1.384708	6	True	10	4	4|5|6|7	4	2015-05-01	2015-05-20	8	2.576029	2015-05-01	2015-05-06	2	True	True	20	12	True
+5692	115	test	1.5	24.616535	33	False	8	13	15|16|17	3	2015-08-02	2015-08-07	3	37.001325	2015-08-04	2015-08-04	1	True	True	6	3	True
+5701	115	test	1.5	24.616535	33	False	8	22	28|29|30	3	2016-07-30	2016-08-10	5	42.532450	2016-08-05	2016-08-05	1	True	True	12	7	True
+5709	115	test	1.5	24.616535	33	False	8	30	40|41|42	3	2017-07-18	2017-07-24	3	31.279470	2017-07-24	2017-07-24	1	True	True	7	4	True
+14901	287	test	1.5	7.034137	33	False	11	3	3|4|5	3	2016-07-23	2016-07-27	3	10.916091	2016-07-25	2016-07-25	1	True	True	5	2	True
+21113	408	test	1.5	8.741520	33	False	9	4	6|7|8	3	2016-05-27	2016-06-04	3	18.354404	2016-05-31	2016-05-31	1	True	True	9	6	True
+21116	408	test	1.5	8.741520	33	False	9	7	11|12|13	3	2016-07-30	2016-08-09	3	15.489326	2016-08-05	2016-08-05	1	True	True	11	8	True
+21485	412	test	1.5	5.869348	33	False	11	6	8|9|10	3	2016-07-31	2016-08-09	3	7.302882	2016-08-05	2016-08-05	1	True	True	10	7	True
+21932	429	test	1.5	4.205101	33	False	10	1	1|2|3	3	2014-02-09	2014-02-17	3	5.662416	2014-02-12	2014-02-12	1	True	True	9	6	True
+22337	436	test	1.5	12.692172	33	False	9	1	1|2|3	3	2014-08-03	2014-08-11	3	19.922330	2014-08-03	2014-08-03	1	True	True	9	6	True
+22718	445	test	1.5	9.318879	33	False	10	4	7|8|9	3	2016-06-18	2016-07-02	3	16.765140	2016-07-02	2016-07-02	1	True	True	15	12	True
+Đã lưu hình: /kaggle/working/Figures/A1_P10_uswrc_grouping.png ; bảy CSV vào: /kaggle/working/Tables
+Thời gian gộp theo tiêu chí USWRC: 83.1 giây.
+CẢNH BÁO: dùng qmax ngày, không phải thủy đồ tức thời; cụm theo quy tắc chưa chứng minh độc lập vật lý/thống kê. Khoảng thiếu và biên kỳ vẫn làm số quan trắc chưa đầy đủ. Không đổi ngưỡng, bỏ ID hoặc chọn quy tắc bằng test.
+DỪNG: gửi hình, bảng (1)–(5) và cảnh báo để chốt tổng kết Phần 10; chưa ghép dự báo hoặc chấm POD/precision/F1.

@@ -1,0 +1,38 @@
+(1) Đối chiếu mặt nạ của nhóm nguồn ngoài; khớp không xác nhận cache hoặc scaler:
+run	contract_id	period	sequence_total_days	mask_signature_sha256	equivalent_ready_contracts	provider_contract	count_status
+66	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	train	365	88f6def85d64eb3c58a24d4612ace8d967249cfa17135d7d8d9fe2c05ddb04b0	W6f046c6c21f2		train_cache_content_unknown
+67	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	train	730	f1b4c823f96f24cb51f5fbee04a88ea8a68ec03d1ed8fd478b5a69546788d43d	W6f046c6c21f2		train_cache_content_unknown
+68	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	validation	365	44a2969df7045d6d1c4b887bed613753f40d405274a3a009854d92483d3e6700	W6f046c6c21f2	W6f046c6c21f2	equivalent_mask_current_CSV_count
+69	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	validation	730	b58c24a4c92ccdebab3ed75f719bc0907c87b94cf34be73566fb78fb7e662115	W6f046c6c21f2	W6f046c6c21f2	equivalent_mask_current_CSV_count
+70	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	test	365	49f79393fc8efcf22fbaf9785c075375e6dd703e07c01dafd5f1ed4420ee13ad	W6f046c6c21f2	W6f046c6c21f2	equivalent_mask_current_CSV_count
+71	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	test	730	48ff36c6e35b83bd25e0e3088f70afce67613296b699cea8588e3415aa8c44d1	W6f046c6c21f2	W6f046c6c21f2	equivalent_mask_current_CSV_count
+(2) Phạm vi cuối theo kỳ/L; train từ cache và phép đếm CSV được phân biệt:
+period	sequence_total_days	count_status	configs
+0	test	365	equivalent_mask_current_CSV_count	1
+1	test	365	own_current_CSV_count	23
+2	test	730	equivalent_mask_current_CSV_count	1
+3	test	730	own_current_CSV_count	23
+4	train	365	own_current_CSV_count	23
+5	train	365	train_cache_content_unknown	1
+6	train	730	own_current_CSV_count	23
+7	train	730	train_cache_content_unknown	1
+8	validation	365	equivalent_mask_current_CSV_count	1
+9	validation	365	own_current_CSV_count	23
+10	validation	730	equivalent_mask_current_CSV_count	1
+11	validation	730	own_current_CSV_count	23
+(3) Số CSV evaluation của nhóm cache khi có mặt nạ tương đương; train giữ chưa biết:
+run	contract_id	period	sequence_total_days	cohort_key	cohort_path_status	count_status	historical_training_count_verified	calendar_days	label_present_days	original_input_complete_days	phase_input_complete_days	original_complete_with_label_days	phase_complete_with_label_days	recovered_with_label_days	original_lookup_rule_days
+66	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	train	365	702fe55b22be	candidate_by_Experiments_suffix	train_cache_content_unknown	False	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+67	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	train	730	702fe55b22be	candidate_by_Experiments_suffix	train_cache_content_unknown	False	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+68	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	validation	365	702fe55b22be	candidate_by_Experiments_suffix	equivalent_mask_current_CSV_count	False	658911.0	656281.0	658911.0	658911.0	656281.0	656281.0	0.0	658911.0
+69	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	validation	730	702fe55b22be	candidate_by_Experiments_suffix	equivalent_mask_current_CSV_count	False	658911.0	656281.0	658911.0	658911.0	656281.0	656281.0	0.0	658911.0
+70	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	test	365	702fe55b22be	candidate_by_Experiments_suffix	equivalent_mask_current_CSV_count	False	658911.0	657366.0	658911.0	658911.0	657366.0	657366.0	0.0	658911.0
+71	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	test	730	702fe55b22be	candidate_by_Experiments_suffix	equivalent_mask_current_CSV_count	False	658911.0	657366.0	658911.0	658911.0	657366.0	657366.0	0.0	658911.0
+(4) Các dòng còn chưa đếm, không gán 0:
+run	contract_id	period	sequence_total_days	cohort_key	cohort_path_status	count_status	historical_training_count_verified	calendar_days	label_present_days	original_input_complete_days	phase_input_complete_days	original_complete_with_label_days	phase_complete_with_label_days	recovered_with_label_days	original_lookup_rule_days
+66	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	train	365	702fe55b22be	candidate_by_Experiments_suffix	train_cache_content_unknown	False	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+67	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml	W8404b4046b9d	train	730	702fe55b22be	candidate_by_Experiments_suffix	train_cache_content_unknown	False	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+Đã lưu ba CSV vào: /kaggle/working/Tables
+Thời gian chốt phạm vi số cửa sổ: 1.6 giây.
+CẢNH BÁO: số CSV mô tả Input hiện tại và cohort ứng viên đã đọc; không xác nhận dữ liệu/scaler lịch sử hoặc dự báo hữu hạn.
+DỪNG: gửi bảng (1)–(4) và cảnh báo; chưa mở cache, chạy loader/mô hình hoặc thay danh sách 451.

@@ -1,0 +1,41 @@
+(1) Khoảng cách CDF và sai khác phân vị trong mẫu; từng ID trọng số bằng nhau, không phải kiểm định:
+below_10_years	metric	basins	defined_basins	min	p05	median	p95	max
+0	False	cdf_max_abs_distance	427	427	5.761700e-02	7.818471e-02	0.132249	0.212309	0.363198
+1	False	quantile_rmse_over_scale	427	427	1.400834e-01	1.718080e-01	0.343798	0.852955	1.491321
+2	False	largest_order_stat_delta_over_scale	427	427	-9.935395e-01	-4.730210e-01	1.091291	4.322295	8.161611
+3	False	fitted_cdf_at_zero	427	427	1.648880e-250	5.969337e-26	0.000196	0.067542	0.188673
+4	True	cdf_max_abs_distance	24	24	1.346763e-01	1.378777e-01	0.212231	0.336517	0.446926
+5	True	quantile_rmse_over_scale	24	24	2.486370e-01	2.689508e-01	0.375853	0.657207	0.669104
+6	True	largest_order_stat_delta_over_scale	24	24	-1.815356e-01	-8.665890e-02	0.563776	1.297278	1.683048
+7	True	fitted_cdf_at_zero	24	24	9.307122e-65	1.082617e-31	0.000253	0.060495	0.084326
+(2) Hồ sơ cố định; F(0) là khối xác suất dưới 0 của Gumbel liên tục đã fit, không phải số năm Q âm quan trắc:
+basin_id	n_years	below_10_years	distinct_maxima	fit_status	used_complete_observed_years	used_years_with_missing_months	sample_min_mm_day	sample_max_mm_day	cdf_dplus	cdf_dminus	cdf_max_abs_distance	quantile_rmse_mm_day	quantile_rmse_over_scale	largest_order_stat_delta_mm_day	largest_order_stat_delta_over_scale	fitted_cdf_at_zero
+26	55	14	False	13	fit_defined	1	13	44.640000	140.968421	0.104672	0.183567	0.183567	6.163934	0.313550	12.324945	0.626950	1.499852e-21
+191	324	3	True	3	fit_defined	3	0	1.505616	4.500887	0.210902	0.340796	0.340796	0.560106	0.388849	0.279967	0.194365	4.564599e-03
+340	600	4	True	4	fit_defined	3	1	8.066730	20.023507	0.193867	0.236608	0.236608	1.731446	0.372574	3.287220	0.707346	2.809021e-04
+343	604	17	False	16	fit_defined	16	1	5.851248	35.329901	0.217629	0.102059	0.217629	3.208209	0.561401	7.868377	1.376879	9.271470e-04
+353	623	4	True	4	fit_defined	3	1	32.757809	53.481542	0.143451	0.277074	0.277074	2.390865	0.306616	2.849206	0.365396	9.307122e-65
+405	742	33	False	27	fit_defined	32	1	0.074464	1.916714	0.140954	0.095531	0.140954	0.138218	0.495562	0.624753	2.239964	4.656443e-02
+414	758	33	False	28	fit_defined	32	1	0.006825	1.222976	0.106758	0.091643	0.106758	0.093585	0.312045	-0.098262	-0.327639	8.673815e-02
+438	800	4	True	4	fit_defined	3	1	92.448000	164.022593	0.224172	0.446926	0.446926	17.512527	0.667148	-1.830239	-0.069724	1.795099e-54
+(3) Mười D lớn nhất trong nhóm n≥10; chỉ xếp mô tả, không áp ngưỡng chấp nhận hoặc lọc ID:
+basin_id	n_years	below_10_years	distinct_maxima	fit_status	used_complete_observed_years	used_years_with_missing_months	sample_min_mm_day	sample_max_mm_day	cdf_dplus	cdf_dminus	cdf_max_abs_distance	quantile_rmse_mm_day	quantile_rmse_over_scale	largest_order_stat_delta_mm_day	largest_order_stat_delta_over_scale	fitted_cdf_at_zero
+85	161	33	False	24	fit_defined	32	1	3.240000	37.107692	0.363198	0.221297	0.363198	4.008272	0.966420	17.599270	4.243297	3.710125e-02
+111	197	29	False	29	fit_defined	28	1	8.392258	217.393548	0.312923	0.163940	0.312923	28.096866	1.482840	133.651595	7.053598	5.985256e-02
+166	290	33	False	32	fit_defined	32	1	5.221463	102.790244	0.265751	0.165383	0.265751	12.156315	1.272716	58.417529	6.116075	4.466380e-02
+317	573	10	False	9	fit_defined	9	1	16.285468	54.202014	0.262794	0.161532	0.262794	4.631958	0.375806	0.606116	0.049176	6.281175e-04
+190	322	32	False	32	fit_defined	31	1	1.249778	77.333333	0.250516	0.230298	0.250516	8.690659	0.885275	38.138087	3.884942	1.886734e-01
+86	162	33	False	32	fit_defined	32	1	2.397315	12.083240	0.246554	0.114350	0.246554	1.131429	0.818708	3.555194	2.572557	6.230285e-07
+204	338	33	False	33	fit_defined	32	1	2.358857	96.000000	0.243383	0.191256	0.243383	11.468860	1.491321	62.766068	8.161611	1.056174e-01
+436	796	33	False	28	fit_defined	32	1	2.857323	10.459843	0.240367	0.133586	0.240367	0.594918	0.391363	1.201140	0.790162	1.873124e-06
+253	453	26	False	26	fit_defined	24	2	5.967628	87.404651	0.232430	0.155892	0.232430	9.996471	1.008462	42.809196	4.318667	3.359313e-02
+283	516	24	False	24	fit_defined	23	1	4.039558	69.812155	0.229754	0.112826	0.229754	6.645528	0.414280	0.487999	0.030422	4.621677e-02
+(4) Trạng thái và số đỉnh dùng; fit không xác định giữ riêng:
+fit_status	below_10_years	basins	annual_maxima
+0	fit_defined	False	427	13033
+1	fit_defined	True	24	158
+basin_id	n_years	below_10_years	distinct_maxima	fit_status	used_complete_observed_years	used_years_with_missing_months	sample_min_mm_day	sample_max_mm_day	cdf_dplus	cdf_dminus	cdf_max_abs_distance	quantile_rmse_mm_day	quantile_rmse_over_scale	largest_order_stat_delta_mm_day	largest_order_stat_delta_over_scale	fitted_cdf_at_zero
+Đã lưu hình: /kaggle/working/Figures/A1_P10_gumbel_cdf_diagnostics.png ; bốn CSV vào: /kaggle/working/Tables
+Thời gian đo độ khớp mô tả Gumbel: 3.0 giây.
+CẢNH BÁO: D dùng chính mẫu đã fit tham số; không có p-value/kiểm định chấp nhận, không xếp chất lượng trạm theo D. Sai khác ở điểm lớn nhất dùng vị trí Weibull hữu hạn, không phải lỗi dự báo. F(0) chỉ mô tả miền hỗ trợ của mô hình, không tự chặn hoặc đổi phân phối.
+DỪNG: gửi hình, bảng (1)–(4) và cảnh báo; chưa chấm dự báo, chọn phân phối/ngưỡng, lọc ID hoặc đếm trận độc lập.

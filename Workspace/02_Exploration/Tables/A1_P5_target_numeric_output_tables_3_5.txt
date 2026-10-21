@@ -1,0 +1,67 @@
+(3) Cùng dữ liệu/ID/ngày, đổi riêng cách tính; ddof=0 và dung sai giữ nguyên 5.2:
+candidate	method	n_basins	n_labels	train_intervals	warmup_days	mean	std_ddof0	saved_mean	saved_std	mean_relative_delta_pct	std_relative_delta_pct	runs	matching_runs
+0	m3_s	numpy32_storage32_acc32	451	1112307	2003-01-01:2009-12-31	364	5.214679241180	17.522224426270	2.572081506154	5.262434054634	102.741601644577	232.968057069303	5	0
+1	m3_s	numpy32_storage32_acc32	451	1112307	2003-01-01:2009-12-31	364	5.214679241180	17.522224426270	2.572082281113	5.262434482574	102.741540559292	232.968029992411	17	0
+2	m3_s	numpy64_storage32_acc64	451	1112307	2003-01-01:2009-12-31	364	5.214678053981	17.522222731567	2.572081506154	5.262434054634	102.741555487442	232.968024865527	5	0
+3	m3_s	numpy64_storage32_acc64	451	1112307	2003-01-01:2009-12-31	364	5.214678053981	17.522222731567	2.572082281113	5.262434482574	102.741494402171	232.967997788638	17	0
+4	m3_s	numpy64_storage64_acc64	451	1112307	2003-01-01:2009-12-31	364	5.214678053811	17.522222780922	2.572081506154	5.262434054634	102.741555480809	232.968025803407	5	0
+5	m3_s	numpy64_storage64_acc64	451	1112307	2003-01-01:2009-12-31	364	5.214678053811	17.522222780922	2.572082281113	5.262434482574	102.741494395539	232.967998726519	17	0
+6	m3_s	xarray32_acceleration_disabled	451	1112307	2003-01-01:2009-12-31	364	5.214679241180	17.522224426270	2.572081506154	5.262434054634	102.741601644577	232.968057069303	5	0
+7	m3_s	xarray32_acceleration_disabled	451	1112307	2003-01-01:2009-12-31	364	5.214679241180	17.522224426270	2.572082281113	5.262434482574	102.741540559292	232.968029992411	17	0
+8	m3_s	xarray32_default	451	1112307	2003-01-01:2009-12-31	364	5.213147163391	17.525707244873	2.572081506154	5.262434054634	102.682035966521	233.034239724845	5	0
+9	m3_s	xarray32_default	451	1112307	2003-01-01:2009-12-31	364	5.213147163391	17.525707244873	2.572082281113	5.262434482574	102.681974899183	233.034212642572	17	0
+10	mm_day_area_calc	numpy32_storage32_acc32	451	1112307	2003-01-01:2009-12-31	364	2.554759502411	5.173095703125	2.572081506154	5.262434054634	0.673462473937	1.697662157509	5	0
+11	mm_day_area_calc	numpy32_storage32_acc32	451	1112307	2003-01-01:2009-12-31	364	2.554759502411	5.173095703125	2.572082281113	5.262434482574	0.673492400651	1.697670151434	17	0
+12	mm_day_area_calc	numpy64_storage32_acc64	451	1112307	2003-01-01:2009-12-31	364	2.554759646938	5.173095424466	2.572081506154	5.262434054634	0.673456854854	1.697667452764	5	0
+13	mm_day_area_calc	numpy64_storage32_acc64	451	1112307	2003-01-01:2009-12-31	364	2.554759646938	5.173095424466	2.572082281113	5.262434482574	0.673486781569	1.697675446688	17	0
+14	mm_day_area_calc	numpy64_storage64_acc64	451	1112307	2003-01-01:2009-12-31	364	2.554759646838	5.173095437856	2.572081506154	5.262434054634	0.673456858749	1.697667198307	5	0
+15	mm_day_area_calc	numpy64_storage64_acc64	451	1112307	2003-01-01:2009-12-31	364	2.554759646838	5.173095437856	2.572082281113	5.262434482574	0.673486785464	1.697675192232	17	0
+16	mm_day_area_calc	xarray32_acceleration_disabled	451	1112307	2003-01-01:2009-12-31	364	2.554759502411	5.173095703125	2.572081506154	5.262434054634	0.673462473937	1.697662157509	5	0
+17	mm_day_area_calc	xarray32_acceleration_disabled	451	1112307	2003-01-01:2009-12-31	364	2.554759502411	5.173095703125	2.572082281113	5.262434482574	0.673492400651	1.697670151434	17	0
+18	mm_day_area_calc	xarray32_default	451	1112307	2003-01-01:2009-12-31	364	2.554646253586	5.171471118927	2.572081506154	5.262434054634	0.677865476906	1.728533502996	5	0
+19	mm_day_area_calc	xarray32_default	451	1112307	2003-01-01:2009-12-31	364	2.554646253586	5.171471118927	2.572082281113	5.262434482574	0.677895402293	1.728541494410	17	0
+20	mm_day_area_gov	numpy32_storage32_acc32	451	1112307	2003-01-01:2009-12-31	364	2.572082281113	5.262434482574	2.572081506154	5.262434054634	0.000030129634	0.000008131979	5	5
+21	mm_day_area_gov	numpy32_storage32_acc32	451	1112307	2003-01-01:2009-12-31	364	2.572082281113	5.262434482574	2.572082281113	5.262434482574	0.000000000000	0.000000000000	17	17
+22	mm_day_area_gov	numpy64_storage32_acc64	451	1112307	2003-01-01:2009-12-31	364	2.572081506154	5.262434048741	2.572081506154	5.262434054634	0.000000000000	0.000000111991	5	5
+23	mm_day_area_gov	numpy64_storage32_acc64	451	1112307	2003-01-01:2009-12-31	364	2.572081506154	5.262434048741	2.572082281113	5.262434482574	0.000030129625	0.000008243970	17	17
+24	mm_day_area_gov	numpy64_storage64_acc64	451	1112307	2003-01-01:2009-12-31	364	2.572081505851	5.262434050208	2.572081506154	5.262434054634	0.000000011776	0.000000084111	5	5
+25	mm_day_area_gov	numpy64_storage64_acc64	451	1112307	2003-01-01:2009-12-31	364	2.572081505851	5.262434050208	2.572082281113	5.262434482574	0.000030141402	0.000008216090	17	17
+26	mm_day_area_gov	xarray32_acceleration_disabled	451	1112307	2003-01-01:2009-12-31	364	2.572082281113	5.262434482574	2.572081506154	5.262434054634	0.000030129634	0.000008131979	5	5
+27	mm_day_area_gov	xarray32_acceleration_disabled	451	1112307	2003-01-01:2009-12-31	364	2.572082281113	5.262434482574	2.572082281113	5.262434482574	0.000000000000	0.000000000000	17	17
+28	mm_day_area_gov	xarray32_default	451	1112307	2003-01-01:2009-12-31	364	2.572047948837	5.260821819305	2.572081506154	5.262434054634	0.001304675476	0.030636684702	5	0
+29	mm_day_area_gov	xarray32_default	451	1112307	2003-01-01:2009-12-31	364	2.572047948837	5.260821819305	2.572082281113	5.262434482574	0.001334804708	0.030644814190	17	0
+(4) Đối chiếu từng run bằng tham chiếu NumPy float64; chưa suy backend khi tác giả huấn luyện:
+run	status_5_2	status_5_3	saved_mean	saved_std	matching_candidates_numpy64	matching_candidates_storage32_acc64	whole_record_max_z_if_gov_supported
+0	Baseline/Forecast	no_candidate_match	gov_stats_match_numpy64	2.572081506154	5.262434054634	mm_day_area_gov	mm_day_area_gov	121.910825354268
+1	Baseline/ForecastAndReanalysis/ForecastAndReanalysis_Complex_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+2	Baseline/ForecastAndReanalysis/ForecastAndReanalysis_Simple_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572081506154	5.262434054634	mm_day_area_gov	mm_day_area_gov	121.910825354268
+3	Baseline/Reanalysis/Reanalysis_Complex_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572081506154	5.262434054634	mm_day_area_gov	mm_day_area_gov	121.910825354268
+4	Baseline/Reanalysis/Reanalysis_Simple_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572081506154	5.262434054634	mm_day_area_gov	mm_day_area_gov	121.910825354268
+5	CrossDomain/CrossDomain_Forecast	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+6	CrossDomain/CrossDomain_Reanalysis	no_candidate_match	gov_stats_match_numpy64	2.572081506154	5.262434054634	mm_day_area_gov	mm_day_area_gov	121.910825354268
+7	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_with_q/Encoder_Decoder_LSTM_with_q_Complex_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+8	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_with_q/Encoder_Decoder_LSTM_with_q_Simple_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+9	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_FCRA_without_q_Simple_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+10	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Complex_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+11	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding	unsupported_or_unreadable	not_evaluated	2.572082281113	5.262434482574			NaN
+12	Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_with_q/Sequential_Forecast_LSTM_RA_with_q_Complex_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+13	Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_with_q/Sequential_Forecast_LSTM_RA_with_q_Simple_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+14	Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_without_q/Sequential_Forecast_LSTM_FCRA_without_q_Simple_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+15	Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_without_q/Sequential_Forecast_LSTM_RA_without_q_Complex_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+16	Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_without_q/Sequential_Forecast_LSTM_RA_without_q_Simple_Embedding	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+17	TransferLearning/TL_AllWeights/TL_AllWeights_RA_Complex_Embedding	missing_yaml	not_evaluated	NaN	NaN			NaN
+18	TransferLearning/TL_EmbeddingNet/TL_EmbeddingNet_FCRA_Complex_Embedding/TL_EmbeddingNet_FCRA_Complex_Embedding_Finetune	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+19	TransferLearning/TL_EmbeddingNet/TL_EmbeddingNet_FCRA_Complex_Embedding/TL_EmbeddingNet_FCRA_Complex_Embedding_PreRun	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+20	TransferLearning/TL_EmbeddingNet/TL_EmbeddingNet_RA_Complex_Embedding/TL_EmbeddingNet_RA_Complex_Embedding_Finetune	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+21	TransferLearning/TL_EmbeddingNet/TL_EmbeddingNet_RA_Complex_Embedding/TL_EmbeddingNet_RA_Complex_Embedding_PreRun	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+22	TransferLearning/TL_EmbeddingNet/TL_EmbeddingNet_RA_Simple_Embedding/TL_EmbeddingNet_RA_Simple_Embedding_Finetune	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+23	TransferLearning/TL_EmbeddingNet/TL_EmbeddingNet_RA_Simple_Embedding/TL_EmbeddingNet_RA_Simple_Embedding_PreRun	no_candidate_match	gov_stats_match_numpy64	2.572082281113	5.262434482574	mm_day_area_gov	mm_day_area_gov	121.910815293243
+(5) Khai báo của run chưa đánh giá; giữ nguyên trạng thái thiếu YAML/phạm vi chưa hỗ trợ:
+run	status_5_2	train_data_file	per_basin_train_periods_file	train_basin_file	detail_5_2
+0	Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding	unsupported_or_unreadable	/home/ok2907/Documents/BiasCast/Experiments/Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/train_data	None	/home/ok2907/Documents/BiasCast/Experiments/basins_filtered.txt	Phạm vi dựa trên train_data_file/per-basin periods chưa được hỗ trợ trong phép kiểm này.
+1	TransferLearning/TL_AllWeights/TL_AllWeights_RA_Complex_Embedding	missing_yaml	<absent>	None	/home/ok2907/Documents/BiasCast/Experiments/basins_filtered.txt	nan
+Số cặp mean/std qmax khác nhau trong các scaler đã đọc: 2 | Scaler đã đọc: 23 | Phạm vi chẩn đoán: 1
+Dung sai giữ nguyên: rtol=1e-05, atol=1e-07; tùy chọn xarray đã khôi phục.
+Đã lưu năm CSV mới vào: /kaggle/working/Tables
+Thời gian chẩn đoán scaler: 8.9 giây.
+DỪNG: gửi bảng (1)–(5), số cặp/phạm vi và cảnh báo; chưa thay scaler hoặc kết luận nguyên nhân lịch sử.

@@ -1,0 +1,43 @@
+(1) Độ nhạy bỏ một năm, mỗi ID trọng số bằng nhau; chỉ tổng hợp tương đối khi mọi lần bỏ đều fit được và ngưỡng gốc >0:
+return_period_years	below_10_years	basins	all_omissions_defined_basins	relative_summary_basins	undefined_omissions	nonpositive_or_undefined_baseline_basins	max_abs_change_pct_p05	max_abs_change_pct_median	max_abs_change_pct_p95	range_pct_median	range_pct_p95	negative_loo_levels
+0	1.5	False	427	427	427	0	0	1.714528	3.059859	6.158197	5.110219	10.795157	0
+1	1.5	True	24	24	24	0	0	7.393638	12.940379	36.407209	20.521902	48.552369	0
+2	2.0	False	427	427	427	0	0	1.892031	4.230001	12.251905	6.444864	15.797016	0
+3	2.0	True	24	24	24	0	0	7.364662	12.329141	29.006548	21.646012	49.208841	0
+4	5.0	False	427	427	427	0	0	2.854891	7.163202	20.053610	8.453878	22.215486	0
+5	5.0	True	24	24	24	0	0	6.062021	15.003291	32.151281	19.651268	41.439752	0
+6	10.0	False	427	427	427	0	0	3.161596	8.283694	22.735924	9.574917	24.971055	0
+7	10.0	True	24	24	24	0	0	7.934635	17.440408	35.394873	23.607196	47.593000	0
+(2) Hồ sơ cố định ở T=10 năm; miền min–max không phải khoảng tin cậy:
+basin_id	n_years	below_10_years	return_period_years	baseline_fit_status	baseline_mm_day	omissions	defined_omissions	all_omissions_defined	min_loo_mm_day	max_loo_mm_day	range_loo_mm_day	max_abs_change_mm_day	range_pct_baseline	max_abs_change_pct_baseline	min_loo_pct_baseline	max_loo_pct_baseline	worst_omitted_hydro_year	worst_omitted_is_sample_max	worst_omitted_complete_year	negative_loo_levels	T_exceeds_n_minus_1
+0	55	14	False	10.0	fit_defined	120.320337	14	14	True	110.085653	122.242289	12.156636	10.234685	10.103559	8.506197	91.493803	101.597362	2012	True	False	0	False
+1	324	3	True	10.0	fit_defined	5.667777	3	3	True	5.019901	6.618315	1.598414	0.950539	28.201781	16.770924	88.569143	116.770924	2012	False	True	0	True
+2	600	4	True	10.0	fit_defined	20.223715	4	4	True	13.283658	23.065162	9.781504	6.940057	48.366505	34.316430	65.683570	114.050075	2013	True	True	0	True
+3	623	4	True	10.0	fit_defined	56.483851	4	4	True	50.018830	60.453954	10.435125	6.465021	18.474528	11.445787	88.554213	107.028741	2013	True	True	0	True
+4	742	33	False	10.0	fit_defined	0.940224	33	33	True	0.809349	0.955284	0.145935	0.130876	15.521352	13.919609	86.080391	101.601743	1987	True	True	0	False
+5	758	33	False	10.0	fit_defined	0.943021	33	33	True	0.888192	0.957833	0.069642	0.054830	7.384944	5.814266	94.185734	101.570678	1987	True	True	0	False
+6	800	4	True	10.0	fit_defined	185.551435	4	4	True	166.718311	195.358843	28.640532	18.833124	15.435360	10.149813	89.850187	105.285547	2010	False	False	0	True
+7	604	17	False	10.0	fit_defined	23.966668	17	17	True	20.356013	24.533683	4.177670	3.610655	17.431168	15.065319	84.934681	102.365849	2010	True	True	0	False
+(3) Mười ID có thay đổi tương đối lớn nhất tại T=10 trong tập mọi lần bỏ đều xác định; chỉ xếp mô tả:
+basin_id	n_years	below_10_years	return_period_years	baseline_fit_status	baseline_mm_day	omissions	defined_omissions	all_omissions_defined	min_loo_mm_day	max_loo_mm_day	range_loo_mm_day	max_abs_change_mm_day	range_pct_baseline	max_abs_change_pct_baseline	min_loo_pct_baseline	max_loo_pct_baseline	worst_omitted_hydro_year	worst_omitted_is_sample_max	worst_omitted_complete_year	negative_loo_levels	T_exceeds_n_minus_1
+915	391	6	True	10.0	fit_defined	13.140744	6	6	True	6.763935	14.659555	7.895620	6.376809	60.085026	48.527003	51.472997	111.558023	2010	True	True	0	True
+819	338	33	False	10.0	fit_defined	23.535537	33	33	True	14.846986	24.017212	9.170226	8.688551	38.963319	36.916733	63.083267	102.046586	2002	True	True	0	False
+787	329	8	True	10.0	fit_defined	32.125562	8	8	True	20.732359	34.613753	13.881394	11.393203	43.209808	35.464603	64.535397	107.745205	2007	True	True	0	True
+723	309	6	True	10.0	fit_defined	101.806076	6	6	True	66.174222	110.032866	43.858643	35.631854	43.080575	34.999732	65.000268	108.080843	2009	True	True	0	True
+447	197	29	False	10.0	fit_defined	62.256298	29	29	True	40.631395	63.635194	23.003799	21.624903	36.950156	34.735286	65.264714	102.214870	1987	True	True	0	False
+1363	600	4	True	10.0	fit_defined	20.223715	4	4	True	13.283658	23.065162	9.781504	6.940057	48.366505	34.316430	65.683570	114.050075	2013	True	True	0	True
+1787	822	9	True	10.0	fit_defined	30.944516	9	9	True	20.498129	33.070450	12.572322	10.446388	40.628594	33.758445	66.241555	106.870148	2011	True	True	0	True
+207	102	14	False	10.0	fit_defined	168.463102	14	14	True	117.175088	176.016320	58.841232	51.288014	34.928261	30.444657	69.555343	104.483604	2013	True	True	0	False
+811	336	33	False	10.0	fit_defined	18.029079	33	33	True	12.547583	18.344144	5.796561	5.481497	32.151177	30.403641	69.596359	101.747537	2002	True	True	0	False
+1715	779	19	False	10.0	fit_defined	71.289292	19	19	True	49.804244	73.540129	23.735885	21.485048	33.295162	30.137833	69.862167	103.157328	1996	True	True	0	False
+(4) Trạng thái fit sau bỏ năm; mỗi năm giữ bốn T, không gộp các năm có cùng đỉnh:
+return_period_years	fit_status	refits
+0	1.5	fit_defined	13191
+1	2.0	fit_defined	13191
+2	5.0	fit_defined	13191
+3	10.0	fit_defined	13191
+basin_id	n_years	below_10_years	return_period_years	baseline_fit_status	baseline_mm_day	omissions	defined_omissions	all_omissions_defined	min_loo_mm_day	max_loo_mm_day	range_loo_mm_day	max_abs_change_mm_day	range_pct_baseline	max_abs_change_pct_baseline	min_loo_pct_baseline	max_loo_pct_baseline	worst_omitted_hydro_year	worst_omitted_is_sample_max	worst_omitted_complete_year	negative_loo_levels	T_exceeds_n_minus_1
+Đã lưu hình: /kaggle/working/Figures/A1_P10_gumbel_leave_one_year_out.png ; bốn CSV vào: /kaggle/working/Tables
+Thời gian kiểm bỏ một đỉnh năm: 8.7 giây.
+CẢNH BÁO: miền bỏ một năm không phải khoảng tin cậy hoặc kiểm định độ khớp; mẫu ngắn, thiếu mùa/đỉnh, phụ thuộc và biến đổi theo thời gian chưa được giải quyết. Không đổi ngưỡng chính hoặc lọc ID theo độ nhạy.
+DỪNG: gửi hình, bảng (1)–(4) và cảnh báo; chưa chấm dự báo, chọn phân phối, đếm trận độc lập hoặc dùng test chỉnh ngưỡng.

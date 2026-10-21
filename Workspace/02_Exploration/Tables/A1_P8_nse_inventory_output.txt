@@ -1,0 +1,70 @@
+(1) Nguồn A2 trong phạm vi tìm kiếm hiện tại; reported_repro_ok là metadata khai báo, chưa kiểm lại:
+Search roots: ['/kaggle/input', '/kaggle/working']
+file	status	sha256	reported_repro_ok	reported_commit
+(2) CSV NSE theo run/nguồn: số âm giữ nguyên; chưa có phép ghép hoặc tương quan:
+source	run	artifact_id	status	scope_status	rows	finite_nse	negative_finite_nse	blank_or_nan_nse	non_numeric_nse	infinite_nse	duplicate_id_rows	selected_ids_without_row	ids_outside_selected	min_nse	median_nse	max_nse
+0	author_packaged	SeqLSTM_Q	author_Experiments	CSV_read	declared_qmax_test_matches_A1	451.0	450.0	4.0	1.0	0.0	0.0	0.0			-78.295601	0.705284	0.963512
+1	author_packaged	SeqLSTM_noQ	author_Experiments	CSV_read	declared_qmax_test_matches_A1	451.0	451.0	3.0	0.0	0.0	0.0	0.0			-8.714366	0.627573	0.901427
+2	author_packaged	EncDec_Q	author_Experiments	CSV_read	declared_qmax_test_matches_A1	451.0	450.0	13.0	1.0	0.0	0.0	0.0			-131.419769	0.662180	0.906630
+3	author_packaged	EncDec_noQ	author_Experiments	CSV_read	declared_qmax_test_matches_A1	451.0	451.0	20.0	0.0	0.0	0.0	0.0			-157.913528	0.568854	0.887867
+4	author_packaged	D_FC	author_Experiments	CSV_read	declared_qmax_test_matches_A1	451.0	451.0	39.0	0.0	0.0	0.0	0.0			-33.289719	0.386676	0.893906
+5	author_packaged	D_RA	author_Experiments	CSV_read	declared_qmax_test_matches_A1	451.0	451.0	3.0	0.0	0.0	0.0	0.0			-85.115341	0.692254	0.930696
+6	A2_rerun_export	SeqLSTM_Q		A2_export_not_found_in_search_roots	not_checked	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+7	A2_rerun_export	SeqLSTM_noQ		A2_export_not_found_in_search_roots	not_checked	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+8	A2_rerun_export	EncDec_Q		A2_export_not_found_in_search_roots	not_checked	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+9	A2_rerun_export	EncDec_noQ		A2_export_not_found_in_search_roots	not_checked	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+10	A2_rerun_export	D_FC		A2_export_not_found_in_search_roots	not_checked	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+11	A2_rerun_export	D_RA		A2_export_not_found_in_search_roots	not_checked	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+(3) Tệp metrics tác giả: chỉ canonical best_model được đọc; các ứng viên khác chưa được tự chọn:
+run	canonical_exists	candidate_files	candidates
+0	SeqLSTM_Q	True	1	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_with_q/Sequential_Forecast_LSTM_RA_with_q_Simple_Embedding/test/best_model/test_metrics.csv
+1	SeqLSTM_noQ	True	1	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_without_q/Sequential_Forecast_LSTM_RA_without_q_Simple_Embedding/test/best_model/test_metrics.csv
+2	EncDec_Q	True	1	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_with_q/Encoder_Decoder_LSTM_with_q_Complex_Embedding/test/best_model/test_metrics.csv
+3	EncDec_noQ	True	1	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Complex_Embedding/test/best_model/test_metrics.csv
+4	D_FC	True	1	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Baseline/Forecast/test/best_model/test_metrics.csv
+5	D_RA	True	1	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Baseline/Reanalysis/Reanalysis_Simple_Embedding/test/best_model/test_metrics.csv
+(4) Các nguồn chưa đọc/schema khác và schema của các tệp hiện có:
+source	run	artifact_id	metric_file	nse_column	columns	status
+0	author_packaged	SeqLSTM_Q	author_Experiments	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_with_q/Sequential_Forecast_LSTM_RA_with_q_Simple_Embedding/test/best_model/test_metrics.csv	NSE	basin | NSE | KGE	CSV_read
+1	author_packaged	SeqLSTM_noQ	author_Experiments	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_without_q/Sequential_Forecast_LSTM_RA_without_q_Simple_Embedding/test/best_model/test_metrics.csv	NSE	basin | NSE | KGE	CSV_read
+2	author_packaged	EncDec_Q	author_Experiments	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_with_q/Encoder_Decoder_LSTM_with_q_Complex_Embedding/test/best_model/test_metrics.csv	NSE	basin | NSE | KGE	CSV_read
+3	author_packaged	EncDec_noQ	author_Experiments	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Complex_Embedding/test/best_model/test_metrics.csv	NSE	basin | NSE | KGE	CSV_read
+4	author_packaged	D_FC	author_Experiments	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Baseline/Forecast/test/best_model/test_metrics.csv	NSE	basin | NSE | KGE	CSV_read
+5	author_packaged	D_RA	author_Experiments	/kaggle/input/datasets/hunhngcthng/lamah-ce-ext/biascast_experiments/Experiments/Baseline/Reanalysis/Reanalysis_Simple_Embedding/test/best_model/test_metrics.csv	NSE	basin | NSE | KGE	CSV_read
+6	A2_rerun_export	SeqLSTM_Q			NaN	NaN	A2_export_not_found_in_search_roots
+7	A2_rerun_export	SeqLSTM_noQ			NaN	NaN	A2_export_not_found_in_search_roots
+8	A2_rerun_export	EncDec_Q			NaN	NaN	A2_export_not_found_in_search_roots
+9	A2_rerun_export	EncDec_noQ			NaN	NaN	A2_export_not_found_in_search_roots
+10	A2_rerun_export	D_FC			NaN	NaN	A2_export_not_found_in_search_roots
+11	A2_rerun_export	D_RA			NaN	NaN	A2_export_not_found_in_search_roots
+(5) NSE các ID hồ sơ nếu có trong CSV đã đọc; không thay NaN bằng 0 hoặc cắt NSE âm:
+source	run	artifact_id	basin_id	nse	finite	scope_status
+275	author_packaged	SeqLSTM_Q	author_Experiments	55	NaN	False	declared_qmax_test_matches_A1
+394	author_packaged	SeqLSTM_Q	author_Experiments	742	-43.940674	True	declared_qmax_test_matches_A1
+404	author_packaged	SeqLSTM_Q	author_Experiments	758	-78.295601	True	declared_qmax_test_matches_A1
+429	author_packaged	SeqLSTM_Q	author_Experiments	800	0.624186	True	declared_qmax_test_matches_A1
+726	author_packaged	SeqLSTM_noQ	author_Experiments	55	0.705703	True	declared_qmax_test_matches_A1
+845	author_packaged	SeqLSTM_noQ	author_Experiments	742	-4.263644	True	declared_qmax_test_matches_A1
+855	author_packaged	SeqLSTM_noQ	author_Experiments	758	-8.714366	True	declared_qmax_test_matches_A1
+880	author_packaged	SeqLSTM_noQ	author_Experiments	800	0.424788	True	declared_qmax_test_matches_A1
+1177	author_packaged	EncDec_Q	author_Experiments	55	NaN	False	declared_qmax_test_matches_A1
+1296	author_packaged	EncDec_Q	author_Experiments	742	-51.199471	True	declared_qmax_test_matches_A1
+1306	author_packaged	EncDec_Q	author_Experiments	758	-131.419769	True	declared_qmax_test_matches_A1
+1331	author_packaged	EncDec_Q	author_Experiments	800	0.526949	True	declared_qmax_test_matches_A1
+1628	author_packaged	EncDec_noQ	author_Experiments	55	0.732324	True	declared_qmax_test_matches_A1
+1747	author_packaged	EncDec_noQ	author_Experiments	742	-63.028679	True	declared_qmax_test_matches_A1
+1757	author_packaged	EncDec_noQ	author_Experiments	758	-157.913528	True	declared_qmax_test_matches_A1
+1782	author_packaged	EncDec_noQ	author_Experiments	800	0.180123	True	declared_qmax_test_matches_A1
+2079	author_packaged	D_FC	author_Experiments	55	0.448833	True	declared_qmax_test_matches_A1
+2198	author_packaged	D_FC	author_Experiments	742	-10.795778	True	declared_qmax_test_matches_A1
+2208	author_packaged	D_FC	author_Experiments	758	-33.289719	True	declared_qmax_test_matches_A1
+2233	author_packaged	D_FC	author_Experiments	800	0.369651	True	declared_qmax_test_matches_A1
+2530	author_packaged	D_RA	author_Experiments	55	0.583690	True	declared_qmax_test_matches_A1
+2649	author_packaged	D_RA	author_Experiments	742	-34.283207	True	declared_qmax_test_matches_A1
+2659	author_packaged	D_RA	author_Experiments	758	-85.115341	True	declared_qmax_test_matches_A1
+2684	author_packaged	D_RA	author_Experiments	800	0.498844	True	declared_qmax_test_matches_A1
+Đã lưu bốn CSV vào: /kaggle/working/Tables
+Thời gian kiểm nguồn NSE: 76.3 giây.
+CẢNH BÁO: chưa thấy export A2 có environment.json trong các Search roots trên; CSV tác giả không được gọi là kết quả chạy lại A2.
+CẢNH BÁO: ngày đánh giá mới kiểm qua khai báo config; CSV NSE chưa xác nhận tập ngày/quan trắc thực sự được dùng để chấm.
+DỪNG: gửi bảng (1)–(5) và cảnh báo; chưa mở test_results.p, tính tương quan/NSE mới, chọn epoch hoặc chọn mô hình theo test.

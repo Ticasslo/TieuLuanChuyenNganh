@@ -1,0 +1,65 @@
+Đã lưu hình: /kaggle/working/Figures/A1_P9_author_profile_series.png
+(1) Đúng tệp chuỗi tác giả cạnh best_model metrics; trạng thái schema/path:
+source	run	file	status	bytes	sha256	clip_qmax_declared	basin_keys
+0	author_packaged	SeqLSTM_Q	/kaggle/input/datasets/hunhngcthng/lamah-ce-ex...	read	16177813	609f2c38fb9e005ad8333ce48cc0946edde6d1fb360115...	True	451
+1	author_packaged	SeqLSTM_noQ	/kaggle/input/datasets/hunhngcthng/lamah-ce-ex...	read	16177815	96aa50c98d02356bdbe82b36edf845b5e83599dd505f0e...	True	451
+2	author_packaged	EncDec_Q	/kaggle/input/datasets/hunhngcthng/lamah-ce-ex...	read	16177813	62458f319b5d2556deac965f579947d361d7c1083db7aa...	True	451
+3	author_packaged	EncDec_noQ	/kaggle/input/datasets/hunhngcthng/lamah-ce-ex...	read	16177815	f379b302cb690f8267cb0d82afc2b38fa2ac73a6b04756...	True	451
+4	author_packaged	D_FC	/kaggle/input/datasets/hunhngcthng/lamah-ce-ex...	read	16177815	52af8de05eafb8156f09d28ea7374aff499d31e135b3c7...	True	451
+5	author_packaged	D_RA	/kaggle/input/datasets/hunhngcthng/lamah-ce-ex...	read	16177815	3b7d13ed8c97a250ea6c3f08159c72a0a3853b72d22408...	True	451
+(2) Đối chiếu ngày, obs và mask với CSV hiện tại; dung sai chỉ mô tả sai khác số học:
+run	basin_id	status	time_steps	rows_outside_test	missing_result_rows	finite_obs_days	finite_csv_days	finite_sim_days	paired_days	obs_csv_missing_mask_difference_days	obs_csv_max_abs_difference_mm_day	obs_csv_within_1e_7_days	obs_csv_within_1e_5_days
+0	SeqLSTM_Q	55	compared	1	0	0	807	807	0	0	0	5.533319e-06	339	807
+1	SeqLSTM_Q	742	compared	1	0	0	1461	1461	1461	1461	0	1.184467e-07	1113	1461
+2	SeqLSTM_Q	758	compared	1	0	0	1461	1461	1461	1461	0	1.186967e-07	1246	1461
+3	SeqLSTM_Q	800	compared	1	0	0	1461	1461	1461	1461	0	1.068512e-05	834	1460
+4	SeqLSTM_noQ	55	compared	1	0	0	807	807	1461	807	0	5.533319e-06	339	807
+5	SeqLSTM_noQ	742	compared	1	0	0	1461	1461	1461	1461	0	1.184467e-07	1113	1461
+6	SeqLSTM_noQ	758	compared	1	0	0	1461	1461	1461	1461	0	1.186967e-07	1246	1461
+7	SeqLSTM_noQ	800	compared	1	0	0	1461	1461	1461	1461	0	1.068512e-05	834	1460
+8	EncDec_Q	55	compared	1	0	0	807	807	0	0	0	5.533319e-06	339	807
+9	EncDec_Q	742	compared	1	0	0	1461	1461	1461	1461	0	1.184467e-07	1113	1461
+10	EncDec_Q	758	compared	1	0	0	1461	1461	1461	1461	0	1.186967e-07	1246	1461
+11	EncDec_Q	800	compared	1	0	0	1461	1461	1461	1461	0	1.068512e-05	834	1460
+12	EncDec_noQ	55	compared	1	0	0	807	807	1461	807	0	5.533319e-06	339	807
+13	EncDec_noQ	742	compared	1	0	0	1461	1461	1461	1461	0	1.184467e-07	1113	1461
+14	EncDec_noQ	758	compared	1	0	0	1461	1461	1461	1461	0	1.186967e-07	1246	1461
+15	EncDec_noQ	800	compared	1	0	0	1461	1461	1461	1461	0	1.068512e-05	834	1460
+16	D_FC	55	compared	1	0	0	807	807	1461	807	0	7.902447e-06	328	807
+17	D_FC	742	compared	1	0	0	1461	1461	1461	1461	0	1.199719e-07	1113	1461
+18	D_FC	758	compared	1	0	0	1461	1461	1461	1461	0	1.186967e-07	1246	1461
+19	D_FC	800	compared	1	0	0	1461	1461	1461	1461	0	1.031053e-05	837	1460
+20	D_RA	55	compared	1	0	0	807	807	1461	807	0	7.902447e-06	328	807
+21	D_RA	742	compared	1	0	0	1461	1461	1461	1461	0	1.199719e-07	1113	1461
+22	D_RA	758	compared	1	0	0	1461	1461	1461	1461	0	1.186967e-07	1246	1461
+23	D_RA	800	compared	1	0	0	1461	1461	1461	1461	0	1.031053e-05	837	1460
+(3) Sai số trên đúng obs/sim hữu hạn; mean error = sim − obs; không dùng CSV obs thay vào NSE:
+run	basin_id	status	paired_days	clip_qmax_declared	negative_sim_raw_days	obs_std_mm_day	mean_error_mm_day	rmse_mm_day	mean_error_squared_over_obs_variance	error_variance_over_obs_variance	nse_from_raw_sim	nse_recomputed_float64	nse_csv	abs_nse_difference	nse_finite_state_matches
+0	SeqLSTM_Q	55	compared	0	True	0	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	True
+1	SeqLSTM_Q	742	compared	1461	True	6	0.017361	0.096242	0.116386	30.730283	14.210393	-44.133718	-43.940676	-43.940674	2.067768e-06	True
+2	SeqLSTM_Q	758	compared	1461	True	17	0.012552	0.092153	0.111776	53.897887	25.397722	-78.762063	-78.295610	-78.295601	8.661331e-06	True
+3	SeqLSTM_Q	800	compared	1461	True	1	14.398316	-0.737215	8.826693	0.002622	0.373192	0.624014	0.624186	0.624186	1.859479e-08	True
+4	SeqLSTM_noQ	55	compared	807	True	113	22.701276	-1.601976	12.315247	0.004980	0.289317	0.705703	0.705703	0.705703	5.060783e-08	True
+5	SeqLSTM_noQ	742	compared	1461	True	397	0.017361	-0.001009	0.039831	0.003380	5.260265	-6.523761	-4.263644	-4.263644	2.166077e-07	True
+6	SeqLSTM_noQ	758	compared	1461	True	581	0.012552	0.010126	0.039123	0.650755	9.063611	-13.830682	-8.714366	-8.714366	2.941626e-07	True
+7	SeqLSTM_noQ	800	compared	1461	True	0	14.398316	-3.185964	10.920074	0.048962	0.526250	0.424788	0.424788	0.424788	1.066480e-08	True
+8	EncDec_Q	55	compared	0	True	0	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	True
+9	EncDec_Q	742	compared	1461	True	0	0.017361	0.123997	0.125434	51.010070	1.189403	-51.199473	-51.199473	-51.199471	2.467381e-06	True
+10	EncDec_Q	758	compared	1461	True	0	0.012552	0.143597	0.144444	130.870193	1.549570	-131.419763	-131.419763	-131.419769	5.834004e-06	True
+11	EncDec_Q	800	compared	1461	True	0	14.398316	-3.121835	9.902977	0.047011	0.426040	0.526949	0.526949	0.526949	7.765667e-08	True
+12	EncDec_noQ	55	compared	807	True	0	22.701276	0.440627	11.745051	0.000377	0.267299	0.732324	0.732324	0.732324	5.799350e-10	True
+13	EncDec_noQ	742	compared	1461	True	0	0.017361	0.137833	0.138922	63.028679	1.000000	-63.028679	-63.028679	-63.028679	1.141153e-08	True
+14	EncDec_noQ	758	compared	1461	True	0	0.012552	0.157737	0.158236	157.913531	1.000000	-157.913531	-157.913531	-157.913528	2.103024e-06	True
+15	EncDec_noQ	800	compared	1461	True	0	14.398316	-5.336298	13.037255	0.137359	0.682518	0.180123	0.180123	0.180123	2.358029e-08	True
+16	D_FC	55	compared	807	True	143	22.701276	-8.876429	16.853564	0.152889	0.398278	0.448790	0.448833	0.448833	8.598236e-08	True
+17	D_FC	742	compared	1461	True	46	0.017361	0.044969	0.059627	6.709166	5.086611	-10.991143	-10.795777	-10.795778	9.200483e-07	True
+18	D_FC	758	compared	1461	True	59	0.012552	0.061989	0.073503	24.388121	9.901600	-33.636061	-33.289721	-33.289719	2.610877e-06	True
+19	D_FC	800	compared	1461	True	0	14.398316	-3.158166	11.431475	0.048111	0.582238	0.369651	0.369651	0.369651	2.011145e-08	True
+20	D_RA	55	compared	807	True	0	22.701276	7.926415	14.647333	0.121914	0.294396	0.583690	0.583690	0.583690	6.604033e-09	True
+21	D_RA	742	compared	1461	True	4	0.017361	0.096892	0.103126	31.146564	4.136641	-34.520288	-34.283205	-34.283207	2.193202e-06	True
+22	D_RA	758	compared	1461	True	4	0.012552	0.111371	0.116483	78.721708	7.393634	-85.484827	-85.115342	-85.115341	6.777962e-07	True
+23	D_RA	800	compared	1461	True	0	14.398316	-3.477593	10.192908	0.058336	0.442820	0.498844	0.498844	0.498844	8.518533e-08	True
+Đã lưu ba CSV vào: /kaggle/working/Tables
+Thời gian đối chiếu bốn hồ sơ chuỗi tác giả: 25.2 giây.
+CẢNH BÁO: float64 có thể lệch số học so NSE lưu; không thay quan trắc, tự đổi đơn vị/ngày hoặc cắt sim ngoài chính sách config. Khớp cùng nguồn không xác nhận độc lập quan trắc vật lý.
+DỪNG: gửi hình, bảng (1)–(3) và cảnh báo; chưa chạy mô hình, đổi danh sách lưu vực, tính persistence/PNSE/KGE hoặc chọn xử lý bằng test.

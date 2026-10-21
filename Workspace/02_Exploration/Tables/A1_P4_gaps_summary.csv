@@ -1,0 +1,3 @@
+﻿scope,files,raw_rows,unique_hours,duplicate_rows,runs,short_runs,long_runs,short_run_hours,long_run_hours,max_run_hours
+all_gap_files,230,780671,780671,0,1198,215,983,542,780129,43824
+selected_gap_files,97,356866,356866,0,441,77,364,191,356675,23137

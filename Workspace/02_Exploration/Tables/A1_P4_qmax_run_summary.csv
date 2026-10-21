@@ -1,0 +1,4 @@
+﻿position,runs,basins,missing_days,median_run_days,p95_run_days,max_run_days,missing_rows,blank_cells,invalid_nonblank
+after_last_valid,1,1,35,35.0,35.0,35,0,35,0
+before_first_valid,141,141,602184,3652.0,9882.0,10841,601693,491,0
+between_valid_dates,220,56,14045,11.0,216.04999999999998,963,0,14045,0

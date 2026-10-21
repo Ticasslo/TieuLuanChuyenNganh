@@ -1,0 +1,78 @@
+(1) Số mức và biên dự báo trên ngày sim hữu hạn; constant chỉ đúng khi max=min chính xác:
+run	basin_id	finite_sim_days	paired_days	raw_distinct_values	raw_constant	raw_min	raw_max	raw_std_ddof0	evaluated_distinct_values	evaluated_constant	evaluated_min	evaluated_max	evaluated_std_ddof0
+0	SeqLSTM_Q	55	0	0	0	False	NaN	NaN	NaN	0	False	NaN	NaN	NaN
+1	SeqLSTM_Q	742	1461	1461	1460	False	-0.258564	0.980942	0.068477	1455	False	0.000000	0.980942	0.067690
+2	SeqLSTM_Q	758	1461	1461	1459	False	-0.291629	0.859183	0.065487	1443	False	0.000000	0.859183	0.064246
+3	SeqLSTM_Q	800	1461	1461	1461	False	-4.816066	83.305023	9.997845	1461	False	0.000000	83.305023	9.994496
+4	SeqLSTM_noQ	55	1461	807	1461	False	-0.541822	84.824707	15.900030	1349	False	0.000000	84.824707	15.893795
+5	SeqLSTM_noQ	742	1461	1461	1460	False	-0.123568	0.266462	0.046978	1064	False	0.000000	0.266462	0.038526
+6	SeqLSTM_noQ	758	1461	1461	1459	False	-0.142441	0.259237	0.047911	880	False	0.000000	0.259237	0.035829
+7	SeqLSTM_noQ	800	1461	1461	1461	False	0.720016	53.897022	6.152882	1461	False	0.720016	53.897022	6.152882
+8	EncDec_Q	55	0	0	0	False	NaN	NaN	NaN	0	False	NaN	NaN	NaN
+9	EncDec_Q	742	1461	1461	1046	False	0.156127	0.286684	0.010477	1046	False	0.156127	0.286684	0.010477
+10	EncDec_Q	758	1461	1461	1020	False	0.156156	0.286726	0.009026	1020	False	0.156156	0.286726	0.009026
+11	EncDec_Q	800	1461	1461	1461	False	0.812537	61.416130	7.147062	1461	False	0.812537	61.416130	7.147062
+12	EncDec_noQ	55	1461	807	1033	False	0.243154	59.496651	16.955103	1033	False	0.243154	59.496651	16.955103
+13	EncDec_noQ	742	1461	1461	1	True	0.173010	0.173010	0.000000	1	True	0.173010	0.173010	0.000000
+14	EncDec_noQ	758	1461	1461	1	True	0.173010	0.173010	0.000000	1	True	0.173010	0.173010	0.000000
+15	EncDec_noQ	800	1461	1461	1356	False	0.582035	26.422783	3.659574	1356	False	0.582035	26.422783	3.659574
+16	D_FC	55	1461	807	1461	False	-0.823331	75.533630	11.354093	1319	False	0.000000	75.533630	11.339208
+17	D_FC	742	1461	1461	1459	False	-0.075388	0.242354	0.044760	1414	False	0.000000	0.242354	0.043213
+18	D_FC	758	1461	1461	1459	False	-0.086243	0.242352	0.045548	1401	False	0.000000	0.242352	0.043634
+19	D_FC	800	1461	1461	1461	False	0.947552	61.638649	6.277480	1461	False	0.947552	61.638649	6.277480
+20	D_RA	55	1461	807	1461	False	0.172442	102.586754	25.061644	1461	False	0.172442	102.586754	25.061644
+21	D_RA	742	1461	1461	1459	False	-0.172851	0.282233	0.036255	1456	False	0.000000	0.282233	0.034572
+22	D_RA	758	1461	1461	1459	False	-0.180020	0.277457	0.036274	1456	False	0.000000	0.277457	0.034403
+23	D_RA	800	1461	1461	1461	False	1.075901	59.772240	6.145627	1461	False	1.075901	59.772240	6.145627
+(2) Dự báo âm trong/ngoài tập ngày có obs; phần mean error là tỷ phần của MSE, không phải tỷ phần nguyên nhân:
+run	basin_id	negative_raw_all_days	negative_raw_paired_days	negative_raw_without_obs_days	zero_evaluated_paired_days	mse_fraction_from_mean_error	nse_gain_from_declared_clipping
+0	SeqLSTM_Q	55	0	0	0	0	NaN	NaN
+1	SeqLSTM_Q	742	6	6	0	6	0.683797	0.193042
+2	SeqLSTM_Q	758	17	17	0	17	0.679708	0.466453
+3	SeqLSTM_Q	800	1	1	0	1	0.006976	0.000172
+4	SeqLSTM_noQ	55	113	0	113	0	0.016921	0.000000
+5	SeqLSTM_noQ	742	397	397	0	397	0.000642	2.260116
+6	SeqLSTM_noQ	758	581	581	0	581	0.066989	5.116316
+7	SeqLSTM_noQ	800	0	0	0	0	0.085120	0.000000
+8	EncDec_Q	55	0	0	0	0	NaN	NaN
+9	EncDec_Q	742	0	0	0	0	0.977214	0.000000
+10	EncDec_Q	758	0	0	0	0	0.988298	0.000000
+11	EncDec_Q	800	0	0	0	0	0.099378	0.000000
+12	EncDec_noQ	55	0	0	0	0	0.001407	0.000000
+13	EncDec_noQ	742	0	0	0	0	0.984382	0.000000
+14	EncDec_noQ	758	0	0	0	0	0.993707	0.000000
+15	EncDec_noQ	800	0	0	0	0	0.167536	0.000000
+16	D_FC	55	143	47	96	47	0.277391	0.000043
+17	D_FC	742	46	46	0	46	0.568777	0.195365
+18	D_FC	758	59	59	0	59	0.711237	0.346339
+19	D_FC	800	0	0	0	0	0.076325	0.000000
+20	D_RA	55	0	0	0	0	0.292844	0.000000
+21	D_RA	742	4	4	0	4	0.882759	0.237083
+22	D_RA	758	4	4	0	4	0.914143	0.369485
+23	D_RA	800	0	0	0	0	0.116402	0.000000
+(3) Hai chuỗi dự báo 742/758 trên cùng ngày; hằng số giữ tương quan NaN:
+source	run	side	common_finite_days	identical_value_days	mean_abs_difference_mm_day	max_abs_difference_mm_day	pearson_r	correlation_status
+0	author_packaged	SeqLSTM_Q	sim_raw	1461	0	0.024206	0.121760	0.995578	defined
+1	author_packaged	SeqLSTM_Q	sim_evaluated	1461	6	0.023994	0.121760	0.995377	defined
+2	author_packaged	SeqLSTM_noQ	sim_raw	1461	0	0.013422	0.023848	0.997626	defined
+3	author_packaged	SeqLSTM_noQ	sim_evaluated	1461	397	0.008787	0.023027	0.987365	defined
+4	author_packaged	EncDec_Q	sim_raw	1461	69	0.000427	0.042837	0.974435	defined
+5	author_packaged	EncDec_Q	sim_evaluated	1461	69	0.000427	0.042837	0.974435	defined
+6	author_packaged	EncDec_noQ	sim_raw	1461	1461	0.000000	0.000000	NaN	constant_or_fewer_than_3_pairs
+7	author_packaged	EncDec_noQ	sim_evaluated	1461	1461	0.000000	0.000000	NaN	constant_or_fewer_than_3_pairs
+8	author_packaged	D_FC	sim_raw	1461	0	0.003239	0.013525	0.999120	defined
+9	author_packaged	D_FC	sim_evaluated	1461	46	0.003050	0.013525	0.998950	defined
+10	author_packaged	D_RA	sim_raw	1461	0	0.005458	0.025864	0.997324	defined
+11	author_packaged	D_RA	sim_evaluated	1461	4	0.005426	0.023804	0.997147	defined
+(4) Ví dụ obs/CSV có sai khác >1e-5 mm/ngày; không bỏ hoặc nâng dung sai. Ba sai khác lớn nhất mỗi hồ sơ lưu CSV:
+source	run	basin_id	date	obs_author_mm_day	qmax_csv_mm_day	abs_difference_mm_day	exceeds_1e_5	abs_difference_from_direct_csv_float32
+9	author_packaged	SeqLSTM_Q	800	2017-08-31	108.308136	108.308125	0.000011	True	0.000008
+21	author_packaged	SeqLSTM_noQ	800	2017-08-31	108.308136	108.308125	0.000011	True	0.000008
+33	author_packaged	EncDec_Q	800	2017-08-31	108.308136	108.308125	0.000011	True	0.000008
+45	author_packaged	EncDec_noQ	800	2017-08-31	108.308136	108.308125	0.000011	True	0.000008
+57	author_packaged	D_FC	800	2017-08-09	107.958351	107.958361	0.000010	True	0.000008
+69	author_packaged	D_RA	800	2017-08-09	107.958351	107.958361	0.000010	True	0.000008
+Đã lưu hình: /kaggle/working/Figures/A1_P9_author_profile_error_components.png ; ba CSV vào: /kaggle/working/Tables
+Thời gian kiểm độ biến thiên hồ sơ: 0.7 giây.
+CẢNH BÁO: khớp mức dự báo hoặc chuỗi hằng chưa xác nhận nguyên nhân mô hình. Ép CSV sang float32 trực tiếp chỉ là đối chiếu số học, không tái tạo đầy đủ chuẩn hóa/khôi phục nhãn tác giả.
+DỪNG: gửi hình, bảng (1)–(4) và cảnh báo; chưa hiệu chỉnh mean error, sửa obs/sim, chọn lọc ID hoặc mở rộng kết luận sang 451 lưu vực.

@@ -1,0 +1,85 @@
+(1) Đoạn vượt liên tiếp, tổng độ dài khớp ngày vượt 10.7; chưa là trận độc lập:
+scope	return_period_years	basins	basins_with_eligible_days	basins_with_runs	basins_eligible_no_runs	basins_no_eligible_days	above_days	run_count	both_contexts_observed_runs	only_onset_observed_runs	only_ending_observed_runs	neither_context_observed_runs	scope_boundary_touching_runs	missing_neighbor_runs	pooled_run_days_median	pooled_run_days_p95	max_run_days
+0	reference_1981_2013	1.5	451	451	451	0	0	33965	16063	16062	1	0	0	0	1	1.0	4.0	192
+1	reference_1981_2013	2.0	451	451	451	0	0	17883	9198	9197	1	0	0	0	1	1.0	4.0	163
+2	reference_1981_2013	5.0	451	451	449	2	0	4919	3023	3023	0	0	0	0	0	1.0	3.0	74
+3	reference_1981_2013	10.0	451	451	442	9	0	2352	1520	1520	0	0	0	0	0	1.0	3.0	60
+4	train	1.5	451	448	446	2	3	7137	3572	3564	1	7	0	8	0	1.0	4.0	121
+5	train	2.0	451	448	437	11	3	3712	2073	2066	0	7	0	7	0	1.0	3.0	95
+6	train	5.0	451	448	333	115	3	940	663	662	0	1	0	1	0	1.0	3.0	24
+7	train	10.0	451	448	218	230	3	438	325	325	0	0	0	0	0	1.0	2.0	6
+8	validation	1.5	451	451	451	0	0	5282	2786	2785	0	1	0	1	0	1.0	4.0	79
+9	validation	2.0	451	451	433	18	0	2806	1581	1581	0	0	0	0	0	1.0	4.0	70
+10	validation	5.0	451	451	324	127	0	869	533	533	0	0	0	0	0	1.0	3.0	37
+11	validation	10.0	451	451	210	241	0	394	285	285	0	0	0	0	0	1.0	3.0	14
+12	test	1.5	451	451	410	41	0	3509	2093	2091	2	0	0	2	0	1.0	3.0	120
+13	test	2.0	451	451	368	83	0	1773	1157	1157	0	0	0	0	0	1.0	3.0	61
+14	test	5.0	451	451	214	237	0	498	366	366	0	0	0	0	0	1.0	2.0	22
+15	test	10.0	451	451	131	320	0	220	184	184	0	0	0	0	0	1.0	2.0	9
+(2) Ngữ cảnh đầu/cuối các đoạn test; ranh giới kỳ và ngày thiếu không coi là ngày không vượt:
+scope	return_period_years	left_context	right_context	runs	above_days
+9	test	1.5	observed_not_above	observed_not_above	2091	3507
+11	test	2.0	observed_not_above	observed_not_above	1157	1773
+14	test	5.0	observed_not_above	observed_not_above	366	498
+15	test	10.0	observed_not_above	observed_not_above	184	220
+18	test	1.5	observed_not_above	scope_boundary	2	2
+(3) Hồ sơ test cố định; không có ngày đủ điều kiện khác có quan trắc nhưng không có đoạn:
+basin_id	scope	return_period_years	threshold_mm_day	n_fit_years	below_10_fit_years	fit_status	expected_days	valid_days	missing_days	eligible_valid_days	above_days	run_count	run_days_sum	both_contexts_observed_runs	only_onset_observed_runs	only_ending_observed_runs	neither_context_observed_runs	scope_boundary_touching_runs	missing_neighbor_runs	median_run_days	max_run_days
+428	55	test	1.5	74.232492	14	False	fit_defined	1461	807	654	807	28	14	28	14	0	0	0	0	0	1.0	8.0
+429	55	test	2.0	83.286457	14	False	fit_defined	1461	807	654	807	7	4	7	4	0	0	0	0	0	1.5	3.0
+430	55	test	5.0	105.568010	14	False	fit_defined	1461	807	654	807	0	0	0	0	0	0	0	0	0	NaN	NaN
+431	55	test	10.0	120.320337	14	False	fit_defined	1461	807	654	807	0	0	0	0	0	0	0	0	0	NaN	NaN
+3068	324	test	1.5	2.290832	3	True	fit_defined	1461	1461	0	1461	3	3	3	3	0	0	0	0	0	1.0	1.0
+3069	324	test	2.0	2.954233	3	True	fit_defined	1461	1461	0	1461	2	2	2	2	0	0	0	0	0	1.0	1.0
+3070	324	test	5.0	4.586845	3	True	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+3071	324	test	10.0	5.667777	3	True	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+5452	600	test	1.5	9.328619	4	True	fit_defined	1461	1461	0	1461	25	16	25	16	0	0	0	0	0	1.0	3.0
+5453	600	test	2.0	11.468962	4	True	fit_defined	1461	1461	0	1461	13	11	13	11	0	0	0	0	0	1.0	2.0
+5454	600	test	5.0	16.736288	4	True	fit_defined	1461	1461	0	1461	4	4	4	4	0	0	0	0	0	1.0	1.0
+5455	600	test	10.0	20.223715	4	True	fit_defined	1461	1461	0	1461	4	4	4	4	0	0	0	0	0	1.0	1.0
+5500	604	test	1.5	10.569167	17	False	fit_defined	1461	1461	0	1461	14	10	14	10	0	0	0	0	0	1.0	3.0
+5501	604	test	2.0	13.201108	17	False	fit_defined	1461	1461	0	1461	5	4	5	4	0	0	0	0	0	1.0	2.0
+5502	604	test	5.0	19.678242	17	False	fit_defined	1461	1461	0	1461	1	1	1	1	0	0	0	0	0	1.0	1.0
+5503	604	test	10.0	23.966668	17	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+5660	623	test	1.5	38.203094	4	True	fit_defined	1461	1461	0	1461	3	3	3	3	0	0	0	0	0	1.0	1.0
+5661	623	test	2.0	41.794352	4	True	fit_defined	1461	1461	0	1461	2	2	2	2	0	0	0	0	0	1.0	1.0
+5662	623	test	5.0	50.632336	4	True	fit_defined	1461	1461	0	1461	1	1	1	1	0	0	0	0	0	1.0	1.0
+5663	623	test	10.0	56.483851	4	True	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+6492	742	test	1.5	0.286338	33	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+6493	742	test	2.0	0.414794	33	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+6494	742	test	5.0	0.730921	33	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+6495	742	test	10.0	0.940224	33	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+6636	758	test	1.5	0.239910	33	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+6637	758	test	2.0	0.378036	33	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+6638	758	test	5.0	0.717961	33	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+6639	758	test	10.0	0.943021	33	False	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+7020	800	test	1.5	124.010896	4	True	fit_defined	1461	1461	0	1461	3	3	3	3	0	0	0	0	0	1.0	1.0
+7021	800	test	2.0	136.100546	4	True	fit_defined	1461	1461	0	1461	2	2	2	2	0	0	0	0	0	1.0	1.0
+7022	800	test	5.0	165.852832	4	True	fit_defined	1461	1461	0	1461	1	1	1	1	0	0	0	0	0	1.0	1.0
+7023	800	test	10.0	185.551435	4	True	fit_defined	1461	1461	0	1461	0	0	0	0	0	0	0	0	0	NaN	NaN
+(4) Tối đa 20 đoạn test dài nhất; cùng chuỗi có thể xuất hiện ở nhiều T lồng nhau:
+basin_id	scope	return_period_years	threshold_mm_day	n_fit_years	below_10_fit_years	fit_status	run_number	start_date	end_date	run_days	observed_peak_mm_day	first_peak_date	last_peak_date	days_at_peak	left_context	right_context	onset_observed	ending_observed	both_contexts_observed
+39469	697	test	1.5	1.978721	33	False	fit_defined	4	2016-06-11	2016-10-08	120	3.253889	2016-08-05	2016-08-06	2	observed_not_above	observed_not_above	True	True	True
+31580	563	test	1.5	2.420263	33	False	fit_defined	3	2014-02-09	2014-04-12	63	4.276724	2014-02-24	2014-02-24	1	observed_not_above	observed_not_above	True	True	True
+39474	697	test	2.0	2.171207	33	False	fit_defined	3	2016-07-12	2016-09-10	61	3.253889	2016-08-05	2016-08-06	2	observed_not_above	observed_not_above	True	True	True
+31586	563	test	2.0	2.764592	33	False	fit_defined	1	2014-02-16	2014-04-02	46	4.276724	2014-02-24	2014-02-24	1	observed_not_above	observed_not_above	True	True	True
+19024	326	test	1.5	3.859389	31	False	fit_defined	7	2017-04-24	2017-05-21	28	4.600519	2017-04-28	2017-04-28	1	observed_not_above	observed_not_above	True	True	True
+34377	593	test	1.5	4.595114	17	False	fit_defined	2	2014-02-09	2014-03-08	28	14.105060	2014-02-22	2014-02-22	1	observed_not_above	observed_not_above	True	True	True
+31581	563	test	1.5	2.420263	33	False	fit_defined	4	2014-09-04	2014-09-30	27	3.263547	2014-09-15	2014-09-15	1	observed_not_above	observed_not_above	True	True	True
+31584	563	test	1.5	2.420263	33	False	fit_defined	7	2016-08-21	2016-09-14	25	3.008981	2016-08-24	2016-08-25	2	observed_not_above	observed_not_above	True	True	True
+31585	563	test	1.5	2.420263	33	False	fit_defined	8	2017-09-19	2017-10-11	23	3.395922	2017-09-25	2017-09-25	1	observed_not_above	observed_not_above	True	True	True
+39478	697	test	5.0	2.644911	33	False	fit_defined	3	2016-08-02	2016-08-23	22	3.253889	2016-08-05	2016-08-06	2	observed_not_above	observed_not_above	True	True	True
+34639	595	test	1.5	3.493475	33	False	fit_defined	3	2014-02-16	2014-03-08	21	9.720000	2014-02-22	2014-02-22	1	observed_not_above	observed_not_above	True	True	True
+31084	556	test	1.5	3.435730	33	False	fit_defined	4	2014-09-03	2014-09-22	20	4.341103	2014-09-14	2014-09-16	3	observed_not_above	observed_not_above	True	True	True
+31583	563	test	1.5	2.420263	33	False	fit_defined	6	2014-12-01	2014-12-20	20	2.759505	2014-12-08	2014-12-09	2	observed_not_above	observed_not_above	True	True	True
+34394	593	test	2.0	6.233488	17	False	fit_defined	2	2014-02-11	2014-03-02	20	14.105060	2014-02-22	2014-02-22	1	observed_not_above	observed_not_above	True	True	True
+38793	688	test	1.5	4.017665	33	False	fit_defined	2	2016-06-09	2016-06-24	16	4.522649	2016-06-11	2016-06-11	1	observed_not_above	observed_not_above	True	True	True
+31587	563	test	2.0	2.764592	33	False	fit_defined	2	2014-09-12	2014-09-26	15	3.263547	2014-09-15	2014-09-15	1	observed_not_above	observed_not_above	True	True	True
+31589	563	test	2.0	2.764592	33	False	fit_defined	4	2017-09-20	2017-10-04	15	3.395922	2017-09-25	2017-09-25	1	observed_not_above	observed_not_above	True	True	True
+43844	786	test	1.5	1.455773	33	False	fit_defined	3	2015-05-03	2015-05-17	15	1.892254	2015-05-06	2015-05-06	1	observed_not_above	observed_not_above	True	True	True
+31590	563	test	5.0	3.611975	33	False	fit_defined	1	2014-02-20	2014-03-05	14	4.276724	2014-02-24	2014-02-24	1	observed_not_above	observed_not_above	True	True	True
+39466	697	test	1.5	1.978721	33	False	fit_defined	1	2015-05-20	2015-06-02	14	2.121641	2015-05-20	2015-05-21	2	observed_not_above	observed_not_above	True	True	True
+Đã lưu hình: /kaggle/working/Figures/A1_P10_gumbel_exceedance_runs.png ; bốn CSV vào: /kaggle/working/Tables
+Thời gian kiểm đoạn vượt liên tiếp: 11.4 giây.
+CẢNH BÁO: hai đoạn cách ngày thiếu có thể thuộc cùng một trận chưa biết; đoạn có đủ hai phía quan trắc cũng chưa bảo đảm độc lập với đoạn khác. Ngưỡng cao hơn có thể tách một đoạn thành nhiều đoạn, nên số đoạn không buộc giảm theo T.
+DỪNG: gửi hình, bảng (1)–(4) và cảnh báo; chưa gộp theo USWRC, xác nhận số trận độc lập, chấm dự báo, lọc ID hoặc dùng test đổi ngưỡng.

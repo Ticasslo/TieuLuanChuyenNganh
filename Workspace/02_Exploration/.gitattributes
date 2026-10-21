@@ -1,0 +1,5 @@
+# Giữ nguyên byte của hình và bảng/log làm bằng chứng, kể cả kiểu xuống dòng.
+# Tab cuối dòng trong bảng/log có thể biểu diễn trường rỗng có chủ đích.
+Figures/*.png -text
+Tables/*.csv -text -whitespace
+Tables/*.txt -text -whitespace

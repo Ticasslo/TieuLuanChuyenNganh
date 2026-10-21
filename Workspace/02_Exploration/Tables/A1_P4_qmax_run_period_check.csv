@@ -1,0 +1,4 @@
+﻿period,overlap_days,missing_days_from_4_2,matches
+train,40900,40900,True
+validation,2630,2630,True
+test,1545,1545,True

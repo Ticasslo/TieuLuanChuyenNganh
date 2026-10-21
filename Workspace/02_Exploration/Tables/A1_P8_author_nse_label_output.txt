@@ -1,0 +1,144 @@
+(1) Ghép đúng sáu CSV tác giả; NSE không hữu hạn giữ riêng, không gọi là kết quả chạy lại A2:
+source	run	selected_basins	rows	finite_nse	negative_finite_nse	nonfinite_nse_ids
+0	author_packaged	SeqLSTM_Q	451	451	450	4	55
+1	author_packaged	SeqLSTM_noQ	451	451	451	3	
+2	author_packaged	EncDec_Q	451	451	450	13	55
+3	author_packaged	EncDec_noQ	451	451	451	20	
+4	author_packaged	D_FC	451	451	451	39	
+5	author_packaged	D_RA	451	451	451	3	
+(2) Tương quan ngang ID trên từng cặp hữu hạn; số thiếu NSE/đặc điểm không đếm lặp:
+run	metric	scope_basins	paired_basins	nonfinite_nse_basins	nonfinite_feature_with_finite_nse	pearson_r	spearman_rho	status
+0	SeqLSTM_Q	train_coverage_pct	451	450	1	0	-0.010545	0.018665	defined
+1	SeqLSTM_Q	test_coverage_pct	451	450	1	0	-0.007647	-0.074545	defined
+2	SeqLSTM_Q	train_std_mm_day	451	447	1	3	0.072081	0.134605	defined
+3	SeqLSTM_Q	test_std_mm_day	451	450	1	0	0.073922	0.134738	defined
+4	SeqLSTM_Q	test_mean_ratio_to_train	451	447	1	3	0.163776	0.101462	defined
+5	SeqLSTM_Q	test_std_ratio_to_train	451	447	1	3	0.014901	0.007283	defined
+6	SeqLSTM_Q	test_w1_to_train_mm_day	451	447	1	3	0.044910	0.147796	defined
+7	SeqLSTM_Q	test_above_p99_pct	451	447	1	3	0.025647	-0.082135	defined
+24	SeqLSTM_noQ	train_coverage_pct	451	451	0	0	0.029994	0.047448	defined
+25	SeqLSTM_noQ	test_coverage_pct	451	451	0	0	-0.020085	-0.030333	defined
+26	SeqLSTM_noQ	train_std_mm_day	451	448	0	3	0.156484	0.381914	defined
+27	SeqLSTM_noQ	test_std_mm_day	451	451	0	0	0.153573	0.374418	defined
+28	SeqLSTM_noQ	test_mean_ratio_to_train	451	448	0	3	0.149795	0.069140	defined
+29	SeqLSTM_noQ	test_std_ratio_to_train	451	448	0	3	-0.002598	0.029094	defined
+30	SeqLSTM_noQ	test_w1_to_train_mm_day	451	448	0	3	0.059938	0.246092	defined
+31	SeqLSTM_noQ	test_above_p99_pct	451	448	0	3	-0.002957	-0.028895	defined
+48	EncDec_Q	train_coverage_pct	451	450	1	0	-0.008641	0.042096	defined
+49	EncDec_Q	test_coverage_pct	451	450	1	0	-0.006741	-0.085622	defined
+50	EncDec_Q	train_std_mm_day	451	447	1	3	0.069680	0.175915	defined
+51	EncDec_Q	test_std_mm_day	451	450	1	0	0.072219	0.187813	defined
+52	EncDec_Q	test_mean_ratio_to_train	451	447	1	3	0.161749	0.164889	defined
+53	EncDec_Q	test_std_ratio_to_train	451	447	1	3	0.014604	0.063729	defined
+54	EncDec_Q	test_w1_to_train_mm_day	451	447	1	3	0.043521	0.164584	defined
+55	EncDec_Q	test_above_p99_pct	451	447	1	3	0.025609	-0.022458	defined
+72	EncDec_noQ	train_coverage_pct	451	451	0	0	-0.008635	0.072014	defined
+73	EncDec_noQ	test_coverage_pct	451	451	0	0	-0.007629	-0.110182	defined
+74	EncDec_noQ	train_std_mm_day	451	448	0	3	0.070285	0.435486	defined
+75	EncDec_noQ	test_std_mm_day	451	451	0	0	0.072416	0.472534	defined
+76	EncDec_noQ	test_mean_ratio_to_train	451	448	0	3	0.160391	0.199400	defined
+77	EncDec_noQ	test_std_ratio_to_train	451	448	0	3	0.013493	0.190258	defined
+78	EncDec_noQ	test_w1_to_train_mm_day	451	448	0	3	0.041811	0.232317	defined
+79	EncDec_noQ	test_above_p99_pct	451	448	0	3	0.025019	0.149695	defined
+96	D_FC	train_coverage_pct	451	451	0	0	-0.007020	0.018795	defined
+97	D_FC	test_coverage_pct	451	451	0	0	-0.012780	-0.052063	defined
+98	D_FC	train_std_mm_day	451	448	0	3	0.122417	0.506314	defined
+99	D_FC	test_std_mm_day	451	451	0	0	0.131294	0.562259	defined
+100	D_FC	test_mean_ratio_to_train	451	448	0	3	0.182703	0.210478	defined
+101	D_FC	test_std_ratio_to_train	451	448	0	3	0.017306	0.191181	defined
+102	D_FC	test_w1_to_train_mm_day	451	448	0	3	0.062896	0.326982	defined
+103	D_FC	test_above_p99_pct	451	448	0	3	0.028494	0.108367	defined
+120	D_RA	train_coverage_pct	451	451	0	0	-0.008952	0.061666	defined
+121	D_RA	test_coverage_pct	451	451	0	0	-0.006165	-0.040901	defined
+122	D_RA	train_std_mm_day	451	448	0	3	0.069268	0.329892	defined
+123	D_RA	test_std_mm_day	451	451	0	0	0.071974	0.357729	defined
+124	D_RA	test_mean_ratio_to_train	451	448	0	3	0.160402	0.186515	defined
+125	D_RA	test_std_ratio_to_train	451	448	0	3	0.013520	0.126506	defined
+126	D_RA	test_w1_to_train_mm_day	451	448	0	3	0.040303	0.198862	defined
+127	D_RA	test_above_p99_pct	451	448	0	3	0.024567	0.082961	defined
+(3) Độ nhạy tại các hồ sơ đã biết; chênh hệ số = phạm vi đối chiếu trừ toàn bộ, không đổi danh sách mô hình:
+run	scope	metric	all_paired_basins	paired_basins	pearson_r	spearman_rho	delta_pearson_r	delta_spearman_rho	status
+3	SeqLSTM_Q	without_742_758_diagnostic	test_std_mm_day	450	448	0.138146	0.123098	0.064223	-0.011640	defined
+5	SeqLSTM_Q	without_742_758_diagnostic	test_std_ratio_to_train	447	445	-0.017839	-0.006163	-0.032740	-0.013445	defined
+6	SeqLSTM_Q	without_742_758_diagnostic	test_w1_to_train_mm_day	447	445	0.037679	0.136827	-0.007231	-0.010968	defined
+11	SeqLSTM_Q	without_800_diagnostic	test_std_mm_day	450	449	0.074725	0.137603	0.000803	0.002865	defined
+13	SeqLSTM_Q	without_800_diagnostic	test_std_ratio_to_train	447	446	0.171046	0.009870	0.156145	0.002587	defined
+14	SeqLSTM_Q	without_800_diagnostic	test_w1_to_train_mm_day	447	446	0.055832	0.151047	0.010922	0.003251	defined
+19	SeqLSTM_noQ	without_742_758_diagnostic	test_std_mm_day	451	449	0.281682	0.366021	0.128110	-0.008397	defined
+21	SeqLSTM_noQ	without_742_758_diagnostic	test_std_ratio_to_train	448	446	-0.054002	0.015974	-0.051405	-0.013120	defined
+22	SeqLSTM_noQ	without_742_758_diagnostic	test_w1_to_train_mm_day	448	446	0.062879	0.236397	0.002941	-0.009695	defined
+27	SeqLSTM_noQ	without_800_diagnostic	test_std_mm_day	451	450	0.158178	0.380623	0.004606	0.006205	defined
+29	SeqLSTM_noQ	without_800_diagnostic	test_std_ratio_to_train	448	447	0.141455	0.033777	0.144053	0.004683	defined
+30	SeqLSTM_noQ	without_800_diagnostic	test_w1_to_train_mm_day	448	447	0.084905	0.251816	0.024968	0.005724	defined
+35	EncDec_Q	without_742_758_diagnostic	test_std_mm_day	450	448	0.178350	0.176886	0.106131	-0.010926	defined
+37	EncDec_Q	without_742_758_diagnostic	test_std_ratio_to_train	447	445	-0.008276	0.051048	-0.022880	-0.012681	defined
+38	EncDec_Q	without_742_758_diagnostic	test_w1_to_train_mm_day	447	445	0.055747	0.153791	0.012226	-0.010792	defined
+43	EncDec_Q	without_800_diagnostic	test_std_mm_day	450	449	0.073030	0.191951	0.000811	0.004139	defined
+45	EncDec_Q	without_800_diagnostic	test_std_ratio_to_train	447	446	0.169780	0.067743	0.155176	0.004014	defined
+46	EncDec_Q	without_800_diagnostic	test_w1_to_train_mm_day	447	446	0.054210	0.168958	0.010689	0.004375	defined
+51	EncDec_noQ	without_742_758_diagnostic	test_std_mm_day	451	449	0.306779	0.465454	0.234362	-0.007080	defined
+53	EncDec_noQ	without_742_758_diagnostic	test_std_ratio_to_train	448	446	-0.049184	0.179316	-0.062677	-0.010942	defined
+54	EncDec_noQ	without_742_758_diagnostic	test_w1_to_train_mm_day	448	446	0.043157	0.222320	0.001346	-0.009997	defined
+59	EncDec_noQ	without_800_diagnostic	test_std_mm_day	451	450	0.073356	0.480318	0.000939	0.007784	defined
+61	EncDec_noQ	without_800_diagnostic	test_std_ratio_to_train	448	447	0.172159	0.196702	0.158666	0.006444	defined
+62	EncDec_noQ	without_800_diagnostic	test_w1_to_train_mm_day	448	447	0.051678	0.239137	0.009866	0.006820	defined
+67	D_FC	without_742_758_diagnostic	test_std_mm_day	451	449	0.424646	0.556384	0.293353	-0.005876	defined
+69	D_FC	without_742_758_diagnostic	test_std_ratio_to_train	448	446	0.017405	0.180251	0.000099	-0.010930	defined
+70	D_FC	without_742_758_diagnostic	test_w1_to_train_mm_day	448	446	0.143843	0.318469	0.080947	-0.008513	defined
+75	D_FC	without_800_diagnostic	test_std_mm_day	451	450	0.132729	0.564418	0.001435	0.002159	defined
+77	D_FC	without_800_diagnostic	test_std_ratio_to_train	448	447	0.192641	0.192488	0.175335	0.001307	defined
+78	D_FC	without_800_diagnostic	test_w1_to_train_mm_day	448	447	0.076347	0.328312	0.013451	0.001330	defined
+83	D_RA	without_742_758_diagnostic	test_std_mm_day	451	449	0.232980	0.349108	0.161006	-0.008621	defined
+85	D_RA	without_742_758_diagnostic	test_std_ratio_to_train	448	446	-0.039663	0.114703	-0.053183	-0.011804	defined
+86	D_RA	without_742_758_diagnostic	test_w1_to_train_mm_day	448	446	-0.007525	0.188580	-0.047829	-0.010282	defined
+91	D_RA	without_800_diagnostic	test_std_mm_day	451	450	0.072866	0.363692	0.000893	0.005963	defined
+93	D_RA	without_800_diagnostic	test_std_ratio_to_train	448	447	0.169418	0.131434	0.155898	0.004928	defined
+94	D_RA	without_800_diagnostic	test_w1_to_train_mm_day	448	447	0.049616	0.204487	0.009312	0.005625	defined
+(4) Hồ sơ nhãn/NSE tác giả theo ID; không suy nguyên nhân hoặc thay NaN:
+run	basin_id	nse	train_valid_days	train_month_types_observed	test_valid_days	test_std_mm_day	test_std_ratio_to_train	test_w1_to_train_mm_day	test_above_p99_pct
+156	SeqLSTM_Q	324	0.410151	0	0	1461	0.278130	NaN	NaN	NaN
+275	SeqLSTM_Q	55	NaN	1292	7	807	22.701275	0.929585	3.676572	0.247831
+321	SeqLSTM_Q	600	0.223199	0	0	1461	2.405921	NaN	NaN	NaN
+335	SeqLSTM_Q	623	0.748529	0	0	1461	4.925606	NaN	NaN	NaN
+394	SeqLSTM_Q	742	-43.940674	2557	12	1461	0.017361	0.156114	0.059285	0.000000
+404	SeqLSTM_Q	758	-78.295601	2557	12	1461	0.012552	0.100242	0.057028	0.000000
+429	SeqLSTM_Q	800	0.624186	38	2	1461	14.398316	87.495430	7.283518	57.768652
+607	SeqLSTM_noQ	324	0.468634	0	0	1461	0.278130	NaN	NaN	NaN
+726	SeqLSTM_noQ	55	0.705703	1292	7	807	22.701275	0.929585	3.676572	0.247831
+772	SeqLSTM_noQ	600	-0.147282	0	0	1461	2.405921	NaN	NaN	NaN
+786	SeqLSTM_noQ	623	0.655505	0	0	1461	4.925606	NaN	NaN	NaN
+845	SeqLSTM_noQ	742	-4.263644	2557	12	1461	0.017361	0.156114	0.059285	0.000000
+855	SeqLSTM_noQ	758	-8.714366	2557	12	1461	0.012552	0.100242	0.057028	0.000000
+880	SeqLSTM_noQ	800	0.424788	38	2	1461	14.398316	87.495430	7.283518	57.768652
+1058	EncDec_Q	324	-0.493062	0	0	1461	0.278130	NaN	NaN	NaN
+1177	EncDec_Q	55	NaN	1292	7	807	22.701275	0.929585	3.676572	0.247831
+1223	EncDec_Q	600	0.338786	0	0	1461	2.405921	NaN	NaN	NaN
+1237	EncDec_Q	623	0.724308	0	0	1461	4.925606	NaN	NaN	NaN
+1296	EncDec_Q	742	-51.199471	2557	12	1461	0.017361	0.156114	0.059285	0.000000
+1306	EncDec_Q	758	-131.419769	2557	12	1461	0.012552	0.100242	0.057028	0.000000
+1331	EncDec_Q	800	0.526949	38	2	1461	14.398316	87.495430	7.283518	57.768652
+1509	EncDec_noQ	324	-0.393201	0	0	1461	0.278130	NaN	NaN	NaN
+1628	EncDec_noQ	55	0.732324	1292	7	807	22.701275	0.929585	3.676572	0.247831
+1674	EncDec_noQ	600	-0.080739	0	0	1461	2.405921	NaN	NaN	NaN
+1688	EncDec_noQ	623	0.496013	0	0	1461	4.925606	NaN	NaN	NaN
+1747	EncDec_noQ	742	-63.028679	2557	12	1461	0.017361	0.156114	0.059285	0.000000
+1757	EncDec_noQ	758	-157.913528	2557	12	1461	0.012552	0.100242	0.057028	0.000000
+1782	EncDec_noQ	800	0.180123	38	2	1461	14.398316	87.495430	7.283518	57.768652
+1960	D_FC	324	0.374076	0	0	1461	0.278130	NaN	NaN	NaN
+2079	D_FC	55	0.448833	1292	7	807	22.701275	0.929585	3.676572	0.247831
+2125	D_FC	600	0.223356	0	0	1461	2.405921	NaN	NaN	NaN
+2139	D_FC	623	0.428810	0	0	1461	4.925606	NaN	NaN	NaN
+2198	D_FC	742	-10.795778	2557	12	1461	0.017361	0.156114	0.059285	0.000000
+2208	D_FC	758	-33.289719	2557	12	1461	0.012552	0.100242	0.057028	0.000000
+2233	D_FC	800	0.369651	38	2	1461	14.398316	87.495430	7.283518	57.768652
+2411	D_RA	324	0.423347	0	0	1461	0.278130	NaN	NaN	NaN
+2530	D_RA	55	0.583690	1292	7	807	22.701275	0.929585	3.676572	0.247831
+2576	D_RA	600	0.024480	0	0	1461	2.405921	NaN	NaN	NaN
+2590	D_RA	623	0.735471	0	0	1461	4.925606	NaN	NaN	NaN
+2649	D_RA	742	-34.283207	2557	12	1461	0.017361	0.156114	0.059285	0.000000
+2659	D_RA	758	-85.115341	2557	12	1461	0.012552	0.100242	0.057028	0.000000
+2684	D_RA	800	0.498844	38	2	1461	14.398316	87.495430	7.283518	57.768652
+Đã lưu hình: /kaggle/working/Figures/A1_P8_author_nse_label_associations.png ; bốn CSV vào: /kaggle/working/Tables
+Thời gian ghép mô tả NSE tác giả: 1.3 giây.
+CẢNH BÁO: đây là NSE tác giả, không phải export chạy lại A2; tương quan dùng đặc điểm CSV hiện tại, chưa xác nhận cùng tập ngày chấm hoặc quan hệ nhân quả.
+DỪNG: gửi hình, bảng (1)–(4) và cảnh báo; chưa tính p-value, mở pickle, tính lại NSE, cắt NSE âm hoặc chọn mô hình/lọc lưu vực bằng test.

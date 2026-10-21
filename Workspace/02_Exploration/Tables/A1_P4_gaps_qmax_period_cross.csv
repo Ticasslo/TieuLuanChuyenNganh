@@ -1,0 +1,10 @@
+﻿period,gap_class,valid_qmax_days,missing_qmax_days,basin_days
+train,no_listed_gap,1112213,37860,1150073
+train,short_runs_only,7,0,7
+train,includes_over_6h_run,87,3040,3127
+validation,no_listed_gap,656250,330,656580
+validation,short_runs_only,9,0,9
+validation,includes_over_6h_run,22,2300,2322
+test,no_listed_gap,657182,0,657182
+test,short_runs_only,25,0,25
+test,includes_over_6h_run,159,1545,1704

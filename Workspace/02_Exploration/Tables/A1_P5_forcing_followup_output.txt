@@ -1,0 +1,119 @@
+Đã kiểm sáu cột khí tượng 50/451 ID
+Đã kiểm sáu cột khí tượng 100/451 ID
+Đã kiểm sáu cột khí tượng 150/451 ID
+Đã kiểm sáu cột khí tượng 200/451 ID
+Đã kiểm sáu cột khí tượng 250/451 ID
+Đã kiểm sáu cột khí tượng 300/451 ID
+Đã kiểm sáu cột khí tượng 350/451 ID
+Đã kiểm sáu cột khí tượng 400/451 ID
+Đã kiểm sáu cột khí tượng 450/451 ID
+Đã kiểm sáu cột khí tượng 451/451 ID
+(1) Thiếu E-OBS toàn lịch, tách ngoài các kỳ; số đếm không phải số mẫu mất:
+variable	period	expected_cells	missing_cells	affected_basins	first_missing	last_missing
+0	EOBS_fg	before_periods	3623785	31	3	1981-10-05	1996-04-13
+1	EOBS_fg	train	1153207	0	0	NaT	NaT
+2	EOBS_fg	validation	658911	0	0	NaT	NaT
+3	EOBS_fg	test	658911	0	0	NaT	NaT
+4	EOBS_fg	after_periods	329230	0	0	NaT	NaT
+5	EOBS_fg	outside_periods	0	0	0	NaT	NaT
+6	EOBS_hu	before_periods	3623785	4005	302	1981-01-03	2002-12-31
+7	EOBS_hu	train	1153207	1980	227	2003-01-02	2009-12-31
+8	EOBS_hu	validation	658911	3049	338	2010-01-01	2013-12-31
+9	EOBS_hu	test	658911	3910	378	2014-01-01	2017-12-31
+10	EOBS_hu	after_periods	329230	1240	271	2018-01-04	2019-12-27
+11	EOBS_hu	outside_periods	0	0	0	NaT	NaT
+(2) Cận quét 364 ngày trước đầu train; thuộc nhóm before_periods ở (1), không cộng lặp:
+variable	window_start	window_end	expected_cells	missing_cells	affected_basins	first_missing	last_missing
+0	EOBS_fg	2002-01-02	2002-12-31	164164	0	0	NaT	NaT
+1	EOBS_hu	2002-01-02	2002-12-31	164164	514	145	2002-01-11	2002-12-31
+(3) Tối đa 50 ngày EOBS_fg thiếu; toàn bộ E-OBS thiếu lưu CSV:
+basin_id	variable	date	period	in_364d_before_train	reason	raw_token
+544	55	EOBS_fg	1981-10-05	before_periods	False	blank	
+545	55	EOBS_fg	1983-02-02	before_periods	False	blank	
+546	55	EOBS_fg	1983-10-16	before_periods	False	blank	
+547	55	EOBS_fg	1983-12-17	before_periods	False	blank	
+548	55	EOBS_fg	1983-12-18	before_periods	False	blank	
+549	55	EOBS_fg	1984-01-03	before_periods	False	blank	
+550	55	EOBS_fg	1984-01-14	before_periods	False	blank	
+551	55	EOBS_fg	1984-01-22	before_periods	False	blank	
+552	55	EOBS_fg	1984-01-27	before_periods	False	blank	
+553	55	EOBS_fg	1985-12-05	before_periods	False	blank	
+554	55	EOBS_fg	1985-12-17	before_periods	False	blank	
+555	55	EOBS_fg	1985-12-25	before_periods	False	blank	
+556	55	EOBS_fg	1985-12-28	before_periods	False	blank	
+557	55	EOBS_fg	1986-01-23	before_periods	False	blank	
+558	55	EOBS_fg	1986-01-29	before_periods	False	blank	
+559	55	EOBS_fg	1986-01-30	before_periods	False	blank	
+560	55	EOBS_fg	1986-01-31	before_periods	False	blank	
+561	55	EOBS_fg	1986-04-22	before_periods	False	blank	
+562	55	EOBS_fg	1988-01-03	before_periods	False	blank	
+563	55	EOBS_fg	1988-01-05	before_periods	False	blank	
+564	55	EOBS_fg	1988-01-06	before_periods	False	blank	
+565	55	EOBS_fg	1988-01-14	before_periods	False	blank	
+566	55	EOBS_fg	1988-01-15	before_periods	False	blank	
+567	55	EOBS_fg	1988-01-20	before_periods	False	blank	
+568	55	EOBS_fg	1988-01-22	before_periods	False	blank	
+569	55	EOBS_fg	1988-01-25	before_periods	False	blank	
+570	55	EOBS_fg	1988-01-26	before_periods	False	blank	
+571	55	EOBS_fg	1988-01-28	before_periods	False	blank	
+572	55	EOBS_fg	1988-01-29	before_periods	False	blank	
+8128	536	EOBS_fg	1982-01-30	before_periods	False	blank	
+13759	813	EOBS_fg	1996-04-13	before_periods	False	blank	
+(4) So tp − lsp − k×cp trên cùng bộ ba; k là giả thuyết thang đo, không sửa dữ liệu:
+variable	valid_days	on_0p01_grid	all_values_on_0p01_grid
+0	ECMWF_tp	2635644	2635644	True
+1	ECMWF_lsp	2635644	2635644	True
+2	ECMWF_cp	2635644	2635644	True
+cp_multiplier	triplets	residual_min	residual_p05	residual_median	residual_p95	residual_max	residual_mean	max_abs_residual	within_same_0p02	same_tolerance	assumed_rounding_allowance	within_assumed_rounding	all_three_on_0p01_grid
+0	1	2635644	0.0	0.00	0.19	7.18	61.28	1.444995	61.28	991554	0.02	0.015	936280	True
+1	1000	2635644	-5.0	-2.05	0.07	3.47	5.00	0.482809	5.00	992463	0.02	5.010	2635644	True
+basin_id	date	tp_stored	lsp_stored	cp_stored	tp_minus_lsp	residual_cp_x1	residual_cp_x1000
+446	822	2017-08-10	62.47	1.13	0.06	61.34	61.28	1.34
+313	568	2014-08-13	70.08	10.10	0.06	59.98	59.92	-0.02
+438	800	2011-07-13	62.95	3.47	0.06	59.48	59.42	-0.52
+448	824	2017-08-10	57.33	1.02	0.06	56.31	56.25	-3.69
+285	520	2011-06-03	55.51	0.76	0.05	54.75	54.70	4.75
+218	359	2014-07-31	72.42	18.28	0.05	54.14	54.09	4.14
+315	571	2014-08-13	60.88	8.92	0.05	51.96	51.91	1.96
+447	823	2017-08-10	51.93	0.90	0.05	51.03	50.98	1.03
+196	329	2014-07-31	75.12	24.12	0.05	51.00	50.95	1.00
+312	567	2012-07-02	51.60	0.95	0.05	50.65	50.60	0.65
+(5) Mười ID có max SWE lớn nhất; ngưỡng 1000 là cờ mô tả theo giá trị lưu trữ:
+basin_id	valid_days	max_stored_swe	first_date_of_max	days_at_max	days_ge_1000_stored	reference_unit
+27	56	14244	6968.38	2019-05-22	1	14244	mm; CSV conversion not independently verified
+60	112	14244	5173.98	2001-04-29	1	14244	mm; CSV conversion not independently verified
+24	47	14244	4545.24	2019-05-22	1	14244	mm; CSV conversion not independently verified
+290	529	14244	3977.56	2001-04-28	1	14244	mm; CSV conversion not independently verified
+292	531	14244	3709.21	2001-04-28	1	14244	mm; CSV conversion not independently verified
+442	814	14244	3292.60	2001-05-01	1	14244	mm; CSV conversion not independently verified
+26	55	14244	3249.58	2019-05-30	1	14244	mm; CSV conversion not independently verified
+61	113	14244	2995.38	2001-04-28	1	14244	mm; CSV conversion not independently verified
+29	58	14244	2969.60	2001-04-28	1	14244	mm; CSV conversion not independently verified
+293	532	14244	2723.60	2001-04-28	1	14244	mm; CSV conversion not independently verified
+(6) Nguồn Q giờ hiện có và header/ba dòng mẫu, chưa tổng hợp:
+directory	status	csv_files	selected_ids_with_file	preview_id
+0	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	csv_found	452	451	10
+directory	basin_id	column	first_three_raw_values
+0	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	YYYY	1981 | 1981 | 1981
+1	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	MM	1 | 1 | 1
+2	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	DD	1 | 1 | 1
+3	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	hh	0 | 1 | 2
+4	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	mm	0 | 0 | 0
+5	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	qobs	1.02 | 1.02 | 1.02
+6	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	ckhs	1 | 1 | 1
+7	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	qceq	0 | 0 | 0
+8	/kaggle/working/Sources/LamaH_CE_v1/D_gauges/2_timeseries/hourly	10	qcol	0 | 0 | 0
+(7) Đối chiếu đúng tập ngày–ID E-OBS thiếu với 4.1:
+variable	period	current_missing	reference_missing_4_1	same_id_date_set
+0	EOBS_fg	train	0	0	True
+1	EOBS_fg	validation	0	0	True
+2	EOBS_fg	test	0	0	True
+3	EOBS_hu	train	1980	1980	True
+4	EOBS_hu	validation	3049	3049	True
+5	EOBS_hu	test	3910	3910	True
+Số bộ ba mưa: 2635644 ; tp-lsp < -0,02: 0 ; cp=0 nhưng tp-lsp >0,02: 1414144
+CẢNH BÁO: khoảng làm tròn 0,01 là giả định; dung sai khác nhau giữa k=1/1000 không dùng để chọn đơn vị.
+CẢNH BÁO: bảng giờ chỉ xác nhận khả năng đọc file; chưa xác nhận cột Q, ngày/múi giờ, nội suy hoặc đỉnh.
+Đã lưu mười CSV vào: /kaggle/working/Tables
+Thời gian kiểm các cờ khí tượng/nguồn giờ: 54.1 giây.
+DỪNG: gửi bảng (1)–(7) và cảnh báo; chưa đổi thang cp, sửa SWE, điền E-OBS hoặc tổng hợp Q giờ.

@@ -1,0 +1,61 @@
+(1) Mean tháng train: số cặp thực dùng, không fit validation/test hoặc điền tháng thiếu:
+pair_id	basins	basin_months	min_train_pairs_per_month	max_train_pairs_per_month	missing_train_months
+0	dewpoint	451	5412	198	217	0
+1	evaporation	451	5412	198	217	0
+2	precipitation	451	5412	198	217	0
+3	solar	451	5412	198	217	0
+4	temperature	451	5412	198	217	0
+(2) r trước/sau trên cùng ngày và cùng ID có cả hai r xác định; delta là hiệu từng ID trước khi lấy median:
+pair_id	period	basins	paired_cells	centered_cells	excluded_missing_train_month	raw_r_defined_basins	centered_r_defined_basins	comparison_basins	centered_r_lower_basins	centered_r_higher_basins	centered_r_equal_basins	raw_r_same_days_p05	raw_r_same_days_median	raw_r_same_days_p95	centered_r_p05	centered_r_median	centered_r_p95	delta_r_p05	delta_r_median	delta_r_p95
+0	solar	train	451	1153207	1153207	0	451	451	451	451	0	0	0.825493	0.959826	0.969136	0.721435	0.881596	0.906052	-0.099567	-0.074327	-0.052585
+1	solar	validation	451	658911	658911	0	451	451	451	451	0	0	0.845175	0.971678	0.978361	0.776103	0.927194	0.941994	-0.061287	-0.042172	-0.029568
+2	solar	test	451	658911	658911	0	451	451	451	451	0	0	0.833096	0.976999	0.985294	0.778610	0.934359	0.957681	-0.058432	-0.037656	-0.016394
+3	temperature	train	451	1153207	1153207	0	451	451	451	451	0	0	0.982411	0.992032	0.995772	0.932020	0.964416	0.981829	-0.050945	-0.027254	-0.013874
+4	temperature	validation	451	658911	658911	0	451	451	451	451	0	0	0.986959	0.994477	0.996917	0.947708	0.975027	0.985837	-0.041020	-0.018805	-0.010927
+5	temperature	test	451	658911	658911	0	451	451	451	451	0	0	0.984263	0.994271	0.997628	0.927934	0.974278	0.987835	-0.056588	-0.020438	-0.009751
+6	dewpoint	train	451	1153207	1153207	0	451	451	451	451	0	0	0.982650	0.991814	0.994231	0.935509	0.969579	0.981619	-0.046691	-0.022217	-0.012618
+7	dewpoint	validation	451	658911	658911	0	451	451	451	451	0	0	0.989163	0.993915	0.996156	0.949739	0.973899	0.984848	-0.038688	-0.020389	-0.011298
+8	dewpoint	test	451	658911	658911	0	451	451	451	451	0	0	0.987001	0.993829	0.996013	0.925658	0.967819	0.982242	-0.062398	-0.025444	-0.013435
+9	precipitation	train	451	1153207	1153207	0	451	451	451	432	19	0	0.736631	0.805085	0.842707	0.731590	0.799681	0.840319	-0.009758	-0.004449	-0.000349
+10	precipitation	validation	451	658911	658911	0	451	451	451	444	7	0	0.753988	0.828564	0.879145	0.746493	0.821362	0.873775	-0.012795	-0.006351	-0.001505
+11	precipitation	test	451	658911	658911	0	451	451	451	430	21	0	0.773656	0.833226	0.869420	0.761790	0.827278	0.865844	-0.015291	-0.004908	-0.000124
+12	evaporation	train	451	1153207	1153207	0	451	451	451	451	0	0	0.856618	0.900324	0.931188	0.491777	0.592640	0.694396	-0.389152	-0.301839	-0.232962
+13	evaporation	validation	451	658911	658911	0	451	451	451	451	0	0	0.857486	0.910356	0.945712	0.478102	0.636095	0.740595	-0.397384	-0.269767	-0.194909
+14	evaporation	test	451	658911	658911	0	451	451	451	451	0	0	0.836428	0.899123	0.944450	0.453871	0.615688	0.730631	-0.400518	-0.283952	-0.206707
+(3) Khớp nguồn 6.2, mean tháng 6.3 và số ngày bị loại do thiếu mean train:
+pair_id	period	basins	paired_cells	centered_cells	excluded_missing_train_month	matches_6_2	train_means_match_6_3
+0	dewpoint	test	451	658911	658911	0	True	True
+1	dewpoint	train	451	1153207	1153207	0	True	True
+2	dewpoint	validation	451	658911	658911	0	True	True
+3	evaporation	test	451	658911	658911	0	True	True
+4	evaporation	train	451	1153207	1153207	0	True	True
+5	evaporation	validation	451	658911	658911	0	True	True
+6	precipitation	test	451	658911	658911	0	True	True
+7	precipitation	train	451	1153207	1153207	0	True	True
+8	precipitation	validation	451	658911	658911	0	True	True
+9	solar	test	451	658911	658911	0	True	True
+10	solar	train	451	1153207	1153207	0	True	True
+11	solar	validation	451	658911	658911	0	True	True
+12	temperature	test	451	658911	658911	0	True	True
+13	temperature	train	451	1153207	1153207	0	True	True
+14	temperature	validation	451	658911	658911	0	True	True
+(4) Tối đa ba ID mỗi cặp có |delta r| lớn nhất ở test; chỉ đọc hồ sơ, không chọn xử lý/mô hình:
+basin_id	pair_id	period	paired_cells	centered_cells	excluded_missing_train_month	train_months_with_pairs	raw_r_all_pairs	raw_r_same_days	centered_r	delta_r	raw_r_status	centered_r_status	matches_6_2	train_means_match_6_3	abs_delta_r
+398	55	dewpoint	test	1461	1461	0	12	0.969966	0.969966	0.893067	-0.076899	defined	defined	True	True	0.076899
+428	57	dewpoint	test	1461	1461	0	12	0.983218	0.983218	0.907015	-0.076202	defined	defined	True	True	0.076202
+878	109	dewpoint	test	1461	1461	0	12	0.990460	0.990460	0.914343	-0.076117	defined	defined	True	True	0.076117
+3434	391	evaporation	test	1461	1461	0	12	0.838920	0.838920	0.315074	-0.523846	defined	defined	True	True	0.523846
+3419	390	evaporation	test	1461	1461	0	12	0.844894	0.844894	0.340275	-0.504619	defined	defined	True	True	0.504619
+3464	398	evaporation	test	1461	1461	0	12	0.860634	0.860634	0.382067	-0.478568	defined	defined	True	True	0.478568
+4061	483	precipitation	test	1461	1461	0	12	0.810928	0.810928	0.780553	-0.030375	defined	defined	True	True	0.030375
+4001	477	precipitation	test	1461	1461	0	12	0.779767	0.779767	0.749788	-0.029979	defined	defined	True	True	0.029979
+4016	478	precipitation	test	1461	1461	0	12	0.792975	0.792975	0.763031	-0.029944	defined	defined	True	True	0.029944
+6632	814	solar	test	1461	1461	0	12	0.791260	0.791260	0.707293	-0.083967	defined	defined	True	True	0.083967
+362	47	solar	test	1461	1461	0	12	0.844531	0.844531	0.762680	-0.081850	defined	defined	True	True	0.081850
+392	55	solar	test	1461	1461	0	12	0.764273	0.764273	0.684624	-0.079648	defined	defined	True	True	0.079648
+6665	818	temperature	test	1461	1461	0	12	0.982203	0.982203	0.866065	-0.116138	defined	defined	True	True	0.116138
+4655	565	temperature	test	1461	1461	0	12	0.983391	0.983391	0.879292	-0.104099	defined	defined	True	True	0.104099
+4670	566	temperature	test	1461	1461	0	12	0.984461	0.984461	0.881827	-0.102634	defined	defined	True	True	0.102634
+Đã lưu hình: /kaggle/working/Figures/A1_P6_pair_train_month_centered_correlations.png ; đã lưu năm CSV vào: /kaggle/working/Tables
+Thời gian kiểm tương quan trừ mean tháng train: 62.3 giây.
+DỪNG: gửi hình, bảng (1)–(4) và cảnh báo; chưa dịch ngày, đổi đơn vị/dấu, sửa input/scaler hoặc kết luận kỹ năng dự báo độc lập.
