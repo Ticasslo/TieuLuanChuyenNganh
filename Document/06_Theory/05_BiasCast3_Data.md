@@ -712,7 +712,7 @@ VD đỉnh 22 là lớn nhất trong 10 năm, nên ước chừng "khoảng 11 n
 
 - **Một trận lũ bắt đầu** ở ngày nước **vượt ngưỡng từ dưới lên** (hôm trước dưới ngưỡng, hôm nay từ ngưỡng trở lên). **Không có độ dài tối thiểu**: một ngày trên ngưỡng đã là một trận; nước ở trên ngưỡng mấy ngày liền vẫn chỉ là một trận.
 - **Hai lần vượt quá sát nhau thì gộp làm một trận** (lựa chọn của đề tài, chi tiết kỹ thuật (g)): nếu nước chỉ nhấp nhô quanh ngưỡng (VD 12,0 → 11,8 → 12,1 với ngưỡng 11,9) thì đó vẫn là một đợt lũ, không phải hai.
-- **Ghép:** một trận lũ thật được tính là **bắt được** nếu mô hình cũng có trận bắt đầu trong vòng **±1 ngày** quanh ngày đó.
+- **Ghép:** một trận lũ thật được tính là **bắt được** nếu mô hình cũng có trận bắt đầu **đúng ngày đó** (cửa sổ chính của đề tài, chi tiết kỹ thuật (e)). Ví dụ dưới đây dùng cửa sổ **±1 ngày** của bảng phụ để thấy rõ cách ghép; với cửa sổ chính, trận mô hình ngày 5 lệch 1 ngày nên thành báo động nhầm và trận thật ngày 4 thành bỏ sót.
 - Trận thật mà mô hình không báo là **bỏ sót**; trận mô hình báo mà thực tế không có là **báo động nhầm**.
 
 Ví dụ 15 ngày, ngưỡng 12:
@@ -741,7 +741,7 @@ Ví dụ 15 ngày, ngưỡng 12:
 
 Như ở Mục 3.5, ưu tiên của GVHD là ít bỏ sót, nên đọc **POD** trước. Kết quả chính cộng dồn số trận B, S, N của cả 451 lưu vực ở mỗi mức T rồi mới tính chỉ số; phân bố chỉ số theo từng lưu vực báo cáo kèm (chi tiết kỹ thuật (h)). Định nghĩa POD, FAR, CSI theo [Kiểm định]; precision = 1 − FAR như [AIFL] mục 4.2, tr. 16; F1 là trung bình điều hòa của precision và recall như [Nearing]. Kế hoạch còn đo **sai số thời điểm đỉnh** (`01_Plan/03_Pipeline.md` Mục 6.2).
 
-**Tóm tắt ý chính:** đỉnh các năm cũ → khớp Gumbel → ngưỡng lũ 1,5; 2; 5; 10 năm → đếm trận lũ thật và trận mô hình báo → ghép trong ±1 ngày → POD, precision, FAR, F1, CSI.
+**Tóm tắt ý chính:** đỉnh các năm cũ → khớp Gumbel → ngưỡng lũ 1,5; 2; 5; 10 năm → đếm trận lũ thật và trận mô hình báo → ghép đúng ngày bắt đầu (bảng phụ ±1 ngày) → POD, precision, FAR, F1, CSI.
 
 #### Chi tiết kỹ thuật (cần khi viết code A1)
 
@@ -793,7 +793,10 @@ L-moments dùng trung bình và độ chênh (không bình phương, không lậ
 |---|---|
 | Nearing và cs. (2024) | trong vòng 2 ngày ([Nearing] Methods: *"within two days of each other"*; mã tính cả 0, 1, 2 ngày) |
 | AIFL | 0 ngày — phải trùng đúng ngày ([AIFL] mục 4.2, tr. 16) |
-| Đề tài | ±1 ngày cho dự báo trước 1 ngày; ±2 ngày ở bước H (dự báo nhiều ngày), như Nearing (`01_Plan/03_Pipeline.md` Mục 6.2, 6.6) |
+| NOAA (kiểm định cảnh báo lũ) | đối xứng ±1/3 hạn dự báo quanh thời điểm dự báo vượt ngưỡng; VD hạn 12 giờ thì cửa sổ 8–16 giờ (Central Region Technical Attachment 98-03, [repository.library.noaa.gov/view/noaa/30340](https://repository.library.noaa.gov/view/noaa/30340)) |
+| Đề tài | 0 ngày cho dự báo trước 1 ngày (±1/3 × 24 giờ = ±8 giờ, trên lịch ngày là cùng ngày); bước H ±⌊hạn/3⌋ ngày; bảng phụ ±1 ngày để so với Nearing (`01_Plan/03_Pipeline.md` Mục 6.2, 6.6) |
+
+Lý do không lấy ±1 ngày làm chính: persistence chép qmax hôm qua nên mọi trận của nó bắt đầu trễ đúng một ngày; cửa sổ ±1 tính các trận trễ đó là bắt được, persistence đạt POD gần 1 dù báo sau khi lũ đã tới, không có giá trị cảnh báo. Với cửa sổ 0 ngày, persistence có POD bằng 0.
 
 Trận lũ bắt đầu ở ngày vượt ngưỡng từ dưới lên theo đúng mã Nearing ([Nearing-mã] `return_period_metrics.py`: `np.maximum(0, np.diff(above_threshold))`).
 
@@ -828,7 +831,7 @@ Ví dụ, ngưỡng lũ 2 năm 11,9, lưu vực trung vị (cần cách nhau 9,2
 - **Kết quả chính cộng dồn trận của cả 451 lưu vực** cho mỗi mức T: tổng B, S, N rồi mới tính POD = ΣB / (ΣB + ΣS), precision = ΣB / (ΣB + ΣN). Lý do: ở lũ 10 năm, lưu vực có trận thường chỉ có 1–2 trận nên POD từng lưu vực chỉ là 0 hoặc 1, trung vị của chúng rất thô; cộng dồn dùng được mọi trận. Phân bố theo lưu vực (chỉ lưu vực có trận) báo cáo kèm.
 - So hai mô hình bằng **cùng tập lưu vực và cùng tập trận thật**, nên POD cộng dồn so được trực tiếp.
 
-**Tóm tắt các lựa chọn:** mức 1,5; 2; 5; 10 năm; đỉnh năm theo năm thủy văn 1/10 – 30/9; ngưỡng đơn từ quan trắc (ngưỡng kép làm phân tích phụ); gộp trận theo tiêu chí USWRC (không gộp báo cáo kèm); cửa sổ ±1 ngày; kết quả chính cộng dồn trận của 451 lưu vực, không dùng quy ước "= 1".
+**Tóm tắt các lựa chọn:** mức 1,5; 2; 5; 10 năm; đỉnh năm theo năm thủy văn 1/10 – 30/9; ngưỡng đơn từ quan trắc (ngưỡng kép làm phân tích phụ); gộp trận theo tiêu chí USWRC (không gộp báo cáo kèm); cửa sổ 0 ngày (bảng phụ ±1 ngày); kết quả chính cộng dồn trận của 451 lưu vực, không dùng quy ước "= 1".
 
 #### Bước A1 kiểm gì
 
@@ -978,7 +981,7 @@ Mô hình không tệ đi, chỉ là kỳ test "khó ghi điểm" hơn. Lưu v�
 | 3.3 So giữa các lưu vực | m³/s phụ thuộc diện tích (4 tới 131 247 km²) nên mã đổi sang mm/ngày bằng `area_gov`; chuẩn hóa chung cho mọi lưu vực làm dao động của lưu vực nhỏ bị chìm nếu không đổi đơn vị |
 | 3.4 Chất lượng, dữ liệu thiếu | ngày thiếu là ô trống hoặc thiếu dòng; một ngày thiếu `qmean` làm mất tới 365 mẫu của mô hình có `qmean` đầu vào; đáng ngờ: đứng giá trị, ngoại lai, số chưa kiểm; lưu vực 742, 758 gần như hằng số |
 | 3.5 Đường duy trì, bốn mức | sắp số từ lớn tới nhỏ, p = thứ hạng / n; bốn mức rất cao (p ≤ 0,02), cao, trung bình, thấp, ngưỡng tính từ quan trắc 1981–2013; chấm như bài toán phân loại (recall, precision từng mức); %BiasFHV đo hụt đỉnh, %BiasFMS, %BiasFLV đo hình dạng |
-| 3.6 Lũ, chu kỳ lặp lại | lũ T năm = mức mà đỉnh năm có 1/T khả năng vượt; khớp Gumbel L-moments trên đỉnh năm thủy văn 1981–2013; mức 1,5; 2; 5; 10 năm; trận = lần vượt ngưỡng từ dưới lên, gộp theo USWRC; ghép trong ±1 ngày; POD, precision, FAR, CSI từ bảng 2×2 |
+| 3.6 Lũ, chu kỳ lặp lại | lũ T năm = mức mà đỉnh năm có 1/T khả năng vượt; khớp Gumbel L-moments trên đỉnh năm thủy văn 1981–2013; mức 1,5; 2; 5; 10 năm; trận = lần vượt ngưỡng từ dưới lên, gộp theo USWRC; ghép đúng ngày bắt đầu (bảng phụ ±1 ngày); POD, precision, FAR, CSI từ bảng 2×2 |
 | 3.7 Kỳ train và kỳ test | chia theo năm để không rò rỉ; mỗi kỳ có thời tiết, trận lũ, phiên bản ECMWF HRES riêng (lưới khoảng 40 → 25 → 16 → 9 km); NSE phụ thuộc độ dao động của kỳ test, nên so mô hình trên cùng kỳ, theo từng lưu vực |
 
 #### Bước A1: danh sách kiểm gộp từ Phần 3
