@@ -2,7 +2,7 @@
 
 Các thí nghiệm đã thực hiện xác nhận việc chạy lại trọng số BiasCast, bổ sung mốc persistence và DLinear, đồng thời đánh giá theo mức lưu lượng và sự kiện lũ. Trên cùng giao ngày test, Sequential Forecast LSTM có Q đạt NSE trung vị **0,705259**, DLinear đạt **0,380152 ± 0,002415** giữa ba hạt giống, còn persistence qmax đạt **0,350031**. DLinear cải thiện theo NSE/PNSE nhưng thấp hơn persistence theo KGE; đánh giá theo mức còn cho thấy khả năng nhận diện ngày lưu lượng rất cao thấp hơn Sequential Forecast LSTM.
 
-Phạm vi thực nghiệm của chương là A2, A3 và bộ đánh giá trên **test 2014–2017, kịch bản S0, hạn một ngày**. Các kết quả so sánh năm lõi thời gian, kịch bản mất dữ liệu và nhiều hạn sẽ được bổ sung khi các thí nghiệm tương ứng hoàn thành. Dữ liệu, độ phủ và ngưỡng trước test được trình bày tại [Chương 4](04_Data.md).
+Phạm vi thực nghiệm của chương là A2, A3 và bộ đánh giá trên **test 2014–2017, kịch bản S0, hạn một ngày**. **S0** là không che thêm đầu vào theo kịch bản, dù dữ liệu gốc vẫn có thể thiếu; **hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Các kết quả so sánh năm lõi thời gian, kịch bản mất dữ liệu và nhiều hạn sẽ được bổ sung khi các thí nghiệm tương ứng hoàn thành. Dữ liệu, độ phủ và ngưỡng trước test được trình bày tại [Chương 4](04_Data.md).
 
 ## 6.1. Câu hỏi thực nghiệm và các cấu hình
 
@@ -29,7 +29,7 @@ Khi so các mô hình ở bước tiếp theo, cùng nguyên tắc được gi�
 
 ### 6.2.2. Đơn vị, ngày chấm và dự báo thiếu
 
-Quan trắc chuẩn dùng qmax nguồn đổi sang mm/ngày theo diện tích trạm. A3 kiểm lịch và quan trắc của sáu A2 trước khi lập mặt nạ. Điểm riêng của từng run dùng các ngày mà run có cặp hữu hạn; bảng so chính dùng **giao chung** giữa các run và persistence, để mọi mô hình được chấm trên cùng quan trắc và ngày.
+Quan trắc chuẩn dùng qmax nguồn đổi sang mm/ngày theo diện tích trạm. Một **ngày–lưu vực**, cũng viết là ngày–ID, là một ngày tại một lưu vực cụ thể. A3 kiểm lịch và quan trắc của sáu A2 trước khi lập **mặt nạ**, tức bảng True/False chọn những cặp ngày–lưu vực được chấm. Điểm riêng của từng run dùng các ngày mà run có cặp hữu hạn; bảng so chính dùng **giao chung**, chỉ giữ những cặp có quan trắc, persistence và dự báo của mọi run cùng hữu hạn, để mọi mô hình được chấm trên cùng dữ liệu.
 
 | Scope | Quy tắc | Mục đích |
 |---|---|---|
@@ -71,7 +71,7 @@ Tương quan cao chưa bảo đảm dự báo chính xác. Ví dụ minh họa, 
 
 Mỗi lưu vực có một bộ điểm; sau đó tổng hợp trung vị, trung bình và P10/P25/P75/P90 qua các lưu vực. Đường CDF biểu diễn tỷ lệ ID có điểm không vượt giá trị trên trục ngang. Các điểm âm được giữ đầy đủ, tránh che phần đuôi bất lợi chỉ bằng trung vị.
 
-So sánh ghép cặp dùng hiệu chỉ số theo cùng ID, Wilcoxon signed-rank hai phía và Cohen's dz = mean(hiệu)/std mẫu(hiệu). Holm hiệu chỉnh toàn bộ cặp run không thứ tự, riêng cho NSE, PNSE, KGE. Sáu A2, ba DLinear và persistence qmax tạo **45 cặp cho mỗi chỉ số**, tổng **135 phép so**; mốc qmean phụ không thuộc họ kiểm định chính. Phương pháp tính p dùng [SciPy Wilcoxon](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.wilcoxon.html).
+So sánh ghép cặp dùng hiệu chỉ số theo cùng ID, Wilcoxon signed-rank hai phía và Cohen's dz = mean(hiệu)/std mẫu(hiệu). Holm hiệu chỉnh các p-value hợp lệ của toàn bộ cặp run không thứ tự, riêng cho NSE, PNSE, KGE; p = NaN không được tính vào kích thước họ. Sáu A2, ba DLinear và persistence qmax tạo **45 cặp dự kiến cho mỗi chỉ số**, tổng **135 phép so**; mốc qmean phụ không thuộc họ kiểm định chính. `family_size` ghi số p hữu hạn, `planned_family_size` ghi số phép so dự kiến. Phương pháp tính p dùng [SciPy Wilcoxon](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.wilcoxon.html).
 
 Số cặp hữu hạn được báo theo từng chỉ số. Hiệu bằng 0, độ lệch chuẩn hiệu bằng 0 và chỉ số không xác định có quy ước riêng trong bộ đánh giá. Do có các lưu vực lồng nhau, các cặp điểm có thể phụ thuộc không gian; p được đọc cùng cỡ hiệu ứng, số lưu vực hơn/kém và phần đuôi chênh lệch.
 
@@ -188,35 +188,46 @@ Các chữ ký đường duy trì bổ sung bằng chứng về dải lưu lư�
 
 Ngưỡng Gumbel A1 cho T = 1,5; 2; 5; 10 năm được giữ cố định trước test, dùng giống nhau cho obs/sim. Sự kiện được trích trên lịch ngày, xuất cả đoạn liên tiếp và cụm USWRC. Cụm có onset/ending không quan sát được hoặc thiếu ngày trong cửa sổ ghép được đánh dấu kiểm duyệt và báo số lượng riêng.
 
-Với hạn một ngày, hai sự kiện được ghép nếu onset nằm trong **±1 ngày**. Thuật toán tối đa hóa số cặp trước rồi tối thiểu hóa tổng lệch onset, không tái sử dụng một sự kiện trong nhiều cặp. Điểm thời gian đỉnh được tính sau khi cặp đã được xác định; dung sai onset và sai số thời điểm đỉnh là hai đại lượng riêng.
+**Bảng chính dùng tolerance = 0: hai trận phải bắt đầu cùng ngày. Bảng phụ dùng ±1 ngày**, xuất riêng để đánh giá độ nhạy với dung sai thời gian. Thuật toán tối đa hóa số cặp trước rồi tối thiểu hóa tổng lệch ngày bắt đầu (onset), không tái sử dụng một sự kiện trong nhiều cặp. Cửa sổ kiểm duyệt theo dung sai của mỗi bảng, vì vậy mẫu số được báo riêng. Điểm thời gian đỉnh được tính sau khi cặp đã được xác định; cùng ngày bắt đầu không bắt buộc cùng ngày đỉnh. [Căn cứ NOAA và phân biệt với cửa sổ ±2 ngày của Nearing 2024](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md#5-sự-kiện-lũ-và-cờ-kiểm-duyệt).
 
 Gọi h là số bắt được, m là bỏ sót và f là báo nhầm. POD = h/(h+m), FAR = f/(h+f), precision = h/(h+f), F1 = 2h/(2h+m+f), CSI = h/(h+m+f). Mẫu số 0 cho NaN. Kết quả chính cộng số trận toàn tập trước khi chia; ngưỡng 1,5/2/5/10 năm và hai cách gộp được báo riêng.
 
-### 6.8.2. Kết quả ở chu kỳ hai năm
+### 6.8.2. Kết quả chính ở chu kỳ hai năm
 
-Theo quy tắc USWRC, có **1.066 cụm quan trắc đủ điều kiện trên 366 lưu vực** ở T = 2 năm. Nhóm dưới 10 năm mẫu fit được giữ và có bảng tách riêng trong CSV.
+Theo quy tắc USWRC, có **1.066 cụm quan trắc đủ điều kiện trên 366 lưu vực** ở T = 2 năm. Bảng chính yêu cầu cùng ngày bắt đầu. Nhóm dưới 10 năm mẫu fit được giữ và có bảng tách riêng trong CSV.
 
 | Run | Bắt được | Bỏ sót | Báo nhầm | POD (%) | FAR (%) |
 |---|---:|---:|---:|---:|---:|
-| SeqLSTM_Q | 348 | 718 | 291 | 32,65 | 45,54 |
-| SeqLSTM_noQ | 256 | 810 | 236 | 24,02 | 47,97 |
-| EncDec_Q | 218 | 848 | 197 | 20,45 | 47,47 |
-| EncDec_noQ | 226 | 840 | 393 | 21,20 | 63,49 |
-| D_FC | 94 | 972 | 255 | 8,82 | 73,07 |
-| D_RA | 325 | 741 | 271 | 30,49 | 45,47 |
-| DLinear 111 | 222 | 844 | 107 | 20,83 | 32,52 |
-| DLinear 222 | 237 | 829 | 105 | 22,23 | 30,70 |
-| DLinear 333 | 222 | 844 | 102 | 20,83 | 31,48 |
-| Persistence qmax | 1.066 | 0 | 0 | 100,00 | 0,00 |
-| Persistence qmean, phụ | 117 | 949 | 84 | 10,98 | 41,79 |
+| SeqLSTM_Q | 208 | 858 | 431 | 19,51 | 67,45 |
+| SeqLSTM_noQ | 188 | 878 | 304 | 17,64 | 61,79 |
+| EncDec_Q | 126 | 940 | 289 | 11,82 | 69,64 |
+| EncDec_noQ | 174 | 892 | 445 | 16,32 | 71,89 |
+| D_FC | 63 | 1.003 | 286 | 5,91 | 81,95 |
+| D_RA | 219 | 847 | 377 | 20,54 | 63,25 |
+| DLinear 111 | 2 | 1.064 | 327 | 0,19 | 99,39 |
+| DLinear 222 | 2 | 1.064 | 340 | 0,19 | 99,42 |
+| DLinear 333 | 2 | 1.064 | 322 | 0,19 | 99,38 |
+| Persistence qmax | 0 | 1.066 | 1.066 | 0,00 | 100,00 |
+| Persistence qmean, phụ | 0 | 1.066 | 201 | 0,00 | 100,00 |
 
-Nguồn: [bảng sự kiện cộng dồn](../../Workspace/06_Evaluation/Tables/Evaluation_events_pooled.csv). SeqLSTM_Q bắt nhiều trận hơn DLinear nhưng có FAR cao hơn, cho thấy đánh đổi giữa bỏ sót và báo nhầm. Thứ hạng từ NSE không tự thay thế kết quả ở ngưỡng lũ cụ thể.
+Nguồn: [bảng sự kiện chính](../../Workspace/06_Evaluation/Tables/Evaluation_events_pooled.csv). SeqLSTM_Q bắt đúng ngày nhiều trận hơn DLinear, dù vẫn bỏ sót 858/1.066 trận. D_RA có 219 cặp đúng ngày, nhưng đây là mốc có tái phân tích ở ngày đích, cần đọc cùng điều kiện nguồn thông tin. Ba seed DLinear chỉ có hai cặp đúng ngày; NSE trung vị nhỉnh hơn persistence chưa phản ánh khả năng bắt đúng ngày khởi phát lũ. Sai số thời điểm đỉnh vẫn được báo riêng vì cùng ngày bắt đầu không bắt buộc cùng ngày đỉnh.
 
-### 6.8.3. Cách đọc kết quả persistence
+### 6.8.3. Bảng phụ ±1 ngày và độ nhạy thời gian
 
-**POD = 1 của persistence ở T = 2 năm là hệ quả của dung sai thời gian.** Chuỗi chép qmax hôm qua dịch trận sang ngày hôm sau; onset lệch một ngày vẫn được ghép đúng. Sai số tuyệt đối thời điểm đỉnh trung bình của persistence tại ngưỡng này là **một ngày**. Vì thế, chỉ số sự kiện có dung sai không đồng nghĩa cảnh báo đúng ngày hoặc cảnh báo sớm hoàn hảo.
+Cho phép lệch ngày bắt đầu tối đa một ngày làm thay đổi kết quả như sau; bảng phụ đầy đủ được giữ trong CSV.
 
-Bảng phân mức đúng ngày cho recall rất cao của persistence chỉ **40,11%**, thấp hơn SeqLSTM_Q **47,58%**. Hai kết quả bổ sung nhau: một phép chấm nhận diện một đợt trong cửa sổ thời gian, còn phép kia kiểm mức của từng ngày. Giao thức ±1 ngày được giữ khi trình bày, không đổi theo test để cải thiện thứ hạng mô hình. Persistence cũng đạt POD = 1 ở T = 5 và 10 năm; ở T = 1,5 năm là 1.849/1.850, khoảng 99,95%.
+| Run | POD chính (%) | FAR chính (%) | POD phụ ±1 (%) | FAR phụ ±1 (%) |
+|---|---:|---:|---:|---:|
+| SeqLSTM_Q | 19,51 | 67,45 | 32,65 | 45,54 |
+| D_RA | 20,54 | 63,25 | 30,49 | 45,47 |
+| DLinear 111 | 0,19 | 99,39 | 20,83 | 32,52 |
+| DLinear 222 | 0,19 | 99,42 | 22,23 | 30,70 |
+| DLinear 333 | 0,19 | 99,38 | 20,83 | 31,48 |
+| Persistence qmax | 0,00 | 100,00 | 100,00 | 0,00 |
+
+Nguồn: [bảng phụ](../../Workspace/06_Evaluation/Tables/Evaluation_events_pooled_tolerance1.csv). **POD = 1 của persistence trong bảng phụ là hệ quả của dung sai ±1 ngày.** Chuỗi chép qmax hôm qua dịch trận sang ngày hôm sau; sai số tuyệt đối thời điểm đỉnh trung bình là **một ngày**. Bảng chính không có cặp persistence đúng ngày tại cả bốn ngưỡng và cả hai cách gộp.
+
+Bảng phân mức đúng ngày cho recall rất cao của persistence là **40,11%**, thấp hơn SeqLSTM_Q **47,58%**. Phân mức ngày và ghép trận đo hai khía cạnh khác nhau, nên cả hai được báo cáo. Trong bảng phụ ±1, persistence cũng đạt POD = 1 ở T = 5 và 10 năm; ở T = 1,5 năm là 1.849/1.850, khoảng 99,95%.
 
 ## 6.9. Kết quả kiểm định ghép cặp
 
@@ -229,13 +240,15 @@ Bảng phân mức đúng ngày cho recall rất cao của persistence chỉ **4
 
 ΔNSE ở bảng là hiệu **mô hình trừ persistence** theo từng ID. Trong CSV, thứ tự trái/phải được xếp theo tên; dấu các hiệu và dz được đổi khi trình bày theo chiều trên, còn p hai phía giữ nguyên. Nguồn: [135 phép kiểm ghép cặp](../../Workspace/06_Evaluation/Tables/Evaluation_paired_tests.csv).
 
+Toàn bộ p-value của lần chạy này đều hữu hạn; bỏ NaN khỏi kích thước họ Holm không làm đổi các p đã báo trong bảng.
+
 Median hiệu ghép cặp khác hiệu của hai median. Ví dụ, DLinear 111 có median ΔNSE **0,035019**, trong khi 0,382799 − 0,350031 = **0,032768**. Đại lượng thứ nhất mới mô tả chênh lệch tại lưu vực ở giữa phân phối hiệu.
 
 Wilcoxon phản ánh phân phối hạng của các hiệu, còn dz phụ thuộc trung bình và độ lệch chuẩn hiệu. SeqLSTM_Q có đa số ID tốt lên và p rất nhỏ nhưng dz khoảng 0,0103 vì phần đuôi bất lợi ảnh hưởng mạnh đến trung bình/độ phân tán. Trên KGE, mỗi seed DLinear thấp hơn persistence ở **449/450 ID**. Trên PNSE, median DLinear dương nhưng mean âm do một số lưu vực có persistence rất mạnh. Các chỉ số này cần được đọc cùng nhau để tránh diễn giải p nhỏ như lợi ích đồng đều ở mọi lưu vực.
 
 ## 6.10. Khả năng đối chiếu và giới hạn của kết quả hiện tại
 
-Bộ đánh giá đã chạy trên Kaggle với Python 3.13.15, NumPy 2.1.3, pandas 2.3.3 và SciPy 1.16.3. Có **49 kiểm thử** trước khi chấm; **7 kiểm đối chiếu A3**, mỗi kiểm trên 4.961 cặp run–ID cho sáu chỉ số và số ngày. Từ 19 tệp kết quả nhận được, **39 kiểm CSV cục bộ** xác nhận công thức SSE/KGE, bảng tổng hợp, số đếm ma trận, bảo toàn số sự kiện, ghép một–một, sai số thời gian, kiểm định, Holm và các điểm CDF. [Biên nhận kiểm tra](../../Workspace/06_Evaluation/Tables/Evaluation_output_verification.json).
+Bộ đánh giá giao thức 2 đã chạy trên Kaggle với Python 3.13.15, NumPy 2.1.3, pandas 2.3.3 và SciPy 1.16.3. Có **60 kiểm thử** trước khi chấm; **7 kiểm đối chiếu A3**, mỗi kiểm trên 4.961 cặp run–ID cho sáu chỉ số và số ngày. Từ 21 tệp được cung cấp, **57 kiểm CSV cục bộ** xác nhận công thức SSE/KGE, bảng tổng hợp, số đếm ma trận, bảo toàn số sự kiện, ghép một–một đúng dung sai, sai số thời gian, kiểm định, Holm và CDF. Bảng tổng hợp ±1 được tính lại từ bảng sự kiện chi tiết đã cung cấp. [Biên nhận kiểm tra](../../Workspace/06_Evaluation/Tables/Evaluation_output_verification.json).
 
 Những kết quả này xác lập một bộ mốc và bộ đánh giá cho **S0, hạn một ngày trên test**. S0 biểu diễn việc không che thêm đầu vào theo kịch bản; dữ liệu nguồn vẫn có thể thiếu và các phạm vi chấm đã xử lý điều đó. Kết quả validation, S1–S4 và nhiều hạn sẽ được chấm khi luồng mô hình cung cấp dự báo tương ứng. Độ biến thiên ba seed DLinear không thay cho phép đo nhiễu LSTM ở A4.
 

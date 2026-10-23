@@ -22,6 +22,10 @@
 # ## Phần 1 — Môi trường và quy ước
 # ### 1.1. Thư viện và hằng số
 # Đơn vị chấm là mm/ngày theo area_gov. Các phép tính chỉ số dùng float64.
+# S0 là kịch bản không che thêm đầu vào; dữ liệu gốc vẫn có thể thiếu.
+# Hạn k là bước ngày thứ k tính từ ngày đích đầu tiên; hạn 1 dự báo ngày kế tiếp lịch sử.
+# Một ngày–lưu vực là một ngày tại một ID. Mặt nạ là bảng True/False chọn các cặp này.
+# Giao chung chỉ giữ ngày–lưu vực có obs, persistence và dự báo của mọi run cùng hữu hạn.
 
 # %% Phần 1.1 — Thư viện và hằng số
 # Không cài hay thay phiên bản môi trường khi chạy đánh giá.
@@ -48,6 +52,9 @@ A2_RUNS = ("SeqLSTM_Q", "SeqLSTM_noQ", "EncDec_Q", "EncDec_noQ", "D_FC", "D_RA")
 RETURN_PERIODS = (1.5, 2.0, 5.0, 10.0)
 LOG_FLOOR_MM_DAY = 1e-6
 TEST_START, TEST_END = "2014-01-01", "2017-12-31"
+PRIMARY_EVENT_TOLERANCE_DAYS = 0
+SUPPLEMENTARY_EVENT_TOLERANCE_DAYS = 1
+PROTOCOL_VERSION = 2
 
 
 # %% [markdown]
@@ -357,13 +364,20 @@ def uswrc(values, runs, area_km2):
 # %% [markdown]
 # ## Phần 6 — Ghép sự kiện một–một
 # ### 6.1. Số cặp tối đa, sau đó tổng lệch onset nhỏ nhất
-# Hạn 1 ngày dùng ±1 ngày; hạn 2–7 dùng ±2 ngày. Thứ tự xử lý là cố định.
+# Bảng chính yêu cầu cùng ngày bắt đầu (tolerance=0); bảng phụ dùng ±1 ngày.
+# NOAA CR TA 98-03 dùng ±1/3 thời gian báo trước: 24 giờ tương ứng ±8 giờ.
+# Với lịch ngày, cùng ngày là lựa chọn của đề tài; không xác nhận độ chính xác dưới ngày.
+# https://repository.library.noaa.gov/view/noaa/30340/noaa_30340_DS1.pdf (Mục III.B)
+# Nearing 2024 dùng ±2 ngày; bảng phụ ±1 của đề tài không tái lập đúng cửa sổ đó.
+# https://www.nature.com/articles/s41586-024-07145-1 (Methods, Metrics)
 # Loại sự kiện có onset/ending không quan sát được và cửa sổ ghép có ngày thiếu.
 # Số sự kiện bị kiểm duyệt được báo riêng, giữ ngày thiếu trong lịch đầy đủ.
 
 # %% Phần 6.1 — Ghép tối ưu theo lịch và chấm POD/FAR
 # Quy hoạch động không tái sử dụng một sự kiện cho nhiều lần báo.
 def match_events(observed, predicted, tolerance):
+    if not isinstance(tolerance, int) or isinstance(tolerance, bool) or tolerance < 0:
+        raise ValueError("tolerance phải là số nguyên ngày không âm")
     n, m = len(observed), len(predicted)
     score = [[(0, 0)] * (m + 1) for _ in range(n + 1)]
     action = np.zeros((n + 1, m + 1), dtype=np.int8)
@@ -395,7 +409,8 @@ def event_rates(hit, missed, false_alarm):
                 CSI=ratio(hit, hit + missed + false_alarm))
 
 
-def score_events(obs, sim, threshold, area, mask, lead=1, grouped=True, forecast_horizon=None):
+def score_events(obs, sim, threshold, area, mask, lead=1, grouped=True, forecast_horizon=None,
+                 tolerance=PRIMARY_EVENT_TOLERANCE_DAYS):
     observed, predicted = [np.asarray(x, dtype=float).copy() for x in (obs, sim)]
     if np.asarray(mask).dtype != np.bool_ or np.asarray(mask).shape != observed.shape or predicted.shape != observed.shape:
         raise ValueError("Sai mặt nạ sự kiện")
@@ -405,7 +420,8 @@ def score_events(obs, sim, threshold, area, mask, lead=1, grouped=True, forecast
     horizon = lead if forecast_horizon is None else forecast_horizon
     if not isinstance(horizon, int) or isinstance(horizon, bool) or not 1 <= lead <= horizon <= 7:
         raise ValueError("Sai hạn hoặc tổng số hạn của mô hình")
-    tolerance = 1 if horizon == 1 else 2
+    if not isinstance(tolerance, int) or isinstance(tolerance, bool) or tolerance < 0:
+        raise ValueError("tolerance phải là số nguyên ngày không âm")
     all_events, eligible, audits = [], [], []
     for values in (observed, predicted):
         events = exceedance_runs(values, threshold)
@@ -447,7 +463,7 @@ def score_events(obs, sim, threshold, area, mask, lead=1, grouped=True, forecast
 # %% [markdown]
 # ## Phần 7 — So sánh mô hình và kịch bản
 # ### 7.1. Wilcoxon hai phía, Cohen's dz và Holm
-# Mỗi lưu vực là một cặp; giữ điểm âm. Họ Holm gồm các phép so đã khai báo.
+# Mỗi lưu vực là một cặp; giữ điểm âm. Holm chỉ đếm các p-value hữu hạn trong họ.
 
 # %% Phần 7.1 — Kiểm định ghép cặp và hiệu chỉnh
 # d không xác định khi std hiệu bằng 0; tất cả hiệu bằng 0 có p=1 theo quy ước.
@@ -487,7 +503,7 @@ def holm(pvalues):
     order = valid[np.argsort(pvalues[valid], kind="stable")]
     previous = 0.0
     for rank, index in enumerate(order):
-        previous = max(previous, (len(pvalues) - rank) * pvalues[index])
+        previous = max(previous, (len(valid) - rank) * pvalues[index])
         adjusted[index] = min(1.0, previous)
     return adjusted
 
@@ -755,18 +771,41 @@ def self_test():
     check("matching_max_cardinality", pairs == [(0, 0), (1, 1)])
     check("matching_no_reuse", len(match_events([dict(start=2), dict(start=3)], [dict(start=2)], 1)) == 1)
     eobs, esim = np.zeros(16), np.zeros(16)
-    eobs[[4, 11]], esim[[5]] = 5, 5
+    eobs[[4, 11]], esim[[4]] = 5, 5
     rates, _ = score_events(eobs, esim, 4, 101, np.ones(16, dtype=bool), grouped=False)
     check("event_hit_missed", (rates["hit"], rates["missed"], rates["false_alarm"]) == (1, 1, 0))
     check("event_POD_FAR", rates["POD"] == .5 and rates["FAR"] == 0)
+    # Persistence trễ đúng một ngày: chính không bắt được; phụ ±1 bắt cả hai trận.
+    delayed = np.r_[0., eobs[:-1]]
+    strict, strict_pairs = score_events(eobs, delayed, 4, 101, np.ones(16, dtype=bool), grouped=False)
+    relaxed, relaxed_pairs = score_events(eobs, delayed, 4, 101, np.ones(16, dtype=bool),
+                                           grouped=False, tolerance=1)
+    check("delayed_persistence_not_a_same_day_hit", (strict["hit"], strict["missed"], strict["false_alarm"]) == (0, 2, 2)
+          and strict["POD"] == 0 and strict["FAR"] == 1 and not strict_pairs)
+    check("delayed_persistence_supplementary_POD_one", relaxed["POD"] == 1 and relaxed["FAR"] == 0
+          and len(relaxed_pairs) == 2 and relaxed["mean_peak_timing_days"] == 1)
+    early = np.r_[eobs[1:], 0.]
+    strict_early, _ = score_events(eobs, early, 4, 101, np.ones(16, dtype=bool), grouped=False)
+    check("early_prediction_not_a_same_day_hit", strict_early["hit"] == 0 and strict_early["missed"] == 2)
+    missing = np.ones(16, dtype=bool)
+    missing[3] = False
+    censored, _ = score_events(eobs, eobs, 4, 101, missing, grouped=False)
+    check("zero_tolerance_still_censors_missing_onset", censored["observed_censored"] == 1 and censored["hit"] == 1)
+    rejects("negative_tolerance_rejected", lambda: score_events(eobs, delayed, 4, 101, missing, tolerance=-1))
+    rejects("fractional_tolerance_rejected", lambda: match_events([], [], .5))
     horizon_obs, horizon_sim = np.zeros(12), np.zeros(12)
     horizon_obs[4], horizon_sim[6] = 5, 5
     horizon_score, _ = score_events(horizon_obs, horizon_sim, 4, 101, np.ones(12, dtype=bool),
                                     lead=1, forecast_horizon=7, grouped=False)
-    check("H_lead1_uses_two_day_tolerance", horizon_score["hit"] == 1 and horizon_score["matching_tolerance_days"] == 2)
+    check("H_lead1_keeps_same_day_primary", horizon_score["hit"] == 0 and horizon_score["matching_tolerance_days"] == 0)
+    same_day, _ = score_events(horizon_obs, horizon_obs, 4, 101, np.ones(12, dtype=bool),
+                               lead=7, forecast_horizon=7, grouped=False)
+    check("H_lead7_keeps_same_day_primary", same_day["hit"] == 1 and same_day["matching_tolerance_days"] == 0)
     check("no_events_not_perfect", np.isnan(event_rates(0, 0, 0)["POD"]))
     check("Holm_known_values", np.allclose(holm([.01, .04, .03]), [.03, .06, .06]))
-    check("Holm_keeps_planned_missing_test", np.allclose(holm([.01, np.nan, .03])[[0, 2]], [.03, .06]))
+    check("Holm_excludes_NaN_from_family", np.allclose(holm([.01, np.nan, .03]), [.02, np.nan, .03], equal_nan=True))
+    check("Holm_all_NaN_or_empty", np.isnan(holm([np.nan, np.nan])).all() and len(holm([])) == 0)
+    check("Holm_single_finite_p", np.allclose(holm([np.nan, .04]), [np.nan, .04], equal_nan=True))
     check("paired_test_identity", paired_test(obs, obs)["p_value"] == 1)
     check("paired_dz_known", np.isclose(paired_test([2., 4., 6.], [1., 2., 3.])["cohen_dz"], 2))
     check("paired_undefined_IDs_counted", paired_test([1., np.nan, 2.], [1., 0., 3.])["n_pairs"] == 2)
@@ -843,8 +882,19 @@ def self_test():
         check("I_O_perfect_scores", np.allclose(perfect[list(METRICS)].to_numpy(), 1))
         check("pooled_levels_from_counts", np.allclose(pool_levels(tables["confusion"]).loc[lambda x: x.run.eq("SeqLSTM_Q"), "accuracy"], 1))
         check("events_short_fit_cohort_kept", set(pool_events(tables["events"]).cohort) == {"all", "fit_ge10_years", "fit_lt10_years"})
+        check("primary_and_supplementary_event_tables_separate",
+              set(tables["events"].matching_tolerance_days) == {0}
+              and set(tables["events_tolerance1"].matching_tolerance_days) == {1}
+              and list(tables["event_matches"].columns) == list(tables["event_matches_tolerance1"].columns)
+              and (tables["event_matches"].obs_onset == tables["event_matches"].sim_onset).all())
         test_table = pairwise_tests(tables["metrics"])
-        check("Holm_all_pairs_family", set(test_table.family_size) == {45})
+        check("Holm_all_pairs_family", set(test_table.family_size) == {45} and set(test_table.planned_family_size) == {45})
+        partial = tables["metrics"].copy()
+        partial.loc[partial.run.eq("SeqLSTM_Q"), ["NSE", "PNSE", "KGE"]] = np.nan
+        partial_tests = pairwise_tests(partial)
+        check("Holm_table_family_counts_only_finite_tests", set(partial_tests.family_size) == {36}
+              and set(partial_tests.planned_family_size) == {45}
+              and partial_tests.loc[partial_tests.p_value.isna(), "p_holm"].isna().all())
         tables["metrics"].to_csv(a3 / "A3_all_metrics_per_basin.csv", index=False)
         checked, _ = check_a3_reference(tables["metrics"], a3)
         check("A3_reference_read_and_join", bool(checked.passed.all()))
@@ -870,7 +920,8 @@ def self_test():
 # native không cấp persistence; paired_source và common_source_all dùng sáu chỉ số cùng mask.
 def evaluate_group(forecasts, levels=None, floods=None):
     shared = common_mask(forecasts)
-    metric_rows, level_rows, matrix_rows, event_rows, match_rows = [], [], [], [], []
+    metric_rows, level_rows, matrix_rows = [], [], []
+    event_rows, match_rows = {0: [], 1: []}, {0: [], 1: []}
     for forecast in forecasts:
         base_meta = dict(run=forecast.name, period=forecast.period, scenario=forecast.scenario,
                          lead=forecast.lead, seed=forecast.seed)
@@ -900,17 +951,25 @@ def evaluate_group(forecasts, levels=None, floods=None):
                 for period in RETURN_PERIODS:
                     threshold = floods.loc[(identifier, period)]
                     for grouped in (True, False):
-                        score, pairs = score_events(obs, sim, threshold.threshold_mm_day, forecast.area[j], mask,
-                                                    lead=forecast.lead, grouped=grouped,
-                                                    forecast_horizon=forecast.metadata.get("forecast_horizon", forecast.lead))
                         event_meta = dict(**meta, return_period_years=period, grouping="USWRC" if grouped else "consecutive",
                                           n_fit_years=int(threshold.n_years), threshold_mm_day=float(threshold.threshold_mm_day))
-                        event_rows.append(dict(**event_meta, **score))
-                        for pair in pairs:
-                            match_rows.append(dict(**event_meta, **{key: str(forecast.dates[value].date())
-                                                                   if key != "peak_timing_days" else value for key, value in pair.items()}))
+                        for tolerance in (PRIMARY_EVENT_TOLERANCE_DAYS, SUPPLEMENTARY_EVENT_TOLERANCE_DAYS):
+                            score, pairs = score_events(obs, sim, threshold.threshold_mm_day, forecast.area[j], mask,
+                                                        lead=forecast.lead, grouped=grouped, tolerance=tolerance,
+                                                        forecast_horizon=forecast.metadata.get("forecast_horizon", forecast.lead))
+                            event_rows[tolerance].append(dict(**event_meta, **score))
+                            for pair in pairs:
+                                match_rows[tolerance].append(dict(**event_meta, matching_tolerance_days=tolerance,
+                                    **{key: str(forecast.dates[value].date()) if key != "peak_timing_days" else value
+                                       for key, value in pair.items()}))
+    # Giữ schema CSV khi không có cặp ghép đúng ngày.
+    match_columns = ["run", "period", "scenario", "lead", "seed", "scope", "basin_id", "return_period_years",
+                     "grouping", "n_fit_years", "threshold_mm_day", "matching_tolerance_days",
+                     "obs_onset", "sim_onset", "obs_peak", "sim_peak", "peak_timing_days"]
     return dict(metrics=pd.DataFrame(metric_rows), levels=pd.DataFrame(level_rows), confusion=pd.DataFrame(matrix_rows),
-                events=pd.DataFrame(event_rows), event_matches=pd.DataFrame(match_rows)), shared
+                events=pd.DataFrame(event_rows[0]), event_matches=pd.DataFrame(match_rows[0], columns=match_columns),
+                events_tolerance1=pd.DataFrame(event_rows[1]),
+                event_matches_tolerance1=pd.DataFrame(match_rows[1], columns=match_columns)), shared
 
 
 def summarize(table):
@@ -939,8 +998,10 @@ def pairwise_tests(table):
                 family.append(dict(period=group[0], scenario=group[1], lead=group[2], metric=metric,
                                    left=left, right=right, **paired_test(wide[left], wide[right])))
             adjusted = holm([row["p_value"] for row in family])
+            valid_family_size = sum(np.isfinite(row["p_value"]) for row in family)
             for row, p in zip(family, adjusted):
-                row.update(p_holm=p, family_size=len(family), significant_005=bool(p <= .05) if np.isfinite(p) else None)
+                row.update(p_holm=p, family_size=int(valid_family_size), planned_family_size=len(family),
+                           significant_005=bool(p <= .05) if np.isfinite(p) else None)
             rows.extend(family)
     return pd.DataFrame(rows)
 
@@ -1085,7 +1146,8 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
                                metadata={"role": "observed_Q_reference_for_scoring"}).validate()
             members.append(baseline)
             forecasts.append(baseline)
-    results = {key: [] for key in ("metrics", "levels", "confusion", "events", "event_matches")}
+    results = {key: [] for key in ("metrics", "levels", "confusion", "events", "event_matches",
+                                  "events_tolerance1", "event_matches_tolerance1")}
     coverages = []
     for group, members in grouped.items():
         print(f"Phần 3–6: chấm {group}; {len(members)} run, giữ {len(members[0].ids)} ID", flush=True)
@@ -1101,6 +1163,7 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     results["paired_tests"] = pairwise_tests(results["metrics"])
     results["levels_pooled"] = pool_levels(results["confusion"])
     results["events_pooled"] = pool_events(results["events"])
+    results["events_pooled_tolerance1"] = pool_events(results["events_tolerance1"])
     results["scenario_changes"] = scenario_changes(forecasts)
     results["coverage"] = pd.DataFrame(coverages)
     reference_table = results["metrics"]
@@ -1118,21 +1181,34 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
         table.to_csv(output / f"Evaluation_{name}.csv", index=False, encoding="utf-8-sig")
     input_manifest = pd.DataFrame([dict(path=str(path), bytes=path.stat().st_size, sha256=sha256(path)) for path in sorted(set(paths))])
     input_manifest.to_csv(output / "Evaluation_input_manifest.csv", index=False, encoding="utf-8-sig")
-    protocol = dict(metric_ddof=0, same_mask_for_six_metrics=True, metric_epsilon=None,
+    protocol = dict(protocol_version=PROTOCOL_VERSION, metric_ddof=0, same_mask_for_six_metrics=True, metric_epsilon=None,
                     level_equality="higher_class", flood_exceedance="strictly_greater",
                     FDC_log_floor_mm_day=LOG_FLOOR_MM_DAY, FDC_quantile_method="linear",
                     FDC_tail_count="ceil_fraction_times_n", event_grouping="USWRC and consecutive",
                     event_matching="maximum_cardinality_then_minimum_total_absolute_onset_error",
-                    event_tolerance="one_day_model_plus_minus_1_day_multi_horizon_model_plus_minus_2_days",
+                    event_tolerance="primary_same_day_onset_0_days_supplementary_plus_minus_1_day_all_leads",
+                    event_tolerance_days=PRIMARY_EVENT_TOLERANCE_DAYS,
+                    supplementary_event_tolerance_days=SUPPLEMENTARY_EVENT_TOLERANCE_DAYS,
+                    event_timing_reference=dict(
+                        NOAA="https://repository.library.noaa.gov/view/noaa/30340/noaa_30340_DS1.pdf",
+                        NOAA_window="plus_minus_one_third_forecast_lead_time_24h_means_8h",
+                        daily_adaptation="same_calendar_day_onset_not_subdaily_verification",
+                        Nearing2024="https://www.nature.com/articles/s41586-024-07145-1",
+                        Nearing2024_window_days=2,
+                        supplementary_note="one_day_sensitivity_is_not_exact_Nearing_replication"),
                     censored_events="excluded_from_scores_and_counted_separately",
                     holm_family="all_unordered_run_pairs_excluding_qmean_aux_per_metric_period_scenario_lead",
+                    holm_family_size="finite_p_values_only_NaN_excluded_planned_size_reported_separately",
                     statistics="two_sided_Wilcoxon_auto_and_paired_Cohen_dz",
                     test_used_for_selection=False)
     (output / "Evaluation_protocol.json").write_text(json.dumps(protocol, ensure_ascii=False, indent=2), encoding="utf-8")
     run_index = [dict(run=f.name, period=f.period, scenario=f.scenario, lead=f.lead, seed=f.seed,
                       IDs=len(f.ids), days=len(f.dates), **{"source_metadata": f.metadata}) for f in forecasts]
     (output / "Evaluation_run_index.json").write_text(json.dumps(run_index, ensure_ascii=False, indent=2), encoding="utf-8")
-    summary = dict(complete=True, fixture_checks=int(len(checks)), A3_reference_matched=True,
+    summary = dict(complete=True, protocol_version=PROTOCOL_VERSION,
+                   event_tolerance_days=PRIMARY_EVENT_TOLERANCE_DAYS,
+                   supplementary_event_tolerance_days=SUPPLEMENTARY_EVENT_TOLERANCE_DAYS,
+                   fixture_checks=int(len(checks)), A3_reference_matched=True,
                    coverage=coverages, scenarios=sorted({f.scenario for f in forecasts}),
                    leads=sorted({f.lead for f in forecasts}),
                    operational_scenarios_run=any(f.scenario != "S0" for f in forecasts),

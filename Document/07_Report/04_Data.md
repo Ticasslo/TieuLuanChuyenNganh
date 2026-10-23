@@ -1,6 +1,6 @@
 # Chương 4. Dữ liệu
 
-Nghiên cứu sử dụng dữ liệu ngày của **Extended LamaH-CE** trên 451 lưu vực Trung Âu, kết hợp khí tượng, lưu lượng quan trắc và thuộc tính lưu vực. Khảo sát A1 cho thấy nhãn có độ phủ cao trên toàn tập nhưng thiếu tập trung ở một số trạm; chiều dài lịch sử, đơn vị và mặt nạ đầu vào là các yếu tố cần kiểm soát khi so sánh mô hình. Chương này trình bày dữ liệu, quy tắc tạo mẫu và các ngưỡng đánh giá được dùng cho những kết quả ở [Chương 6](06_ExperimentsAndResults.md).
+Nghiên cứu sử dụng dữ liệu ngày của **Extended LamaH-CE** trên 451 lưu vực Trung Âu, kết hợp khí tượng, lưu lượng quan trắc và thuộc tính lưu vực. Khảo sát A1 cho thấy nhãn có độ phủ cao trên toàn tập nhưng thiếu tập trung ở một số trạm; chiều dài lịch sử, đơn vị và **mặt nạ đầu vào** — bảng chỉ rõ ô dữ liệu nào có giá trị, ô nào thiếu — là các yếu tố cần kiểm soát khi so sánh mô hình. Chương này trình bày dữ liệu, quy tắc tạo mẫu và các ngưỡng đánh giá được dùng cho những kết quả ở [Chương 6](06_ExperimentsAndResults.md).
 
 ## 4.1. Nguồn dữ liệu và phạm vi lựa chọn
 
@@ -48,7 +48,7 @@ A1 kiểm kê 40 cột khí tượng trong tệp nguồn. Các cấu hình đang
 
 Tái phân tích tái dựng thời tiết đã xảy ra bằng quan trắc và mô hình; dự báo là thông tin cho thời điểm tương lai tại lúc phát hành. Sự khác nhau về nguồn, độ phân giải, phép tổng hợp và đại lượng vật lý có thể làm hai chuỗi cùng tên gần đúng khác nhau. Chẳng hạn, bức xạ thuần và bức xạ tới mặt đất không thể được xem là cùng đại lượng chỉ từ tương quan hoặc độ lớn trung bình.
 
-Khảo sát A1 giữ các phép ghép theo cùng ngày–ID khi so nguồn, kiểm độ phủ và phân phối thay vì tự hiệu chỉnh dữ liệu theo kết quả test. ECMWF HRES có từ **01/01/2002**; lịch dòng CSV và khoảng thời gian có giá trị hữu hạn của từng nguồn được kiểm riêng. Điều này đặc biệt quan trọng khi dùng lịch sử 730 ngày, vốn có thể đi vào thời gian trước khi nguồn dự báo bắt đầu.
+Khảo sát A1 giữ các phép ghép theo cùng **ngày–ID**, tức một ngày tại một lưu vực cụ thể, khi so nguồn, kiểm độ phủ và phân phối thay vì tự hiệu chỉnh dữ liệu theo kết quả test. ECMWF HRES có từ **01/01/2002**; lịch dòng CSV và khoảng thời gian có giá trị hữu hạn của từng nguồn được kiểm riêng. Điều này đặc biệt quan trọng khi dùng lịch sử 730 ngày, vốn có thể đi vào thời gian trước khi nguồn dự báo bắt đầu.
 
 ### 4.3.2. Nhãn qmax và biến qmean
 

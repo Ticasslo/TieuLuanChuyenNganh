@@ -114,7 +114,7 @@ Mỗi ngày được xếp vào một trong bốn mức theo ngưỡng riêng c�
 
 *Hình 6. Sự kiện lũ: (a) một lưu vực, ngưỡng chu kỳ 2 năm, đánh dấu trận bắt được, bỏ sót và báo nhầm; (b) POD, precision, F1, CSI của mô hình A khi cộng dồn số trận 451 lưu vực, theo bốn ngưỡng; (c) CDF POD theo lưu vực, chỉ tính lưu vực có trận.*
 
-Một trận lũ bắt đầu ở ngày lưu lượng vượt ngưỡng từ dưới lên; trận quan trắc được tính **bắt được** nếu dự báo có trận bắt đầu trong ±1 ngày, ngược lại là **bỏ sót**; trận dự báo không khớp trận thật nào là **báo nhầm** (`03_Pipeline.md` Mục 6.2). Hình minh họa chưa áp tiêu chí gộp trận độc lập USWRC mà đề tài dùng khi làm thật.
+Một trận lũ bắt đầu ở ngày lưu lượng vượt ngưỡng từ dưới lên. Giao thức chính yêu cầu trận dự báo bắt đầu **cùng ngày** trận thật; bảng phụ cho phép ±1 ngày (`03_Pipeline.md` Mục 6.2). Trận quan trắc không có cặp khớp là **bỏ sót**; trận dự báo không khớp trận thật nào là **báo nhầm**. Hình dưới minh họa cửa sổ ±1 của bảng phụ và chưa áp tiêu chí gộp trận độc lập USWRC.
 
 | Chỉ số | Công thức (h bắt được, m bỏ sót, f báo nhầm) | Nghĩa |
 |---|---|---|

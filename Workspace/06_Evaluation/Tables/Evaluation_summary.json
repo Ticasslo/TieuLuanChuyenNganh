@@ -1,6 +1,9 @@
 {
   "complete": true,
-  "fixture_checks": 49,
+  "protocol_version": 2,
+  "event_tolerance_days": 0,
+  "supplementary_event_tolerance_days": 1,
+  "fixture_checks": 60,
   "A3_reference_matched": true,
   "coverage": [
     {

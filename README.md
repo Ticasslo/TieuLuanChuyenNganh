@@ -33,7 +33,7 @@ PDF trong `PaperResearch/PaperResearchPDF/` để nhóm tham khảo. Giấy phé
 
 ## Trạng thái
 
-Đã hoàn thành A1, tái lập suy luận A2 và các mốc A3. Trên giao chung 450 lưu vực, SeqLSTM có Q đạt NSE trung vị 0,705259; persistence qmax đạt 0,350031; DLinear ba seed đạt 0,380152 ± 0,002415. Bộ đánh giá đã chạy trên Kaggle cho test/S0/hạn một ngày, khớp A3 và qua 39 kiểm tra CSV cục bộ. Kết quả gồm chỉ số liên tục, bốn mức, sự kiện lũ và kiểm định ghép cặp.
+Đã hoàn thành A1, tái lập suy luận A2 và các mốc A3. Trên giao chung 450 lưu vực, SeqLSTM có Q đạt NSE trung vị 0,705259; persistence qmax đạt 0,350031; DLinear ba seed đạt 0,380152 ± 0,002415. Bộ đánh giá giao thức 2 đã chạy trên Kaggle cho test/S0/hạn một ngày, khớp A3, qua 60 kiểm thử và 57 kiểm tra CSV cục bộ. Bảng lũ chính yêu cầu cùng ngày bắt đầu; bảng phụ dùng ±1 ngày. Kết quả gồm chỉ số liên tục, bốn mức, sự kiện lũ và kiểm định ghép cặp.
 
 Luồng mô hình tiếp tục A4 và B1; luồng dữ liệu/đánh giá chuẩn bị báo cáo, bàn giao kết quả và tích hợp B2 khi A4/B1 sẵn sàng. Các kịch bản S1–S4, nhiều hạn và so sánh năm lõi được bổ sung khi có dự báo tương ứng.
 

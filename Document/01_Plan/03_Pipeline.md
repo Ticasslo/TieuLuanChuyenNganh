@@ -189,7 +189,7 @@ Theo cấu hình của tác giả (BiasCast Mục 2.2; `02_BasePaper.md` Mục 1
 
 - **Theo lưu vực trên test 2014–2017:** NSE, KGE (và ba thành phần r, α, β), **PNSE** (NSE lấy qmax ngày t−1 quan sát làm mốc, tức hệ số persistence của Kitanidis & Bras, WRR 1980; MF²LSTM dùng tên PNSE).
 - **Tổng hợp:** trung vị, trung bình, P10/P25/P75/P90, đường CDF, số lưu vực tốt lên / kém đi.
-- **Kiểm định:** Wilcoxon signed-rank hai phía, ghép cặp theo lưu vực, kèm cỡ hiệu ứng Cohen's d dạng ghép cặp (trung bình chênh lệch chia độ lệch chuẩn của chênh lệch) — cách của Kratzert và cs. (2019, 2024), Gauch và cs. (2025), Nearing và cs. (2024); hiệu chỉnh Holm khi so nhiều cặp.
+- **Kiểm định:** Wilcoxon signed-rank hai phía, ghép cặp theo lưu vực, kèm cỡ hiệu ứng Cohen's d dạng ghép cặp (trung bình chênh lệch chia độ lệch chuẩn của chênh lệch) — cách của Kratzert và cs. (2019, 2024), Gauch và cs. (2025), Nearing và cs. (2024); hiệu chỉnh Holm khi so nhiều cặp, chỉ đếm p-value hữu hạn trong từng họ, bỏ NaN và ghi riêng số phép so dự kiến.
 - **Ba tầng chỉ số.** Mọi chỉ số tính từ cùng một tệp dự báo; chia tầng để chỉ một chỉ số dùng cho việc chọn, các chỉ số còn lại dùng để so sánh và giải thích:
 
 | Tầng | Chỉ số | Vai trò |
@@ -207,7 +207,7 @@ Trung vị có dấu của %BiasFHV có thể gần 0 khi các lưu vực lệch
 | Ngưỡng mức | Riêng từng lưu vực, tính trên qmax 1981–2013 (trước kỳ test): bốn mức theo xác suất vượt của đường duy trì lưu lượng — rất cao (0–0,02), cao (0,02–0,2), trung bình (0,2–0,7), thấp (0,7–1). Yilmaz, Gupta, Wagener (WRR 2008) chia ba đoạn: cao 0–0,02, giữa 0,2–0,7, thấp 0,7–1; khoảng 0,02–0,2 nằm giữa hai đoạn của Yilmaz, đề tài tách thành mức riêng để bốn mức phủ hết đường duy trì |
 | Chỉ số theo mức | Ma trận nhầm lẫn 4 mức, độ chính xác, recall và precision từng mức; %BiasFHV, %BiasFMS, %BiasFLV |
 | Ngưỡng lũ | Chu kỳ lặp lại 1,5; 2; 5; 10 năm (mức thấp nhất 1,5 năm như AIFL; Nearing và cs., Nature 2024 ghi "1 năm" nhưng mã dùng T = 1,01, ngưỡng thấp hơn khoảng 99% đỉnh năm, trùng vai trò với mức "rất cao"), đỉnh năm theo năm thủy văn 1/10 – 30/9 như mã Nearing, bỏ năm thiếu quá nửa số ngày (mẫu số cả lịch năm 365/366; mẫu chính giữ năm biên 1981 nếu đủ ≥50%, mẫu chỉ gồm năm nằm trọn reference 1982–2013 là độ nhạy riêng; không dùng test hoàn thành năm thủy văn 2014); Gumbel fit bằng L-moments (Hosking, JRSS B 1990) trên qmax năm 1981–2013, như AIFL. Số năm có Q khác nhau giữa các trạm (3 trạm chỉ có Q từ 2010 — `01_LamaHCE.md` Mục 6.1), nên ghi số năm dùng để fit cho từng lưu vực; lưu vực dưới 10 năm báo cáo riêng (ngưỡng 10 năm là lựa chọn của đề tài) |
-| Sự kiện | Một trận lũ quan trắc tính là phát hiện đúng nếu chuỗi dự báo có trận bắt đầu trong vòng ±1 ngày quanh ngày bắt đầu của trận đó — lựa chọn của đề tài cho hạn 1 ngày; Nearing và cs. (2024) tính đúng khi hai bên vượt ngưỡng "within two days of each other" với dự báo nhiều ngày; bước H dùng ±2 ngày như Nearing. Trận lũ bắt đầu ở ngày vượt ngưỡng từ dưới lên (như mã Nearing); hai lần vượt liên tiếp gộp làm một trận nếu đỉnh cách nhau dưới 5 + ln(A dặm vuông) ngày hoặc lưu lượng giữa hai đỉnh không tụt dưới 3/4 đỉnh nhỏ hơn (tiêu chí độc lập USWRC 1976, theo tổng quan Pan và cs., SERRA 36:2419–2435, 2022), áp như nhau cho quan trắc và dự báo; kết quả không gộp báo cáo kèm để so với Nearing |
+| Sự kiện | Bảng chính yêu cầu trận dự báo bắt đầu **cùng ngày** trận thật (tolerance = 0); bảng phụ cho phép ±1 ngày, áp như nhau cho mọi run và từng hạn. NOAA CR TA 98-03 Mục III.B dùng cửa sổ ±1/3 thời gian báo trước; lựa chọn cùng ngày của đề tài phù hợp độ phân giải ngày ở hạn một ngày. Nearing và cs. (2024) dùng ±2 ngày, nên bảng phụ ±1 là phân tích độ nhạy khi đối chiếu, không tái lập nguyên cửa sổ Nearing. Trận lũ bắt đầu ở ngày vượt ngưỡng từ dưới lên; hai lần vượt liên tiếp gộp làm một trận nếu đỉnh cách nhau dưới 5 + ln(A dặm vuông) ngày hoặc lưu lượng giữa hai đỉnh không tụt dưới 3/4 đỉnh nhỏ hơn (tiêu chí độc lập USWRC 1976, theo tổng quan Pan và cs., SERRA 36:2419–2435, 2022), áp như nhau cho quan trắc và dự báo; kết quả không gộp báo cáo kèm |
 | Chỉ số sự kiện | Tỉ lệ phát hiện (POD/recall), tỉ lệ báo động nhầm (FAR), precision, F1, CSI; sai số thời điểm đỉnh. Kết quả chính cộng dồn số trận bắt được, bỏ sót, báo nhầm của cả 451 lưu vực ở mỗi mức T; theo lưu vực thì POD chỉ tính ở lưu vực có trận thật, precision chỉ ở lưu vực có trận báo, ghi kèm số lưu vực được tính (không dùng quy ước gán 1 khi không có trận như mã Nearing) |
 | Ngưỡng kép (phân tích độ nhạy) | Ngưỡng của mô hình tính trên chính chuỗi dự báo của mô hình (Nearing 2024, AIFL); vì mô hình chỉ có dự báo 2003–2017 (gồm cả kỳ train), chỉ dùng làm phân tích phụ, nêu rõ hạn chế |
 | Cách đọc | Ưu tiên bỏ sót ít ở mức lũ và mức rất thấp (GVHD; "rất thấp" ứng với mức thấp, xác suất vượt 0,7–1), tức đọc recall/POD trước ở mức rất cao, mức thấp và các mức lũ, chấp nhận báo động nhầm nhiều hơn; so các lõi ở từng mức |
@@ -236,7 +236,7 @@ Số tham số, thời gian mỗi epoch, bộ nhớ GPU, thời gian suy luận 
 
 ### 6.6. Theo hạn dự báo (bước H)
 
-Với từng hạn 1–7 ngày: NSE, KGE; PNSE lấy qmax ngày t−1 quan sát làm mốc cho mọi hạn (persistence cùng hạn); chỉ số sự kiện lũ với cửa sổ ±2 ngày như Nearing và cs. (2024); so ba cách (a), (b), (c) để tách phần đóng góp của dự báo thời tiết thật ở ngày đầu và mức suy giảm khi không có dự báo.
+Với từng hạn 1–7 ngày: NSE, KGE; PNSE lấy qmax ngày t−1 quan sát làm mốc cho mọi hạn (persistence cùng hạn); chỉ số sự kiện lũ yêu cầu cùng ngày bắt đầu ở bảng chính, ±1 ngày ở bảng phụ theo Mục 6.2; so ba cách (a), (b), (c) để tách phần đóng góp của dự báo thời tiết thật ở ngày đầu và mức suy giảm khi không có dự báo.
 
 ### 6.7. Giải thích mô hình
 
@@ -349,7 +349,7 @@ Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook
 | `03_Baseline/` | A2 tái lập (`01_A2_LamaHCEExt_Reproduce.py`), A3 mốc so sánh gồm persistence, PNSE, KGE, DLinear (`02_A3_LamaHCEExt_Benchmarks.py`), A4 huấn luyện lại và nhiễu hạt giống (`03_A4_LamaHCEExt_Retrain.py`) | A2 tái lập đạt; A3 hoàn thành persistence, sáu A2 và DLinear ba hạt giống; A4 thuộc luồng Người 2 |
 | `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Có bản kiểm bộ nạp B2 độc lập đạt trên Kaggle; tích hợp B1 thực hiện sau A4/B1 |
 | `05_Training/` | Notebook huấn luyện theo bước B–H | Chưa viết |
-| `06_Evaluation/` | Bộ đánh giá Mục 6 | Đã chấm A2/DLinear trên Kaggle, test/S0/hạn một ngày; 49 kiểm thử đạt, khớp A3 trên 4.961 cặp run–ID và qua 39 kiểm CSV cục bộ; mở rộng khi có dự báo validation/S1–S4/nhiều hạn |
+| `06_Evaluation/` | Bộ đánh giá Mục 6 | Đã chấm A2/DLinear trên Kaggle theo giao thức 2, test/S0/hạn một ngày; 60 kiểm thử đạt, khớp A3 trên 4.961 cặp run–ID và qua 57 kiểm CSV cục bộ; bảng lũ chính cùng ngày bắt đầu, bảng phụ ±1; mở rộng khi có dự báo validation/S1–S4/nhiều hạn |
 | `07_Demo/` | Demo (mục dự án trong trang web của nhóm) | Chưa viết |
 
 Tên thư mục từ `04_` trở đi là đề xuất, đặt khi bắt đầu viết mã.

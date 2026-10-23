@@ -6,6 +6,8 @@
 
 Đề tài đã hoàn thành khảo sát dữ liệu A1, chạy lại suy luận từ trọng số tác giả ở A2 và xây dựng các mốc so sánh A3, gồm persistence và DLinear với ba hạt giống. Các kết quả tạo cơ sở để đánh giá những mô hình tiếp theo trên cùng dữ liệu, đơn vị và ngày dự báo.
 
+Đợt đánh giá hiện tại dùng **S0**, tức không che thêm đầu vào theo kịch bản; dữ liệu gốc vẫn có thể thiếu. **Hạn một ngày** nghĩa là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Một **ngày–lưu vực** là một ngày tại một trạm có ID riêng. **Mặt nạ** là bảng chọn hoặc bỏ các cặp ngày–lưu vực khi chấm; **giao chung** chỉ giữ các cặp có quan trắc, persistence và dự báo của mọi mô hình cùng hữu hạn, để các mô hình được so trên cùng dữ liệu.
+
 | Hạng mục | Kết quả đã đạt |
 |---|---|
 | A1 — dữ liệu | Khảo sát 451 lưu vực; xác định độ phủ nhãn, đơn vị, cửa sổ đầu vào; tính ngưỡng bốn mức lưu lượng và ngưỡng lũ theo chu kỳ lặp lại |
@@ -209,11 +211,11 @@ Ví dụ thực nghiệm tại **758**, DLinear seed 111 có r ≈ **0,9837** nh
 
 Bộ đánh giá dùng ngưỡng A1 đã chấm cùng giao ngày của A3. Trên 11.759 ngày–lưu vực quan trắc ở mức rất cao, SeqLSTM_Q bắt đúng 5.595 ngày, tương ứng recall **47,58%**, precision **67,58%**; persistence qmax đạt recall **40,11%**, precision **40,28%**. Ba seed DLinear có recall khoảng **21,80–22,30%**, cho thấy hạn chế ở dải lưu lượng cao dù NSE trung vị nhỉnh hơn persistence.
 
-Với ngưỡng lũ chu kỳ hai năm và quy tắc USWRC, có **1.066 cụm quan trắc đủ điều kiện trên 366 lưu vực**. SeqLSTM_Q bắt 348 cụm, bỏ sót 718 và báo nhầm 291: POD **32,65%**, FAR **45,54%**. DLinear có POD **20,83–22,23%** và FAR **30,70–32,52%**, thể hiện đánh đổi giữa bắt được nhiều trận và báo nhầm.
+**Bảng lũ chính yêu cầu trận dự báo bắt đầu cùng ngày trận thật (tolerance = 0); bảng phụ cho phép ±1 ngày.** Với ngưỡng lũ chu kỳ hai năm và quy tắc USWRC, có **1.066 cụm quan trắc đủ điều kiện trên 366 lưu vực**. SeqLSTM_Q bắt đúng ngày 208 trận, bỏ sót 858 và báo nhầm 431: POD **19,51%**, FAR **67,45%**. D_RA đạt POD **20,54%**, FAR **63,25%**, nhưng dùng tái phân tích ở ngày đích nên là mốc tham chiếu về nguồn thông tin. Mỗi seed DLinear bắt đúng hai trận, POD **0,19%**, FAR **99,38–99,42%**. Persistence không có cặp đúng ngày, POD **0%**, FAR **100%**.
 
-Persistence đạt POD = 1 trong phép ghép sự kiện này vì chuỗi chép hôm qua làm trận xuất hiện trễ đúng một ngày, vẫn nằm trong dung sai ±1 ngày đã định. Sai số thời điểm đỉnh trung bình tuyệt đối là một ngày. Kết quả đó phải được đọc cùng phân mức đúng ngày; nó không tương đương dự báo đúng ngày hay cảnh báo sớm hoàn hảo. Giao thức được giữ cố định khi so mô hình.
+Ở **bảng phụ ±1 ngày**, SeqLSTM_Q có POD **32,65%**, FAR **45,54%**; DLinear có POD **20,83–22,23%**, FAR **30,70–32,52%**. Persistence đạt POD = 1 vì trận trễ một ngày vẫn được ghép; sai số thời điểm đỉnh trung bình tuyệt đối là một ngày. Chênh lệch giữa hai bảng cho thấy cần phân biệt cải thiện sai số cả chuỗi với khả năng bắt đúng ngày khởi phát lũ. [Bảng chính, bảng phụ và quy tắc ghép](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md#103-sự-kiện-lũ-chu-kỳ-hai-năm).
 
-Các kiểm định gồm 45 cặp run × 3 chỉ số, hiệu chỉnh Holm riêng theo từng chỉ số. Chênh lệch NSE của DLinear so với persistence có median dương ở cả ba seed; KGE thấp hơn persistence ở 449/450 lưu vực cho mỗi seed. [Bảng mức, sự kiện và kiểm định](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle).
+Các kiểm định gồm 45 cặp run dự kiến × 3 chỉ số, hiệu chỉnh Holm riêng theo từng chỉ số và **chỉ đếm p-value hữu hạn, bỏ NaN**. Toàn bộ p-value của lần chạy hiện có đều hợp lệ nên số đã báo giữ nguyên. Chênh lệch NSE của DLinear so với persistence có median dương ở cả ba seed; KGE thấp hơn persistence ở 449/450 lưu vực cho mỗi seed. [Bảng mức, sự kiện và kiểm định](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle).
 
 ## 7. Đã trả lời được gì về thuộc tính ảnh hưởng đến dự báo?
 
@@ -229,7 +231,9 @@ Các kết quả hiện tại cung cấp ba loại bằng chứng. Thứ nhất,
 
 Bộ đánh giá đọc dự báo đã lưu, không cần huấn luyện hoặc chờ B1. Dự báo A2 và DLinear là dữ liệu thử đầu tiên; kết quả A3 là đối chiếu cho các chỉ số liên tục.
 
-Đã có [mã bộ đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.py) và [thuyết minh](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md). Lần chạy Kaggle trên Output thật A1/A2/A3 qua 49 kiểm thử và khớp A3 ở sáu chỉ số cùng số ngày trên 4.961 cặp run–lưu vực. Các CSV kết quả qua 39 kiểm tra cục bộ về công thức, tổng hợp, ghép sự kiện và kiểm định. Phạm vi đã xác nhận là test/S0/hạn một ngày.
+Đã có [mã bộ đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.py) và [thuyết minh](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md). Lần chạy Kaggle trên Output thật A1/A2/A3 qua **60 kiểm thử** và khớp A3 ở sáu chỉ số cùng số ngày trên **4.961 cặp run–lưu vực**. Các CSV kết quả qua **57 kiểm tra cục bộ** về công thức, tổng hợp, ghép sự kiện và kiểm định. Phạm vi đã xác nhận là test/S0/hạn một ngày.
+
+Kết quả đã có đủ bảng lũ chính cùng ngày bắt đầu và bảng phụ ±1, đồng thời bỏ p = NaN khỏi kích thước họ Holm. Các chỉ số liên tục giữ nguyên so với A3; phân mức giữ nguyên so với lần đánh giá trước. Lần cập nhật này chỉ chấm lại các dự báo đã lưu, giữ nguyên A1–A3.
 
 | Nhóm công việc | Sản phẩm cần có |
 |---|---|
@@ -240,7 +244,7 @@ Bộ đánh giá đọc dự báo đã lưu, không cần huấn luyện hoặc 
 | Sự kiện lũ | Dùng ngưỡng Gumbel A1, gộp cụm theo quy tắc cố định và ghép một–một; POD, FAR, precision, F1, CSI và sai số thời điểm đỉnh |
 | Theo kịch bản và hạn | Nhận dự báo S0–S4 và hạn 1–7 khi có; thống kê mức suy giảm so với S0 và kết quả từng hạn |
 
-Các bảng ngưỡng và cụm A1, dự báo cùng thông tin cấu hình A2/DLinear được bàn giao bằng Kaggle Dataset từ Output đã lưu. Tệp nén không phải điều kiện của quy trình; các notebook giữ đầu ra trực tiếp để dùng qua Save Version và Add Input. Bước chuẩn hóa dự báo và chỉ số liên tục có thể triển khai trước trong lúc hoàn tất chia sẻ các tệp ngưỡng.
+Các bảng ngưỡng và cụm A1, dự báo cùng thông tin cấu hình A2/DLinear được sử dụng bằng cách **gắn Output notebook làm Input**. Các notebook giữ đầu ra trực tiếp qua Save Version, sau đó nguồn đã lưu được gắn bằng Add Input cho notebook đánh giá.
 
 ### 8.2. Phối hợp với luồng mô hình
 
