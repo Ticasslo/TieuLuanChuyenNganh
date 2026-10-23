@@ -861,5 +861,5 @@ print("Thêm: eval_summary.csv, compare_per_basin.csv, environment.json")
 section("(2) Môi trường")
 display(pd.DataFrame([(k, v) for k, v in env.items() if k not in ("libs", "runs")]
                      + [(f"phiên bản {k}", v) for k, v in env["libs"].items()], columns=["mục", "giá trị"]))
-print("Việc tiếp: Save Version kiểu Save & Run All (chạy lại cả notebook) => mở bản đã lưu => Output => New Dataset,"
-      " tên biascast-a2-reproduce (chỉ cần thư mục a2_output)")
+print("Việc tiếp: Save Version kiểu Save & Run All (chạy lại cả notebook); notebook sau gắn thẳng Output của"
+      " bản đã lưu làm Input (thư mục a2_output), không tạo Dataset")

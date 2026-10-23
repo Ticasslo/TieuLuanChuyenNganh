@@ -73,6 +73,8 @@ Ghép sự kiện theo **ngày bắt đầu (onset)**, một–một, tối đa 
 
 Mỗi bảng áp bán kính kiểm duyệt tương ứng với dung sai của mình. Vì vậy số trận đủ điều kiện có thể khác giữa bảng chính và phụ; mỗi bảng giữ riêng số bắt được, bỏ sót, báo nhầm và số bị kiểm duyệt. Trận trễ một ngày không được tính là bắt đúng trong bảng chính, kể cả khi hai trận còn chồng lấn.
 
+Kế hoạch bước H trong pipeline quy định dung sai chính ±⌊hạn/3⌋ ngày cho dự báo nhiều hạn. Bản bộ đánh giá hiện tại dùng dung sai chính 0 và mới có kết quả thực nghiệm hạn một ngày; quy tắc tăng dung sai theo hạn của bước H được triển khai khi mở rộng phần đánh giá nhiều hạn. Hai quy tắc cùng cho dung sai 0 ở hạn một ngày.
+
 Từ số bắt được h, bỏ sót m, báo nhầm f, tính POD = h/(h+m), FAR = f/(h+f), precision = h/(h+f), F1 = 2h/(2h+m+f), CSI = h/(h+m+f). Khi mẫu số bằng 0, kết quả là NaN. Bảng chính cộng số trận trước khi chia, tách riêng từng T và cách gộp; đồng thời có kết quả cho tất cả ID, nhóm fit ≥10 năm và nhóm fit <10 năm. Các nhóm này là các cách trình bày song song, không cộng với nhau.
 
 ## 6. Kiểm định và kịch bản
