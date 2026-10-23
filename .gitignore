@@ -230,3 +230,7 @@ __marimo__/
 
 # Cấu hình công cụ Serena (MCP), chỉ dùng trên máy
 .serena/
+
+# Local execution plans; excluded from commits and pushes.
+/Document/01_Plan/planA3.md
+/Document/01_Plan/planB2.md

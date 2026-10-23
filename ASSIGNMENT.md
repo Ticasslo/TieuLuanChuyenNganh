@@ -15,24 +15,28 @@
 | Tỉ lệ thiếu dữ liệu, persistence (NSE trung vị 0,35–0,37) | `01_LamaHCE.md` Mục 6.1 |
 | Fork thư viện `Ticasslo/neuralhydrology`, nhánh `research` tại `dda45fc` (bước 0a) | `03_Pipeline.md` Mục 9.1 |
 | A2: chạy lại trọng số tác giả, khớp NSE trung vị cả 6 run | `01_LamaHCE.md` Mục 6.3 |
+| A1: hoàn thành khảo sát và tính ngưỡng đánh giá | [Thuyết minh A1](Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md#sec-25) |
+| A3: persistence, sáu run A2, DLinear 3 hạt giống và chẩn đoán | [Thuyết minh A3](Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.md#report-part-10) |
+| Báo cáo tiến độ A1/A2/A3, cập nhật 23/10/2026 | [Báo cáo gửi GVHD](Document/01_Plan/04_ProgressReport_2026-10-23.md) |
+| Bộ đánh giá: đã chấm A2/DLinear trên test, S0, hạn một ngày; khớp A3 và qua đối chiếu CSV | [Kết quả bộ đánh giá](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle) |
 | Ghi chú học BiasCast Phần 1–5 | `Document/06_Theory/03_…` tới `07_…` |
 
 ## 2. Việc theo từng bước
 
-Thứ tự trong bảng là thứ tự làm. Cột "Cần trước" là thứ phải có trước khi bắt đầu.
+Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên Người 1 từ 23/10/2026:** hoàn tất báo cáo tiến độ → bộ đánh giá (#5), thử trên dự báo A2 và DLinear; tiếp tục tích hợp bộ nạp B2 (#4) sau A4/B1 của Người 2. Bản kiểm bộ nạp B2 độc lập đã đạt các phép kiểm, còn bước tích hợp và rà soát chung. Cột "Cần trước" ghi đầu vào của từng việc.
 
 ### Người 1 — dữ liệu, bộ nạp, đánh giá, demo D1–D3
 
 | # | Bước | Việc | Ra | Cần trước |
 |---|---|---|---|---|
 | 1 | A1 | Notebook `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.py`: cấu trúc tệp, −999 toàn chuỗi, tỉ lệ thiếu, số mẫu hợp lệ (365 và 730 ngày, bộ lọc gốc và bộ lọc sửa), phân phối, bản đồ, so ECMWF HRES với tái phân tích và bước nhảy theo năm, so các kỳ, lưu vực bất thường (55, 742, 758, 800), ngưỡng 4 mức và ngưỡng lũ 1,5/2/5/10 năm | Tệp ngưỡng; số liệu và hình cho chương Dữ liệu | Dataset `lamah-ce-ext` |
-| 2 | Báo cáo tiến độ | Báo cáo gửi GVHD (khoảng 25/10/2026): tái lập A2, dữ liệu A1, persistence; viết cho người chưa đọc bài | Tệp `.md` trong `Document/01_Plan/` | A1, A2 |
+| 2 | Báo cáo tiến độ | Báo cáo gửi GVHD (khoảng 25/10/2026): tái lập A2, dữ liệu A1, persistence và DLinear; giải thích thủy văn, chỉ số bằng ví dụ cho người chưa đọc bài | [Báo cáo tiến độ](Document/01_Plan/04_ProgressReport_2026-10-23.md) | A1, A2, A3 |
 | 3 | A3 | Notebook `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.py`: persistence, PNSE, KGE (r, α, β) cho 6 run A2; DLinear 3 hạt giống; lưu vực NSE âm lớn so với danh sách A1 | Bảng mốc | Dự báo đã lưu của A2, kết quả A1 |
 | 4 | B2 (bộ nạp) | Nhóm biến theo nguồn, sửa `_validate_samples`, nhóm Q (`qmean`, `qmax` quá khứ theo mm/ngày), cách (b) của bước H (ngày t+1…t+6 không nhận ECMWF HRES); kiểm thử đơn vị phần bộ nạp | Mã trong fork, nhánh `research` | A1 (số mẫu), B1 của người 2 |
-| 5 | Bộ đánh giá | Mục 6 của pipeline: NSE, KGE, PNSE, Wilcoxon + Cohen's d + Holm; 4 mức; sự kiện lũ; kịch bản S0–S4; theo lưu vực; theo hạn; đọc tệp dự báo định dạng chung (Mục 9.5) | Notebook `Workspace/06_Evaluation/` | Tệp ngưỡng A1, định dạng tệp dự báo |
+| 5 | Bộ đánh giá | Mục 6 của pipeline: NSE, KGE, PNSE, Wilcoxon + Cohen's d + Holm; 4 mức; sự kiện lũ; kịch bản S0–S4; theo lưu vực; theo hạn; đọc tệp dự báo định dạng chung (Mục 9.5). Đã chấm và đối chiếu A2/DLinear trên test/S0/hạn một ngày; chấm thêm validation, S1–S4 và nhiều hạn khi có dự báo | [Mã đánh giá](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.py), [thuyết minh](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md) | Dự báo A2/DLinear; tệp ngưỡng A1 cho phần mức/sự kiện; bổ sung dự báo S0–S4 và nhiều hạn khi có |
 | 6 | Đánh giá | Chạy bộ đánh giá cho bước B (cả S0–S4 trên validation để chọn B*), bước C, các bước mở rộng | Bảng, hình kết quả | Dự báo do người 2 xuất |
 | 7 | Demo D1–D3 | Hàm dự báo tách khỏi mã huấn luyện → chạy CPU → giao diện trên laptop, đóng gói thành một khối độc lập (mã, trọng số, dữ liệu, hướng dẫn chạy) để đưa lên VPS (Mục 9.6) | Khối demo chạy được trên laptop, dùng làm bản dự phòng ngày bảo vệ | Trọng số mô hình chính thức, kết quả XAI |
-| 8 | Báo cáo | Chương Dữ liệu, Đánh giá, Demo; slide phần tương ứng | | Kết quả các bước |
+| 8 | Báo cáo | Chương Dữ liệu, Đánh giá, Demo; slide phần tương ứng. Đã có bản thảo dữ liệu và thí nghiệm từ A1/A2/A3, đánh giá test/S0/hạn một ngày; bổ sung các bước sau khi có kết quả | [Chương 4](Document/07_Report/04_Data.md), [Chương 6](Document/07_Report/06_ExperimentsAndResults.md) | Kết quả các bước |
 
 ### Người 2 — thư viện, mô hình, huấn luyện, giải thích mô hình, VPS
 

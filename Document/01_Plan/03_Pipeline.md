@@ -345,11 +345,11 @@ Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook
 | Thư mục | Việc | Trạng thái |
 |---|---|---|
 | `01_Download/` | Tải dữ liệu | Xong |
-| `02_Exploration/` | Khảo sát dữ liệu (A1), ngưỡng | Có nháp Phần 1 của `01_A1_LamaHCEExt_Explore.py` |
-| `03_Baseline/` | A2 tái lập (`01_A2_LamaHCEExt_Reproduce.py`), A3 mốc so sánh gồm persistence, PNSE, KGE, DLinear (`02_A3_LamaHCEExt_Benchmarks.py`), A4 huấn luyện lại và nhiễu hạt giống (`03_A4_LamaHCEExt_Retrain.py`) | A2 đã chạy, tái lập đạt (`03_Data/01_LamaHCE.md` Mục 6.3) |
-| `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Chưa viết |
+| `02_Exploration/` | Khảo sát dữ liệu (A1), ngưỡng | A1 hoàn thành khảo sát và tính ngưỡng; thuyết minh tại `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md` |
+| `03_Baseline/` | A2 tái lập (`01_A2_LamaHCEExt_Reproduce.py`), A3 mốc so sánh gồm persistence, PNSE, KGE, DLinear (`02_A3_LamaHCEExt_Benchmarks.py`), A4 huấn luyện lại và nhiễu hạt giống (`03_A4_LamaHCEExt_Retrain.py`) | A2 tái lập đạt; A3 hoàn thành persistence, sáu A2 và DLinear ba hạt giống; A4 thuộc luồng Người 2 |
+| `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Có bản kiểm bộ nạp B2 độc lập đạt trên Kaggle; tích hợp B1 thực hiện sau A4/B1 |
 | `05_Training/` | Notebook huấn luyện theo bước B–H | Chưa viết |
-| `06_Evaluation/` | Bộ đánh giá Mục 6 | Chưa viết |
+| `06_Evaluation/` | Bộ đánh giá Mục 6 | Đã chấm A2/DLinear trên Kaggle, test/S0/hạn một ngày; 49 kiểm thử đạt, khớp A3 trên 4.961 cặp run–ID và qua 39 kiểm CSV cục bộ; mở rộng khi có dự báo validation/S1–S4/nhiều hạn |
 | `07_Demo/` | Demo (mục dự án trong trang web của nhóm) | Chưa viết |
 
 Tên thư mục từ `04_` trở đi là đề xuất, đặt khi bắt đầu viết mã.
@@ -385,15 +385,17 @@ Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu
 
 | Thứ tự | Người 1 (dữ liệu, đánh giá, demo D1–D3) | Người 2 (mô hình, huấn luyện, XAI, VPS) |
 |---|---|---|
-| 1 | A1 khảo sát dữ liệu, tệp ngưỡng; báo cáo tiến độ (A2, A1, persistence) | Bước 0: `mamba-ssm` trên T4, mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) |
+| 1 | A1 khảo sát dữ liệu, tệp ngưỡng; báo cáo tiến độ (A2, A1, persistence và DLinear từ A3) | Bước 0: `mamba-ssm` trên T4, mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) |
 | 2 | A3 mốc so sánh (persistence, PNSE, KGE, DLinear) | A4 nhiễu hạt giống, đo thời gian 1 epoch để gắn ngày cho lịch |
-| 3 | Bộ nạp B2 (nhóm theo nguồn, sửa bộ lọc, Q), cách (b) của bước H; bộ đánh giá Mục 6 | B1 → B3, B*; gắn mốc `freeze-C` |
+| 3 | Sau báo cáo tiến độ: bộ đánh giá Mục 6, thử trước trên A2/DLinear; tích hợp bộ nạp B2 và cách (b) của bước H sau A4/B1 | B1 → B3, B*; phối hợp rà soát bộ nạp B2 trước khi huấn luyện B2; gắn mốc `freeze-C` |
 | 4 | Đánh giá bước B (gồm kịch bản S0–S4 trên validation cho B*) | C1, C2 |
 | 5 | Đánh giá bước C; demo D1, D2 (Mục 9.6) | H, D, E, F, GV theo thứ tự ưu tiên ở Mục 7, 8.3 |
 | 6 | Đánh giá bước mở rộng; demo D3 | Giải thích mô hình (Mục 6.7); demo D4 trên VPS |
 | 7 | Báo cáo, slide (Mục 9.8) | Báo cáo, slide (Mục 9.8) |
 
 Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.
+
+Ưu tiên hiện tại của Người 1 là [báo cáo tiến độ ngày 23/10/2026](04_ProgressReport_2026-10-23.md), sau đó bộ đánh giá. A1 và A3 đã có kết quả; bộ đánh giá dùng ngay dự báo A2/DLinear và tệp ngưỡng A1. Bản kiểm bộ nạp B2 độc lập đã đạt, phần tích hợp tiếp tục khi luồng A4/B1 sẵn sàng. Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
 
 | Nội dung học | Nguồn | Học trước bước |
 |---|---|---|
@@ -415,13 +417,15 @@ Báo cáo tiểu luận viết tiếng Việt; chữ trong hình và sơ đồ v
 | 1. Mở đầu | Bài toán dự báo qmax, câu hỏi nghiên cứu RQ1–RQ6, đóng góp C1–C6 | Mục 1 |
 | 2. Cơ sở lý thuyết | LSTM, GRU, Transformer, SSM, S4D, Mamba; NSE, KGE, PNSE, chỉ số theo mức và theo sự kiện | `06_Theory/` |
 | 3. Công trình liên quan | BiasCast; các công trình so sánh tính mới (Mục 1.3); khảo sát theo yêu cầu GVHD | `02_BasePaper.md`, `05_Survey/` |
-| 4. Dữ liệu | Liệt kê bộ dữ liệu theo năm phát hành, rồi đoạn thảo luận thống kê từ A1 (khuôn GVHD, biên bản 27/9/2026 Mục 3.1) | `03_Data/01_LamaHCE.md` |
+| 4. Dữ liệu | Liệt kê bộ dữ liệu theo năm phát hành, rồi đoạn thảo luận thống kê từ A1 (khuôn GVHD, biên bản 27/9/2026 Mục 3.1) | [Bản thảo Chương 4](../07_Report/04_Data.md); `03_Data/01_LamaHCE.md` |
 | 5. Phương pháp | Khung chung, khối giữ nguyên và khối sửa đổi (sơ đồ), giao thức so sánh cùng tham số | Mục 3–5, `Diagrams/ProjectDiagram.drawio` |
-| 6. Thí nghiệm và kết quả | Bước A, B, C, mở rộng; đánh giá Mục 6; giải thích mô hình | Mục 6, 7 |
+| 6. Thí nghiệm và kết quả | Bước A, B, C, mở rộng; đánh giá Mục 6; giải thích mô hình | [Bản thảo Chương 6](../07_Report/06_ExperimentsAndResults.md); Mục 6, 7 |
 | 7. Demo | Kiến trúc demo, hai phần phát lại và chạy trực tiếp | Mục 9.5, 9.6 |
 | 8. Kết luận | Trả lời RQ1–RQ6, hạn chế, hướng khóa luận | Mục 11 |
 
 Slide bảo vệ làm sau khi có kết quả bước C; phần hỏi đáp chuẩn bị từ `05_Survey/02_LiteratureReview.md`. Bản demo trên laptop (bước D3) mang theo ngày bảo vệ.
+
+Hai bản thảo tại `Document/07_Report/` sử dụng số liệu A1/A2/A3 và bộ đánh giá test/S0/hạn một ngày đã đối chiếu. Các kết quả B/C, kịch bản và nhiều hạn được bổ sung sau thí nghiệm tương ứng.
 
 ---
 

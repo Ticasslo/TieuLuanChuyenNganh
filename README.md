@@ -12,8 +12,9 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `Document/04_Ideas/` | Ý tưởng cho đề tài: căn cứ, chi phí, vị trí trong lộ trình |
 | `Document/05_Survey/` | Khảo sát bộ dữ liệu, khảo sát tài liệu, ghi chú đọc từng PDF tham khảo |
 | `Document/06_Theory/` | Lý thuyết LSTM, Transformer, GRU, Mamba; ghi chú đọc mã RiverMamba (tham khảo); ghi chú học BiasCast từng phần; cách đọc hình các chỉ số đánh giá (`08_EvaluationFigures.md`) |
+| `Document/07_Report/` | Bản thảo báo cáo theo chương: Chương 4 Dữ liệu và Chương 6 Thí nghiệm, kết quả từ A1/A2/A3 và đánh giá S0 |
 | `Diagrams/` | Sơ đồ đề tài (`ProjectDiagram.drawio`, sinh bằng `Tools/Diagram_Build.py`): thứ tự thực hiện, kiến trúc chi tiết, thứ tự cắt |
-| `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc: `01_Download` (tải dữ liệu), `02_Exploration` (khám phá dữ liệu, bước A1 — xong), `03_Baseline` (tái lập và mốc so sánh, bước A2–A4 — A2, A3 xong) |
+| `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc: `01_Download` (tải dữ liệu), `02_Exploration` (A1), `03_Baseline` (A2–A4; A2/A3 đã có kết quả), `06_Evaluation` (bộ đánh giá, bảng và hình S0/hạn một ngày) |
 | `NeuralHydrology/` | Thư viện huấn luyện (submodule, fork `Ticasslo/neuralhydrology`, nhánh `research`) — nơi viết phần đề tài thêm vào thư viện |
 | `Tools/` | Công cụ phụ trợ: chuyển giọng nói buổi họp thành văn bản, sinh sơ đồ đề tài, sinh hình minh họa cho ghi chú lý thuyết (`Theory_Figures.py`) |
 | `PaperResearch/` | PDF tham khảo (`PaperResearchPDF/`, ghi chú từng bài ở `Document/05_Survey/03_PaperNotes.md`) và mã tác giả BiasCast (`PaperResearchCode/`, hai submodule trỏ tới `conestone/biascast`, `conestone/neuralhydrology` — chỉ để đọc, không sửa) |
@@ -27,9 +28,18 @@ PDF trong `PaperResearch/PaperResearchPDF/` để nhóm tham khảo. Giấy phé
 - **Tải repo kèm mã tác giả:** `git clone --recurse-submodules <link repo>`; nếu đã clone rồi thì chạy `git submodule update --init`.
 - **Thư viện huấn luyện:** fork `github.com/Ticasslo/neuralhydrology` — nhánh `master` là mã tác giả, nhánh `research` là phần đề tài viết thêm; notebook cài theo mã commit. Sửa thư viện: làm trong `NeuralHydrology/`, commit và push trong thư mục đó (nhánh `research`), rồi commit lại thư mục `NeuralHydrology` ở repo đề tài để cập nhật con trỏ submodule.
 - **Dữ liệu:** Kaggle Dataset `lamah-ce-ext` (riêng tư, cần chia sẻ quyền truy cập cho thành viên), tải bằng `Workspace/01_Download/01_LamaHCEExt_Download.py`.
-- **Quy ước:** tên thư mục, tệp tiếng Anh, nội dung tiếng Việt; tài liệu trong `Document/` đánh số theo thứ tự đọc; mỗi thư mục `Workspace/` một việc; mỗi notebook một tệp `.py` tự đủ, tên `NN_<Bước>_<BộDữLiệu>_<Việc>.py` (VD `01_A2_LamaHCEExt_Reproduce.py`, trùng tên notebook Kaggle), chia cell `# %% Phần X`; không đưa khóa API vào mã (dùng Kaggle/Colab Secrets).
+- **Quy ước:** tên thư mục, tệp tiếng Anh, nội dung tiếng Việt; tài liệu trong `Document/` đánh số theo thứ tự đọc; mỗi thư mục `Workspace/` một việc; mỗi notebook có nguồn `.py` tự đủ, tên `NN_<Bước>_<BộDữLiệu>_<Việc>.py` (VD `01_A2_LamaHCEExt_Reproduce.py`, trùng tên notebook Kaggle), chia cell `# %% Phần X`. Bản `.ipynb` phục vụ nhập vào Kaggle được sinh từ `.py`; sửa ở nguồn rồi sinh lại để giữ đồng bộ. Không đưa khóa API vào mã (dùng Kaggle/Colab Secrets).
 - **Sơ đồ:** sửa nội dung trong `Tools/Diagram_Build.py` rồi chạy lại, không sửa tay tệp `.drawio`.
 
 ## Trạng thái
 
-Đã chốt bài cơ sở BiasCast và pipeline; đã tải dữ liệu, kiểm tra % thiếu và tính persistence (NSE trung vị 0,35–0,37 so với 0,705 của mô hình tốt nhất). Nhánh `research` của fork đã lấy thêm ba bản sửa của thư viện gốc (bước 0a). Bước A2 xong: chạy lại trọng số của tác giả trên Kaggle T4, NSE trung vị khớp cả 6 run của Hình 7 (`Document/03_Data/01_LamaHCE.md` Mục 6.3). Ghi chú học BiasCast trong `Document/06_Theory/`: Phần 1–5 xong. Bước A1 (khám phá dữ liệu, ngưỡng 4 mức và Gumbel) và A3 (persistence, PNSE, KGE, DLinear 3 hạt giống) xong. Việc tiếp theo: A4 (3 hạt giống), rồi bước B; phần còn lại của bước 0 (cài `mamba-ssm`, kiểm thử đơn vị).
+Đã hoàn thành A1, tái lập suy luận A2 và các mốc A3. Trên giao chung 450 lưu vực, SeqLSTM có Q đạt NSE trung vị 0,705259; persistence qmax đạt 0,350031; DLinear ba seed đạt 0,380152 ± 0,002415. Bộ đánh giá đã chạy trên Kaggle cho test/S0/hạn một ngày, khớp A3 và qua 39 kiểm tra CSV cục bộ. Kết quả gồm chỉ số liên tục, bốn mức, sự kiện lũ và kiểm định ghép cặp.
+
+Luồng mô hình tiếp tục A4 và B1; luồng dữ liệu/đánh giá chuẩn bị báo cáo, bàn giao kết quả và tích hợp B2 khi A4/B1 sẵn sàng. Các kịch bản S1–S4, nhiều hạn và so sánh năm lõi được bổ sung khi có dự báo tương ứng.
+
+## Tài liệu báo cáo
+
+- [Báo cáo tiến độ cho GVHD](Document/01_Plan/04_ProgressReport_2026-10-23.md): dữ liệu, tái lập, persistence/DLinear, phân mức và sự kiện, có ví dụ giải thích chỉ số.
+- [Chương 4 — Dữ liệu](Document/07_Report/04_Data.md): nguồn theo năm, đơn vị, độ phủ, cửa sổ và ngưỡng.
+- [Chương 6 — Thí nghiệm và kết quả](Document/07_Report/06_ExperimentsAndResults.md): giao thức, các kết quả đã chạy và diễn giải.
+- [Bộ đánh giá và bằng chứng thực nghiệm](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md): mã, notebook, bảng kết quả và kiểm tra.

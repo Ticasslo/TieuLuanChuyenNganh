@@ -1,0 +1,28 @@
+{
+  "complete": true,
+  "fixture_checks": 49,
+  "A3_reference_matched": true,
+  "coverage": [
+    {
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "runs": 11,
+      "common_day_IDs": 652628,
+      "IDs_with_days": 450
+    }
+  ],
+  "scenarios": [
+    "S0"
+  ],
+  "leads": [
+    1
+  ],
+  "operational_scenarios_run": false,
+  "multi_lead_run": false,
+  "python": "3.13.15",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3",
+  "scipy": "1.16.3",
+  "output": "/kaggle/working/evaluation_output"
+}

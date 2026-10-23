@@ -1,0 +1,17 @@
+{
+  "metric_ddof": 0,
+  "same_mask_for_six_metrics": true,
+  "metric_epsilon": null,
+  "level_equality": "higher_class",
+  "flood_exceedance": "strictly_greater",
+  "FDC_log_floor_mm_day": 1e-06,
+  "FDC_quantile_method": "linear",
+  "FDC_tail_count": "ceil_fraction_times_n",
+  "event_grouping": "USWRC and consecutive",
+  "event_matching": "maximum_cardinality_then_minimum_total_absolute_onset_error",
+  "event_tolerance": "one_day_model_plus_minus_1_day_multi_horizon_model_plus_minus_2_days",
+  "censored_events": "excluded_from_scores_and_counted_separately",
+  "holm_family": "all_unordered_run_pairs_excluding_qmean_aux_per_metric_period_scenario_lead",
+  "statistics": "two_sided_Wilcoxon_auto_and_paired_Cohen_dz",
+  "test_used_for_selection": false
+}

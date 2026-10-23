@@ -1,0 +1,148 @@
+[
+  {
+    "run": "SeqLSTM_Q",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "415e417818bd6c97d51d9787793c4c919bf960e35c3abd33a52df8eac2e7b5af",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/SeqLSTM_Q/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "SeqLSTM_noQ",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "645bf04a9edfa17d8eae68064ab5abff6a65d63bf2b609c3786b170ce1938d16",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/SeqLSTM_noQ/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "EncDec_Q",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "9762066afaaa7260dd9cb65759c1725a9b765de06974638cc9802a9071d74693",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/EncDec_Q/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "EncDec_noQ",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "1636a5cc0dcb73793cd59b80106671f6fa1c7d3dd2044885c2d92fe4b5a9b346",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/EncDec_noQ/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "D_FC",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "bcd348c2aa94cb12be2a9fdfe84955761c9d9b35c3a085f2cdcc927383728b72",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/D_FC/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "D_RA",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "37fa1e8912443a7c928c7ce0465f3aae30aa99629bb0b7c9539525116f514565",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/D_RA/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "DLinear_seed_111",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 111,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/02-a3-lamahceext-benchmarks/a3_output/dlinear/seed_111/test_predictions.npz",
+      "config_sha256": "0640b77b27ff9799d336220ae01ed3c3bf26d5db0dc92ef4349cf11caad396f4",
+      "selected_epoch": 4
+    }
+  },
+  {
+    "run": "DLinear_seed_222",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 222,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/02-a3-lamahceext-benchmarks/a3_output/dlinear/seed_222/test_predictions.npz",
+      "config_sha256": "0640b77b27ff9799d336220ae01ed3c3bf26d5db0dc92ef4349cf11caad396f4",
+      "selected_epoch": 2
+    }
+  },
+  {
+    "run": "DLinear_seed_333",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 333,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/02-a3-lamahceext-benchmarks/a3_output/dlinear/seed_333/test_predictions.npz",
+      "config_sha256": "0640b77b27ff9799d336220ae01ed3c3bf26d5db0dc92ef4349cf11caad396f4",
+      "selected_epoch": 5
+    }
+  },
+  {
+    "run": "Persistence_qmax",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {}
+  },
+  {
+    "run": "Persistence_qmean_aux",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {}
+  }
+]
