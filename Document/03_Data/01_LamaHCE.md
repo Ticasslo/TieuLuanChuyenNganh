@@ -128,7 +128,7 @@ Phần thiếu tập trung ở train, chủ yếu do **27 lưu vực bắt đầ
 
 ### 6.2. Khám phá dữ liệu
 
-Theo góp ý của GVHD (`Document/02_Meetings/Meeting_2026-09-27.md` Mục 3.1): phần liệt kê mỗi bộ dữ liệu một dòng gồm kích thước, cách phát hành, thống kê cơ bản nhất; thống kê sâu (độ lệch chuẩn, tứ phân vị, khác biệt phân phối train/test) viết thành đoạn thảo luận để biện luận kết quả, đồng thời phục vụ quyết định khi dựng bộ nạp dữ liệu. Mã khám phá đặt ở `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.py` (bước A1, đang viết), chạy trên Kaggle (CPU), gắn dataset `lamah-ce-ext`.
+Theo góp ý của GVHD (`Document/02_Meetings/Meeting_2026-09-27.md` Mục 3.1): phần liệt kê mỗi bộ dữ liệu một dòng gồm kích thước, cách phát hành, thống kê cơ bản nhất; thống kê sâu (độ lệch chuẩn, tứ phân vị, khác biệt phân phối train/test) viết thành đoạn thảo luận để biện luận kết quả, đồng thời phục vụ quyết định khi dựng bộ nạp dữ liệu. Mã khám phá đặt ở `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.py` (bước A1, báo cáo đầy đủ ở `01_A1_LamaHCEExt_Explore.md` cùng thư mục), chạy trên Kaggle (CPU), gắn dataset `lamah-ce-ext`.
 
 Extended LamaH-CE gồm 859 lưu vực có chuỗi khí tượng, 882 trạm có chuỗi lưu lượng ngày; 40 biến khí tượng (ERA5-Land 21, ECMWF HRES 8, E-OBS 8, MSWEP 1, GLEAM 2) và 62 thuộc tính tĩnh cho 859 lưu vực. Mọi tệp khí tượng có đủ dòng ngày từ 01/01/1981 đến 31/12/2019. Trạm lấy từ `Gauges.shp` (EPSG:3035), ranh giới từ `Basins_A.shp` (859 đa giác).
 

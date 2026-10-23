@@ -13,7 +13,7 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `Document/05_Survey/` | Khảo sát bộ dữ liệu, khảo sát tài liệu, ghi chú đọc từng PDF tham khảo |
 | `Document/06_Theory/` | Lý thuyết LSTM, Transformer, GRU, Mamba; ghi chú đọc mã RiverMamba (tham khảo); ghi chú học BiasCast từng phần; cách đọc hình các chỉ số đánh giá (`08_EvaluationFigures.md`) |
 | `Diagrams/` | Sơ đồ đề tài (`ProjectDiagram.drawio`, sinh bằng `Tools/Diagram_Build.py`): thứ tự thực hiện, kiến trúc chi tiết, thứ tự cắt |
-| `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc: `01_Download` (tải dữ liệu), `02_Exploration` (khám phá dữ liệu, bước A1 — mới có nháp Phần 1), `03_Baseline` (tái lập và mốc so sánh, bước A2–A4 — A2 đã chạy, tái lập đạt) |
+| `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc: `01_Download` (tải dữ liệu), `02_Exploration` (khám phá dữ liệu, bước A1 — xong), `03_Baseline` (tái lập và mốc so sánh, bước A2–A4 — A2, A3 xong) |
 | `NeuralHydrology/` | Thư viện huấn luyện (submodule, fork `Ticasslo/neuralhydrology`, nhánh `research`) — nơi viết phần đề tài thêm vào thư viện |
 | `Tools/` | Công cụ phụ trợ: chuyển giọng nói buổi họp thành văn bản, sinh sơ đồ đề tài, sinh hình minh họa cho ghi chú lý thuyết (`Theory_Figures.py`) |
 | `PaperResearch/` | PDF tham khảo (`PaperResearchPDF/`, ghi chú từng bài ở `Document/05_Survey/03_PaperNotes.md`) và mã tác giả BiasCast (`PaperResearchCode/`, hai submodule trỏ tới `conestone/biascast`, `conestone/neuralhydrology` — chỉ để đọc, không sửa) |
@@ -32,4 +32,4 @@ PDF trong `PaperResearch/PaperResearchPDF/` để nhóm tham khảo. Giấy phé
 
 ## Trạng thái
 
-Đã chốt bài cơ sở BiasCast và pipeline; đã tải dữ liệu, kiểm tra % thiếu và tính persistence (NSE trung vị 0,35–0,37 so với 0,705 của mô hình tốt nhất). Nhánh `research` của fork đã lấy thêm ba bản sửa của thư viện gốc (bước 0a). Bước A2 xong: chạy lại trọng số của tác giả trên Kaggle T4, NSE trung vị khớp cả 6 run của Hình 7 (`Document/03_Data/01_LamaHCE.md` Mục 6.3). Ghi chú học BiasCast trong `Document/06_Theory/`: Phần 1–5 xong. Việc tiếp theo: bước A1 (viết lại notebook khám phá dữ liệu), A3 (persistence, PNSE, KGE, DLinear), A4 (3 hạt giống), rồi bước B; phần còn lại của bước 0 (cài `mamba-ssm`, kiểm thử đơn vị).
+Đã chốt bài cơ sở BiasCast và pipeline; đã tải dữ liệu, kiểm tra % thiếu và tính persistence (NSE trung vị 0,35–0,37 so với 0,705 của mô hình tốt nhất). Nhánh `research` của fork đã lấy thêm ba bản sửa của thư viện gốc (bước 0a). Bước A2 xong: chạy lại trọng số của tác giả trên Kaggle T4, NSE trung vị khớp cả 6 run của Hình 7 (`Document/03_Data/01_LamaHCE.md` Mục 6.3). Ghi chú học BiasCast trong `Document/06_Theory/`: Phần 1–5 xong. Bước A1 (khám phá dữ liệu, ngưỡng 4 mức và Gumbel) và A3 (persistence, PNSE, KGE, DLinear 3 hạt giống) xong. Việc tiếp theo: A4 (3 hạt giống), rồi bước B; phần còn lại của bước 0 (cài `mamba-ssm`, kiểm thử đơn vị).

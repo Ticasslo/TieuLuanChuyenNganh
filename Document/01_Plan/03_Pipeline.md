@@ -61,8 +61,8 @@ Cách nói trước hội đồng: đề tài không khẳng định Mamba tốt
 |---|---|---|---|
 | 0. Hạ tầng | Fork NeuralHydrology riêng, cài `mamba-ssm` trên Kaggle T4, kiểm thử đơn vị, đo thời gian | Môi trường chạy được mọi lõi; bảng thời gian mỗi epoch | Đã lấy 3 bản sửa từ thư viện gốc vào nhánh `research` (commit `dda45fc`); đo thời gian ở đầu A4; `mamba-ssm` và kiểm thử đơn vị ở bước C |
 | 1. Thu thập dữ liệu | Tải Extended LamaH-CE và kết quả của tác giả | Kaggle Dataset `lamah-ce-ext` | Xong (`01_LamaHCE.md` Mục 6) |
-| 2. Khảo sát dữ liệu | Theo khuôn GVHD: dạng cơ bản + thống kê sâu; ngưỡng mức lưu lượng; bảng độ trễ nguồn | Báo cáo khảo sát, tệp ngưỡng | Một phần số liệu đã có; notebook viết lại |
-| 3. Tái lập và mốc | Chạy lại trọng số tác giả; persistence; DLinear; nhiễu hạt giống | Bảng mốc | Persistence xong (NSE trung vị 0,35–0,37, `01_LamaHCE.md` Mục 6.1); chạy lại trọng số tác giả (A2) khớp NSE trung vị cả 6 cấu hình (`01_LamaHCE.md` Mục 6.3) |
+| 2. Khảo sát dữ liệu | Theo khuôn GVHD: dạng cơ bản + thống kê sâu; ngưỡng mức lưu lượng; bảng độ trễ nguồn | Báo cáo khảo sát, tệp ngưỡng | Xong bước A1 (`Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md`; ngưỡng 4 mức và Gumbel trong đầu ra notebook) |
+| 3. Tái lập và mốc | Chạy lại trọng số tác giả; persistence; DLinear; nhiễu hạt giống | Bảng mốc | Persistence, chạy lại trọng số tác giả (A2, khớp NSE trung vị cả 6 cấu hình, `01_LamaHCE.md` Mục 6.3) và DLinear 3 hạt giống (A3: NSE trung vị 0,380 so với persistence 0,350 và mô hình tốt nhất 0,705 trên cùng tập ngày, `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.md`) xong; nhiễu hạt giống của LSTM (A4) chưa làm |
 | 4. Bộ nạp | Sửa bộ lọc mẫu, nhóm biến theo nguồn, Q cùng đơn vị | Cấu hình dữ liệu dùng chung | Chưa làm |
 | 5. Mô hình | Khung hindcast–forecast với lõi thay được | Mô-đun trong fork | Chưa làm |
 | 6. Huấn luyện | Bước B → H (Mục 7) | Trọng số, nhật ký | Chưa làm |
