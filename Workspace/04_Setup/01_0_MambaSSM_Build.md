@@ -34,7 +34,7 @@ Môi trường Kaggle (ảnh dựng ngày 01/10/2026): Python 3.13.15, torch 2.1
 <a id="3"></a>
 ## 3. Các Phần và kết quả
 
-Kết quả dưới đây lấy từ bản lưu chính thức (Save & Run All, phiên sạch, 23/10/2026): chạy hết Phần 1–9 trong 827 giây, mọi Phần đạt. Phiên tương tác chạy trước đó cùng ngày cho cùng kết luận ở mọi Phần; số đo thời gian và mức lệch đạo hàm chênh nhau chút ít giữa hai lần chạy.
+Kết quả dưới đây lấy từ bản lưu chính thức **Version 1** (Save & Run All, phiên sạch, 23/10/2026 lúc 22:29, Kaggle ghi chạy 13 phút 59 giây): chạy hết Phần 1–9 (riêng các cell mất 827 giây), mọi Phần đạt. Notebook kèm output ở [01_0_MambaSSM_Build.ipynb](01_0_MambaSSM_Build.ipynb). Phiên tương tác chạy trước đó cùng ngày cho cùng kết luận ở mọi Phần; số đo thời gian và mức lệch đạo hàm chênh nhau chút ít giữa hai lần chạy.
 
 ### Phần 1. Kiểm môi trường
 
@@ -99,7 +99,7 @@ Cell tự đủ, không dùng biến của Phần 1–8: tìm `build_info.json` 
 <a id="5"></a>
 ## 5. Cách dùng ở notebook khác
 
-Gắn Output của notebook `01_0_MambaSSM_Build` làm Input (Add Input → Notebook Output), chép nguyên cell Phần 9 làm cell đầu. Khi Kaggle đổi ảnh làm torch khác 2.11.0+cu128, cell dừng và báo phải dựng lại bằng notebook này.
+Gắn Output của notebook `01_0_MambaSSM_Build` (Version 1) làm Input (Add Input → Notebook Output), chép nguyên cell Phần 9 làm cell đầu. Khi Kaggle đổi ảnh làm torch khác 2.11.0+cu128, cell dừng và báo phải dựng lại bằng notebook này.
 
 <a id="6"></a>
 ## 6. Nguồn
