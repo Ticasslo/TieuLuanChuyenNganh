@@ -42,7 +42,7 @@ Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu 
 
 | # | Bước | Việc | Ra | Cần trước |
 |---|---|---|---|---|
-| 1 | Bước 0 | Cài `mamba-ssm` trên Kaggle T4 (dự phòng `mambapy`); mô hình chung "Sequential Forecast" nhận lõi bất kỳ; các lõi GRU, Transformer, S4D, Mamba; kiểm thử đơn vị Mục 9.2 (nạp trọng số tác giả cho đầu ra trùng, không rò rỉ, đúng trục, số tham số lệch ≤ 1%) | Mã trong fork, wheel lưu thành Kaggle Dataset | Fork `research` |
+| 1 | Bước 0 | Cài `mamba-ssm` trên Kaggle T4 (dự phòng `mambapy`); mô hình chung "Sequential Forecast" nhận lõi bất kỳ; các lõi GRU, Transformer, S4D, Mamba; kiểm thử đơn vị Mục 9.2 (nạp trọng số tác giả cho đầu ra trùng, không rò rỉ, đúng trục, số tham số lệch ≤ 1%) | Mã trong fork, wheel ở Output notebook `01_0_MambaSSM_Build` (gắn làm Input) | Fork `research` |
 | 2 | A4 | Notebook `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.py`: đo thời gian 1 epoch trên T4; huấn luyện lại mô hình tốt nhất của bài với hạt giống 111, 222, 333 | Độ lệch chuẩn giữa hạt giống; thời gian mỗi lần chạy để gắn ngày cho lịch | Thư mục Q (A2 Phần 4) |
 | 3 | B1, B3, B* | B1: sửa lưu mô hình tốt nhất, Q mm/ngày, qmax quá khứ; B2 phần mô hình (nhúng theo nguồn, masked mean); B3: che dữ liệu hai mức; B*: chọn theo luật ghi sẵn; gắn mốc `freeze-C` | Trọng số, nhật ký, tệp dự báo | A4; bộ nạp B2 của người 1 |
 | 4 | C | C1 tinh chỉnh 5 lõi × 8 cấu hình; C2 chạy chính thức 3 hạt giống | Tệp dự báo mọi cấu hình chính thức | `freeze-C` |
@@ -74,6 +74,6 @@ Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu 
 - **Đọc trước:** `Document/01_Plan/03_Pipeline.md`, `Document/01_Plan/02_BasePaper.md`, `CLAUDE.md` (quy tắc làm việc).
 - **Notebook:** mỗi notebook Kaggle là một tệp `.py` tự đủ trong `Workspace/<NN_Việc>/`, tên `NN_<Bước>_<BộDữLiệu>_<Việc>.py`, chia cell `# %% Phần X`, có mục lục ở đầu; hình tải về đặt ở `Workspace/<NN_Việc>/Figures/`, tên bắt đầu bằng mã bước; chữ trong hình tiếng Anh, chú thích tiếng Việt.
 - **Thư viện:** sửa trong `NeuralHydrology/` (nhánh `research`), mỗi thay đổi một commit; notebook cài theo mã commit; sau mốc `freeze-C` không đổi mã dùng chung (`03_Pipeline.md` Mục 9.1).
-- **Kết quả:** trọng số và nhật ký lưu thành Kaggle Dataset, chia sẻ quyền cho thành viên kia; mỗi lần huấn luyện lưu kèm tệp cấu hình và mã commit.
+- **Kết quả:** trọng số và nhật ký nằm ở Output của bản Save Version (Save & Run All); notebook sau gắn Output đó làm Input, ghi số phiên bản cho kết quả chính thức; chia sẻ notebook cho thành viên kia; mỗi lần huấn luyện lưu kèm tệp cấu hình và mã commit.
 - **Ghi chú:** kết quả và quyết định ghi vào `.md` tương ứng trong `Document/`, văn phong báo cáo, có nguồn.
 - **Không** đưa khóa API vào mã; không dùng GPU trả phí; mỗi tài khoản Kaggle chạy một nhóm thí nghiệm.

@@ -813,7 +813,7 @@ print("=> TÁI LẬP ĐẠT" if REPRO_OK else "=> CHƯA ĐẠT - gửi bảng đ
 # %% Phần 8 - Lưu kết quả cho A3, A4
 # Gom vào WORK_DIR/a2_output: mỗi run test_metrics.csv, test_results.p (chuỗi quan trắc, dự báo theo ngày - A3 dùng),
 # config.yml đã sửa; bảng so sánh Phần 6, 7; tệp môi trường (phiên bản thư viện, commit, GPU). Không gom thư mục Q
-# (1,35 GB) vì A4 dựng lại bằng code Phần 4. Sau đó Save Version rồi tạo Kaggle Dataset từ output notebook.
+# (1,35 GB) vì A4 dựng lại bằng code Phần 4. Sau đó Save Version; notebook sau gắn Output của bản lưu làm Input.
 # Cần chạy Phần 7 trước trong phiên (dùng eval_df, COMPARE, REPRO_OK, RUNS_DIR, A2_RUNS, RUN_SHORT).
 import json
 import platform
