@@ -928,7 +928,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 plt.rcParams.update({"svg.fonttype": "none", "font.family": "Arial", "font.size": 9,
-                     "axes.titlesize": 10, "axes.spines.top": False, "axes.spines.right": False})
+                     "axes.titlesize": 10, "axes.spines.top": False, "axes.spines.right": False,
+                     "svg.hashsalt": "theory-figures"})   # mã phần tử SVG cố định => sinh lại không đổi tệp
 N_BASINS, HIST_YEARS, TEST_DAYS, YEAR = 451, 30, 1461, 365
 LEVEL_NAMES = ["low", "medium", "high", "very high"]
 RETURN_T = [1.5, 2, 5, 10]
@@ -1084,7 +1085,7 @@ def finish(fig, name, title):
     fig.suptitle(title, fontsize=11, fontweight="bold")
     fig.text(0.5, 0.005, SYN_NOTE, ha="center", fontsize=8, color="#666")
     fig.tight_layout(rect=(0, 0.03, 1, 0.95))
-    fig.savefig(OUT_DIR / name, format="svg")
+    fig.savefig(OUT_DIR / name, format="svg", metadata={"Date": None})   # bỏ ngày sinh để tệp chỉ đổi khi hình đổi
     plt.close(fig)
     print("Đã ghi", OUT_DIR / name)
 

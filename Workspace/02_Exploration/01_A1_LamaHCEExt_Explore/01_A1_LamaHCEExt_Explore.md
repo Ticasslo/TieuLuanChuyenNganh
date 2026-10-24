@@ -2,11 +2,11 @@
 
 Tài liệu thuyết minh bước A1: cấu trúc và độ phủ dữ liệu, thuộc tính, phân phối, hợp đồng cửa sổ, hồ sơ chẩn đoán và ngưỡng đánh giá qmax. Khảo sát thực thi đã hoàn thành đến cell 10.9; Phần 11 tại Mục 25 tổng hợp kết quả và bàn giao A3/B2. Những giới hạn về nguồn, đơn vị và mẫu ngắn được giữ riêng; hoàn thành khảo sát không có nghĩa mọi nguyên nhân hoặc dữ liệu lịch sử đã được xác nhận.
 
-[Notebook thực hiện](01_A1_LamaHCEExt_Explore.ipynb) · [Mã các cell](01_A1_LamaHCEExt_Explore.py) · [Ghi chú dữ liệu tổng thể](../../Document/03_Data/01_LamaHCE.md)
+[Notebook thực hiện](01_A1_LamaHCEExt_Explore.ipynb) · [Mã các cell](01_A1_LamaHCEExt_Explore.py) · [Ghi chú dữ liệu tổng thể](../../../Document/03_Data/01_LamaHCE.md)
 
 **Cách đọc bằng chứng.** Bảng ghi “đã đo” dựa vào output thật trên Kaggle với input hiện tại. Giải thích từ bài/tài liệu được gắn nguồn tương ứng. Câu có “giả thuyết”, “chưa xác nhận” hoặc “nếu” không phải kết luận đo được. Các ví dụ tự đặt được ghi rõ là minh họa; các ca trạm có ID/ngày cụ thể được lấy từ output đã kiểm.
 
-Khảo sát chạy Kaggle CPU với input `lamah-ce-ext`, đọc dữ liệu gốc và lưu bảng/hình vào `WORK_DIR`; không sửa input. LAMAH_DIR chỉ tới `LamaH_extended`, EXP_DIR chỉ tới `Experiments`. Cell 2.5 tự chuẩn bị Q giờ khi thiếu; bật Internet cho lần cần tải từ Zenodo. Đường dẫn trên máy khác có thể đổi qua LAMAH_ROOT. Phần 1 đã kiểm môi trường Python 3.13.15, NumPy 2.1.3, pandas 2.3.3, matplotlib 3.10.0, geopandas 1.1.4, shapely 2.1.2, pyogrio 0.13.0, scipy 1.16.3, torch 2.11.0+cpu và xarray 2025.12.0; đây là môi trường đã chạy, không phải yêu cầu mọi máy phải có đúng các phiên bản này.
+Khảo sát chạy Kaggle CPU với input `lamah-ce-ext`; bản chính thức là Version 2 của notebook `01_A1_LamaHCEExt_Explore` (Save & Run All, tệp `.ipynb` có output cạnh tệp này), đọc dữ liệu gốc và lưu bảng/hình vào `WORK_DIR`; không sửa input. LAMAH_DIR chỉ tới `LamaH_extended`, EXP_DIR chỉ tới `Experiments`. Cell 2.5 tự chuẩn bị Q giờ khi thiếu; bật Internet cho lần cần tải từ Zenodo. Đường dẫn trên máy khác có thể đổi qua LAMAH_ROOT. Phần 1 đã kiểm môi trường Python 3.13.15, NumPy 2.1.3, pandas 2.3.3, matplotlib 3.10.0, geopandas 1.1.4, shapely 2.1.2, pyogrio 0.13.0, scipy 1.16.3, torch 2.11.0+cpu và xarray 2025.12.0; đây là môi trường đã chạy, không phải yêu cầu mọi máy phải có đúng các phiên bản này.
 
 ## Mục lục
 
@@ -388,7 +388,7 @@ Không tự đảo dấu, đổi đơn vị hoặc coi hai đại lượng cùng
 Mục lục Phần 6 dùng “ECMWF HRES / nguồn đối chiếu”: năm cặp trong mã tác giả không phải đều
 so với ERA5-Land. Hai cặp nhiệt độ dùng ERA5L; bức xạ dùng ERA5L; mưa dùng MSWEP_RR;
 bốc hơi dùng GLEAM_ETA. Ngữ nghĩa, phạm vi ghép và khác biệt của từng cặp được trình bày ở Phần 6 (Mục 20).
-Căn cứ cặp biến: [VARIABLE_PAIRS trong mã phân tích của tác giả](../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L53). Tên cặp không tự xác nhận cùng bản chất vật lý/đơn vị.
+Căn cứ cặp biến: [VARIABLE_PAIRS trong mã phân tích của tác giả](../../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L53). Tên cặp không tự xác nhận cùng bản chất vật lý/đơn vị.
 
 ### Ví dụ tính toán về diện tích và đơn vị
 
@@ -400,7 +400,7 @@ Khi đó q=8,64 mm/ngày. Với cùng Q=10 m³/s nhưng A=1000 km², q chỉ cò
 
 Với **qmax**, nhân tốc độ cực đại ngày với hệ số trên tạo đại lượng cực đại đã chuẩn hóa diện tích có đơn vị mm/ngày. Nó **không phải tổng lượng nước thực chảy trong cả ngày**, vì cực đại không nhất thiết duy trì 24 giờ. Cân bằng nước ngày cần lưu lượng trung bình hoặc tích phân theo thời gian.
 
-Căn cứ triển khai: [hàm chuẩn hóa Q trong lamah.py](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L303). Bộ nạp đang xét lấy diện tích `area_gov` khi chuẩn hóa ([đoạn lấy diện tích](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L230)). Vì vậy, kiểm `area_calc` so với `area_gov` ở Phần 3 có ý nghĩa trực tiếp; không tự thay loại diện tích chỉ vì tên cột dễ tìm hơn.
+Căn cứ triển khai: [hàm chuẩn hóa Q trong lamah.py](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L303). Bộ nạp đang xét lấy diện tích `area_gov` khi chuẩn hóa ([đoạn lấy diện tích](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L230)). Vì vậy, kiểm `area_calc` so với `area_gov` ở Phần 3 có ý nghĩa trực tiếp; không tự thay loại diện tích chỉ vì tên cột dễ tìm hơn.
 
 <a id="sec-14"></a>
 
@@ -493,7 +493,7 @@ Ví dụ, `elev_mean`, `elev_med`, `elev_std` và `elev_ran` mô tả các mặt
 
 Không. `Stream_dist.csv` có ID và `dist_hup`. `Water_balance.csv` có ID và P, PCRPS, PERA5, PMSW, PET, ET0, ETA, Q1, Q2. Tên, đơn vị, kỳ tính và cách dùng những trường này cần đối chiếu metadata; chưa đủ căn cứ suy toàn bộ ý nghĩa chỉ từ các chữ viết tắt.
 
-[Hàm load_lamah_attributes hiện dùng](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L265) đọc `Catchment_attributes.csv` của mức lưu vực và `Gauge_attributes.csv` của trạm, rồi ghép theo ID. Hàm này không tự đọc mọi CSV trong thư mục thuộc tính. Vì vậy:
+[Hàm load_lamah_attributes hiện dùng](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L265) đọc `Catchment_attributes.csv` của mức lưu vực và `Gauge_attributes.csv` của trạm, rồi ghép theo ID. Hàm này không tự đọc mọi CSV trong thư mục thuộc tính. Vì vậy:
 
 - Bảng có mặt trong dataset không đồng nghĩa bảng được bộ nạp đưa vào mô hình.
 - Cột có trong bảng bộ nạp đọc không đồng nghĩa cấu hình yêu cầu cột đó.
@@ -505,7 +505,7 @@ Ngoài ra cần phân biệt `qmean` trong chuỗi D theo ngày với `q_mean` t
 
 ### 17.4. Xác nhận 33 thuộc tính từ 24 cấu hình
 
-[Bảng A2 BiasCast](https://hess.copernicus.org/articles/30/5067/2026/index.html#appendixA) và [STATIC_ATTR_COLS trong mã phân tích của tác giả](../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L62) là căn cứ về danh sách thuộc tính. Phép đọc trực tiếp tại cell 3.2 xác nhận **24/24 tệp cấu hình có cùng 33 tên, cùng thứ tự khai báo**, một tập S1 và một mẫu thứ tự O1. Cả 33 trường đều có trong Catchment_attributes.csv; không có tên thiếu, trùng nguồn A/D hoặc thuộc tính Gauge được yêu cầu trong các cấu hình này.
+[Bảng A2 BiasCast](https://hess.copernicus.org/articles/30/5067/2026/index.html#appendixA) và [STATIC_ATTR_COLS trong mã phân tích của tác giả](../../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L62) là căn cứ về danh sách thuộc tính. Phép đọc trực tiếp tại cell 3.2 xác nhận **24/24 tệp cấu hình có cùng 33 tên, cùng thứ tự khai báo**, một tập S1 và một mẫu thứ tự O1. Cả 33 trường đều có trong Catchment_attributes.csv; không có tên thiếu, trùng nguồn A/D hoặc thuộc tính Gauge được yêu cầu trong các cấu hình này.
 
 Nguồn số đo: bảng nhóm cấu hình và ánh xạ tên của cell 3.2; bảng đầy đủ lưu thành `A1_P3_static_configs.csv`, `A1_P3_static_config_summary.csv` và `A1_P3_static_attribute_sources.csv`. Đây là số tệp cấu hình, không tự xác nhận 24 run đều hoàn tất huấn luyện. Mỗi thuộc tính có mặt trong cả 24 cấu hình.
 
@@ -561,9 +561,9 @@ Những giải thích này xác định cách đọc theo metadata nguồn. Phé
 
 ### 17.6. Thuộc tính phân loại được bộ nạp xử lý thế nào?
 
-`lc_dom` là biến phân loại về mặt ý nghĩa, dù CSV ghi mã bằng số. Luồng mã đang dùng chọn các trường được cấu hình yêu cầu, rồi sắp cột theo alphabet, tính trung bình/độ lệch chuẩn và chuẩn hóa dạng số trước khi tạo tensor. Do vậy, thứ tự O1 kiểm ở 3.2 là thứ tự khai báo YAML, **chưa phải thứ tự cuối cùng trong tensor**. Xem [chọn cột](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L693), [sắp thứ tự và chuẩn hóa](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L722).
+`lc_dom` là biến phân loại về mặt ý nghĩa, dù CSV ghi mã bằng số. Luồng mã đang dùng chọn các trường được cấu hình yêu cầu, rồi sắp cột theo alphabet, tính trung bình/độ lệch chuẩn và chuẩn hóa dạng số trước khi tạo tensor. Do vậy, thứ tự O1 kiểm ở 3.2 là thứ tự khai báo YAML, **chưa phải thứ tự cuối cùng trong tensor**. Xem [chọn cột](../../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L693), [sắp thứ tự và chuẩn hóa](../../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L722).
 
-Luồng này không tự tách mã `lc_dom` thành các cột chỉ báo 0/1 theo lớp. Đây là hành vi mã để tái lập, không phải bằng chứng mã CORINE có thứ tự vật lý. Tài liệu chưa quyết định thay cách mã hóa, thay danh sách biến hoặc thay công thức chuẩn hóa. [Kiểm thuộc tính của thư viện](../../NeuralHydrology/neuralhydrology/datautils/utils.py#L145) cũng kiểm giá trị thiếu và độ lệch chuẩn bằng 0/NaN; vì vậy sự hiện diện của đủ 33 tên chưa bảo đảm bảng dùng được cho huấn luyện.
+Luồng này không tự tách mã `lc_dom` thành các cột chỉ báo 0/1 theo lớp. Đây là hành vi mã để tái lập, không phải bằng chứng mã CORINE có thứ tự vật lý. Tài liệu chưa quyết định thay cách mã hóa, thay danh sách biến hoặc thay công thức chuẩn hóa. [Kiểm thuộc tính của thư viện](../../../NeuralHydrology/neuralhydrology/datautils/utils.py#L145) cũng kiểm giá trị thiếu và độ lệch chuẩn bằng 0/NaN; vì vậy sự hiện diện của đủ 33 tên chưa bảo đảm bảng dùng được cho huấn luyện.
 
 ### 17.7. Kết quả chất lượng và khoảng giá trị của thuộc tính — 3.3
 
@@ -688,11 +688,11 @@ Nguồn số đo 3.4: `A1_P3_area_shape_by_basin.csv`, `A1_P3_area_audit_summary
 
 ### 17.11. Mã có thực sự đổi nhãn Q sang mm/ngày không?
 
-Cần đọc đủ hai tầng gọi hàm, không chỉ xem giá trị tham số ở hàm đọc. Trong [LamaH._load_basin_data](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L125), dữ liệu Q được đọc với normalize_discharge=False, rồi ngay sau đó được đưa qua _normalize_discharge với diện tích self._basin_area. [Diện tích này lấy từ area_gov](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L78). [Hàm đổi đơn vị](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L303) dùng Q×86,4/area_gov cho dữ liệu ngày.
+Cần đọc đủ hai tầng gọi hàm, không chỉ xem giá trị tham số ở hàm đọc. Trong [LamaH._load_basin_data](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L125), dữ liệu Q được đọc với normalize_discharge=False, rồi ngay sau đó được đưa qua _normalize_discharge với diện tích self._basin_area. [Diện tích này lấy từ area_gov](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L78). [Hàm đổi đơn vị](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L303) dùng Q×86,4/area_gov cho dữ liệu ngày.
 
-Do đó, **False ở hàm đọc không có nghĩa nhãn đầu ra của luồng LamaH giữ nguyên m³/s**. Cờ đó tránh đổi ngay trong hàm đọc; phép đổi vẫn được gọi rõ ràng ở tầng trên. Không có bước chờ một cờ normalize_discharge của từng YAML để kích hoạt lệnh gọi này. Đoạn tương ứng cũng có trong [bản mã tác giả lưu trong repo](../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/lamah.py#L125).
+Do đó, **False ở hàm đọc không có nghĩa nhãn đầu ra của luồng LamaH giữ nguyên m³/s**. Cờ đó tránh đổi ngay trong hàm đọc; phép đổi vẫn được gọi rõ ràng ở tầng trên. Không có bước chờ một cờ normalize_discharge của từng YAML để kích hoạt lệnh gọi này. Đoạn tương ứng cũng có trong [bản mã tác giả lưu trong repo](../../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/lamah.py#L125).
 
-Phát biểu này áp dụng khi qmax là nhãn được xử lý qua lớp LamaH hiện tại. Nó xác nhận hành vi mã, không thay phép kiểm phiên bản bộ nạp và dữ liệu của mọi run bất kỳ. Đối chứng A2 đã so thống kê qmax từ D theo mm/ngày với tệp chuẩn hóa của tác giả và ghi nhận khớp, xem [Mục 6.3 của ghi chú dữ liệu](../../Document/03_Data/01_LamaHCE.md). Phép kiểm 3.4 tập trung vào thuộc tính diện tích/hình dạng, không đọc đầu ra của cả 24 run.
+Phát biểu này áp dụng khi qmax là nhãn được xử lý qua lớp LamaH hiện tại. Nó xác nhận hành vi mã, không thay phép kiểm phiên bản bộ nạp và dữ liệu của mọi run bất kỳ. Đối chứng A2 đã so thống kê qmax từ D theo mm/ngày với tệp chuẩn hóa của tác giả và ghi nhận khớp, xem [Mục 6.3 của ghi chú dữ liệu](../../../Document/03_Data/01_LamaHCE.md). Phép kiểm 3.4 tập trung vào thuộc tính diện tích/hình dạng, không đọc đầu ra của cả 24 run.
 
 Đổi Q theo diện tích là bước đổi **đơn vị vật lý trước chuẩn hóa thống kê**; chuẩn hóa trung bình/độ lệch chuẩn để huấn luyện là bước khác. Giữ hai bước riêng khi giải thích nhãn và dự báo.
 
@@ -907,7 +907,7 @@ Lưới thập phân được đo bằng cách tìm bước 1, 0,1, 0,01… phù
 
 Hệ số tương quan không tự là nhân quả, không chứng minh hai cột thay thế được cho nhau và không tự là lý do loại biến. Không báo p-value: các lưu vực mức A có thể lồng nhau/phụ thuộc không gian, và đây là bước mô tả đặc điểm, không phải kiểm định mẫu độc lập.
 
-**D — scaler.** [LamaH._load_attributes](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L137) truyền danh sách lưu vực của kỳ vào hàm đọc. [BaseDataset](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L725) tính mean và std của bảng thuộc tính, với std mặc định mẫu (ddof=1); sau đó áp dụng (x−mean)/std. Một lưu vực đóng góp một hàng thuộc tính, không được cân trọng số bằng số ngày Q hợp lệ. Cần phân biệt bước này với thống kê chuỗi ngày gộp theo ngày–lưu vực.
+**D — scaler.** [LamaH._load_attributes](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L137) truyền danh sách lưu vực của kỳ vào hàm đọc. [BaseDataset](../../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L725) tính mean và std của bảng thuộc tính, với std mặc định mẫu (ddof=1); sau đó áp dụng (x−mean)/std. Một lưu vực đóng góp một hàng thuộc tính, không được cân trọng số bằng số ngày Q hợp lệ. Cần phân biệt bước này với thống kê chuỗi ngày gộp theo ngày–lưu vực.
 
 Cell đọc train_data/train_data_scaler.yml tương ứng từng config đã tìm ở 3.2, hỗ trợ tên khóa hiện tại và khóa cũ camels_attr_*. Không yêu cầu cài NeuralHydrology hay nạp checkpoint chỉ để đọc mapping số. Mean/std được so với 451 hiện tại bằng rtol=10⁻⁶, atol=10⁻⁸; std tính lại dùng ddof=1. Nếu khác, chỉ ghi không khớp tham chiếu 451, chưa gọi scaler sai: cần đọc phạm vi huấn luyện hoặc phiên bản thuộc tính tương ứng. Tệp thiếu/không hỗ trợ được ghi trạng thái, không thay bằng số tự ước tính.
 
@@ -1021,7 +1021,7 @@ Mã lần NEXTDOWNID từ mỗi trạm được chọn, đi xuyên qua các tr�
 
 **Run thiếu scaler.** Chỉ với run thiếu YAML ở vị trí dự kiến, mã liệt kê tệp train_data_scaler* trong thư mục run và đọc base_run_dir đã khai báo. Đường dẫn nguồn cũ được đối chiếu với các run thực có dưới EXP_DIR; chỉ đọc nguồn khi xác định được duy nhất một run, không đoán giữa các tên trùng. Nếu có YAML nguồn thì so thống kê tĩnh với 451 hiện tại; không chép tệp đó thay cho scaler riêng hoặc nạp pickle.
 
-[BaseTrainer.initialize_training](../../NeuralHydrology/neuralhydrology/training/basetrainer.py#L149) có nhánh fine-tune nạp scaler từ base_run_dir; hành vi này cũng có trong bản mã tác giả. Tuy nhiên, [BaseDataset](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L144) còn gọi ghi scaler khi tạo dataset train. Vì vậy, việc có một run nguồn không tự chứng minh nguyên nhân YAML cục bộ vắng mặt trong gói đang xét. Kết quả có thể xác nhận đường dẫn/nguồn đọc được, còn lý do thiếu trong gói chỉ được kết luận nếu có bằng chứng riêng.
+[BaseTrainer.initialize_training](../../../NeuralHydrology/neuralhydrology/training/basetrainer.py#L149) có nhánh fine-tune nạp scaler từ base_run_dir; hành vi này cũng có trong bản mã tác giả. Tuy nhiên, [BaseDataset](../../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L144) còn gọi ghi scaler khi tạo dataset train. Vì vậy, việc có một run nguồn không tự chứng minh nguyên nhân YAML cục bộ vắng mặt trong gói đang xét. Kết quả có thể xác nhận đường dẫn/nguồn đọc được, còn lý do thiếu trong gói chỉ được kết luận nếu có bằng chứng riêng.
 
 Đầu ra là sáu bảng CSV có tiền tố A1_P3_final_: coordinate_checks, coordinate_by_gauge, selected_topology, headwater_comparison, land_fraction_sum, missing_scaler_probe. Kết quả thực tế như sau.
 
@@ -1616,9 +1616,9 @@ Thời gian thực tế **30,1 giây**. Hình đã được sao chép nguyên b�
 
 Đối chiếu scaler nhãn phù hợp Phần 5 vì nó kiểm đơn vị thực sự đi vào mô hình. Ghi chú A2 Mục 6.3 đã có phép đối chiếu một run có Q: qmax khớp mm/ngày, qmean đầu vào khớp m³/s. Phép kiểm A1 ở đây mở rộng sang tất cả config.yml hiện có; không tự xem kết quả một run là kết quả của cả 24 run hoặc xem thiếu scaler là đã kiểm được.
 
-**Hai loại chuẩn hóa khác nhau.** [Lớp LamaH](../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/lamah.py#L125) gọi hàm đọc Q với normalize_discharge=False rồi gọi _normalize_discharge ngay sau đó bằng area_gov. False ở hàm đọc tránh chuyển đơn vị tại bước đó, không vô hiệu bước đổi đơn vị của lớp dữ liệu. [_normalize_discharge](../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/lamah.py#L303) thực hiện đổi tốc độ dòng chảy sang mm/ngày ở độ phân giải ngày. Vì vậy, tìm cờ normalize_discharge=True trong YAML không phải điều kiện đủ/cần để kết luận nhãn đã đổi; cell vẫn ghi nhận có khóa và giá trị khai báo để không suy đoán.
+**Hai loại chuẩn hóa khác nhau.** [Lớp LamaH](../../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/lamah.py#L125) gọi hàm đọc Q với normalize_discharge=False rồi gọi _normalize_discharge ngay sau đó bằng area_gov. False ở hàm đọc tránh chuyển đơn vị tại bước đó, không vô hiệu bước đổi đơn vị của lớp dữ liệu. [_normalize_discharge](../../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/lamah.py#L303) thực hiện đổi tốc độ dòng chảy sang mm/ngày ở độ phân giải ngày. Vì vậy, tìm cờ normalize_discharge=True trong YAML không phải điều kiện đủ/cần để kết luận nhãn đã đổi; cell vẫn ghi nhận có khóa và giá trị khai báo để không suy đoán.
 
-Sau bước đơn vị, [BaseDataset đặt nhãn trước đầu train thành NaN](../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/basedataset.py#L450), [chuyển dữ liệu sang float32](../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/basedataset.py#L495), rồi [tính mean/std theo các ô hữu hạn trước _create_lookup_table](../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/basedataset.py#L743). Nhãn chỉ tính trên ngày train có Q, không cần mọi cửa sổ khí tượng/qmean hợp lệ trước khi đóng góp cho scaler. Độ lệch chuẩn động dùng ddof=0; điều này khác std ddof=1 của thuộc tính tĩnh ở Phần 3 và std mẫu mô tả ở 5.1.
+Sau bước đơn vị, [BaseDataset đặt nhãn trước đầu train thành NaN](../../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/basedataset.py#L450), [chuyển dữ liệu sang float32](../../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/basedataset.py#L495), rồi [tính mean/std theo các ô hữu hạn trước _create_lookup_table](../../../PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/basedataset.py#L743). Nhãn chỉ tính trên ngày train có Q, không cần mọi cửa sổ khí tượng/qmean hợp lệ trước khi đóng góp cho scaler. Độ lệch chuẩn động dùng ddof=0; điều này khác std ddof=1 của thuộc tính tĩnh ở Phần 3 và std mẫu mô tả ở 5.1.
 
 Cell dùng cache Q 5.1, đọc cấu hình và train_data/train_data_scaler.yml của từng run, không đọc lại toàn bộ CSV Q. Tệp ID train được giải bằng đường dẫn hiện có hoặc tên tệp duy nhất trong input; kiểm trùng, ID ngoài cache và sắp theo chuỗi như thư viện. Không mặc định mỗi run dùng 451 nếu tệp ID không giải được. Ngày đầu/cuối, seq_length và predict_last_n phải có giá trị hợp lệ; thời gian khởi động là seq_length−predict_last_n ở cấu hình ngày đơn tần. Có nhiều khoảng train thì nhãn hợp lệ theo hợp các khoảng, nhãn ngoài chúng giữ NaN.
 
@@ -2040,7 +2040,7 @@ Khảo sát Q ngày đã đủ cho mô tả phân phối ở các mục 5.1–5.
 
 **Đơn vị tham chiếu:** [Bảng A1 BiasCast, tr. 5086–5087](https://hess.copernicus.org/articles/30/5067/2026/) liệt kê 36 biến của các cấu hình dùng trong bài. Các đơn vị đó là tài liệu tham chiếu cho bảng, chưa phải phép xác minh mỗi phép chuyển đổi trong CSV. Bốn cột có trong schema đang kiểm nhưng không liệt kê tại bảng này là ECMWF_cp/lsp/msl và EOBS_hu; để đơn vị CSV chưa giải quyết, không lấy đơn vị sản phẩm gốc tự gán vào bản đã xử lý. Tên trường và đơn vị tham chiếu được xuất riêng cho cả 40 cột.
 
-Riêng ECMWF_ssrd, Bảng A1 ghi W/m², trong khi [nhãn VARIABLE_PAIRS của mã phân tích tác giả](../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L55) ghi J/m² cho cặp bức xạ. Đây là bất nhất giữa nhãn tham chiếu, chưa xác định đơn vị thật của CSV hoặc chứng minh một nguồn đã đổi sai. Panel ssrd dùng nhãn raw; unit unresolved. [Bảng A2 LamaH-CE](https://essd.copernicus.org/articles/13/4529/2021/) ghi total_et dương cho bốc hơi, âm cho ngưng tụ; phép đo vẫn giữ dấu thực trong CSV và không tự áp một quy ước khác cho ECMWF/GLEAM. Việc so đúng đại lượng, dấu, tích lũy và đơn vị thuộc Phần 6.
+Riêng ECMWF_ssrd, Bảng A1 ghi W/m², trong khi [nhãn VARIABLE_PAIRS của mã phân tích tác giả](../../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L55) ghi J/m² cho cặp bức xạ. Đây là bất nhất giữa nhãn tham chiếu, chưa xác định đơn vị thật của CSV hoặc chứng minh một nguồn đã đổi sai. Panel ssrd dùng nhãn raw; unit unresolved. [Bảng A2 LamaH-CE](https://essd.copernicus.org/articles/13/4529/2021/) ghi total_et dương cho bốc hơi, âm cho ngưng tụ; phép đo vẫn giữ dấu thực trong CSV và không tự áp một quy ước khác cho ECMWF/GLEAM. Việc so đúng đại lượng, dấu, tích lũy và đơn vị thuộc Phần 6.
 
 **Giá trị và phân phối:** đọc từng ô dạng chữ, tách không có dòng/rỗng/-999/nội dung không phải số/vô hạn. Giá trị hợp lệ của phép khảo sát là hữu hạn khác -999, gồm số âm và 0. Kiểm số ngày hợp lệ theo từng ID/biến khớp phép quét toàn chuỗi 2.8, tổng âm+0+dương và tổng các loại ô khớp lịch. Không xem mọi số âm là lỗi hoặc dùng một tiêu chí chung 0–1 cho mọi cột.
 
@@ -2348,7 +2348,7 @@ Cell không thêm hình; chín CSV tiền tố A1_P5_: hourly_qobs_profile/hourl
 | qcol | 0 | 131508782 |
 | qcol | 1 | 9744 |
 
-Mỗi cờ cộng đúng 131878728 dòng. Theo [Bảng A1 LamaH-CE, tr. 4549](../../PaperResearch/PaperResearchPDF/Evidence/Klingler2021_ESSD_LamaHCE.pdf), ckhs cho biết đã được cơ quan thủy văn kiểm hay chưa, nhưng phạm vi kiểm không mô tả cụ thể; qceq đánh dấu giá trị bằng nhau ít nhất 10 bước liên tiếp; qcol là cờ ngoại lai tự động, có thể bao gồm Q thấp/cao có thật. Trong tệp giờ, 10 bước là 10 giờ, không phải 10 ngày. Không dùng các token để tự lọc Q; token qcol rỗng không được gán bằng 0. Chưa có bảng theo từng giờ/ID trong output để suy 9744 cờ qcol nằm ở ca nào hoặc số âm thuộc bao nhiêu ngày.
+Mỗi cờ cộng đúng 131878728 dòng. Theo [Bảng A1 LamaH-CE, tr. 4549](../../../PaperResearch/PaperResearchPDF/Evidence/Klingler2021_ESSD_LamaHCE.pdf), ckhs cho biết đã được cơ quan thủy văn kiểm hay chưa, nhưng phạm vi kiểm không mô tả cụ thể; qceq đánh dấu giá trị bằng nhau ít nhất 10 bước liên tiếp; qcol là cờ ngoại lai tự động, có thể bao gồm Q thấp/cao có thật. Trong tệp giờ, 10 bước là 10 giờ, không phải 10 ngày. Không dùng các token để tự lọc Q; token qcol rỗng không được gán bằng 0. Chưa có bảng theo từng giờ/ID trong output để suy 9744 cờ qcol nằm ở ca nào hoặc số âm thuộc bao nhiêu ngày.
 
 #### 19.11.2. Tái dựng ngày và mẫu số
 
@@ -2447,7 +2447,7 @@ Số giờ còn lại 12/16/9 là −999, khớp 37 mốc đã đo ở 4.5. Phé
 
 ### 19.12. Cell 5.12 — cờ ở các ca Q và hai đoạn ngắn
 
-Chỉ đọc các ID thuộc top 10 ngày đỉnh, 15 đoạn hằng đã kiểm, có giờ âm theo profile 5.11 hoặc có sai khác nội suy ngắn >0,0005. Giữ một lần đọc mỗi ID trong hợp tập; không tải hoặc đọc lại 452 tệp. Nguồn cờ là [Bảng A1 LamaH-CE, tr. 4549](../../PaperResearch/PaperResearchPDF/Evidence/Klingler2021_ESSD_LamaHCE.pdf): ckhs kiểm của cơ quan thủy văn, qceq bằng nhau ≥10 bước, qcol ngoại lai tự động có thể là dòng chảy thật. Không tự lọc theo cờ, xem ckhs=0 là lỗi hoặc đổi qcol rỗng thành 0.
+Chỉ đọc các ID thuộc top 10 ngày đỉnh, 15 đoạn hằng đã kiểm, có giờ âm theo profile 5.11 hoặc có sai khác nội suy ngắn >0,0005. Giữ một lần đọc mỗi ID trong hợp tập; không tải hoặc đọc lại 452 tệp. Nguồn cờ là [Bảng A1 LamaH-CE, tr. 4549](../../../PaperResearch/PaperResearchPDF/Evidence/Klingler2021_ESSD_LamaHCE.pdf): ckhs kiểm của cơ quan thủy văn, qceq bằng nhau ≥10 bước, qcol ngoại lai tự động có thể là dòng chảy thật. Không tự lọc theo cờ, xem ckhs=0 là lỗi hoặc đổi qcol rỗng thành 0.
 
 Đỉnh kiểm **mọi giờ đồng max** của mỗi ngày, không chỉ giờ đầu. Đoạn hằng đếm cờ trên mọi giờ trong đoạn, báo số mức qobs. Giờ âm khác −999 được giữ toàn bộ, nối với qmin ngày đúng ID/ngày; tổng giờ âm phải khớp 5.11. In số ID/ngày và tối đa 20 dòng âm, không suy số ngày từ 111 giờ.
 
@@ -2555,7 +2555,7 @@ Các câu hỏi còn mở được bàn giao đúng nơi: đơn vị/dấu/tích
 
 ### 20.1. Cell 6.1 — ngữ nghĩa, phạm vi ghép và mức lưu trữ
 
-Năm cặp lấy đúng từ [VARIABLE_PAIRS của mã phân tích tác giả](../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L53):
+Năm cặp lấy đúng từ [VARIABLE_PAIRS của mã phân tích tác giả](../../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L53):
 
 | Cặp | Cột đối chiếu | Cột forecast | Đơn vị Bảng A1 / nhãn mã tác giả |
 |---|---|---|---|
@@ -3133,7 +3133,7 @@ Phần 7 kiểm ô đầu vào theo từng pha và cửa sổ cùng điều ki�
 
 Cell quét các config.yml dưới EXP_DIR, đọc cấu hình thật và lưu SHA256 mỗi file. Nhóm cấu hình theo JSON các trường ảnh hưởng đầu vào/cửa sổ/kỳ sau diễn giải path như Config._parse_config, giữ cả mã JSON thô để đối chiếu. Thứ tự tên và nhóm biến được giữ; đổi optimizer đơn thuần không tạo hợp đồng mới. Nhóm này phục vụ kiểm cấu trúc, chưa xác nhận cùng trọng số, scaler, thư mục dữ liệu hoặc mã thư viện đang cài. Những đường dẫn máy tác giả không được dùng để âm thầm thay input.
 
-Căn cứ cách cắt và kiểm mẫu trong [basedataset.py:158](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L158), [x_d_validate và chế độ train/evaluation](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L613), [_validate_samples](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L861), cùng [Config](../../NeuralHydrology/neuralhydrology/utils/config.py#L357). Bộ lọc gốc ở train xét NaN của các cột động trên toàn seq_length trước khi __getitem__ cắt pha. Đánh giá không truyền x_d/y vào cùng phép kiểm train. Cờ nan_handling_method không tự thay điều kiện lọc này. Nhãn chỉ kiểm all-NaN trong predict_last_n; ở bước hiện tại chỉ chuẩn bị trường hợp một nhãn cuối/ngày, chưa mô phỏng các trường hợp khác.
+Căn cứ cách cắt và kiểm mẫu trong [basedataset.py:158](../../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L158), [x_d_validate và chế độ train/evaluation](../../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L613), [_validate_samples](../../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L861), cùng [Config](../../../NeuralHydrology/neuralhydrology/utils/config.py#L357). Bộ lọc gốc ở train xét NaN của các cột động trên toàn seq_length trước khi __getitem__ cắt pha. Đánh giá không truyền x_d/y vào cùng phép kiểm train. Cờ nan_handling_method không tự thay điều kiện lọc này. Nhãn chỉ kiểm all-NaN trong predict_last_n; ở bước hiện tại chỉ chuẩn bị trường hợp một nhãn cuối/ngày, chưa mô phỏng các trường hợp khác.
 
 Với tổng khung L, forecast F, overlap O, offset tính từ ngày cuối t=0: hindcast dùng từ 1−L đến −F+O (bao gồm hai đầu); forecast từ 1−F đến 0. Biến thuộc cả hai pha dùng hợp các offset; biến không thuộc pha nào nhưng còn trong dynamic_inputs vẫn bị bộ lọc gốc kiểm. Mô hình một pha dùng cả khung. So số bước bộ lọc gốc kiểm với số bước thực sự được cắt cho mô hình ở từng biến để chỉ ra các ô kiểm thêm. Đây chưa là chứng minh mọi ô có số hoặc đầu ra mô hình hữu hạn.
 
@@ -3166,7 +3166,7 @@ Có 14 cudalstm, 5 handoff_forecast_lstm và 5 sequential_forecast_lstm. Tất c
 
 #### 21.1.2. Nguồn ngoài và hình học cửa sổ
 
-Trong **120 giá trị path được kiểm, chỉ 1 hoạt động sau parse**. additional_feature_files và ba per_basin_*_periods_file đều là chuỗi thô "None" trong 24 config và đều thành None. Riêng train_data_file có 8 chuỗi "None", 8 trường không khai báo, 7 YAML null và 1 đường dẫn thật. Quy tắc [Config._parse_config](../../NeuralHydrology/neuralhydrology/utils/config.py#L203) chỉ đổi đúng null/chuỗi "None", không xóa một path thật dựa trên bool của chuỗi thô.
+Trong **120 giá trị path được kiểm, chỉ 1 hoạt động sau parse**. additional_feature_files và ba per_basin_*_periods_file đều là chuỗi thô "None" trong 24 config và đều thành None. Riêng train_data_file có 8 chuỗi "None", 8 trường không khai báo, 7 YAML null và 1 đường dẫn thật. Quy tắc [Config._parse_config](../../../NeuralHydrology/neuralhydrology/utils/config.py#L203) chỉ đổi đúng null/chuỗi "None", không xóa một path thật dựa trên bool của chuỗi thô.
 
 Path hoạt động thuộc Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/config.yml: **/home/ok2907/Documents/BiasCast/Experiments/Encoder_Decoder_LSTM/Encoder_Decoder_LSTM_without_q/Encoder_Decoder_LSTM_RA_without_q_Simple_Embedding/train_data**. Điều này xác nhận cấu hình chỉ định cache, chưa xác nhận cache có trong Input hiện tại hoặc nội dung cache. Bộ nạp có nhánh dùng train_data_file ở train, còn evaluation đọc dữ liệu ngày; không thay cache bằng CSV để gọi là số mẫu huấn luyện lịch sử của run này. Nhóm W8404b4046b9d giữ review_required/source_review_required, dù hình học cửa sổ vẫn rõ.
 
@@ -3275,7 +3275,7 @@ Nguồn cache duy nhất được khai báo bởi Encoder_Decoder_LSTM_RA_withou
 
 Danh sách giống nhau giữa mặt nạ toàn khung và mặt nạ ô dùng theo pha. Tăng từ L=365 lên L=730 làm thêm **295, 296, 391 và 791** không có cửa sổ train đầy đủ dù có nhãn. Số ID train không có mẫu giao tăng từ **5 lên 9** khi có Q. Đây là chẩn đoán cửa sổ, chưa là lý do loại ID hoặc giải thích nguyên nhân dự báo NaN. ID **55** là trường hợp duy nhất không có giao cửa sổ đầy đủ–nhãn ở evaluation có Q, cả validation/test và cả hai L; kết quả nối với hồ sơ Q đã có, không thay thế kiểm dự báo thực tế của A2.
 
-Tái cộng theo cohort hiện có cho **23 config ở mỗi kỳ/L**, cùng tập 451 nên không đổi mẫu số hoặc các số CSV 7.2. Bảng (6) có **138 dòng current_CSV_subset_count** và **6 dòng external_source_contract_not_counted** của nhóm W8404b4046b9d; cả sáu giữ NaN. Đây là phạm vi tái cộng đã thực hiện ở 7.3, không phải bằng chứng cache làm thiếu cả ba kỳ. Nguồn [basedataset.py:346](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L346) chỉ dùng train_data_file khi is_train=True; evaluation vào nhánh đọc CSV. Do đó cần tách số train chưa biết từ cache khỏi khả năng xác định mặt nạ evaluation trên CSV.
+Tái cộng theo cohort hiện có cho **23 config ở mỗi kỳ/L**, cùng tập 451 nên không đổi mẫu số hoặc các số CSV 7.2. Bảng (6) có **138 dòng current_CSV_subset_count** và **6 dòng external_source_contract_not_counted** của nhóm W8404b4046b9d; cả sáu giữ NaN. Đây là phạm vi tái cộng đã thực hiện ở 7.3, không phải bằng chứng cache làm thiếu cả ba kỳ. Nguồn [basedataset.py:346](../../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py#L346) chỉ dùng train_data_file khi is_train=True; evaluation vào nhánh đọc CSV. Do đó cần tách số train chưa biết từ cache khỏi khả năng xác định mặt nạ evaluation trên CSV.
 
 #### 21.3.3. Giới hạn bàn giao
 
@@ -3764,9 +3764,9 @@ Phần 10 trình bày ngưỡng đánh giá theo giao thức đã định ở k�
 
 ### 24.1. Cell 10.1 — bốn mức từ qmax quan trắc trước test
 
-Phạm vi fit cố định là **01/01/1981–31/12/2013**, theo [kế hoạch Mục 6.2](../../Document/01_Plan/03_Pipeline.md#L207). Dùng mọi qmax quan trắc hữu hạn không âm của từng ID trong cache, giữ 0 và dữ liệu thiếu; không dùng dự báo hoặc quan trắc test để fit/chọn ngưỡng. Giai đoạn tham chiếu gồm cả validation; đây là ngưỡng đánh giá theo giao thức đã định trước, không phải scaler hoặc ngưỡng chỉ tính từ train của Phần 8. Reference chứa các kỳ train/validation nên không cộng số ngày các phạm vi này với nhau.
+Phạm vi fit cố định là **01/01/1981–31/12/2013**, theo [kế hoạch Mục 6.2](../../../Document/01_Plan/03_Pipeline.md#L207). Dùng mọi qmax quan trắc hữu hạn không âm của từng ID trong cache, giữ 0 và dữ liệu thiếu; không dùng dự báo hoặc quan trắc test để fit/chọn ngưỡng. Giai đoạn tham chiếu gồm cả validation; đây là ngưỡng đánh giá theo giao thức đã định trước, không phải scaler hoặc ngưỡng chỉ tính từ train của Phần 8. Reference chứa các kỳ train/validation nên không cộng số ngày các phạm vi này với nhau.
 
-Ba ngưỡng là phân vị mẫu **q30/q80/q98**, nội suy tuyến tính. Chúng tương ứng các mốc xác suất vượt 0,7/0,2/0,02. Đề tài dùng bốn mức để phủ toàn bộ đường duy trì; không nói Yilmaz gốc định nghĩa nguyên xi bốn mức này. Quy ước bằng ngưỡng vào mức cao hơn khớp [tài liệu phân mức hiện có](../../Document/06_Theory/05_BiasCast3_Data.md#L447):
+Ba ngưỡng là phân vị mẫu **q30/q80/q98**, nội suy tuyến tính. Chúng tương ứng các mốc xác suất vượt 0,7/0,2/0,02. Đề tài dùng bốn mức để phủ toàn bộ đường duy trì; không nói Yilmaz gốc định nghĩa nguyên xi bốn mức này. Quy ước bằng ngưỡng vào mức cao hơn khớp [tài liệu phân mức hiện có](../../../Document/06_Theory/05_BiasCast3_Data.md#L447):
 
 | Mức | Quy tắc trên giá trị qmax |
 |---|---|
@@ -3831,7 +3831,7 @@ Ngưỡng có đơn vị mm/ngày. 324/600/623 không có nhãn train nhưng có
 
 ### 24.2. Cell 10.2 — độ nhạy ngưỡng theo hai nửa giai đoạn tham chiếu
 
-Hai khoảng cố định **1981–1997** và **1998–2013** lấy từ [danh sách khảo sát A1](../../Document/06_Theory/05_BiasCast3_Data.md#L991). Chỉ dùng qmax trước test, fit lại q30/q80/q98 cho từng nửa bằng cùng phân vị tuyến tính/quy tắc biên. Bảng ngưỡng chính 1981–2013 của 10.1 giữ nguyên; cell tính lại từ cache để kiểm n và các ngưỡng chính không bị thay đổi. Không chọn giai đoạn, ngưỡng hoặc ID theo mức khớp test.
+Hai khoảng cố định **1981–1997** và **1998–2013** lấy từ [danh sách khảo sát A1](../../../Document/06_Theory/05_BiasCast3_Data.md#L991). Chỉ dùng qmax trước test, fit lại q30/q80/q98 cho từng nửa bằng cùng phân vị tuyến tính/quy tắc biên. Bảng ngưỡng chính 1981–2013 của 10.1 giữ nguyên; cell tính lại từ cache để kiểm n và các ngưỡng chính không bị thay đổi. Không chọn giai đoạn, ngưỡng hoặc ID theo mức khớp test.
 
 Mỗi ID ghi số ngày lịch/hợp lệ/thiếu, năm và loại tháng có quan trắc, số ngưỡng phân biệt ở từng nửa. Trạng thái both_halves/early_only/late_only/no_reference_observations tách riêng. Chỉ có một nửa thì các phép chênh/tỷ số/đổi mức cần hai nửa giữ NaN; không gán 0 hoặc thay bằng ngưỡng toàn kỳ. Có một số ngày ở mỗi nửa chưa bảo đảm đủ năm hoặc đủ mùa để coi ngưỡng ổn định.
 
@@ -3890,7 +3890,7 @@ Ngưỡng chính 1981–2013 và danh sách 451 giữ nguyên. Phép so chưa đ
 
 ### 24.3. Cell 10.3 — độ phủ và đỉnh quan trắc theo năm thủy văn
 
-Trước khi fit Gumbel, cell kiểm chuỗi đỉnh năm theo [giao thức năm thủy văn và thiếu quá nửa số ngày](../../Document/01_Plan/03_Pipeline.md#L209). Một năm chạy **01/10 năm trước đến 30/09 năm kết thúc**, gắn nhãn bằng năm kết thúc. Chỉ đọc quan trắc có ngày trong reference **01/01/1981–31/12/2013**; không dùng ngày test để hoàn thành một năm bị cắt ở rìa.
+Trước khi fit Gumbel, cell kiểm chuỗi đỉnh năm theo [giao thức năm thủy văn và thiếu quá nửa số ngày](../../../Document/01_Plan/03_Pipeline.md#L209). Một năm chạy **01/10 năm trước đến 30/09 năm kết thúc**, gắn nhãn bằng năm kết thúc. Chỉ đọc quan trắc có ngày trong reference **01/01/1981–31/12/2013**; không dùng ngày test để hoàn thành một năm bị cắt ở rìa.
 
 Do reference theo năm lịch, nó giao 34 năm thủy văn gắn nhãn 1981–2014; chỉ 1982–2013 là 32 năm nằm trọn trong reference. Năm 1981 có 273 ngày trong reference và 92 ngày ngoài; năm 2014 chỉ có 92 ngày cuối 2013 trong reference và 273 ngày ngoài. Cell giữ mẫu số cả năm **365/366 ngày**, đếm riêng ngày thiếu bên trong reference và ngày ngoài reference. Không rút mẫu số xuống lát 273/92 ngày hoặc coi ngày ngoài reference là số quan trắc.
 
@@ -3995,9 +3995,9 @@ Tất cả hồ sơ dưới đây đều giao 34 năm thủy văn và có 32 nă
 
 ### 24.4. Cell 10.4 — Gumbel L-moments và độ nhạy với năm biên
 
-Cell dùng đỉnh quan trắc từ 10.3, không đọc thêm nhãn test. **Mẫu chính half_calendar_primary** giữ năm có 2×valid_days ≥ full_year_days, kể cả năm biên 1981 nếu đủ điều kiện, nhất quán với [phương pháp lấy đỉnh năm](../../Document/06_Theory/05_BiasCast3_Data.md#L748). Mẫu phụ full_window_sensitivity yêu cầu thêm năm nằm trọn reference, chỉ có nhãn 1982–2013. Đây là hai mẫu thay thế, không cộng đỉnh của chúng với nhau. Năm thủy văn 2014 chỉ có tối đa 92 ngày reference nên không qua quy tắc; không dùng test hoàn thành năm đó.
+Cell dùng đỉnh quan trắc từ 10.3, không đọc thêm nhãn test. **Mẫu chính half_calendar_primary** giữ năm có 2×valid_days ≥ full_year_days, kể cả năm biên 1981 nếu đủ điều kiện, nhất quán với [phương pháp lấy đỉnh năm](../../../Document/06_Theory/05_BiasCast3_Data.md#L748). Mẫu phụ full_window_sensitivity yêu cầu thêm năm nằm trọn reference, chỉ có nhãn 1982–2013. Đây là hai mẫu thay thế, không cộng đỉnh của chúng với nhau. Năm thủy văn 2014 chỉ có tối đa 92 ngày reference nên không qua quy tắc; không dùng test hoàn thành năm đó.
 
-Với n đỉnh năm, l₁ là mean, l₂ là tổng chênh tuyệt đối trên mọi cặp i<j chia n(n−1), bằng nửa mean chênh cặp. Cell kiểm bằng công thức trọng số theo thứ tự của cùng mẫu. Tham số Gumbel α=l₂/ln2 và ξ=l₁−γ×α, γ là hằng số Euler; ngưỡng x_T=ξ−α×ln[−ln(1−1/T)] tại **T=1,5; 2; 5; 10 năm**. Kiểm riêng với hàm phân vị gumbel_r của SciPy, không dùng fit MLE thay cho L-moments. Công thức và ví dụ được đối chiếu với [chi tiết kỹ thuật](../../Document/06_Theory/05_BiasCast3_Data.md#L750).
+Với n đỉnh năm, l₁ là mean, l₂ là tổng chênh tuyệt đối trên mọi cặp i<j chia n(n−1), bằng nửa mean chênh cặp. Cell kiểm bằng công thức trọng số theo thứ tự của cùng mẫu. Tham số Gumbel α=l₂/ln2 và ξ=l₁−γ×α, γ là hằng số Euler; ngưỡng x_T=ξ−α×ln[−ln(1−1/T)] tại **T=1,5; 2; 5; 10 năm**. Kiểm riêng với hàm phân vị gumbel_r của SciPy, không dùng fit MLE thay cho L-moments. Công thức và ví dụ được đối chiếu với [chi tiết kỹ thuật](../../../Document/06_Theory/05_BiasCast3_Data.md#L750).
 
 Có ít hơn hai đỉnh hoặc l₂=0 thì tham số/ngưỡng giữ NaN với trạng thái riêng; không tự thêm nhiễu hoặc đổi phân phối. **Fit xác định về số học không đồng nghĩa đủ bằng chứng thống kê.** Mẫu dưới 10 năm vẫn được tính nếu xác định, gắn cờ và in toàn bộ ID; không lọc khỏi tập 451. Số năm hoàn chỉnh, năm thiếu nguyên tháng, năm biên, số mức đỉnh phân biệt được lưu. Giữ ties và số 0. Ngưỡng âm nếu có được lưu và gắn cờ, không chặn về 0; T lớn hơn số năm mẫu và ngưỡng cao hơn max mẫu cũng có cờ riêng.
 
@@ -4612,7 +4612,7 @@ Nguồn giải thích:
 - [BiasCast, Mục 2.1 và Phụ lục A](https://hess.copernicus.org/articles/30/5067/2026/index.html): bản mở rộng, nguồn qmin/qmax và các nhóm đầu vào.
 - [LamaH-CE, Mục 4.1 và Mục 5](https://essd.copernicus.org/articles/13/4529/2021/): nguồn dữ liệu, quy trình xử lý giờ và định nghĩa thuộc tính.
 - [Bảng 1 — typimpact](https://essd.copernicus.org/articles/13/4529/2021/essd-13-4529-2021-t01.xlsx), [Bảng 2 — degimpact](https://essd.copernicus.org/articles/13/4529/2021/essd-13-4529-2021-t02.xlsx), [Bảng A1 — metadata trạm](https://essd.copernicus.org/articles/13/4529/2021/essd-13-4529-2021-t03.xlsx): mã và đơn vị thuộc tính trạm.
-- [Bộ nạp lamah.py](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L240): hành vi đọc thuộc tính và chuẩn hóa Q của mã đang dùng.
-- [Mã phân tích cặp biến và thuộc tính tĩnh của tác giả](../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L53): tên các cặp nguồn và danh sách thuộc tính trong phân tích tác giả.
+- [Bộ nạp lamah.py](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py#L240): hành vi đọc thuộc tính và chuẩn hóa Q của mã đang dùng.
+- [Mã phân tích cặp biến và thuộc tính tĩnh của tác giả](../../../PaperResearch/PaperResearchCode/BiasCast/Inspect_Experiments/code/wasserstein_distance_static_attributes.py#L53): tên các cặp nguồn và danh sách thuộc tính trong phân tích tác giả.
 
 Khi mô tả trong bài khác quan trắc của input, giữ cả hai cùng phạm vi và nguồn. Các giả thuyết chưa được xác nhận không dùng làm kết luận về chất lượng trạm hoặc tiêu chí tác giả.

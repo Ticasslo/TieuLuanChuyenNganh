@@ -1,7 +1,7 @@
 # =============================================================================
 # Bước A2 - chạy lại trọng số của tác giả BiasCast trên kỳ test 2014-2017 và so NSE với bài
 # Bài: Konold và cs., HESS 30:5067-5096 (2026). Dữ liệu Zenodo 17119635 (CC BY-NC 4.0), kết quả thí nghiệm
-#      Zenodo 17292895 - đã lưu thành Kaggle Dataset "lamah-ce-ext" (Workspace/01_Download/01_LamaHCEExt_Download.py).
+#      Zenodo 17292895 - đã lưu thành Kaggle Dataset "lamah-ce-ext" (Workspace/01_Download/01_LamaHCEExt_Download/01_LamaHCEExt_Download.py).
 # Kế hoạch: Document/01_Plan/03_Pipeline.md Mục 7 (dòng A2), Mục 3.3 (thư mục Q).
 # Notebook Kaggle "01_A2_LamaHCEExt_Reproduce": Accelerator = GPU T4, Internet = On, Persistence = Files only,
 # Add Input => Your Datasets => lamah-ce-ext. Mỗi Phần dán vào 1 cell, chạy lần lượt.

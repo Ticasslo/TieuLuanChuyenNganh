@@ -1,6 +1,6 @@
 # Bộ đánh giá dự báo lưu lượng — Extended LamaH-CE
 
-Tài liệu đi cùng [mã Python](01_Evaluation_LamaHCEExt.py) và [notebook để nhập vào Kaggle](01_Evaluation_LamaHCEExt.ipynb), thực hiện việc #5 trong [phân công](../../ASSIGNMENT.md) và [pipeline Mục 6](../../Document/01_Plan/03_Pipeline.md#6-đánh-giá). Bộ đánh giá đọc dự báo đã lưu, tính chỉ số, đánh giá bốn mức và sự kiện lũ, so sánh theo cặp lưu vực, rồi xuất CSV/PNG/JSON trực tiếp cho Kaggle Save Version.
+Tài liệu đi cùng [mã Python](01_Evaluation_LamaHCEExt.py) và [notebook](01_Evaluation_LamaHCEExt.ipynb) (bản chính thức: Version 2 của notebook Kaggle `01_Evaluation_LamaHCEExt`, Save & Run All trên CPU, có output), thực hiện việc #5 trong [phân công](../../../ASSIGNMENT.md) và [pipeline Mục 6](../../../Document/01_Plan/03_Pipeline.md#6-đánh-giá). Bộ đánh giá đọc dự báo đã lưu, tính chỉ số, đánh giá bốn mức và sự kiện lũ, so sánh theo cặp lưu vực, rồi xuất CSV/PNG/JSON trực tiếp cho Kaggle Save Version.
 
 **S0** là kịch bản không che thêm đầu vào; dữ liệu gốc vẫn có thể thiếu. **Hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Một **ngày–lưu vực** là một ngày tại một ID; **mặt nạ** là bảng True/False chọn các cặp đó để chấm. **Giao chung** chỉ giữ ngày–lưu vực có quan trắc, persistence và dự báo của mọi run cùng hữu hạn.
 
@@ -19,7 +19,7 @@ Gắn Output notebook làm Input cho ba nguồn kết quả đã Save Version c�
 
 Mặc định tìm nguồn dưới `/kaggle/input`, xuất vào `/kaggle/working/evaluation_output`. Nếu có nhiều phiên bản cùng tên, chương trình yêu cầu chỉ định nguồn thay vì tự chọn. Khi chạy dạng script, dùng các tham số `--a1`, `--a2`, `--a3` trỏ đúng thư mục; đường dẫn A2 là thư mục `a2_output` chứa `runs`. Với notebook, có thể điền trực tiếp ba đường dẫn khi gọi hàm `run` ở phần cuối.
 
-Kiểm độc lập bằng lệnh `python Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.py --self-test` từ thư mục repo. Môi trường cần NumPy, pandas, SciPy, xarray, PyYAML; phần vẽ dùng matplotlib. Kaggle A1/A2/A3 đã có các thư viện này. Bộ đánh giá không thay phiên bản thư viện trong phiên chạy.
+Kiểm độc lập bằng lệnh `python Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py --self-test` từ thư mục repo. Môi trường cần NumPy, pandas, SciPy, xarray, PyYAML; phần vẽ dùng matplotlib. Kaggle A1/A2/A3 đã có các thư viện này. Bộ đánh giá không thay phiên bản thư viện trong phiên chạy.
 
 Mã `.py` dùng các cell `# %%` và cell Markdown `# %% [markdown]`: tiêu đề phần → đề mục → code đúng chức năng. File `.ipynb` được sinh từ nguồn này để nhập vào Kaggle; việc sửa mã tập trung ở `.py`, sau đó sinh lại notebook. Notebook giữ mã SHA-256 của nguồn và có 27 cell Markdown, 15 cell code, không kèm output thực thi.
 
@@ -39,7 +39,7 @@ Thêm mô hình có thể làm giao chung thay đổi. Phép đối chiếu A3 l
 
 ## 3. Chỉ số liên tục và đường duy trì lưu lượng
 
-NSE, PNSE, KGE dạng 2009 và r/α/β dùng float64, cùng mặt nạ trong một scope, độ lệch chuẩn ddof=0. PNSE lấy qmax hôm trước làm mốc cho dự báo một ngày. Mẫu số bằng 0 có giá trị NaN và trạng thái giải thích; các hàm không tự thêm epsilon hoặc thu hẹp mask đã truyền. [Công thức và ví dụ A3](../03_Baseline/02_A3_LamaHCEExt_Benchmarks.md#report-part-5).
+NSE, PNSE, KGE dạng 2009 và r/α/β dùng float64, cùng mặt nạ trong một scope, độ lệch chuẩn ddof=0. PNSE lấy qmax hôm trước làm mốc cho dự báo một ngày. Mẫu số bằng 0 có giá trị NaN và trạng thái giải thích; các hàm không tự thêm epsilon hoặc thu hẹp mask đã truyền. [Công thức và ví dụ A3](../../03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#report-part-5).
 
 Ba chỉ số đường duy trì được tính trên cùng cặp ngày nhưng xếp riêng obs và sim. Quy ước rời rạc của bộ đánh giá được cố định trước khi chạy:
 
@@ -61,7 +61,7 @@ Ma trận nhầm lẫn có hàng là mức quan trắc, cột là mức dự bá
 
 ## 5. Sự kiện lũ và cờ kiểm duyệt
 
-Ngưỡng lấy từ `half_calendar_primary` của A1 cho T = 1,5; 2; 5; 10 năm, giữ số năm fit theo từng lưu vực. Bộ đánh giá áp cùng ngưỡng và quy tắc cho obs/sim; xuất cả đoạn liên tiếp và cụm USWRC. [Giao thức đã chốt](../../Document/01_Plan/03_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd).
+Ngưỡng lấy từ `half_calendar_primary` của A1 cho T = 1,5; 2; 5; 10 năm, giữ số năm fit theo từng lưu vực. Bộ đánh giá áp cùng ngưỡng và quy tắc cho obs/sim; xuất cả đoạn liên tiếp và cụm USWRC. [Giao thức đã chốt](../../../Document/01_Plan/03_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd).
 
 Một đoạn gồm các ngày liên tiếp có Q **lớn hơn** ngưỡng. Quy tắc gộp xét khoảng cách đỉnh tối thiểu ceil[5 + ln(A dặm vuông)] và yêu cầu đáy giữa hai đỉnh thấp hơn 0,75 lần đỉnh nhỏ hơn; chưa đủ một trong hai điều kiện thì gộp. Sau gộp, kiểm lại cụm kề. Đồng đỉnh dùng ngày đỉnh cuối bên trái và đầu bên phải để tính khoảng cách gần nhất. [HEC-USACE giải thích khoảng cách theo diện tích](https://www.hec.usace.army.mil/confluence/sspdocs/sspum/latest/peaks-over-threshold-analysis/peaks-over-threshold-filtering).
 

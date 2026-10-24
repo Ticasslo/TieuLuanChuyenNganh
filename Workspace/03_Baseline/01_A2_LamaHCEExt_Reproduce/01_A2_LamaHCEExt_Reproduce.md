@@ -73,7 +73,7 @@ Thư viện chuẩn hóa mỗi biến bằng trung bình và độ lệch chuẩ
 | `qmax` (đối chứng) | tính lại, m³/s | 5,2147 | 17,5222 | 102,74% / 232,97% |
 | `qmax` (đối chứng) | tính lại, mm/ngày | 2,5721 | 5,2624 | 0,00% / 0,00% |
 
-Dòng đối chứng `qmax` khớp ở mm/ngày theo `MATCH_TOL` = 0,01 (1%) của cell, phù hợp mã đổi nhãn sang mm/ngày. Bảng hiển thị bốn chữ số thập phân; phép kiểm này không xác nhận bằng nhau ở dung sai 10⁻⁵ hoặc giống hệt phép giảm số học của thư viện. A1 Mục 5.3 sau đó đã xác nhận trung bình và độ lệch chuẩn `qmax` mm/ngày theo `area_gov` ở dung sai 10⁻⁵ cho 22 run tái dựng được phạm vi ([A1](../02_Exploration/01_A1_LamaHCEExt_Explore.md)). Kết luận trong phạm vi phép kiểm đơn vị này:
+Dòng đối chứng `qmax` khớp ở mm/ngày theo `MATCH_TOL` = 0,01 (1%) của cell, phù hợp mã đổi nhãn sang mm/ngày. Bảng hiển thị bốn chữ số thập phân; phép kiểm này không xác nhận bằng nhau ở dung sai 10⁻⁵ hoặc giống hệt phép giảm số học của thư viện. A1 Mục 5.3 sau đó đã xác nhận trung bình và độ lệch chuẩn `qmax` mm/ngày theo `area_gov` ở dung sai 10⁻⁵ cho 22 run tái dựng được phạm vi ([A1](../../02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md)). Kết luận trong phạm vi phép kiểm đơn vị này:
 
 - Tác giả đưa `qmean` vào mô hình theo **m³/s**, trong khi nhãn `qmax` theo mm/ngày.
 - Giá trị `qmean` lấy nguyên từ tệp trạm `D_gauges`, ngày thiếu để trống, không điền: thống kê khớp tới chữ số thứ tư. Hàm đọc tệp trạm của thư viện đổi số âm (mã ghi chú −999 là giá trị thiếu) thành ô trống (`lamah.py` dòng 228–229), còn hàm đọc tệp khí tượng không đổi, nên khi chép `qmean` sang tệp khí tượng cũng đổi số âm thành ô trống; ở 3 lưu vực kiểm ngẫu nhiên (788, 330, 698) tệp trạm không có −999, ngày thiếu là ô trống.
@@ -133,7 +133,7 @@ So với `test_metrics.csv` và `test_results.p` của tác giả (có trên Zen
 - Quan trắc `qmax_obs` trùng hoàn toàn ở cả sáu run (lệch lớn nhất 0, vị trí ô trống giống nhau).
 - Dự báo `qmax_sim` lệch rất nhỏ: trung vị 0,0001–0,0003 mm/ngày, mức 99,9% là 0,011–0,028 mm/ngày, lớn nhất 0,09–0,22 mm/ngày trên khoảng 650 nghìn ngày–lưu vực mỗi run; mức này phù hợp với sai khác số học giữa hai GPU và hai môi trường thư viện, không phải sai khác dữ liệu.
 - Lệch NSE trung bình theo lưu vực 0,00004–0,0003. Chỉ hai lưu vực có lệch NSE trên 0,01 là 742 và 758 (tới 0,085 ở lưu vực 758, run Sequential Forecast LSTM có Q); cả hai có phương sai `qmax` quan trắc kỳ test chỉ 0,0002–0,0003 (mm/ngày)² và NSE từ −4 tới −131 ở mọi run. Vì NSE = 1 − SSE / (n × phương sai quan trắc), phương sai gần 0 khuếch đại lệch dự báo khoảng 0,001 mm/ngày thành lệch NSE vài phần trăm.
-- Riêng run Encoder–Decoder LSTM không Q, hàm tính KGE báo hệ số tương quan không xác định (một chuỗi không đổi) ở ít nhất một lưu vực; A3 xác định đó là dự báo hằng ở lưu vực 742 và 758 ([A3](02_A3_LamaHCEExt_Benchmarks.md) Mục 3.3).
+- Riêng run Encoder–Decoder LSTM không Q, hàm tính KGE báo hệ số tương quan không xác định (một chuỗi không đổi) ở ít nhất một lưu vực; A3 xác định đó là dự báo hằng ở lưu vực 742 và 758 ([A3](../02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md) Mục 3.3).
 
 ![NSE từng lưu vực: chạy lại so với tác giả](Figures/A2_Scatter.png)
 

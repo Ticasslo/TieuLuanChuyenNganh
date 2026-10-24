@@ -1,6 +1,6 @@
 # A3 — Các mốc so sánh trên Extended LamaH-CE
 
-Tài liệu đi cùng [notebook](02_A3_LamaHCEExt_Benchmarks.ipynb) và [mã Python](02_A3_LamaHCEExt_Benchmarks.py). Các phép tính A3 đã chạy thành công: persistence, sáu A2, DLinear ba seed và sáu hình chẩn đoán. Giao chung có 652628 ngày–ID trên 450 lưu vực; DLinear có mean ± std mẫu giữa ba NSE median 0,380152 ± 0,002415.
+Tài liệu đi cùng [notebook](02_A3_LamaHCEExt_Benchmarks.ipynb) (bản chính thức: Version 1 của notebook Kaggle `02_A3_LamaHCEExt_Benchmarks`, Save & Run All trên GPU T4, có output) và [mã Python](02_A3_LamaHCEExt_Benchmarks.py). Các phép tính A3 đã chạy thành công: persistence, sáu A2, DLinear ba seed và sáu hình chẩn đoán. Giao chung có 652628 ngày–ID trên 450 lưu vực; DLinear có mean ± std mẫu giữa ba NSE median 0,380152 ± 0,002415.
 
 Notebook dùng tiêu đề Phần → đề mục → cell code theo chức năng. Các đề mục dưới đây trùng notebook; phần thảo luận chi tiết và số liệu đã đo được giữ riêng trong báo cáo. Bảng, dự báo, checkpoint và hình được lưu trực tiếp trong a3_output bằng Save & Commit của Kaggle.
 
@@ -202,7 +202,7 @@ Ví dụ minh họa: một ID có đủ 1461 dòng, obs hữu hạn 807 ngày v�
 
 #### Giữ dự báo raw và chính sách clip
 
-Đối chiếu [mã tester](../../NeuralHydrology/neuralhydrology/evaluation/tester.py): xarray kết quả được lưu vào cấu trúc kết quả trước thao tác clip dùng khi tính metrics. Vì vậy config khai báo clip không đủ để suy mọi giá trị sim trong pickle đã không âm. bước kiểm dự báo A2 giữ sim_raw và đếm số âm; khi tái lập chỉ số cần tách bản chấm theo chính sách config khỏi chuỗi raw. Chưa thực hiện bước chấm đó trong cell này.
+Đối chiếu [mã tester](../../../NeuralHydrology/neuralhydrology/evaluation/tester.py): xarray kết quả được lưu vào cấu trúc kết quả trước thao tác clip dùng khi tính metrics. Vì vậy config khai báo clip không đủ để suy mọi giá trị sim trong pickle đã không âm. bước kiểm dự báo A2 giữ sim_raw và đếm số âm; khi tái lập chỉ số cần tách bản chấm theo chính sách config khỏi chuỗi raw. Chưa thực hiện bước chấm đó trong cell này.
 
 #### Kết quả thực tế bước kiểm dự báo A2
 
@@ -239,7 +239,7 @@ Chỉ lưu cửa sổ **31/12/2013–31/12/2017**, gồm lịch test cộng mộ
 
 #### Bản số thô, bản theo loader và phép đổi đơn vị
 
-Giữ `A3_Q_NUMERIC` với giá trị số thô, kể cả −999 và số âm khác. Bản `A3_Q_LOADER_M3S` tái hiện hợp đồng của [loader LamaH](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py): Q âm được thay bằng NaN. Đây là cách đối chiếu đúng nhãn A2, không phải kết luận mọi số âm đều là lỗi quan trắc; các ca đó vẫn nằm trong audit. Chưa dùng quy tắc này để chốt xử lý qmean của DLinear.
+Giữ `A3_Q_NUMERIC` với giá trị số thô, kể cả −999 và số âm khác. Bản `A3_Q_LOADER_M3S` tái hiện hợp đồng của [loader LamaH](../../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py): Q âm được thay bằng NaN. Đây là cách đối chiếu đúng nhãn A2, không phải kết luận mọi số âm đều là lỗi quan trắc; các ca đó vẫn nằm trong audit. Chưa dùng quy tắc này để chốt xử lý qmean của DLinear.
 
 Từ bản theo loader, tính `A3_Q_MM_DAY` bằng **q = Q×86,4/area_gov**, với Q tính bằng m³/s, diện tích km². Ví dụ minh họa: Q=3 m³/s, area_gov=43,2 km² cho q=6 mm/ngày. qmax theo mm/ngày là cường độ tương đương quy đổi theo diện tích, không phải tổng lượng dòng chảy thực tế của cả ngày.
 
@@ -411,7 +411,7 @@ Gọi o là obs, s là sim, p là qmax persistence trên cùng n ngày. SSE mô 
 | β | mean(sim) / mean(obs) |
 | KGE | 1 − √[(r−1)²+(α−1)²+(β−1)²] |
 
-Đây là KGE theo Gupta và cs. (2009), đúng dạng trong [mã metrics NeuralHydrology](../../NeuralHydrology/neuralhydrology/evaluation/metrics.py). β là tỷ số trung bình của KGE, không phải `beta_nse`.
+Đây là KGE theo Gupta và cs. (2009), đúng dạng trong [mã metrics NeuralHydrology](../../../NeuralHydrology/neuralhydrology/evaluation/metrics.py). β là tỷ số trung bình của KGE, không phải `beta_nse`.
 
 Ví dụ minh họa: o=[1,2,3,4], p=[1,1,2,3]. Mean obs=2,5, TSS obs=5; SSE persistence=3. Nếu s=p thì:
 
@@ -667,7 +667,7 @@ Lưu các tệp cần dùng cho mô hình và xác nhận hash config.
 
 bước đối chiếu Q nguồn chỉ lưu test cùng ngày liền trước, chưa đủ để huấn luyện. Cell 7.1 đọc Q từ **01/01/2002 đến 31/12/2017**: 365 ngày ngữ cảnh trước train và đủ ba kỳ đã cố định. Dùng CPU, không cần Internet/GPU. Việc đọc 451 tệp có thể mất vài phút tùy Input Kaggle; in tiến độ mỗi 100 ID. Byte của từng tệp được đọc một lần để vừa kiểm SHA-256 theo manifest bước đối chiếu Q nguồn vừa phân tích CSV.
 
-Căn cứ từ [thuyết minh A1](../02_Exploration/01_A1_LamaHCEExt_Explore.md): Mục 19.2–19.3 phân biệt đổi đơn vị với chuẩn hóa và độ chính xác tính toán; Mục 21 phân biệt ngày có nhãn với mẫu đủ cửa sổ; Mục 25 giữ thống kê scaler chỉ từ train. A1 ghi ba ID 324/600/623 không có nhãn train, ID 800 chỉ có 38 nhãn, ID 55 thiếu lịch sử Q dài. Những số này cần đối chiếu bằng dữ liệu A3, không được đổi 38 nhãn thành 38 mẫu đủ 365 ngày.
+Căn cứ từ [thuyết minh A1](../../02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md): Mục 19.2–19.3 phân biệt đổi đơn vị với chuẩn hóa và độ chính xác tính toán; Mục 21 phân biệt ngày có nhãn với mẫu đủ cửa sổ; Mục 25 giữ thống kê scaler chỉ từ train. A1 ghi ba ID 324/600/623 không có nhãn train, ID 800 chỉ có 38 nhãn, ID 55 thiếu lịch sử Q dài. Những số này cần đối chiếu bằng dữ liệu A3, không được đổi 38 nhãn thành 38 mẫu đủ 365 ngày.
 
 Đầu vào ứng viên là **qmean(t−365), …, qmean(t−1)**, nhãn qmax(t). Đây là hợp đồng DLinear riêng; bảng đếm khí tượng/cửa sổ của A1 có hình học và biến tiêu thụ khác nên không yêu cầu số mẫu trùng A1. Đặc biệt không dùng qmean ngày đích và không dịch lag thêm lần nữa khi triển khai.
 
@@ -1278,7 +1278,7 @@ Cell đọc lại hai CSV A1 đã hash trong Phần 2: A1_P9_author_profile_scor
 
 Các cột A1 luôn có tiền tố a1_author_; giá trị NSE của tác giả được giữ cạnh A2 native để đối chiếu **hai nguồn dự báo**. Không dùng NSE A1 thay NSE chạy lại, không diễn giải chênh điểm là tác động mô hình hoặc yêu cầu chúng bằng nhau. DLinear không có dòng dự báo tác giả tương ứng; cờ hồ sơ của lưu vực vẫn đi cùng kết quả mới.
 
-Hồ sơ cố định gồm 55/742/758/800/324/600/623 từ [bàn giao A1, Mục 25](../02_Exploration/01_A1_LamaHCEExt_Explore.md#sec-25) và 295 từ audit A3 không có mẫu train. Đếm lại nhãn train hữu hạn và mẫu DLinear bằng dữ liệu/mask đã kiểm; báo std train, số obs test và số ngày giao. Cờ thiếu nhãn/biến thiên nhỏ chỉ mô tả dữ liệu; không tự kết luận lỗi trạm, nguyên nhân NaN hoặc cơ chế vật lý.
+Hồ sơ cố định gồm 55/742/758/800/324/600/623 từ [bàn giao A1, Mục 25](../../02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-25) và 295 từ audit A3 không có mẫu train. Đếm lại nhãn train hữu hạn và mẫu DLinear bằng dữ liệu/mask đã kiểm; báo std train, số obs test và số ngày giao. Cờ thiếu nhãn/biến thiên nhỏ chỉ mô tả dữ liệu; không tự kết luận lỗi trạm, nguyên nhân NaN hoặc cơ chế vật lý.
 
 #### Bảng chẩn đoán và phân rã sai số
 

@@ -1,6 +1,6 @@
 # LamaH-CE — Ghi chú thực thi
 
-> Tài liệu ghi các quyết định và kết quả thực thi với bộ dữ liệu LamaH-CE. Dữ liệu chính của đề tài là Extended LamaH-CE theo ngày của bài cơ sở BiasCast (Mục 6). Mục 1–5 ghi gói LamaH-CE gốc theo giờ (tải ban đầu theo mã của Kirschstein & Sun, ICML 2024), giữ cho các hướng khóa luận: dữ liệu giờ, mạng sông. Mã: mỗi notebook Kaggle một tệp `.py` tự đủ — `Workspace/01_Download/02_LamaHCE_Download_Core.py`, `03_LamaHCE_Download_Extra.py`. Thông tin tổng quan về bộ dữ liệu: `Document/05_Survey/01_Datasets.md` Mục 2. Trích dẫn mã tải gốc: Kirschstein & Sun, PMLR 235:24713–24725, https://proceedings.mlr.press/v235/kirschstein24a.html. Trích dẫn dữ liệu: Klingler và cs. (2021), ESSD 13:4529–4565, DOI 10.5194/essd-13-4529-2021; dữ liệu DOI 10.5281/zenodo.4525244.
+> Tài liệu ghi các quyết định và kết quả thực thi với bộ dữ liệu LamaH-CE. Dữ liệu chính của đề tài là Extended LamaH-CE theo ngày của bài cơ sở BiasCast (Mục 6). Mục 1–5 ghi gói LamaH-CE gốc theo giờ (tải ban đầu theo mã của Kirschstein & Sun, ICML 2024), giữ cho các hướng khóa luận: dữ liệu giờ, mạng sông. Mã: mỗi notebook Kaggle một tệp `.py` tự đủ — `Workspace/01_Download/02_LamaHCE_Download_Core/02_LamaHCE_Download_Core.py`, `03_LamaHCE_Download_Extra.py`. Thông tin tổng quan về bộ dữ liệu: `Document/05_Survey/01_Datasets.md` Mục 2. Trích dẫn mã tải gốc: Kirschstein & Sun, PMLR 235:24713–24725, https://proceedings.mlr.press/v235/kirschstein24a.html. Trích dẫn dữ liệu: Klingler và cs. (2021), ESSD 13:4529–4565, DOI 10.5194/essd-13-4529-2021; dữ liệu DOI 10.5281/zenodo.4525244.
 
 ## 1. Nguồn dữ liệu
 
@@ -37,7 +37,7 @@ Kết quả đọc toàn bộ mã của Kirschstein & Sun (`dataset.py`, `functi
 | `lamah_ce_extra.zip` (`03_LamaHCE_Download_Extra.py`) | A (trừ chuỗi ngày), thuộc tính và shapefile của C, mạng sông, COSERO, Info | Baseline không đồ thị dùng khí tượng toàn thượng nguồn; thuộc tính tĩnh (LOAN, EA-LSTM); bản đồ demo; baseline mô hình vật lý |
 
 - Không tải chuỗi theo ngày (tính lại được từ chuỗi giờ; bản chỉ có chuỗi ngày nặng 1,5 GB, tải riêng khi cần) và chuỗi thời gian của C.
-- **Lưu trữ lâu dài:** tạo Kaggle Dataset (Private) từ output của mỗi notebook tải dữ liệu; các notebook sau gắn bằng *Add Input*. Dataset riêng tư có thể chia sẻ cho cộng tác viên.
+- **Lưu trữ lâu dài:** tạo Kaggle Dataset từ output của mỗi notebook tải dữ liệu (`lamah-ce-core`, `lamah-ce-extra` riêng tư, chia sẻ cho thành viên; `lamah-ce-ext` công khai); các notebook sau gắn bằng *Add Input*.
 - Mã nguồn và 957 checkpoint (1,9 GB; 162 cho thí nghiệm chính ở Bảng 2 = 18 cấu hình đồ thị × 3 kiến trúc × 3 cách chia, 3 cho MLP, 108 cho ablation, 684 cho mạng con) của Kirschstein & Sun lấy bằng `git clone` repo `github.com/nkirschi/neural-flood-forecasting`, không đưa vào dataset.
 
 ## 4. Kiểm thử trước khi chạy
@@ -75,7 +75,7 @@ Dữ liệu chính của đề tài. Notebook `01_LamaHCEExt_Download.py` tải 
 |---|---|
 | Dữ liệu | Extended LamaH-CE theo ngày, Zenodo 17119635, tệp `Extended_LamaH-CE_daily.tar.gz` 0,95 GB, CC BY-NC 4.0; thư mục gốc `LamaH_extended/` gồm `A_basins_total_upstrm` và `D_gauges` (mỗi phần có thuộc tính, chuỗi thời gian, shapefile); tệp trạm ngày có cột `YYYY;MM;DD;qmin;qmean;qmax` (m³/s) |
 | Kết quả tác giả | Zenodo 17292895, tệp `Experiments.tar.gz` 0,23 GB: cấu hình, trọng số, scaler, NSE/KGE theo lưu vực của 24 cấu hình |
-| Cách tải | Đọc theo luồng, ghi vào `lamah_ce_ext.zip` và `biascast_experiments.zip`; lưu thành Kaggle Dataset (Private) `lamah-ce-ext` |
+| Cách tải | Đọc theo luồng, ghi vào `lamah_ce_ext.zip` và `biascast_experiments.zip`; lưu thành Kaggle Dataset công khai `hunhngcthng/lamah-ce-ext` |
 | Kaggle Dataset `lamah-ce-ext` (bản 1, 27/9/2026) | Kaggle tự giải nén hai tệp ZIP khi tạo dataset: thư mục `lamah_ce_ext/LamaH_extended/` (`A_basins_total_upstrm`, `D_gauges`), `biascast_experiments/Experiments/` (5 thư mục cấp một `Baseline`, `CrossDomain`, `Encoder_Decoder_LSTM`, `Sequential_Forecast_LSTM`, `TransferLearning`, gồm 11 nhóm thí nghiệm con, và `basins_filtered.txt`), cùng `biascast_data_quality.csv`, `biascast_persistence_cdf.png`; 2.116 tệp, 3,45 GB. Notebook sau đọc thẳng các thư mục này, không đọc ZIP |
 | Kiểm tra chất lượng và persistence | % thiếu `qmax` và `qmean` theo kỳ train 2003–2009 / validation 2010–2013 / test 2014–2017 của 451 lưu vực; % thiếu từng biến khí tượng 2003–2017 và ngày có ECMWF đầu tiên; persistence trên test (qmax(t−1) và qmean(t−1) làm dự báo cho qmax(t)) so với NSE theo lưu vực của 5 cấu hình tác giả; hình CDF. Mã: persistence tính trong notebook bước A (`Workspace/03_Baseline/`), % thiếu trong notebook khám phá (`Workspace/02_Exploration/`) |
 | Kết quả | Đã chạy trên Kaggle (26/9/2026), số liệu ở Mục 6.1; `lamah_ce_ext.zip` 1.991 file (2,81 GB gốc → 0,95 GB, 10,0 phút), `biascast_experiments.zip` 123 file (0,64 GB gốc → 0,23 GB, 2,2 phút), lỗi CRC `None` |
@@ -128,7 +128,7 @@ Phần thiếu tập trung ở train, chủ yếu do **27 lưu vực bắt đầ
 
 ### 6.2. Khám phá dữ liệu
 
-**A1 đã hoàn thành khảo sát 451 lưu vực, xác định độ phủ và đơn vị Q, kiểm cửa sổ đầu vào, đồng thời tính ngưỡng cho đánh giá theo mức và sự kiện lũ.** Kết quả chi tiết, hình và phương pháp nằm trong [thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md); [Phần 11](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md#sec-25) tổng hợp kết quả bàn giao.
+**A1 đã hoàn thành khảo sát 451 lưu vực, xác định độ phủ và đơn vị Q, kiểm cửa sổ đầu vào, đồng thời tính ngưỡng cho đánh giá theo mức và sự kiện lũ.** Kết quả chi tiết, hình và phương pháp nằm trong [thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md); [Phần 11](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-25) tổng hợp kết quả bàn giao.
 
 Dữ liệu mô hình gồm 33 thuộc tính tĩnh, 31 biến tái phân tích thuộc ERA5-Land/E-OBS/MSWEP/GLEAM và 5 biến dự báo ECMWF HRES. Các nguồn được ghép theo mã lưu vực và ngày. ECMWF HRES có từ 01/01/2002; các kỳ huấn luyện, validation và test lần lượt là 2003–2009, 2010–2013 và 2014–2017.
 
@@ -150,7 +150,7 @@ A1 cung cấp cơ sở dữ liệu và các hồ sơ chẩn đoán cho A3, bộ 
 
 ### 6.3. Tái lập bằng trọng số tác giả (bước A2, Kaggle 11/10/2026)
 
-Chạy lại `best_model.pt` của tác giả trên kỳ test 2014–2017 cho sáu cấu hình (đúng sáu đường Hình 7, mục 3.4 của bài); chi tiết từng Phần, lý do chọn sáu run, hình và tiêu chí tái lập ở [thuyết minh A2](../../Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce.md). Bản lưu chính thức là Version 2 của notebook `01_A2_LamaHCEExt_Reproduce` (Save & Run All, GPU T4, 2106 giây).
+Chạy lại `best_model.pt` của tác giả trên kỳ test 2014–2017 cho sáu cấu hình (đúng sáu đường Hình 7, mục 3.4 của bài); chi tiết từng Phần, lý do chọn sáu run, hình và tiêu chí tái lập ở [thuyết minh A2](../../Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md). Bản lưu chính thức là Version 2 của notebook `01_A2_LamaHCEExt_Reproduce` (Save & Run All, GPU T4, 2106 giây).
 
 | Run | NSE trung vị chạy lại | NSE trung vị tác giả |
 |---|---|---|

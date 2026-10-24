@@ -44,7 +44,7 @@ Khung Sequential Forecast LSTM của A2 gồm 364 ngày lịch sử và một b�
 
 ### 2.3. Phạm vi dữ liệu và cách chia thời gian
 
-Đề tài dùng Extended LamaH-CE và danh sách 451 lưu vực của bài cơ sở. Các thuộc tính, chuỗi khí tượng và Q được ghép bằng mã lưu vực và ngày. Chi tiết dữ liệu được trình bày trong [báo cáo A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md).
+Đề tài dùng Extended LamaH-CE và danh sách 451 lưu vực của bài cơ sở. Các thuộc tính, chuỗi khí tượng và Q được ghép bằng mã lưu vực và ngày. Chi tiết dữ liệu được trình bày trong [báo cáo A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md).
 
 | Thành phần | Phạm vi sử dụng |
 |---|---|
@@ -122,7 +122,7 @@ A1 đã tính **q30, q80, q98 riêng cho 451 lưu vực** trên qmax tham chiế
 
 Ví dụ minh họa, nếu q30 = 0,5; q80 = 2; q98 = 5 mm/ngày, thì ngày có qmax = 6 thuộc mức rất cao. Dự báo 1,5 sẽ bị xếp mức trung bình: mô hình bỏ sót mức rất cao dù sai số liên tục chỉ là một con số. Bộ đánh giá sẽ dùng ma trận nhầm lẫn, recall và precision để thể hiện điều này.
 
-Ngưỡng lũ **1,5; 2; 5; 10 năm** được ước lượng từ đỉnh qmax của năm thủy văn 01/10–30/09, fit Gumbel bằng L-moments. Năm có dưới một nửa số ngày quan trắc được loại khỏi mẫu đỉnh năm. Các đoạn vượt ngưỡng được tổng hợp thành cụm theo quy tắc USWRC để chuẩn bị đánh giá sự kiện. [Phương pháp và kết quả ngưỡng A1, Phần 10](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md#sec-24).
+Ngưỡng lũ **1,5; 2; 5; 10 năm** được ước lượng từ đỉnh qmax của năm thủy văn 01/10–30/09, fit Gumbel bằng L-moments. Năm có dưới một nửa số ngày quan trắc được loại khỏi mẫu đỉnh năm. Các đoạn vượt ngưỡng được tổng hợp thành cụm theo quy tắc USWRC để chuẩn bị đánh giá sự kiện. [Phương pháp và kết quả ngưỡng A1, Phần 10](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-24).
 
 Chu kỳ T năm tương ứng xác suất vượt trong một năm khoảng 1/T theo mô hình thống kê, chẳng hạn mức 10 năm tương ứng khoảng 10% mỗi năm; không có nghĩa đúng mười năm mới xảy ra một lần. Ngưỡng tính được ở cả 451 lưu vực; **427 lưu vực có ít nhất 10 năm đỉnh, 24 lưu vực chỉ có 3–9 năm**, nên kết quả nhóm mẫu ngắn sẽ được báo riêng. Bốn mức theo phân vị ngày và ngưỡng theo đỉnh năm là hai cách đánh giá bổ sung nhau.
 
@@ -147,7 +147,7 @@ Sequential Forecast LSTM duy trì trạng thái khi chuyển từ lịch sử sa
 
 **Cả sáu cấu hình đạt tiêu chí tái lập.** Quan trắc trùng tệp tác giả; chênh NSE trung vị không quá 0,005; sai khác dự báo ở phân vị 99,9% không quá 0,05 mm/ngày. Hai lưu vực lệch NSE trên 0,01 là 742 và 758, đều có NSE dưới −1 và phương sai quan trắc nhỏ. Mã thư viện được cố định tại commit `dda45fcf19ee7ffd481b9d192778539df46fb074` để truy lại môi trường tính toán.
 
-![Phân phối NSE: chạy lại so với tác giả](../../Workspace/03_Baseline/Figures/A2_CDF.png)
+![Phân phối NSE: chạy lại so với tác giả](../../Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/Figures/A2_CDF.png)
 
 *Hình 1. Đường liền là kết quả chạy lại, nét đứt là kết quả tác giả. Các cặp đường gần như trùng nhau. Trục dọc biểu diễn tỷ lệ lưu vực có NSE nhỏ hơn hoặc bằng giá trị trên trục ngang; vị trí 0,5 cho trung vị. Hình A2 hiển thị miền NSE khoảng −0,5 đến 1; các điểm âm xa hơn được phân tích đầy đủ trong A3.*
 
@@ -213,9 +213,9 @@ Bộ đánh giá dùng ngưỡng A1 đã chấm cùng giao ngày của A3. Trên
 
 **Bảng lũ chính yêu cầu trận dự báo bắt đầu cùng ngày trận thật (tolerance = 0); bảng phụ cho phép ±1 ngày.** Với ngưỡng lũ chu kỳ hai năm và quy tắc USWRC, có **1.066 cụm quan trắc đủ điều kiện trên 366 lưu vực**. SeqLSTM_Q bắt đúng ngày 208 trận, bỏ sót 858 và báo nhầm 431: POD **19,51%**, FAR **67,45%**. D_RA đạt POD **20,54%**, FAR **63,25%**, nhưng dùng tái phân tích ở ngày đích nên là mốc tham chiếu về nguồn thông tin. Mỗi seed DLinear bắt đúng hai trận, POD **0,19%**, FAR **99,38–99,42%**. Persistence không có cặp đúng ngày, POD **0%**, FAR **100%**.
 
-Ở **bảng phụ ±1 ngày**, SeqLSTM_Q có POD **32,65%**, FAR **45,54%**; DLinear có POD **20,83–22,23%**, FAR **30,70–32,52%**. Persistence đạt POD = 1 vì trận trễ một ngày vẫn được ghép; sai số thời điểm đỉnh trung bình tuyệt đối là một ngày. Chênh lệch giữa hai bảng cho thấy cần phân biệt cải thiện sai số cả chuỗi với khả năng bắt đúng ngày khởi phát lũ. [Bảng chính, bảng phụ và quy tắc ghép](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md#103-sự-kiện-lũ-chu-kỳ-hai-năm).
+Ở **bảng phụ ±1 ngày**, SeqLSTM_Q có POD **32,65%**, FAR **45,54%**; DLinear có POD **20,83–22,23%**, FAR **30,70–32,52%**. Persistence đạt POD = 1 vì trận trễ một ngày vẫn được ghép; sai số thời điểm đỉnh trung bình tuyệt đối là một ngày. Chênh lệch giữa hai bảng cho thấy cần phân biệt cải thiện sai số cả chuỗi với khả năng bắt đúng ngày khởi phát lũ. [Bảng chính, bảng phụ và quy tắc ghép](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#103-sự-kiện-lũ-chu-kỳ-hai-năm).
 
-Các kiểm định gồm 45 cặp run dự kiến × 3 chỉ số, hiệu chỉnh Holm riêng theo từng chỉ số và **chỉ đếm p-value hữu hạn, bỏ NaN**. Toàn bộ p-value của lần chạy hiện có đều hợp lệ nên số đã báo giữ nguyên. Chênh lệch NSE của DLinear so với persistence có median dương ở cả ba seed; KGE thấp hơn persistence ở 449/450 lưu vực cho mỗi seed. [Bảng mức, sự kiện và kiểm định](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle).
+Các kiểm định gồm 45 cặp run dự kiến × 3 chỉ số, hiệu chỉnh Holm riêng theo từng chỉ số và **chỉ đếm p-value hữu hạn, bỏ NaN**. Toàn bộ p-value của lần chạy hiện có đều hợp lệ nên số đã báo giữ nguyên. Chênh lệch NSE của DLinear so với persistence có median dương ở cả ba seed; KGE thấp hơn persistence ở 449/450 lưu vực cho mỗi seed. [Bảng mức, sự kiện và kiểm định](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle).
 
 ## 7. Đã trả lời được gì về thuộc tính ảnh hưởng đến dự báo?
 
@@ -223,7 +223,7 @@ Các kết quả hiện tại cung cấp ba loại bằng chứng. Thứ nhất,
 
 Phân tích **chênh lệch kỹ năng từng lưu vực** đã chạy với 12 phép so và 31 trong 33 thuộc tính dạng số; mã lớp phủ và góc hướng được mô tả theo nhóm. Trên 450 lưu vực có ngày chấm, hệ số tương quan thứ hạng Spearman giữa ΔNSE của SeqLSTM_Q so persistence với độ cao trung bình là **−0,422**, với tỷ phần tuyết **−0,263**, và với chỉ số khô hạn **0,211**. Hệ số dương nghĩa thuộc tính lớn hơn thường đi cùng mức cải thiện lớn hơn; hệ số âm biểu thị xu hướng ngược lại. Median ΔNSE của SeqLSTM_Q so persistence ở nhóm độ cao thấp nhất [221; 591,5) m là **0,4420**, còn nhóm cao nhất [1.294; 3.122] m là **0,1302**. Đây là chênh lệch điểm so mốc, không phải NSE tuyệt đối hoặc phần trăm cải thiện.
 
-Với diện tích, hệ số của SeqLSTM_Q − persistence khá yếu (**−0,075**), nhưng hệ số của SeqLSTM có Q − không Q là **0,274**. Kết luận do đó cần nêu rõ mốc so sánh. Các hướng liên hệ chính còn giữ khi xét 321 lưu vực có ngày chấm và không có lưu vực được chọn khác ở thượng lưu. Riêng kỹ năng bắt đúng ngày khởi phát lũ cần đọc POD và số trận: SeqLSTM_Q đạt **38/267 = 14,23%** ở nhóm diện tích thấp nhất, **62/216 = 28,70%** ở nhóm cao nhất, dù mức cải thiện NSE so persistence thấp hơn ở nhóm cao nhất. [Phương pháp, bảng và hình theo lưu vực](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin.md#11-kết-quả-thực-nghiệm-và-kiểm-chứng).
+Với diện tích, hệ số của SeqLSTM_Q − persistence khá yếu (**−0,075**), nhưng hệ số của SeqLSTM có Q − không Q là **0,274**. Kết luận do đó cần nêu rõ mốc so sánh. Các hướng liên hệ chính còn giữ khi xét 321 lưu vực có ngày chấm và không có lưu vực được chọn khác ở thượng lưu. Riêng kỹ năng bắt đúng ngày khởi phát lũ cần đọc POD và số trận: SeqLSTM_Q đạt **38/267 = 14,23%** ở nhóm diện tích thấp nhất, **62/216 = 28,70%** ở nhóm cao nhất, dù mức cải thiện NSE so persistence thấp hơn ở nhóm cao nhất. [Phương pháp, bảng và hình theo lưu vực](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#11-kết-quả-thực-nghiệm-và-kiểm-chứng).
 
 Các kết quả mô tả mối liên hệ trên một dataset; các thuộc tính có thể đồng biến và lưu vực có thể phụ thuộc không gian. Chúng giúp xác định nhóm cần phân tích tiếp, trong khi đóng góp riêng của từng đầu vào cần kết hợp các thí nghiệm trong [pipeline Mục 6.4 và 6.7](03_Pipeline.md#64-theo-lưu-vực).
 
@@ -235,7 +235,7 @@ Các kết quả mô tả mối liên hệ trên một dataset; các thuộc tí
 
 Bộ đánh giá đọc dự báo đã lưu, không cần huấn luyện hoặc chờ B1. Dự báo A2 và DLinear là dữ liệu thử đầu tiên; kết quả A3 là đối chiếu cho các chỉ số liên tục.
 
-Đã có [mã bộ đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.py) và [thuyết minh](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md). Lần chạy Kaggle trên Output thật A1/A2/A3 qua **60 kiểm thử** và khớp A3 ở sáu chỉ số cùng số ngày trên **4.961 cặp run–lưu vực**. Các CSV kết quả qua **57 kiểm tra cục bộ** về công thức, tổng hợp, ghép sự kiện và kiểm định. Phạm vi đã xác nhận là test/S0/hạn một ngày.
+Đã có [mã bộ đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py) và [thuyết minh](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md). Lần chạy Kaggle trên Output thật A1/A2/A3 qua **60 kiểm thử** và khớp A3 ở sáu chỉ số cùng số ngày trên **4.961 cặp run–lưu vực**. Các CSV kết quả qua **57 kiểm tra cục bộ** về công thức, tổng hợp, ghép sự kiện và kiểm định. Phạm vi đã xác nhận là test/S0/hạn một ngày.
 
 Kết quả đã có đủ bảng lũ chính cùng ngày bắt đầu và bảng phụ ±1, đồng thời bỏ p = NaN khỏi kích thước họ Holm. Các chỉ số liên tục giữ nguyên so với A3; phân mức giữ nguyên so với lần đánh giá trước. Lần cập nhật này chỉ chấm lại các dự báo đã lưu, giữ nguyên A1–A3.
 
@@ -262,9 +262,9 @@ Sau đó, bộ đánh giá được dùng lại cho bước B, các lõi ở bư
 |---|---|
 | Bài cơ sở, thiết kế dự báo | [Konold và cộng sự, BiasCast, HESS 2026](https://hess.copernicus.org/articles/30/5067/2026/) |
 | Dữ liệu và trọng số tác giả | [Extended LamaH-CE](https://doi.org/10.5281/zenodo.17119635), [kết quả thực nghiệm BiasCast](https://doi.org/10.5281/zenodo.17292895) |
-| Khảo sát, độ phủ, ngưỡng và cụm | [Thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md#sec-25) |
-| Đối chiếu chạy lại trọng số tác giả | [LamaH-CE, Mục 6.3](../03_Data/01_LamaHCE.md#63-tái-lập-bằng-trọng-số-tác-giả-bước-a2-kaggle-11102026), [mã A2](../../Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce.py) |
-| Mốc so sánh, huấn luyện và chẩn đoán | [Thuyết minh A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.md#report-part-10), [mã A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.py) |
+| Khảo sát, độ phủ, ngưỡng và cụm | [Thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-25) |
+| Đối chiếu chạy lại trọng số tác giả | [LamaH-CE, Mục 6.3](../03_Data/01_LamaHCE.md#63-tái-lập-bằng-trọng-số-tác-giả-bước-a2-kaggle-11102026), [mã A2](../../Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.py) |
+| Mốc so sánh, huấn luyện và chẩn đoán | [Thuyết minh A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#report-part-10), [mã A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.py) |
 | Giao thức đánh giá và kế hoạch tiếp theo | [Pipeline](03_Pipeline.md), [giải thích cách đọc chỉ số](../06_Theory/08_EvaluationFigures.md) |
 | Bản thảo báo cáo theo chương | [Chương 4 — Dữ liệu](../07_Report/04_Data.md), [Chương 6 — Thí nghiệm và kết quả](../07_Report/06_ExperimentsAndResults.md) |
 

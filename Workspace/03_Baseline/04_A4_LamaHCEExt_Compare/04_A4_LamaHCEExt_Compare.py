@@ -8,7 +8,7 @@
 #   - Output 02_A3_LamaHCEExt_Benchmarks (người 1, Version 1) - ngữ cảnh quan trắc, persistence, diện tích;
 #   - Dataset lamah-ce-ext - chỉ số test của tác giả.
 # Không cần GPU, không cần thư viện NeuralHydrology: test_results.p chỉ cần xarray để đọc (giống bộ đánh giá đọc A2,
-# Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.py dòng 591-631).
+# Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py dòng 591-631).
 # Dán nguyên tệp vào notebook rồi Save & Run All, không sửa dòng nào.
 #
 # MỤC LỤC
@@ -610,4 +610,4 @@ missing = sorted(expected - set(MANIFEST["tệp"]))
 if missing:
     raise RuntimeError(f"Phần 6 CHƯA đạt: thiếu {missing}")
 print(f"=> Xong A4 ({'ĐẠT' if A4_PASS else 'KHÔNG ĐẠT'} điều kiện). Tải 2 hình A4_Seeds.png, A4_BasinNoise.png về "
-      "Workspace/03_Baseline/Figures/; Output này (Save Version) gắn làm Input cho bộ đánh giá.")
+      "Workspace/03_Baseline/04_A4_LamaHCEExt_Compare/Figures/; Output này (Save Version) gắn làm Input cho bộ đánh giá.")

@@ -23,7 +23,7 @@ Một lưu vực là vùng có dòng chảy tập trung về một cửa ra. M�
 
 Tập 451 lưu vực gồm **349 trạm ở Áo, 88 ở Đức, 9 ở Thụy Sĩ và 5 ở Séc**, tính theo quốc gia đặt trạm. Tỷ trọng trạm Áo là 77,38%. Quốc gia của trạm không đồng nghĩa toàn bộ diện tích lưu vực nằm trong quốc gia đó. Phân bố này cho thấy phạm vi kết quả chủ yếu phản ánh các điều kiện thủy văn trong tập Trung Âu đang xét.
 
-![Phân bố không gian và thuộc tính lưu vực A1](../../Workspace/02_Exploration/Figures/A1_P3_basin_maps.png)
+![Phân bố không gian và thuộc tính lưu vực A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/Figures/A1_P3_basin_maps.png)
 
 *Hình 4.1. Vị trí 451 lưu vực được chọn trong tập 859 lưu vực mức A; phân bố diện tích tính từ lưu vực, độ cao và quốc gia đặt trạm. Bản đồ dùng hệ tọa độ EPSG:3035 và biểu diễn tọa độ theo km. Diện tích trên ô bản đồ là diện tích lưu vực tính toán; phép quy đổi lưu lượng trong nghiên cứu sử dụng diện tích trạm area_gov.*
 
@@ -120,7 +120,7 @@ A1 tính ba phân vị **q30, q80, q98** từ qmax hữu hạn của từng lưu
 
 Đúng ngưỡng được xếp vào mức cao hơn. Ví dụ minh họa, với q30 = 0,5, q80 = 2 và q98 = 5 mm/ngày, qmax = 6 thuộc mức rất cao. Dự báo 1,5 mm/ngày bị xếp vào mức trung bình, biểu hiện bỏ sót mức rất cao dù bài toán gốc là hồi quy liên tục. Ngưỡng riêng theo lưu vực giúp tránh dùng một trị số m³/s chung cho các sông có quy mô rất khác nhau.
 
-![Ngưỡng bốn mức và phân bố các kỳ](../../Workspace/02_Exploration/Figures/A1_P10_qmax_four_levels.png)
+![Ngưỡng bốn mức và phân bố các kỳ](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/Figures/A1_P10_qmax_four_levels.png)
 
 *Hình 4.2. Phân phối ngưỡng riêng của 451 lưu vực và tỷ trọng mức quan trắc theo kỳ từ A1. Ngưỡng được giữ cố định theo tham chiếu trước test; tỷ trọng ở từng kỳ có thể khác tỷ trọng tham chiếu. Phạm vi tham chiếu bao gồm train/validation nên không cộng các kỳ này với nhau.*
 
@@ -140,7 +140,7 @@ Cả 451 ID có fit xác định; **427 ID có ít nhất 10 năm đỉnh, 24 ID
 
 Số ngày vượt, số đoạn liên tiếp và số cụm sự kiện là các đại lượng khác nhau. Một đợt lưu lượng cao có thể vượt ngưỡng nhiều ngày và có những đoạn giảm tạm thời. A1 giữ ngày–ID gốc, trích đoạn có qmax lớn hơn ngưỡng và gộp theo quy tắc USWRC đã định trong pipeline.
 
-Điều kiện tách xét khoảng cách đỉnh tối thiểu ceil[5 + ln(A dặm vuông)] và đáy giữa hai đỉnh thấp hơn 0,75 lần đỉnh nhỏ hơn. Cặp chưa thỏa điều kiện được gộp và kiểm lại với cụm kề; ngày thiếu ngăn việc nối qua khoảng trống. Cụm chạm biên hoặc có ngữ cảnh thiếu giữ cờ để bộ đánh giá xử lý. Khoảng cách theo diện tích được mô tả trong [tài liệu HEC-USACE](https://www.hec.usace.army.mil/confluence/sspdocs/sspum/latest/peaks-over-threshold-analysis/peaks-over-threshold-filtering); các quy tắc lịch/thiếu cụ thể của nghiên cứu nằm trong [thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md#sec-24).
+Điều kiện tách xét khoảng cách đỉnh tối thiểu ceil[5 + ln(A dặm vuông)] và đáy giữa hai đỉnh thấp hơn 0,75 lần đỉnh nhỏ hơn. Cặp chưa thỏa điều kiện được gộp và kiểm lại với cụm kề; ngày thiếu ngăn việc nối qua khoảng trống. Cụm chạm biên hoặc có ngữ cảnh thiếu giữ cờ để bộ đánh giá xử lý. Khoảng cách theo diện tích được mô tả trong [tài liệu HEC-USACE](https://www.hec.usace.army.mil/confluence/sspdocs/sspum/latest/peaks-over-threshold-analysis/peaks-over-threshold-filtering); các quy tắc lịch/thiếu cụ thể của nghiên cứu nằm trong [thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-24).
 
 ## 4.7. Ý nghĩa đối với thiết kế thí nghiệm
 
@@ -152,10 +152,10 @@ Các đặc điểm diện tích, độ cao, tuyết, khí hậu và lớp phủ
 
 | Nội dung | Tài liệu hoặc kết quả |
 |---|---|
-| Kiểm kê, thuộc tính, đơn vị, độ phủ, cửa sổ | [Thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md#sec-25) |
-| Phân vị, Gumbel và quy tắc cụm | [A1 Phần 10](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md#sec-24) |
-| Chuẩn bị DLinear và phạm vi scaler | [A3 Phần 7](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.md#report-part-7) |
+| Kiểm kê, thuộc tính, đơn vị, độ phủ, cửa sổ | [Thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-25) |
+| Phân vị, Gumbel và quy tắc cụm | [A1 Phần 10](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-24) |
+| Chuẩn bị DLinear và phạm vi scaler | [A3 Phần 7](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#report-part-7) |
 | Đơn vị và tái lập trọng số tác giả | [Ghi chú LamaH-CE, Mục 6.3](../03_Data/01_LamaHCE.md#63-tái-lập-bằng-trọng-số-tác-giả-bước-a2-kaggle-11102026) |
-| Nguồn thực sự dùng cho đánh giá | [Manifest đầu vào](../../Workspace/06_Evaluation/Tables/Evaluation_input_manifest.csv) |
+| Nguồn thực sự dùng cho đánh giá | [Manifest đầu vào](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_input_manifest.csv) |
 
 Các tệp ngưỡng và chuỗi dự báo được sử dụng từ Output Kaggle đã lưu; repo giữ mã, thuyết minh, hình và bảng tổng hợp để đối chiếu. Ngày thiếu và cờ mẫu ngắn được mang theo trong các kết quả đánh giá thay vì biến mất khỏi mẫu số mà không giải thích.

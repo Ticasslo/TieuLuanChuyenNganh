@@ -332,7 +332,7 @@ Bài không báo cáo còn lại bao nhiêu mẫu train sau khi lọc; bước A
 | Ngoại lai | một ngày vọt lên hay tụt xuống bất thường rồi trở lại | ghi số sai, lỗi truyền tin; đôi khi là lũ hoặc cạn có thật | `qcol` |
 | Chưa kiểm | nhìn số không thấy được | chưa qua kiểm tra của cơ quan thủy văn | `ckhs` |
 
-**Trường hợp đã gặp: lưu vực 742 và 758.** Suốt kỳ test, `qmax` của hai lưu vực này gần như một đường thẳng: độ lệch chuẩn chỉ khoảng 0,014–0,017 mm/ngày. Mọi mô hình đều có NSE từ −4 tới −131 ở hai lưu vực này ([LamaH] Mục 6.3; hình `Workspace/03_Baseline/Figures/A2_Basin758.png`).
+**Trường hợp đã gặp: lưu vực 742 và 758.** Suốt kỳ test, `qmax` của hai lưu vực này gần như một đường thẳng: độ lệch chuẩn chỉ khoảng 0,014–0,017 mm/ngày. Mọi mô hình đều có NSE từ −4 tới −131 ở hai lưu vực này ([LamaH] Mục 6.3; hình `Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/Figures/A2_Basin758.png`).
 
 Mô hình không hẳn dở: NSE so sai số với độ dao động của chính quan trắc (NSE = 1 − SSE / (n × phương sai quan trắc)). Chuỗi gần như không dao động thì mẫu số gần 0, nên sai số rất nhỏ cũng làm NSE âm rất lớn.
 

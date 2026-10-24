@@ -32,7 +32,7 @@ paths:
 - Q thiếu kỳ train 3,55% do 27 trạm bắt đầu đo muộn (3 trạm không có Q cả kỳ train), test 0,23%.
 - Lưu vực đặc biệt: 55 không có `qmean` => không có dự báo ở run có Q (giống tác giả) và không có cửa sổ DLinear; 742, 758 có `qmax` gần như hằng số (phương sai 0,0002–0,0003, NSE −4…−131).
 
-## Mốc A3 (người 1, `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.md`)
+## Mốc A3 (người 1, `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md`)
 
 - Trung vị NSE/PNSE/KGE trên giao chung 450 lưu vực, 652.628 ngày–lưu vực: SeqLSTM có Q 0,705/0,496/0,767 (hơn persistence ở 420/450); 𝒟RA 0,693/0,485/0,737; DLinear 3 hạt giống 0,380±0,002/0,061/0,518 (hơn persistence khoảng 315/450, KGE thấp hơn vì α ≈ 0,70); persistence `qmax` 0,350/0/0,675.
 - DLinear làm đúng bản gốc trên `qmean` quá khứ theo mm/ngày (diện tích `area_gov`), 365 ngày đủ, không điền ô thiếu.
@@ -42,13 +42,13 @@ paths:
 - Lỗi lưu mô hình tốt nhất của fork tác giả (`02_BasePaper.md` Mục 11.5): `_is_best_model` so với `best_value` không tính `min_delta`, còn `EarlyStopping` chỉ cập nhật `best_value` khi cải thiện trên 0,005 => `best_model.pt` có thể bị ghi đè bởi epoch kém hơn tối đa 0,005 NSE validation. A4 giữ nguyên lỗi, B1 sửa. Ở A4 cả 3 hạt giống có `best_model.pt` trùng epoch NSE validation cao nhất (epoch 11/15/14), dừng sớm ở 16/20/19.
 - `continue_training` không khôi phục trạng thái dừng sớm và scheduler => mỗi lần huấn luyện chạy trọn 1 phiên Kaggle.
 - Không bật chế độ tất định (các bước B, C chạy cùng cách nên nhiễu đo phải gồm phần không tất định của GPU); đạo hàm Mamba không tất định từng bit kể cả khi bật chế độ tất định (`gpuAtomicAdd`) => nhiễu hạt giống là một phần của kết quả, đo ở A4 và tính vào C.
-- Nhiễu hạt giống A4 (SeqLSTM có Q): NSE trung vị test 0,6952/0,7038/0,7059 (trung bình 0,7016, độ lệch chuẩn 0,0056); NSE trung vị validation 0,7411/0,7541/0,7574 (độ lệch chuẩn 0,0086); độ lệch chuẩn NSE theo lưu vực trung vị 0,0207, lớn nhất ở lưu vực NSE thấp. Chi tiết: `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.md`.
+- Nhiễu hạt giống A4 (SeqLSTM có Q): NSE trung vị test 0,6952/0,7038/0,7059 (trung bình 0,7016, độ lệch chuẩn 0,0056); NSE trung vị validation 0,7411/0,7541/0,7574 (độ lệch chuẩn 0,0086); độ lệch chuẩn NSE theo lưu vực trung vị 0,0207, lớn nhất ở lưu vực NSE thấp. Chi tiết: `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md`.
 - Tái lập A2: chạy lại trọng số tác giả trên T4 khớp NSE trung vị cả 6 run (SeqLSTM có Q 0,7053, không Q 0,6276, EncDec có Q bản Complex 0,6622, EncDec không Q bản Complex 0,569, 𝒟FC 0,3864/0,3867, 𝒟RA bản Simple 0,6923); quan trắc trùng, dự báo lệch < 0,03 mm/ngày ở 99,9% cặp ngày–lưu vực; 6 run = đúng 6 đường Hình 7 (mục 3.4) theo `Inspect_Experiments/config/Role_of_integrating_discharge.yml`. EncDec không Q có cảnh báo KGE r không xác định ở ít nhất 1 lưu vực.
 - Dự báo âm trước khi cắt về 0: có (1.660–2.261 cặp ngày–lưu vực ở A4); thư viện chỉ chặn âm khi tính chỉ số (`evaluation/tester.py` dòng 319–322) theo `clip_targets_to_zero: [qmax]`; `test_results.p` giữ dự báo thô => NPZ phải chặn giống vậy để NSE tính lại khớp thư viện.
 
 ## mamba-ssm và môi trường
 
 - Môi trường Kaggle (11/10/2026, còn đúng ở 24/10/2026): Python 3.13, torch 2.11.0+cu128, NumPy 2.1.3, GPU T4 (sm_75).
-- Bản phát hành `mamba-ssm` chỉ có wheel tới torch 2.10 => tự biên dịch `mamba-ssm` 2.3.2.post1 + `causal-conv1d` 1.6.2.post1 chỉ cho sm_75 (`Workspace/04_Setup/01_0_MambaSSM_Build.py`, Version 1, 13 phút 59 giây); đạt test chính thức của tác giả thư viện.
+- Bản phát hành `mamba-ssm` chỉ có wheel tới torch 2.10 => tự biên dịch `mamba-ssm` 2.3.2.post1 + `causal-conv1d` 1.6.2.post1 chỉ cho sm_75 (`Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.py`, Version 1, 13 phút 59 giây); đạt test chính thức của tác giả thư viện.
 - `mambapy` 1.2.0 (dự phòng, chạy CPU cho demo D2–D4) nạp trọng số `strict`, trùng kết quả GPU/CPU.
-- NeuralHydrology có sẵn `modelzoo/mamba.py` (`Mamba_SSM`) — đọc lại khi làm mô hình chung bước C.
+- NeuralHydrology có sẵn `modelzoo/mamba.py` (`Mamba_SSM`, PR #163) nhưng **quét sai trục**: `InputLayer` trả [seq, batch, feat] còn `mamba_ssm.Mamba` nhận (batch, length, dim), nên Mamba quét theo trục batch; sửa bằng `x.transpose(0, 1)` (`02_BasePaper.md` Mục 11.5). Đề tài tự thêm Mamba vào `modelzoo` ở bước C.

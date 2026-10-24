@@ -3,7 +3,7 @@
 #
 # Mục lục:
 #   Phần 1 - Màu theo bước và kiểu hình
-#   Phần 2 - Nội dung: trình tự, kiến trúc (bài gốc / sửa đổi), thứ tự cắt và khóa luận
+#   Phần 2 - Nội dung: trình tự, kiến trúc (bài gốc / sửa đổi) (chỉ phạm vi tiểu luận)
 #   Phần 3 - Bố cục tọa độ và ghi tệp
 
 from html import escape
@@ -31,7 +31,7 @@ SEQUENCE = [
     ("A", "A. Tái lập, persistence, PNSE, DLinear, nhiễu 3 hạt giống (6 lần)"),
     ("B", "B. LSTM cải tiến: Q, masked mean theo nguồn, che dữ liệu (12 lần)"),
     ("C", "C. 5 lõi cùng tham số, tinh chỉnh 8 cấu hình, 3 hạt giống (tối đa 70 lần)"),
-    ("C", "D–H. 730 ngày, dự báo 1–7 ngày, CMAL, biến thể, kiểm chứng lấy mẫu lũ (42 lần)"),
+    ("C", "H → D → E → F → GV. Dự báo 1–7 ngày, 730 ngày, biến thể, CMAL, kiểm chứng lấy mẫu lũ (42 lần)"),
     ("EV", "Đánh giá: mức, sự kiện lũ, kịch bản vận hành, kiểm định"),
     ("G", "G. Giải thích mô hình, dò trạng thái ẩn, demo (dùng ngưỡng lũ của A1)"),
     ("keep", "BÁO CÁO"),
@@ -91,12 +91,6 @@ BANDS = [
          [("G", "G. Integrated Gradients, dò trạng thái ẩn, demo trên trang web của nhóm (VPS): bản đồ 451 lưu vực tô màu theo ngưỡng lũ của A1, đường Q 7 ngày; chạy CPU: Kaggle GPU → Kaggle CPU → laptop → VPS")]),
     ]),
 ]
-CUT_ORDER = ("Thứ tự cắt khi thiếu thời gian: (1) GRU bỏ tinh chỉnh → (2) biến thể dự phòng bước E → (3) kiểm chứng lấy mẫu lũ"
-             " → (4) CMAL bước F → (5) giải thích mô hình → (6) biến thể chính bước E → (7) 730 ngày cho S4D"
-             " → (8) cách dự báo hoàn hảo ở bước H → (9) tinh chỉnh 8 → 4 cấu hình mỗi lõi")
-THESIS = ("Khóa luận: đồ thị mạng sông, tiền huấn luyện trên tái phân tích 1981–2002, so với khung mã nguồn mở của Google, dữ liệu giờ,"
-          " dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật, hàm mất mát ưu tiên đỉnh,"
-          " biến thể lai Mamba–Transformer, xLSTM, phần mềm ứng dụng")
 
 # %% Phần 3 - Bố cục tọa độ và ghi tệp
 cells = []
@@ -162,10 +156,7 @@ for b, (title, rows) in enumerate(BANDS):
         prev_last = oid
     y += band_h + BAND_GAP
 
-vertex("secIII", "III. THỨ TỰ CẮT VÀ KHÓA LUẬN", BAND, LEFT, y, WIDTH, 34 + 2 * ROW_STEP + 4)
-box("cut", "keep", CUT_ORDER, 40, y + 34, 1420, ROW_H)
-box("thesis", "G", THESIS, 40, y + 34 + ROW_STEP, 1420, ROW_H)
-page_h = y + 34 + 2 * ROW_STEP + 40
+page_h = y + 20
 
 xml = ('<mxfile host="Electron">\n  <diagram id="sododetai" name="Sơ đồ đề tài">\n'
        f'    <mxGraphModel dx="1030" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" '

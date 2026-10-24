@@ -1,6 +1,0 @@
-# Keep notebook 02's source digest stable across Windows and Kaggle.
-02_Evaluation_LamaHCEExt_ByBasin.py text eol=lf
-02_Evaluation_LamaHCEExt_ByBasin.ipynb text eol=lf
-
-# Preserve the exact received bytes recorded in the result manifest.
-Tables/BasinAnalysis_* -text

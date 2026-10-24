@@ -2,13 +2,13 @@
 # Extended LamaH-CE (BiasCast, HESS 2026) - khảo sát dữ liệu (bước A1)
 # Bài: Konold và cs., HESS 30:5067-5096 (2026). Dữ liệu Zenodo 17119635 (CC BY-NC 4.0),
 #      kết quả thí nghiệm Zenodo 17292895 - đã lưu thành Kaggle Dataset "lamah-ce-ext"
-#      (Workspace/01_Download/01_LamaHCEExt_Download.py).
+#      (Workspace/01_Download/01_LamaHCEExt_Download/01_LamaHCEExt_Download.py).
 # Notebook Kaggle "01_A1_LamaHCEExt_Explore": Accelerator = None (CPU), Internet bật khi 2.5 cần tải Q giờ, Persistence = Files only,
 # Add Input => Your Datasets => lamah-ce-ext; 2.5 dùng core sẵn có hoặc tự tải riêng Q giờ khi thiếu.
 # Mỗi khối # %% là một cell; chạy từ trên xuống trong cùng phiên.
 # Chạy được cả trên Colab/máy khác: đặt biến môi trường LAMAH_ROOT trỏ tới thư mục chứa dữ liệu đã giải nén.
 # Chữ trong hình viết tiếng Anh; ghi chú, chú thích kết quả viết ở Document/03_Data/01_LamaHCE.md.
-# Thuyết minh A1 kèm dẫn chứng và ví dụ: Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md.
+# Thuyết minh A1 kèm dẫn chứng và ví dụ: Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md.
 #
 # MỤC LỤC
 #   Phần 1 - Môi trường, đường dẫn, hằng số dùng chung

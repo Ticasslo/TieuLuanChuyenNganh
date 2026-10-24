@@ -33,9 +33,11 @@ for p in media:
         n_audio = len(f.streams.audio)
     print(f"{p}  |  {p.stat().st_size / 1e6:,.0f} MB  |  {dur / 60:.1f} phút  |  luồng âm thanh: {n_audio}")
 if not media:
-    print("Không thấy file âm thanh/video nào - kiểm tra Add Input.")
+    raise FileNotFoundError("Không thấy file âm thanh/video nào trong /kaggle/input hay /content - kiểm tra Add Input.")
 
-print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "KHÔNG CÓ")
+if not torch.cuda.is_available():
+    raise RuntimeError("Không có GPU - bật Accelerator = GPU T4.")
+print("GPU:", torch.cuda.get_device_name(0))
 WhisperModel("tiny", device="cuda", compute_type="float16")
 print("Nạp mô hình thử trên GPU: OK")
 

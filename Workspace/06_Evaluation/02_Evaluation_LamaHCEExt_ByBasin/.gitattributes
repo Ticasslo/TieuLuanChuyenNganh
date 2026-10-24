@@ -1,0 +1,6 @@
+# Giữ nguồn notebook 02 ổn định giữa Windows và Kaggle (mã băm nguồn).
+02_Evaluation_LamaHCEExt_ByBasin.py text eol=lf
+02_Evaluation_LamaHCEExt_ByBasin.ipynb text eol=lf
+
+# Giữ nguyên byte các bảng đã nhận, khớp manifest kết quả.
+Tables/BasinAnalysis_* -text

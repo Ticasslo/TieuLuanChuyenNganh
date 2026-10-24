@@ -2,7 +2,7 @@
 # Bước A4 - huấn luyện lại Sequential Forecast LSTM có Q của BiasCast với 3 hạt giống (111, 222, 333) trên Kaggle T4
 # để đo nhiễu giữa hạt giống
 # Bài: Konold và cs., HESS 30:5067-5096 (2026). Dữ liệu Zenodo 17119635 (CC BY-NC 4.0), config tác giả Zenodo 17292895
-#      - đã lưu thành Kaggle Dataset "lamah-ce-ext" (Workspace/01_Download/01_LamaHCEExt_Download.py).
+#      - đã lưu thành Kaggle Dataset "lamah-ce-ext" (Workspace/01_Download/01_LamaHCEExt_Download/01_LamaHCEExt_Download.py).
 # Kế hoạch: Document/01_Plan/03_Pipeline.md Mục 7 (dòng A4), 8.1 (ngân sách thời gian), 9.5 (định dạng dự báo).
 # Mỗi hạt giống một tệp và một notebook Kaggle cùng tên: "03_A4_LamaHCEExt_Retrain_Seed111", "..._Seed222",
 # "..._Seed333" - ba tệp giống hệt nhau, chỉ khác dòng RUN_SEED ở Phần 1. Một lần huấn luyện + đánh giá mất 1,2-4,7 giờ
@@ -600,7 +600,7 @@ if len(rows) == 3:
 (OUT_DIR / f"summary_seed{RUN_SEED}.json").write_text(json.dumps(SUMMARY, indent=2))
 
 # (4) Hình: chữ trong hình tiếng Anh, chú thích tiếng Việt in ngay dưới (caption), legend đặt ngoài vùng vẽ.
-#     Lưu ở a4_output/Figures, tải về đặt ở Workspace/03_Baseline/Figures/.
+#     Lưu ở a4_output/Figures, tải về đặt ở Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/Figures/.
 def caption(text):
     # Chú thích tiếng Việt in ngay dưới hình (chữ trong hình tiếng Anh).
     print(f"Hình: {text}")

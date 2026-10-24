@@ -1,6 +1,6 @@
 # Quan hệ giữa đặc điểm lưu vực và kết quả dự báo — Extended LamaH-CE
 
-Tài liệu đi cùng [mã Python](02_Evaluation_LamaHCEExt_ByBasin.py) và [notebook Kaggle](02_Evaluation_LamaHCEExt_ByBasin.ipynb), mở rộng phân tích theo lưu vực ở [pipeline Mục 6.4](../../Document/01_Plan/03_Pipeline.md#64-theo-lưu-vực). Phân tích sử dụng các dự báo A2, DLinear và persistence đã lưu để trả lời: **mức cải thiện dự báo thay đổi thế nào theo diện tích, độ cao, tỷ phần tuyết, độ khô hạn và mức đầy đủ dữ liệu?**
+Tài liệu đi cùng [mã Python](02_Evaluation_LamaHCEExt_ByBasin.py) và [notebook Kaggle](02_Evaluation_LamaHCEExt_ByBasin.ipynb) (bản chính thức: Version 1 của notebook `02_Evaluation_LamaHCEExt_ByBasin`, Save & Run All trên CPU, có output), mở rộng phân tích theo lưu vực ở [pipeline Mục 6.4](../../../Document/01_Plan/03_Pipeline.md#64-theo-lưu-vực). Phân tích sử dụng các dự báo A2, DLinear và persistence đã lưu để trả lời: **mức cải thiện dự báo thay đổi thế nào theo diện tích, độ cao, tỷ phần tuyết, độ khô hạn và mức đầy đủ dữ liệu?**
 
 Trên 450 lưu vực có ngày chấm, **mức cải thiện NSE của SeqLSTM_Q so persistence có liên hệ âm với độ cao trung bình (ρ = −0,422) và tỷ phần tuyết (ρ = −0,263), liên hệ dương với chỉ số khô hạn (ρ = 0,211)**. Diện tích có liên hệ yếu trong phép so này (ρ = −0,075), nhưng liên hệ dương rõ hơn với chênh lệch SeqLSTM có Q so không Q (ρ = 0,274). Kết luận phụ thuộc vào mô hình, mốc tham chiếu và chỉ số đang xét. [Kết quả thực nghiệm](#11-kết-quả-thực-nghiệm-và-kiểm-chứng) trình bày hệ số, phân nhóm, số trận và độ nhạy.
 
@@ -41,7 +41,7 @@ Ngưỡng lũ và sự kiện được giữ theo Output bộ đánh giá. Phân
 
 ## 4. Thuộc tính tĩnh và đơn vị
 
-Danh sách 33 trường là hợp đồng đầu vào đã kiểm tại [A1 Mục 17.4–17.6](../02_Exploration/01_A1_LamaHCEExt_Explore.md#174-xác-nhận-33-thuộc-tính-từ-24-cấu-hình). Toàn bộ giá trị lấy từ `Catchment_attributes.csv`:
+Danh sách 33 trường là hợp đồng đầu vào đã kiểm tại [A1 Mục 17.4–17.6](../../02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#174-xác-nhận-33-thuộc-tính-từ-24-cấu-hình). Toàn bộ giá trị lấy từ `Catchment_attributes.csv`:
 
 | Nhóm | Thuộc tính |
 |---|---|
@@ -262,9 +262,9 @@ Những kết quả này xác định được các nhóm cần phân tích và 
 
 ## 12. Nguồn tham khảo
 
-- [A1 — cấu trúc, ý nghĩa và kiểm thuộc tính](../02_Exploration/01_A1_LamaHCEExt_Explore.md), đặc biệt Mục 17.4–17.6, 17.17–17.19.
-- [A3 — dữ liệu DLinear, mặt nạ và chẩn đoán sai số](../03_Baseline/02_A3_LamaHCEExt_Benchmarks.md).
-- [Bộ đánh giá — chỉ số, mức lưu lượng và sự kiện](01_Evaluation_LamaHCEExt.md).
+- [A1 — cấu trúc, ý nghĩa và kiểm thuộc tính](../../02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md), đặc biệt Mục 17.4–17.6, 17.17–17.19.
+- [A3 — dữ liệu DLinear, mặt nạ và chẩn đoán sai số](../../03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md).
+- [Bộ đánh giá — chỉ số, mức lưu lượng và sự kiện](../01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md).
 - [Klingler và cs. (2021), LamaH-CE](https://essd.copernicus.org/articles/13/4529/2021/), Mục 5 và Phụ lục A: định nghĩa, đơn vị và nguồn thuộc tính.
 - [Konold và cs. (2026), BiasCast](https://hess.copernicus.org/articles/30/5067/2026/index.html), phân tích theo lưu vực và liên hệ đặc điểm với mức cải thiện; phần phân tích chọn riêng ΔNSE dương của bài được phân biệt với tập đầy đủ dùng ở đây.
 - [SciPy — Spearman](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.spearmanr.html) và [permutation test](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html): hệ số thứ hạng và phép thử bằng hoán vị.

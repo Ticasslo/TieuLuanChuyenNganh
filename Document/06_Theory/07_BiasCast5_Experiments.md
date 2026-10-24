@@ -519,7 +519,7 @@ Cả 6 run khớp bài. Sáu run này bao đủ ba kiến trúc (LSTM một pha,
 
 #### Những điểm cần nhớ khi trích số của bài
 
-- Mọi số là **một** hạt giống; nhiễu giữa các lần huấn luyện chưa đo (bước A4).
+- Mọi số là **một** hạt giống; bài không đo nhiễu giữa các lần huấn luyện. Đề tài đo ở bước A4: huấn luyện lại mô hình tốt nhất với 3 hạt giống cho NSE trung vị test 0,6952–0,7059, độ lệch chuẩn 0,0056 (`Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md`).
 - Hai mô hình chính không cùng loại lớp nhúng: Encoder–Decoder 0,57 là bản phức tạp, Sequential 0,63 là bản đơn giản (Mục 5.5, Chi tiết kỹ thuật).
 - Thí nghiệm thêm 5 biến ECMWF HRES vào quá khứ được báo cáo là bản **không** `qmean`, khác phần chữ; Encoder–Decoder ở thí nghiệm đó so hai loại lớp nhúng khác nhau (Mục 5.5, Điều 3).
 - Học chuyển giao chỉ lớp nhúng: 0,44 là bản phức tạp, 0,39 là bản đơn giản (Mục 5.4).

@@ -3,8 +3,8 @@
 # Bài: Konold và cs., "BiasCast: learning and adjusting real time biases from meteorological forecasts
 #      to enhance runoff predictions", HESS 30:5067-5096 (2026). Dữ liệu Zenodo 17119635 (CC BY-NC 4.0),
 #      kết quả thí nghiệm Zenodo 17292895.
-# Notebook Kaggle: Accelerator = None, bật Internet, dán Phần 1-2 vào 2 cell (hoặc cả file vào 1 cell),
-# rồi Run All. Xong: tab Output => New Dataset (Private) "lamah-ce-ext" (giữ cả 2 file ZIP;
+# Notebook Kaggle: Accelerator = None, bật Internet, dán Phần 1 vào cell 1, Phần 2 vào cell 2,
+# rồi Save Version => Save & Run All. Xong: tab Output => New Dataset "lamah-ce-ext" (công khai; giữ cả 2 file ZIP;
 # Kaggle tự giải nén thành thư mục khi tạo dataset). Khám phá dữ liệu: Workspace/02_Exploration/.
 # Chạy được cả trên Colab (lưu vào /content).
 #

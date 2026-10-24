@@ -59,10 +59,10 @@ Cách nói trước hội đồng: đề tài không khẳng định Mamba tốt
 
 | Giai đoạn | Việc chính | Đầu ra | Trạng thái |
 |---|---|---|---|
-| 0. Hạ tầng | Fork NeuralHydrology riêng, cài `mamba-ssm` trên Kaggle T4, kiểm thử đơn vị, đo thời gian | Môi trường chạy được mọi lõi; bảng thời gian mỗi epoch | Đã lấy 3 bản sửa từ thư viện gốc vào nhánh `research` (commit `dda45fc`); `mamba-ssm` 2.3.2.post1 và `causal-conv1d` 1.6.2.post1 tự biên dịch cho torch 2.11 trên T4, đạt bộ test chính thức của tác giả, `mambapy` nạp được trọng số (`Workspace/04_Setup/01_0_MambaSSM_Build.md`); thời gian huấn luyện đo ở A4 (`Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.md`); mô hình chung nhận lõi bất kỳ và kiểm thử đơn vị chưa làm |
+| 0. Hạ tầng | Fork NeuralHydrology riêng, cài `mamba-ssm` trên Kaggle T4, kiểm thử đơn vị, đo thời gian | Môi trường chạy được mọi lõi; bảng thời gian mỗi epoch | Đã lấy 3 bản sửa từ thư viện gốc vào nhánh `research` (commit `dda45fc`); `mamba-ssm` 2.3.2.post1 và `causal-conv1d` 1.6.2.post1 tự biên dịch cho torch 2.11 trên T4, đạt bộ test chính thức của tác giả, `mambapy` nạp được trọng số (`Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md`); thời gian huấn luyện đo ở A4 (`Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md`); mô hình chung nhận lõi bất kỳ và kiểm thử đơn vị chưa làm |
 | 1. Thu thập dữ liệu | Tải Extended LamaH-CE và kết quả của tác giả | Kaggle Dataset `lamah-ce-ext` | Xong (`01_LamaHCE.md` Mục 6) |
-| 2. Khảo sát dữ liệu | Theo khuôn GVHD: dạng cơ bản + thống kê sâu; ngưỡng mức lưu lượng; bảng độ trễ nguồn | Báo cáo khảo sát, tệp ngưỡng | Xong bước A1 (`Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md`; ngưỡng 4 mức và Gumbel trong đầu ra notebook) |
-| 3. Tái lập và mốc | Chạy lại trọng số tác giả; persistence; DLinear; nhiễu hạt giống | Bảng mốc | Persistence, chạy lại trọng số tác giả (A2, khớp NSE trung vị cả 6 cấu hình, `Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce.md`) và DLinear 3 hạt giống (A3: NSE trung vị 0,380 so với persistence 0,350 và mô hình tốt nhất 0,705 trên cùng tập ngày, `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.md`) xong; A4 huấn luyện lại Sequential Forecast LSTM có Q với 3 hạt giống: NSE trung vị test 0,6952/0,7038/0,7059, giá trị 0,7053 của bài nằm trong khoảng, độ lệch chuẩn NSE trung vị validation giữa hạt giống 0,0086, trung vị độ lệch chuẩn NSE theo lưu vực 0,0207 (`Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.md`) |
+| 2. Khảo sát dữ liệu | Theo khuôn GVHD: dạng cơ bản + thống kê sâu; ngưỡng mức lưu lượng; bảng độ trễ nguồn | Báo cáo khảo sát, tệp ngưỡng | Xong bước A1 (`Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md`; ngưỡng 4 mức và Gumbel trong đầu ra notebook) |
+| 3. Tái lập và mốc | Chạy lại trọng số tác giả; persistence; DLinear; nhiễu hạt giống | Bảng mốc | Persistence, chạy lại trọng số tác giả (A2, khớp NSE trung vị cả 6 cấu hình, `Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md`) và DLinear 3 hạt giống (A3: NSE trung vị 0,380 so với persistence 0,350 và mô hình tốt nhất 0,705 trên cùng tập ngày, `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md`) xong; A4 huấn luyện lại Sequential Forecast LSTM có Q với 3 hạt giống: NSE trung vị test 0,6952/0,7038/0,7059, giá trị 0,7053 của bài nằm trong khoảng, độ lệch chuẩn NSE trung vị validation giữa hạt giống 0,0086, trung vị độ lệch chuẩn NSE theo lưu vực 0,0207 (`Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md`) |
 | 4. Bộ nạp | Sửa bộ lọc mẫu, nhóm biến theo nguồn, Q cùng đơn vị | Cấu hình dữ liệu dùng chung | Chưa làm |
 | 5. Mô hình | Khung hindcast–forecast với lõi thay được | Mô-đun trong fork | Chưa làm |
 | 6. Huấn luyện | Bước B → H (Mục 7) | Trọng số, nhật ký | Chưa làm |
@@ -100,7 +100,7 @@ Hindcast chia thành các nhóm theo nguồn, mỗi nhóm một mạng nhúng; m
 | Việc | Lý do | Cách làm |
 |---|---|---|
 | Sửa `_validate_samples` để giữ mẫu có đầu vào thiếu khi dùng masked mean | Bản gốc loại mẫu nếu bất kỳ cột nào thiếu ở bất kỳ ngày nào trong 365 ngày (`basedataset.py` dòng 861–919), kể cả khi bật `nan_handling_method` | Khi có `nan_handling_method`, chỉ yêu cầu nhãn và thuộc tính tĩnh hợp lệ; vẫn loại mẫu không đủ lịch sử |
-| Dựng thư mục có Q (thay `LamaH_expanded_q_input` không công bố) | Biến thể có Q của bài đọc thư mục này | Bộ nạp đọc `qmean` thẳng từ tệp khí tượng (`datasetzoo/lamah.py` dòng 107–135; chỉ nhãn `qmax` được đọc từ `D_gauges` và đổi sang mm/ngày), nên chép `qmean` từ `D_gauges` vào tệp khí tượng mức A (thêm `qmax` cho B1). Tác giả dùng `qmean` theo m³/s, ngày thiếu để trống: thống kê chuẩn hóa tính lại từ `D_gauges` khớp tệp chuẩn hóa của tác giả tới chữ số thứ tư, đối chứng `qmax` khớp ở mm/ngày (A2 Phần 3, `Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce.md`); A2 và A4 dựng đúng như vậy, B1 đổi sang mm/ngày theo `area_gov` như nhãn |
+| Dựng thư mục có Q (thay `LamaH_expanded_q_input` không công bố) | Biến thể có Q của bài đọc thư mục này | Bộ nạp đọc `qmean` thẳng từ tệp khí tượng (`datasetzoo/lamah.py` dòng 107–135; chỉ nhãn `qmax` được đọc từ `D_gauges` và đổi sang mm/ngày), nên chép `qmean` từ `D_gauges` vào tệp khí tượng mức A (thêm `qmax` cho B1). Tác giả dùng `qmean` theo m³/s, ngày thiếu để trống: thống kê chuẩn hóa tính lại từ `D_gauges` khớp tệp chuẩn hóa của tác giả tới chữ số thứ tư, đối chứng `qmax` khớp ở mm/ngày (A2 Phần 3, `Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md`); A2 và A4 dựng đúng như vậy, B1 đổi sang mm/ngày theo `area_gov` như nhãn |
 | Báo cáo số mẫu hợp lệ từng cấu hình | Biết cải tiến lấy lại bao nhiêu mẫu | Ghi số mẫu train trước và sau sửa bộ lọc, với hindcast 365 và 730 ngày |
 
 ### 3.4. Che dữ liệu khi huấn luyện
@@ -230,7 +230,7 @@ Các kịch bản chạy trên cả kỳ validation (dùng để chọn cấu h�
 
 ΔNSE giữa Mamba (và S4D) với LSTM cải tiến; bản đồ; tương quan Spearman với 33 thuộc tính và khoảng cách Wasserstein tái phân tích – dự báo (mã phân tích của tác giả). Kiểm giả thuyết từ Wang và cs. (WRR 2025), Jing và cs. (ESWA 2026), Zhang và cs. (2026): SSM có lợi ở lưu vực tuyết, động lực chậm, bất lợi ở lũ nhanh — dùng tỷ lệ tuyết, độ cao, chỉ số khô hạn, diện tích. Tách nhóm đầu nguồn (72,5%) và lồng nhau (27,5%) theo số liệu của BiasCast (thư trả lời phản biện 1, `PeerReview/ResponseToReferee1.pdf`).
 
-Phân tích các mốc A2/DLinear trước bước C dùng [notebook theo lưu vực](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin.md): 12 cặp so trên giao ngày chung, ΔNSE, ΔPNSE và ΔPOD lũ hai năm. Trong 33 thuộc tính, tương quan thứ hạng dùng 31 trường; mã lớp phủ `lc_dom` và góc vòng `mvert_ang` được mô tả theo nhóm riêng. Rho và số ID là kết quả mô tả chính; p hoán vị và Holm trong từng cặp–outcome có giả định trao đổi ID, không thay bằng chứng nhân quả hoặc kiểm phụ thuộc không gian. Các trường khí hậu/thực vật tổng hợp sẵn không được gọi là thống kê chỉ fit trên train.
+Phân tích các mốc A2/DLinear trước bước C dùng [notebook theo lưu vực](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md): 12 cặp so trên giao ngày chung, ΔNSE, ΔPNSE và ΔPOD lũ hai năm. Trong 33 thuộc tính, tương quan thứ hạng dùng 31 trường; mã lớp phủ `lc_dom` và góc vòng `mvert_ang` được mô tả theo nhóm riêng. Rho và số ID là kết quả mô tả chính; p hoán vị và Holm trong từng cặp–outcome có giả định trao đổi ID, không thay bằng chứng nhân quả hoặc kiểm phụ thuộc không gian. Các trường khí hậu/thực vật tổng hợp sẵn không được gọi là thống kê chỉ fit trên train.
 
 ### 6.5. Chi phí tính toán
 
@@ -254,7 +254,7 @@ Số lần huấn luyện ghi dạng "cấu hình × hạt giống". Mỗi bư�
 |---|---|---|---|
 | 0 | Hạ tầng: fork riêng, wheel `mamba-ssm`, kiểm thử đơn vị (Mục 9.2), đo thời gian 1 epoch mỗi lõi | 0 (chạy thử ngắn) | Mọi kiểm thử qua; có bảng thời gian |
 | A1 | Khảo sát dữ liệu; ngưỡng mức và ngưỡng lũ tính trên 1981–2013; so kỳ train, validation, test (độ dao động `qmax`, số trận lũ) và bước nhảy của ECMWF HRES theo năm do các lần nâng lưới (1/2/2006, 1/2010, 8/3/2016), so với ERA5-Land; danh sách kiểm đầy đủ ở `06_Theory/05_BiasCast3_Data.md` Mục 3.8 | 0 | Có tệp ngưỡng |
-| A2 | Kiểm đơn vị `qmean` và dựng thư mục Q (Mục 3.3); chạy lại trọng số tác giả trên kỳ test cho 6 cấu hình: Sequential Forecast LSTM và Encoder–Decoder LSTM, mỗi loại có và không có lưu lượng quá khứ, mốc dưới 𝒟FC, mốc trên 𝒟RA (đúng sáu run của Hình 7, mục 3.4 của bài, bao trùm 3 kiến trúc, có/không Q, hai loại nhúng, hai nguồn dữ liệu; lý do chọn ở `Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce.md` Phần 2); lưu dự báo cho A3 | 0 | NSE trung vị lệch số của tác giả không quá 0,005 |
+| A2 | Kiểm đơn vị `qmean` và dựng thư mục Q (Mục 3.3); chạy lại trọng số tác giả trên kỳ test cho 6 cấu hình: Sequential Forecast LSTM và Encoder–Decoder LSTM, mỗi loại có và không có lưu lượng quá khứ, mốc dưới 𝒟FC, mốc trên 𝒟RA (đúng sáu run của Hình 7, mục 3.4 của bài, bao trùm 3 kiến trúc, có/không Q, hai loại nhúng, hai nguồn dữ liệu; lý do chọn ở `Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md` Phần 2); lưu dự báo cho A3 | 0 | NSE trung vị lệch số của tác giả không quá 0,005 |
 | A3 | Mốc so sánh, sau A1: persistence (tính lại), PNSE, KGE (r, α, β) cho 6 cấu hình của A2 và persistence, tính trên dự báo đã lưu ở A2; DLinear bản gốc trên `qmean` quá khứ (Mục 4.2), cách chuẩn hóa `qmean` (chung mọi lưu vực hay riêng từng lưu vực) và xử lý ô trống trong 365 ngày quá khứ quyết theo kết quả khảo sát của A1; liệt kê lưu vực có NSE âm lớn ở từng run (Sequential Forecast LSTM có Q, lớp nhúng đơn giản: trung vị 0,71 nhưng trung bình 0,40 theo Bảng F1 — `06_Theory/07_BiasCast5_Experiments.md` Mục 5.6) và so với danh sách lưu vực bất thường của A1 | 1 × 3 | |
 | A4 | Đo thời gian 1 epoch trên T4 (phần đo thời gian của bước 0) rồi huấn luyện lại Sequential Forecast LSTM có lưu lượng quá khứ theo cấu hình tác giả, giữ nguyên cả lỗi lưu mô hình tốt nhất (sửa ở B1) và cách chạy không tất định của thư viện (các bước B, C chạy cùng cách nên nhiễu đo phải gồm phần không tất định của GPU), hạt giống 111 (của tác giả), 222, 333 — đo nhiễu hạt giống (B0); mỗi lần chạy nằm trọn trong một phiên Kaggle vì chạy tiếp không khôi phục trạng thái dừng sớm và lập lịch learning rate (`training/basetrainer.py`) | 1 × 3 | Có độ lệch chuẩn NSE trung vị test và validation giữa hạt giống; 0,7053 của bài nằm trong khoảng [nhỏ nhất, lớn nhất] của 3 hạt giống hoặc cách trung bình không quá 2 độ lệch chuẩn (bài chỉ chạy 1 hạt giống nên không có khoảng của tác giả để so) |
 | B1 | B0 + sửa lỗi lưu mô hình tốt nhất + Q cùng đơn vị mm/ngày với nhãn (A2 xác nhận tác giả đưa `qmean` theo m³/s, `01_LamaHCE.md` Mục 6.3) + thêm `qmax` quá khứ vào nhóm Q | 1 × 3 | |
@@ -280,14 +280,14 @@ Tổng tối đa 130 lần huấn luyện (A: 6; B: 12; C: 40 + 30; D, E, F, H, 
 ### 8.1. Ngân sách
 
 - Từ 3 tài khoản Kaggle trở lên, mỗi tài khoản 30 giờ GPU/tuần, tối đa 12 giờ/phiên (hạn mức Kaggle hiển thị trong tài khoản) — khoảng 90 giờ/tuần. Chỉ dùng GPU T4: tệp `setup.py` của `state-spaces/mamba` và `causal-conv1d` chỉ biên dịch nhân CUDA cho kiến trúc từ sm_75 trở lên (T4 là sm_75, P100 là sm_60).
-- Thời gian đo ở A4 trên T4 (Sequential Forecast LSTM có Q, cấu hình tác giả): khoảng 9,5 phút/epoch, gồm huấn luyện 5,6–5,9 phút và validation 451 lưu vực 3,4–3,6 phút (validation chiếm khoảng 38%); dừng sớm ở epoch 16–20 nên một lần huấn luyện mất 2,5–3,2 giờ, tối đa khoảng 4,7 giờ nếu chạy đủ 30 epoch; cộng dựng dữ liệu và đánh giá test, một notebook mất 2,7–3,4 giờ (`Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.md`). Với khoảng 3 giờ/lần, 130 lần cần khoảng 390 giờ GPU, tức khoảng 4,3 tuần với 3 tài khoản (khoảng 90 giờ/tuần); lõi khác LSTM có thời gian riêng, đo ở C1.
+- Thời gian đo ở A4 trên T4 (Sequential Forecast LSTM có Q, cấu hình tác giả): khoảng 9,5 phút/epoch, gồm huấn luyện 5,6–5,9 phút và validation 451 lưu vực 3,4–3,6 phút (validation chiếm khoảng 38%); dừng sớm ở epoch 16–20 nên một lần huấn luyện mất 2,5–3,2 giờ, tối đa khoảng 4,7 giờ nếu chạy đủ 30 epoch; cộng dựng dữ liệu và đánh giá test, một notebook mất 2,7–3,4 giờ (`Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md`). Với khoảng 3 giờ/lần, 130 lần cần khoảng 390 giờ GPU, tức khoảng 4,3 tuần với 3 tài khoản (khoảng 90 giờ/tuần); lõi khác LSTM có thời gian riêng, đo ở C1.
 - Mỗi tài khoản chạy một nhóm thí nghiệm; trọng số và nhật ký nằm ở Output của bản Save Version, notebook đánh giá gắn các Output đó làm Input (ghi số phiên bản cho kết quả chính thức).
 
 ### 8.2. Rủi ro
 
 | Rủi ro | Cách xử lý |
 |---|---|
-| Không cài được `mamba-ssm` trên Kaggle | Bản phát hành chỉ có wheel tới torch 2.10, Kaggle dùng torch 2.11.0+cu128 và Python 3.13, nên tự biên dịch một lần chỉ cho sm_75 (notebook `01_0_MambaSSM_Build`, biên dịch `causal-conv1d` 5,9 phút và `mamba-ssm` 6,2 phút), wheel lưu ở Output notebook, notebook sau gắn làm Input và cài bằng cell kiểm phiên bản torch; đạt bộ test chính thức của tác giả (`Workspace/04_Setup/01_0_MambaSSM_Build.md`). Kaggle đổi ảnh làm torch khác thì cell cài dừng và dựng lại; dự phòng `mambapy` (PyTorch thuần, chậm hơn) |
+| Không cài được `mamba-ssm` trên Kaggle | Bản phát hành chỉ có wheel tới torch 2.10, Kaggle dùng torch 2.11.0+cu128 và Python 3.13, nên tự biên dịch một lần chỉ cho sm_75 (notebook `01_0_MambaSSM_Build`, biên dịch `causal-conv1d` 5,9 phút và `mamba-ssm` 6,2 phút), wheel lưu ở Output notebook, notebook sau gắn làm Input và cài bằng cell kiểm phiên bản torch; đạt bộ test chính thức của tác giả (`Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md`). Kaggle đổi ảnh làm torch khác thì cell cài dừng và dựng lại; dự phòng `mambapy` (PyTorch thuần, chậm hơn) |
 | Mamba quá khớp sớm (như Shahriar 2026) | Dừng sớm theo validation, dropout, theo dõi NSE validation và test mỗi epoch |
 | Không đạt chênh lệch tham số ≤1% vì số chiều chỉ chỉnh theo bước nguyên (mô hình nhỏ, khoảng 85 nghìn tham số) | Đo ở bước 0; nếu không đạt, chỉnh thêm số chiều lớp nhúng hoặc đầu ra, ghi rõ chênh lệch thực tế |
 | Lõi mới học kém do siêu tham số của LSTM | Tinh chỉnh cùng ngân sách có learning rate (Mục 5.2) |
@@ -342,19 +342,19 @@ Việc cụ thể của từng người theo từng bước, điểm bàn giao v
 
 ### 9.4. Thư mục mã
 
-Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook một tệp `.py` tự đủ, có mục lục, chia cell theo "Phần". Tên tệp (cũng là tên notebook Kaggle) dạng `NN_<Bước>_<BộDữLiệu>_<Việc>.py`: `NN` là thứ tự chạy trong thư mục, `<Bước>` là mã bước ở Mục 7 (VD `03_Baseline/01_A2_LamaHCEExt_Reproduce.py`); tệp không thuộc bước nào (tải dữ liệu) bỏ phần `<Bước>`. Thứ tự thực hiện bước A: A2 → A1 → A3 → A4, xong trước bước B. A2 chạy trước để kiểm môi trường; A1 trước A3 vì DLinear trong A3 cần A1 để quyết cách chuẩn hóa và xử lý ô trống của `qmean`, và persistence cần biết trước các lưu vực bất thường; B cần số liệu thiếu và số mẫu hợp lệ của A1.
+Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook một tệp `.py` tự đủ, có mục lục, chia cell theo "Phần", nằm trong thư mục con cùng tên cùng tệp `.ipynb` (bản chính thức Save & Run All có output), báo cáo `.md`, `Figures/` và `Tables/` của notebook đó; các biến thể của một notebook (VD 3 hạt giống A4) chung một thư mục. Tên tệp (cũng là tên notebook Kaggle) dạng `NN_<Bước>_<BộDữLiệu>_<Việc>.py`: `NN` là thứ tự chạy trong thư mục, `<Bước>` là mã bước ở Mục 7 (VD `03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.py`); tệp không thuộc bước nào (tải dữ liệu) bỏ phần `<Bước>`. Thứ tự thực hiện bước A: A2 → A1 → A3 → A4, xong trước bước B. A2 chạy trước để kiểm môi trường; A1 trước A3 vì DLinear trong A3 cần A1 để quyết cách chuẩn hóa và xử lý ô trống của `qmean`, và persistence cần biết trước các lưu vực bất thường; B cần số liệu thiếu và số mẫu hợp lệ của A1.
 
 | Thư mục | Việc | Trạng thái |
 |---|---|---|
 | `01_Download/` | Tải dữ liệu | Xong |
-| `02_Exploration/` | Khảo sát dữ liệu (A1), ngưỡng | A1 hoàn thành khảo sát và tính ngưỡng; thuyết minh tại `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore.md` |
+| `02_Exploration/` | Khảo sát dữ liệu (A1), ngưỡng | A1 hoàn thành khảo sát và tính ngưỡng; thuyết minh tại `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md` |
 | `03_Baseline/` | A2 tái lập (`01_A2_LamaHCEExt_Reproduce.py`), A3 mốc so sánh gồm persistence, PNSE, KGE, DLinear (`02_A3_LamaHCEExt_Benchmarks.py`), A4 huấn luyện lại và nhiễu hạt giống (`03_A4_LamaHCEExt_Retrain_Seed111/222/333.py`, so sánh `04_A4_LamaHCEExt_Compare.py`) | A2 tái lập đạt; A3 hoàn thành persistence, sáu A2 và DLinear ba hạt giống; A4 huấn luyện lại đạt, xuất 3 tệp dự báo theo hợp đồng của bộ đánh giá |
-| `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Wheel `mamba-ssm` và `causal-conv1d` cho Kaggle T4 dựng xong, đạt bộ test chính thức (`01_0_MambaSSM_Build.py`); có bản kiểm bộ nạp B2 độc lập đạt trên Kaggle; tích hợp B1 thực hiện sau A4/B1 |
+| `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Wheel `mamba-ssm` và `causal-conv1d` cho Kaggle T4 dựng xong, đạt bộ test chính thức (`01_0_MambaSSM_Build.py`); mô hình chung, các lõi và kiểm thử đơn vị chưa viết |
 | `05_Training/` | Notebook huấn luyện theo bước B–H | Chưa viết |
 | `06_Evaluation/` | Bộ đánh giá Mục 6 | Đã chấm A2/DLinear trên Kaggle theo giao thức 2, test/S0/hạn một ngày; 60 kiểm thử đạt, khớp A3 trên 4.961 cặp run–ID và qua 57 kiểm CSV cục bộ; bảng lũ chính cùng ngày bắt đầu, bảng phụ ±1; mở rộng khi có dự báo validation/S1–S4/nhiều hạn |
 | `07_Demo/` | Demo (mục dự án trong trang web của nhóm) | Chưa viết |
 
-Tên thư mục từ `04_` trở đi là đề xuất, đặt khi bắt đầu viết mã.
+`05_Training/`, `07_Demo/` là tên đề xuất, đặt khi bắt đầu viết mã.
 
 ### 9.5. Đầu ra cho đánh giá và demo
 
@@ -368,7 +368,7 @@ Mô hình chạy trong demo chọn theo tầng 1 của Mục 6.1: trong các l�
 
 Huấn luyện chạy trên GPU (Kaggle); demo chạy trên CPU. Mỗi lần dự báo một lưu vực, một ngày là một lượt chạy xuôi của mô hình khoảng 85 nghìn tham số trên chuỗi 365 bước, nên CPU đủ dùng. GPU miễn phí để phục vụ web không phù hợp: Hugging Face ZeroGPU tính hạn mức GPU theo tài khoản người xem (tài khoản miễn phí 5 phút mỗi ngày) và chỉ chạy Gradio; Space Gradio hoặc Docker trên CPU Basic cần gói trả phí mới tạo được (tài liệu Hugging Face *Spaces ZeroGPU*, *Using GPU Spaces*). Giao diện chạy trong notebook Kaggle không dùng làm demo vì chỉ sống trong phiên notebook (tối đa 12 giờ).
 
-`mamba-ssm` chỉ chạy trên GPU CUDA, nên khi chạy trên CPU, khối Mamba thay bằng `mambapy` (PyTorch thuần). `MambaBlock` của `mambapy` 1.2.0 có cùng tên tham số và cùng mặc định với `mamba_ssm.Mamba`: nạp `state_dict` với `strict=True` không thiếu, không thừa khóa, và cho đầu ra trùng trên GPU và CPU (`Workspace/04_Setup/01_0_MambaSSM_Build.md` Phần 8). LSTM, GRU, Transformer chạy CPU bằng nguyên mã; S4D chạy CPU nếu cài đặt không dùng kernel CUDA riêng (chọn khi viết lõi ở bước C).
+`mamba-ssm` chỉ chạy trên GPU CUDA, nên khi chạy trên CPU, khối Mamba thay bằng `mambapy` (PyTorch thuần). `MambaBlock` của `mambapy` 1.2.0 có cùng tên tham số và cùng mặc định với `mamba_ssm.Mamba`: nạp `state_dict` với `strict=True` không thiếu, không thừa khóa, và cho đầu ra trùng trên GPU và CPU (`Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md` Phần 8). LSTM, GRU, Transformer chạy CPU bằng nguyên mã; S4D chạy CPU nếu cài đặt không dùng kernel CUDA riêng (chọn khi viết lõi ở bước C).
 
 Thứ tự thực hiện, bước sau chỉ làm khi bước trước đạt:
 
@@ -383,21 +383,21 @@ Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba
 
 ### 9.7. Lịch theo hai luồng
 
-Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu khi điều kiện chuyển bước ở Mục 7 đạt. Ngày cụ thể gắn sau bước A4, khi đã đo thời gian một lần huấn luyện trên T4 (Mục 8.1); mốc đã có: báo cáo tiến độ gửi GVHD khoảng 25/10/2026.
+Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu khi điều kiện chuyển bước ở Mục 7 đạt. Lịch tính từ thời gian đo ở A4 (Mục 8.1): khoảng 3 giờ GPU mỗi lần huấn luyện, khoảng 90 giờ GPU mỗi tuần với 3 tài khoản. Cột "giờ GPU" chỉ gồm thời gian huấn luyện theo số lần ở Mục 7, chưa gồm thời gian viết mã và đánh giá; lõi khác LSTM có thời gian riêng, đo ở C1, nên lịch từ bước C trở đi được cập nhật sau C1. Tuần tính từ thứ Hai.
 
-| Thứ tự | Người 1 (dữ liệu, đánh giá, demo D1–D3) | Người 2 (mô hình, huấn luyện, XAI, VPS) |
-|---|---|---|
-| 1 | A1 khảo sát dữ liệu, tệp ngưỡng; báo cáo tiến độ (A2, A1, persistence và DLinear từ A3) | Bước 0: `mamba-ssm` trên T4, mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) |
-| 2 | A3 mốc so sánh (persistence, PNSE, KGE, DLinear) | A4 nhiễu hạt giống, đo thời gian 1 epoch để gắn ngày cho lịch |
-| 3 | Sau báo cáo tiến độ: bộ đánh giá Mục 6, thử trước trên A2/DLinear; tích hợp bộ nạp B2 và cách (b) của bước H sau A4/B1 | B1 → B3, B*; phối hợp rà soát bộ nạp B2 trước khi huấn luyện B2; gắn mốc `freeze-C` |
-| 4 | Đánh giá bước B (gồm kịch bản S0–S4 trên validation cho B*) | C1, C2 |
-| 5 | Đánh giá bước C; demo D1, D2 (Mục 9.6) | H, D, E, F, GV theo thứ tự ưu tiên ở Mục 7, 8.3 |
-| 6 | Đánh giá bước mở rộng; demo D3 | Giải thích mô hình (Mục 6.7); demo D4 trên VPS |
-| 7 | Báo cáo, slide (Mục 9.8) | Báo cáo, slide (Mục 9.8) |
+| Thứ tự | Tuần dự kiến | Người 1 (dữ liệu, đánh giá, demo D1–D3) | Người 2 (mô hình, huấn luyện, XAI, VPS) | Giờ GPU |
+|---|---|---|---|---|
+| 1 | Xong 24/10/2026 | A1 khảo sát dữ liệu, tệp ngưỡng; A3 mốc so sánh; báo cáo tiến độ; bộ đánh giá trên A2/DLinear | Bước 0 phần cài `mamba-ssm` trên T4; A2; A4 nhiễu hạt giống và đo thời gian | – |
+| 2 | 26/10 – 08/11/2026 | Chấm ba dự báo A4 bằng bộ đánh giá; viết bộ nạp B2 trên mã B1 và cách (b) của bước H, kiểm thử đơn vị phần bộ nạp | B1 (sửa lưu mô hình tốt nhất, Q mm/ngày, `qmax` quá khứ); song song: mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) | B1: 3 lần, khoảng 9 giờ |
+| 3 | 09/11 – 22/11/2026 | Đánh giá bước B, gồm kịch bản S0–S4 trên validation cho B* | B2, B3, B*; phối hợp rà soát bộ nạp B2 trước khi huấn luyện B2; gắn mốc `freeze-C` | B2, B3: 9 lần, khoảng 27 giờ |
+| 4 | 23/11 – 13/12/2026 | Đánh giá bước C; demo D1, D2 (Mục 9.6) | C1 tinh chỉnh, C2 chạy chính thức | Tối đa 70 lần, khoảng 210 giờ (khoảng 2,3 tuần GPU) |
+| 5 | 14/12 – 27/12/2026 | Đánh giá bước mở rộng; demo D3 | H, D, E, F, GV theo thứ tự ưu tiên ở Mục 7, 8.3 | Tối đa 42 lần, khoảng 126 giờ (khoảng 1,4 tuần GPU) |
+| 6 | 28/12/2026 – 10/01/2027 | Hoàn thiện đánh giá, khối demo D3 bàn giao | Giải thích mô hình (Mục 6.7); demo D4 trên VPS | – |
+| 7 | Song song từ bước 4, hoàn tất 17/01/2027 | Báo cáo, slide (Mục 9.8) | Báo cáo, slide (Mục 9.8) | – |
 
 Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.
 
-Ưu tiên hiện tại của Người 1 là [báo cáo tiến độ ngày 23/10/2026](04_ProgressReport_2026-10-23.md), sau đó bộ đánh giá. A1 và A3 đã có kết quả; bộ đánh giá dùng ngay dự báo A2/DLinear và tệp ngưỡng A1. Bản kiểm bộ nạp B2 độc lập đã đạt, phần tích hợp tiếp tục khi luồng A4/B1 sẵn sàng. Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
+Bước A đã xong (A1–A4) và bộ đánh giá đã chấm A2/DLinear. Ưu tiên hiện tại: Người 2 làm B1; Người 1 chấm ba dự báo A4 bằng bộ đánh giá, rồi viết bộ nạp B2 trên mã B1 (B2 sửa tiếp từ B1). Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
 
 | Nội dung học | Nguồn | Học trước bước |
 |---|---|---|

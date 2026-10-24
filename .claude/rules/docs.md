@@ -27,9 +27,9 @@ paths:
 ## Hình và sơ đồ
 
 - Mọi chữ **trong** hình, sơ đồ mới viết toàn tiếng Anh (số dấu chấm thập phân); nội dung và chú thích dưới hình tiếng Việt; không trộn hai thứ tiếng trong một hình. `Diagrams/ProjectDiagram.drawio` giữ nguyên tiếng Việt.
-- `ProjectDiagram.drawio` là sơ đồ duy nhất của đề tài (không dùng Mermaid/PlantUML): phần I thứ tự thực hiện 0 → A → B → C → D–F → đánh giá → G → báo cáo; phần II kiến trúc 5 tầng, cột trái khối bài gốc BiasCast đọc từ mã, cột phải khối đề tài sửa/thay (màu theo bước); phần III thứ tự cắt và khóa luận. Sinh bằng `Tools/Diagram_Build.py`: đổi pipeline (`03_Pipeline.md` Mục 4–8) => sửa Phần 2 của script rồi chạy lại, không sửa tay tệp drawio.
+- `ProjectDiagram.drawio` là sơ đồ duy nhất của đề tài (không dùng Mermaid/PlantUML): phần I thứ tự thực hiện 0 → A → B → C → H, D, E, F, GV → đánh giá → G → báo cáo; phần II kiến trúc 5 tầng, cột trái khối bài gốc BiasCast đọc từ mã, cột phải khối đề tài sửa/thay (màu theo bước). Sơ đồ chỉ chứa phạm vi tiểu luận: không đưa khóa luận, thứ tự cắt (xem `03_Pipeline.md` Mục 8.3). Sinh bằng `Tools/Diagram_Build.py`: đổi pipeline (`03_Pipeline.md` Mục 4–8) => sửa Phần 2 của script rồi chạy lại, không sửa tay tệp drawio.
 - Hình lý thuyết ở `Document/06_Theory/Figures/`, sinh bằng `Tools/Theory_Figures.py` (sơ đồ, bảng: SVG Python thuần; hình số liệu: matplotlib, seaborn khi cần); sinh xong mở trong trình duyệt kiểm chữ đè.
-- Hình kết quả notebook nằm ở `Workspace/<NN_Việc>/Figures/`; `.md` trỏ tới đó, không chép sang `Document/`.
+- Hình kết quả notebook nằm ở `Workspace/<NN_Việc>/<notebook>/Figures/`; `.md` trỏ tới đó, không chép sang `Document/`.
 
 ## Tên và đường dẫn
 

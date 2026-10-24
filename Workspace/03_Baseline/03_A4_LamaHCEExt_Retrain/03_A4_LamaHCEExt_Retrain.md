@@ -1,6 +1,6 @@
 # A4 — Huấn luyện lại Sequential Forecast LSTM có Q với ba hạt giống
 
-Tài liệu đi cùng mã của bốn notebook Kaggle: [03_A4_LamaHCEExt_Retrain_Seed111.py](03_A4_LamaHCEExt_Retrain_Seed111.py), [_Seed222](03_A4_LamaHCEExt_Retrain_Seed222.py), [_Seed333](03_A4_LamaHCEExt_Retrain_Seed333.py) (huấn luyện, mỗi hạt giống một notebook) và [04_A4_LamaHCEExt_Compare.py](04_A4_LamaHCEExt_Compare.py) (so sánh, xuất dự báo cho bộ đánh giá). A4 huấn luyện lại từ đầu mô hình tốt nhất của BiasCast — Sequential Forecast LSTM có lưu lượng quá khứ, lớp nhúng đơn giản — đúng cấu hình của tác giả, với ba hạt giống 111 (hạt giống của tác giả), 222, 333, để trả lời ba câu hỏi:
+Tài liệu đi cùng mã của bốn notebook Kaggle: [03_A4_LamaHCEExt_Retrain_Seed111.py](03_A4_LamaHCEExt_Retrain_Seed111.py), [_Seed222](03_A4_LamaHCEExt_Retrain_Seed222.py), [_Seed333](03_A4_LamaHCEExt_Retrain_Seed333.py) (huấn luyện, mỗi hạt giống một notebook) và [04_A4_LamaHCEExt_Compare.py](../04_A4_LamaHCEExt_Compare/04_A4_LamaHCEExt_Compare.py) (so sánh, xuất dự báo cho bộ đánh giá). A4 huấn luyện lại từ đầu mô hình tốt nhất của BiasCast — Sequential Forecast LSTM có lưu lượng quá khứ, lớp nhúng đơn giản — đúng cấu hình của tác giả, với ba hạt giống 111 (hạt giống của tác giả), 222, 333, để trả lời ba câu hỏi:
 
 1. Mã đã công bố huấn luyện lại có ra kết quả của bài (NSE trung vị test 0,7053) không?
 2. Chỉ đổi hạt giống thì kết quả dao động bao nhiêu? Đây là mốc nhiễu để đọc mọi so sánh ở bước B, C: chênh lệch giữa hai mô hình nhỏ hơn mức này chưa đủ để kết luận mô hình nào tốt hơn.
@@ -145,7 +145,7 @@ Nếu mô hình của tác giả chỉ như một lần chạy thứ tư cùng p
 
 Lưu vực mô hình dự báo càng tốt thì nhiễu hạt giống càng nhỏ: trung vị độ lệch chuẩn giảm từ 0,034 ở nhóm NSE 0–0,5 xuống 0,009 ở nhóm ≥ 0,85.
 
-**Kiểm định ghép cặp theo lưu vực.** Cùng cách của bộ đánh giá (`Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.py` Phần 7.1): Wilcoxon hạng có dấu hai phía trên hiệu NSE từng lưu vực, Cohen's dz = trung bình hiệu / độ lệch chuẩn hiệu, hiệu chỉnh Holm trong từng họ so sánh. Hiệu dương nghĩa là mô hình bên trái tốt hơn.
+**Kiểm định ghép cặp theo lưu vực.** Cùng cách của bộ đánh giá (`Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py` Phần 7.1): Wilcoxon hạng có dấu hai phía trên hiệu NSE từng lưu vực, Cohen's dz = trung bình hiệu / độ lệch chuẩn hiệu, hiệu chỉnh Holm trong từng họ so sánh. Hiệu dương nghĩa là mô hình bên trái tốt hơn.
 
 | Họ | Trái | Phải | Trái tốt hơn | Trái kém hơn | Trung bình hiệu | Trung vị hiệu | Cohen's dz | p Wilcoxon | p Holm |
 |---|---|---|---|---|---|---|---|---|---|
@@ -166,18 +166,18 @@ Trung bình hiệu và Cohen's dz ở họ "hạt giống với tác giả" bị
 <a id="p4"></a>
 ## Phần 4. Hình
 
-![A4_Seeds](Figures/A4_Seeds.png)
+![A4_Seeds](../04_A4_LamaHCEExt_Compare/Figures/A4_Seeds.png)
 
 Hình 1. (a) NSE trung vị validation sau mỗi epoch của ba hạt giống; ngôi sao là epoch lưu thành `best_model.pt` (11, 15, 14), trùng epoch có NSE validation cao nhất; mỗi đường dừng ở epoch dừng sớm. Ba đường tăng nhanh trong 5 epoch đầu rồi dao động quanh 0,73–0,76. (b) NSE trung vị test của ba hạt giống (chấm tròn) so với `best_model.pt` của tác giả (nét đứt); dải xám là trung bình ± 2 độ lệch chuẩn của ba hạt giống. Giá trị của tác giả nằm giữa các hạt giống và trong dải xám.
 
-![A4_BasinNoise](Figures/A4_BasinNoise.png)
+![A4_BasinNoise](../04_A4_LamaHCEExt_Compare/Figures/A4_BasinNoise.png)
 
 Hình 2. (a) Hàm phân phối tích lũy NSE test theo lưu vực của ba hạt giống và tác giả: mỗi điểm (x, y) cho biết tỉ lệ y lưu vực có NSE không quá x, đường càng lệch phải càng tốt. Bốn đường gần như chồng lên nhau; hai lưu vực 742, 758 có NSE dưới −0,5 nằm ngoài trục. (b) Mỗi chấm là một lưu vực: trục ngang là NSE trung bình ba hạt giống, trục dọc là độ lệch chuẩn NSE qua ba hạt giống (thang log); đường đỏ nối trung vị của từng mức NSE. Nhiễu hạt giống giảm dần khi NSE của lưu vực tăng.
 
 <a id="p5"></a>
 ## Phần 5. Dự báo theo hợp đồng của bộ đánh giá
 
-Mỗi hạt giống được xuất thành một tệp `contracts/SeqLSTM_Q_A4_seed{111,222,333}_test_S0_lead1.npz` theo hợp đồng NPZ của bộ đánh giá (`Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md` Mục 7), để bộ đánh giá đọc bằng tham số `--extra-contract` và chấm cùng A2, DLinear, persistence trên cùng tập ngày–lưu vực.
+Mỗi hạt giống được xuất thành một tệp `contracts/SeqLSTM_Q_A4_seed{111,222,333}_test_S0_lead1.npz` theo hợp đồng NPZ của bộ đánh giá (`Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md` Mục 7), để bộ đánh giá đọc bằng tham số `--extra-contract` và chấm cùng A2, DLinear, persistence trên cùng tập ngày–lưu vực.
 
 - Dự báo thô lấy từ `test_results.p` của `best_model.pt` (`qmax_sim`, bước thời gian 0), chưa chặn âm; thư viện chỉ chặn âm khi tính chỉ số (`evaluation/tester.py` dòng 319–322). Dự báo dùng để chấm = max(dự báo thô, 0) theo `clip_targets_to_zero: [qmax]` của config; mỗi hạt giống có 1.660–2.261 ngày–lưu vực dự báo âm trước khi chặn.
 - Quan trắc, persistence, diện tích và thứ tự 451 lưu vực lấy nguyên từ ngữ cảnh A3 (`A3_persistence_predictions.npz`, `A3_Q_source_window.npz`), dựng lại và kiểm như hàm `read_context` của bộ đánh giá, vì bộ đánh giá đòi các mô hình cùng nhóm có quan trắc và persistence bằng nhau từng bit.
@@ -195,7 +195,7 @@ Thư mục `a4_compare/` trong Output notebook `04_A4_LamaHCEExt_Compare` Versio
 | `A4_seed_table.csv`, `A4_seed_stats.csv` | Bảng ba hạt giống và tác giả; thống kê qua ba hạt giống (Phần 2) |
 | `A4_seed_noise_by_basin.csv` | NSE từng lưu vực của bốn mô hình, độ lệch chuẩn, khoảng, mức NSE (Phần 3) |
 | `A4_paired_tests.csv` | Kiểm định ghép cặp (Phần 3) |
-| `A4_Seeds.png`, `A4_BasinNoise.png` | Hai hình (Phần 4), bản sao ở [Figures/](Figures/) |
+| `A4_Seeds.png`, `A4_BasinNoise.png` | Hai hình (Phần 4), bản sao ở [Figures/](../04_A4_LamaHCEExt_Compare/Figures/) |
 | `contracts/*.npz` | Ba tệp dự báo cho bộ đánh giá (Phần 5) |
 | `a4_summary.json` | Số liệu chính: đạt/không, NSE từng hạt giống, z, nhiễu theo lưu vực và theo mức, p Holm các cặp hạt giống |
 | `environment.json` | Input đã gắn kèm số Version, sha256 tệp A3 và tệp chỉ số tác giả, thư viện |
