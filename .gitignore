@@ -217,8 +217,9 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Claude Code local settings (CLAUDE.md được theo dõi trong git)
-.claude/
+# Claude Code: cấu hình riêng từng máy bỏ qua; quy tắc chung .claude/rules/ được theo dõi trong git
+.claude/*
+!.claude/rules/
 
 
 # CodeGraph index (local, rebuild bằng codegraph sync)
