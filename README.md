@@ -14,7 +14,7 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `Document/06_Theory/` | Lý thuyết LSTM, Transformer, GRU, Mamba; ghi chú đọc mã RiverMamba (tham khảo); ghi chú học BiasCast từng phần; cách đọc hình các chỉ số đánh giá (`08_EvaluationFigures.md`) |
 | `Document/07_Report/` | Bản thảo báo cáo theo chương: Chương 4 Dữ liệu và Chương 6 Thí nghiệm, kết quả từ A1/A2/A3 và đánh giá S0 |
 | `Diagrams/` | Sơ đồ đề tài (`ProjectDiagram.drawio`, sinh bằng `Tools/Diagram_Build.py`): thứ tự thực hiện, kiến trúc chi tiết, thứ tự cắt |
-| `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc: `01_Download` (tải dữ liệu), `02_Exploration` (A1), `03_Baseline` (A2–A4; A2/A3 đã có kết quả), `06_Evaluation` (bộ đánh giá, bảng và hình S0/hạn một ngày) |
+| `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc: `01_Download` (tải dữ liệu), `02_Exploration` (A1), `03_Baseline` (A2–A4; A2/A3 đã có kết quả), `04_Setup` (bước 0: dựng `mamba-ssm` cho Kaggle T4), `06_Evaluation` (bộ đánh giá, bảng và hình S0/hạn một ngày) |
 | `NeuralHydrology/` | Thư viện huấn luyện (submodule, fork `Ticasslo/neuralhydrology`, nhánh `research`) — nơi viết phần đề tài thêm vào thư viện |
 | `Tools/` | Công cụ phụ trợ: chuyển giọng nói buổi họp thành văn bản, sinh sơ đồ đề tài, sinh hình minh họa cho ghi chú lý thuyết (`Theory_Figures.py`) |
 | `PaperResearch/` | PDF tham khảo (`PaperResearchPDF/`, ghi chú từng bài ở `Document/05_Survey/03_PaperNotes.md`) và mã tác giả BiasCast (`PaperResearchCode/`, hai submodule trỏ tới `conestone/biascast`, `conestone/neuralhydrology` — chỉ để đọc, không sửa) |
@@ -35,7 +35,7 @@ PDF trong `PaperResearch/PaperResearchPDF/` để nhóm tham khảo. Giấy phé
 
 Đã hoàn thành A1, tái lập suy luận A2 và các mốc A3. Trên giao chung 450 lưu vực, SeqLSTM có Q đạt NSE trung vị 0,705259; persistence qmax đạt 0,350031; DLinear ba seed đạt 0,380152 ± 0,002415. Bộ đánh giá giao thức 2 đã chạy trên Kaggle cho test/S0/hạn một ngày, khớp A3, qua 60 kiểm thử và 57 kiểm tra CSV cục bộ. Bảng lũ chính yêu cầu cùng ngày bắt đầu; bảng phụ dùng ±1 ngày. Kết quả gồm chỉ số liên tục, bốn mức, sự kiện lũ và kiểm định ghép cặp.
 
-Luồng mô hình tiếp tục A4 và B1; luồng dữ liệu/đánh giá chuẩn bị báo cáo, bàn giao kết quả và tích hợp B2 khi A4/B1 sẵn sàng. Các kịch bản S1–S4, nhiều hạn và so sánh năm lõi được bổ sung khi có dự báo tương ứng.
+Bước 0 đã dựng xong `mamba-ssm` cho Kaggle T4 (torch 2.11), đạt bộ test chính thức của tác giả. Luồng mô hình tiếp tục A4 và B1; luồng dữ liệu/đánh giá chuẩn bị báo cáo, bàn giao kết quả và tích hợp B2 khi A4/B1 sẵn sàng. Các kịch bản S1–S4, nhiều hạn và so sánh năm lõi được bổ sung khi có dự báo tương ứng.
 
 Phân tích đặc điểm lưu vực đã chạy trên Kaggle: 12 phép so, 31 thuộc tính dạng số, 1.116 hệ số cho ΔNSE, ΔPNSE và ΔPOD lũ hai năm. Có 30 kiểm thử và 143 kiểm tra kết quả cục bộ đạt. Với SeqLSTM_Q so persistence, mức cải thiện NSE liên hệ âm với độ cao trung bình (ρ = −0,422); với SeqLSTM có Q so không Q, chênh lệch NSE liên hệ dương với diện tích (ρ = 0,274). Các hệ số mô tả liên hệ trong Extended LamaH-CE.
 
