@@ -1,6 +1,8 @@
 # Quan hệ giữa đặc điểm lưu vực và kết quả dự báo — Extended LamaH-CE
 
-Tài liệu đi cùng [mã Python](02_Evaluation_LamaHCEExt_ByBasin.py) và [notebook Kaggle](02_Evaluation_LamaHCEExt_ByBasin.ipynb) (bản chính thức: Version 1 của notebook `02_Evaluation_LamaHCEExt_ByBasin`, Save & Run All trên CPU, có output), mở rộng phân tích theo lưu vực ở [pipeline Mục 6.4](../../../Document/01_Plan/03_Pipeline.md#64-theo-lưu-vực). Phân tích sử dụng các dự báo A2, DLinear và persistence đã lưu để trả lời: **mức cải thiện dự báo thay đổi thế nào theo diện tích, độ cao, tỷ phần tuyết, độ khô hạn và mức đầy đủ dữ liệu?**
+Tài liệu đi cùng [mã Python](02_Evaluation_LamaHCEExt_ByBasin.py) và [notebook Kaggle](02_Evaluation_LamaHCEExt_ByBasin.ipynb), mở rộng phân tích theo lưu vực ở [pipeline Mục 6.4](../../../Document/01_Plan/03_Pipeline.md#64-theo-lưu-vực). Phân tích sử dụng các dự báo A2, DLinear, LSTM A4 và persistence đã lưu để trả lời: **mức cải thiện dự báo thay đổi thế nào theo diện tích, độ cao, tỷ phần tuyết, độ khô hạn và mức đầy đủ dữ liệu; các liên hệ có ổn định qua ba seed LSTM hay không?**
+
+Bản phân tích đã chạy trên Kaggle với **14 run, 18 phép so**, giữ 451 ID và giao chung 652.628 ngày–lưu vực. **Ba seed LSTM A4 giữ liên hệ âm của ΔNSE với độ cao và tuyết, dương với độ khô hạn**, đồng thời cho thấy biến thiên đáng kể ở một số lưu vực. Phần mở rộng qua 41 kiểm thử Kaggle và 492 kiểm CSV cục bộ. [Kết quả A4](#12-kết-quả-phân-tích-14-run-có-a4); Mục 11.1–11.7 trình bày bộ 11 run gốc.
 
 Trên 450 lưu vực có ngày chấm, **mức cải thiện NSE của SeqLSTM_Q so persistence có liên hệ âm với độ cao trung bình (ρ = −0,422) và tỷ phần tuyết (ρ = −0,263), liên hệ dương với chỉ số khô hạn (ρ = 0,211)**. Diện tích có liên hệ yếu trong phép so này (ρ = −0,075), nhưng liên hệ dương rõ hơn với chênh lệch SeqLSTM có Q so không Q (ρ = 0,274). Kết luận phụ thuộc vào mô hình, mốc tham chiếu và chỉ số đang xét. [Kết quả thực nghiệm](#11-kết-quả-thực-nghiệm-và-kiểm-chứng) trình bày hệ số, phân nhóm, số trận và độ nhạy.
 
@@ -23,19 +25,21 @@ Notebook chạy bằng CPU, đọc đầu vào dưới `/kaggle/input` và ghi t
 | Dataset `lamah-ce-ext` | `A_basins_total_upstrm/1_attributes/Catchment_attributes.csv` và `D_gauges/1_attributes/Gauge_attributes.csv` |
 | Output A1 | `A1_P3_static_attribute_sources.csv`; bảng topology nếu có |
 | Output A3 | `A3_DLinear_data_audit.npz`, `A3_final_evaluation_masks.npz`, `A3_DLinear_loss_stats.csv` |
-| Output bộ đánh giá | `Evaluation_summary.json`, `Evaluation_protocol.json`, `Evaluation_metrics.csv`, `Evaluation_events.csv` |
+| Output bộ đánh giá | `Evaluation_summary.json`, `Evaluation_protocol.json`, `Evaluation_metrics.csv`, `Evaluation_events.csv`; với A4 cần thêm `Evaluation_A4_input_check.csv` và `Evaluation_A4_contract_check.csv` |
 
-Output A1 xác nhận ánh xạ 33 thuộc tính đã dùng; giá trị thuộc tính được đọc từ bảng gốc. Output A3 cung cấp lịch, ID, diện tích, Q số thô và mặt nạ đánh giá. Output bộ đánh giá cung cấp chỉ số theo lưu vực và số trận đã chấm bằng giao thức cùng ngày bắt đầu. Không cần gắn lại Output A2 hoặc chạy lại mô hình.
+Output A1 xác nhận ánh xạ 33 thuộc tính đã dùng; giá trị thuộc tính được đọc từ bảng gốc. Output A3 cung cấp lịch, ID, diện tích, Q số thô và mặt nạ đánh giá. Output bộ đánh giá cung cấp chỉ số theo lưu vực và số trận đã chấm bằng giao thức cùng ngày bắt đầu. Không cần gắn lại Output A2/A4 Compare hoặc chạy lại mô hình.
 
-Các phiên bản giao thức đánh giá từ 2 trở lên được nhận khi thỏa hợp đồng dữ liệu cần dùng: test/S0/hạn một ngày, cùng giao chung và dung sai khớp trận chính bằng 0. Phiên bản mới hơn không tự làm thay đổi phạm vi phân tích. Nguồn trùng tên cần được chỉ rõ; không tự chọn một phiên bản giữa nhiều ứng viên.
+Để phân tích A4, dùng Output bộ đánh giá **đã Save Version sau lần chấm 14 run** và cập nhật phiên bản Input đó trong notebook 02. Các CSV tổng hợp như `Evaluation_summary.csv` hoặc `Evaluation_events_pooled.csv` không thay được bảng từng lưu vực `Evaluation_metrics.csv` và `Evaluation_events.csv`. Phần 2 in số run, số phép so và cờ A4; lần phân tích mở rộng phải báo **14 run, 18 phép so, A4=True**.
 
-Mã `.py` là nguồn chỉnh sửa chính; `.ipynb` được sinh để nhập vào Kaggle. Notebook trình bày theo phần, đề mục Markdown và cell code theo chức năng. Chạy Run All theo thứ tự, rồi giữ Output bằng Save Version. Kết quả ghi trực tiếp, không đóng ZIP.
+Nguồn 11 run gốc được nhận từ giao thức đánh giá 2; nguồn 14 run cần giao thức từ 3, xác nhận đủ ba hợp đồng A4 Compare Version 2 và các hàng kiểm nguồn đều đạt. Metadata seed trong chỉ số/sự kiện phải khớp bảng hợp đồng. Thiếu một seed hoặc có run chưa khai báo làm chương trình dừng. Cả hai chế độ đều dùng test/S0/hạn một ngày, cùng giao chung và dung sai khớp trận chính bằng 0. Nguồn trùng tên cần được chỉ rõ; không tự chọn một phiên bản giữa nhiều ứng viên.
+
+Mã `.py` là nguồn chỉnh sửa chính. Repo giữ `.ipynb` chính thức Version 1 có output của lần phân tích 11 run; nguồn `.py` và kết quả CSV tại Mục 12 đã bao gồm A4. Tệp `.ipynb` tải từ phiên Save & Run All tương ứng với lần phân tích 14 run được bổ sung khi có. Notebook trình bày theo phần, đề mục Markdown và cell code theo chức năng; không thay bản chính thức bằng notebook trống output. Kết quả ghi trực tiếp, không đóng ZIP.
 
 ## 3. Ghép dữ liệu và kiểm tính nhất quán
 
 Các bảng ghép theo khóa ID, không theo vị trí dòng. Danh sách ID, lịch ngày và thứ tự các trục trong NPZ phải khớp trước khi tính thống kê. Khóa trùng, ID thiếu/thừa, dữ liệu vô cực hoặc schema không rõ được báo ở bước kiểm nguồn.
 
-Mặt nạ `common_source_all` đọc từ A3 được dùng để đối chiếu số ngày đánh giá của từng run. Các hàng NSE/PNSE dùng đúng cùng phạm vi; không lấy NSE native của hai run có ngày chấm khác nhau rồi trừ. Các run phải có cùng quan trắc canonical, số ngày và mẫu số đánh giá trong phép so.
+Mặt nạ `common_source_all` đọc từ A3 được dùng để đối chiếu số ngày đánh giá của từng run. Các hàng NSE/PNSE dùng đúng cùng phạm vi; không lấy NSE native của hai run có ngày chấm khác nhau rồi trừ. Các run phải có cùng quan trắc canonical, số ngày và mẫu số đánh giá trong phép so. Lần chấm 14 run hiện giữ nguyên giao A3; nếu một nguồn mới làm giảm giao, phép kiểm sẽ dừng để cập nhật mặt nạ chẩn đoán, không âm thầm dùng lại thống kê trên mặt nạ cũ.
 
 Ngưỡng lũ và sự kiện được giữ theo Output bộ đánh giá. Phân tích này không fit lại ngưỡng, không đổi quy tắc gộp cụm và không nới dung sai để tăng số trận bắt được. Bảng chính chỉ lấy cụm USWRC, chu kỳ lặp lại hai năm và dung sai 0.
 
@@ -75,7 +79,7 @@ Bảng tương quan chính dùng **31 trường**, loại mã phân loại `lc_d
 
 Theo [LamaH-CE Mục 5](https://essd.copernicus.org/articles/13/4529/2021/#section5), nhiều chỉ số khí hậu được tính trên 1989–2009, ET0 từ GCD v2 có kỳ 1970–2000 và các chỉ số thực vật dùng kỳ nguồn dài hạn có thể tới 2020. Đây là metadata có sẵn của dataset, không phải toàn bộ thống kê chỉ fit từ train của thí nghiệm. Phạm vi nguồn được giữ khi diễn giải; các diagnostics mới từ chuỗi Q được tách riêng theo kỳ.
 
-## 5. Mười hai phép so sánh và ba outcome
+## 5. Các phép so sánh và ba outcome
 
 Mỗi phép so có hướng cố định: **run bên trái trừ run tham chiếu**. Giá trị dương biểu thị cải thiện theo outcome đang xét.
 
@@ -85,12 +89,16 @@ Mỗi phép so có hướng cố định: **run bên trái trừ run tham chiế
 | Ba seed DLinear so persistence qmax | DLinear_seed_111, DLinear_seed_222 và DLinear_seed_333; mỗi run trừ Persistence_qmax |
 | Có/không Q trong cùng kiến trúc | SeqLSTM_Q − SeqLSTM_noQ; EncDec_Q − EncDec_noQ |
 | Hai miền khí tượng tham chiếu | D_RA − D_FC |
+| Ba seed LSTM A4 so persistence qmax | SeqLSTM_Q_A4_seed111/222/333, mỗi run trừ Persistence_qmax |
+| Ba seed LSTM A4 so trọng số tác giả | Mỗi run A4 trừ SeqLSTM_Q |
+
+Nguồn 11 run có 12 phép so; nguồn 14 run có **18 phép so**, tương ứng **1.674 hàng tương quan = 31 thuộc tính × 18 phép so × 3 outcome**. Mười hai phép so gốc giữ nguyên cách tính, seed hoán vị và họ Holm. Thêm A4 không làm đổi p của các họ liên hệ thuộc tính cũ khi dữ liệu của các phép so đó giữ nguyên. Đây là các họ 31 thuộc tính, khác họ 78 cặp mô hình trong notebook đánh giá 01.
 
 D_RA dùng tái phân tích ở ngày đích, nên đây là mốc tham chiếu về nguồn thông tin. Các cặp A2 có/không Q cũng chỉ mô tả những run đã có, chưa tách riêng tác động của đầu vào khỏi nhiễu hạt giống và những khác biệt cấu hình đi kèm.
 
 **ΔNSE** là NSE của run trừ NSE tham chiếu trên cùng ngày. Ví dụ NSE 0,60 so 0,40 cho ΔNSE = 0,20. Đây là chênh lệch điểm, không phải cải thiện 20%.
 
-**ΔPNSE** là PNSE của run trừ PNSE tham chiếu. PNSE = 1 − SSE mô hình / SSE persistence, trong đó SSE là tổng bình phương sai số trên mặt nạ đã cố định. PNSE của persistence qmax bằng 0 khi mẫu số dương, nên với chín phép so persistence, ΔPNSE bằng PNSE của run. Các phép so Q/noQ và D_RA/D_FC vẫn cần lấy chênh hai PNSE. Mẫu số bằng 0 cho trạng thái không xác định, không thêm epsilon.
+**ΔPNSE** là PNSE của run trừ PNSE tham chiếu. PNSE = 1 − SSE mô hình / SSE persistence, trong đó SSE là tổng bình phương sai số trên mặt nạ đã cố định. PNSE của persistence qmax bằng 0 khi mẫu số dương, nên trong các phép so persistence, ΔPNSE bằng PNSE của run. Các phép so giữa hai mô hình vẫn lấy chênh hai PNSE. Mẫu số bằng 0 cho trạng thái không xác định, không thêm epsilon.
 
 **ΔPOD hai năm** là POD của run trừ POD tham chiếu ở ngưỡng lũ hai năm, cụm USWRC và dung sai 0. POD = h/(h+m), với h là số trận bắt đúng và m là số trận bỏ sót. Phép so kiểm cùng số trận thật đủ điều kiện trước khi trừ. Lưu vực không có trận thật đủ điều kiện có POD không xác định, không được gán POD bằng 0 để đưa vào tương quan.
 
@@ -128,7 +136,9 @@ Bốn thuộc tính ưu tiên cho hình và bảng nhóm là `area_calc`, `elev_
 
 `lc_dom` được mô tả theo lớp CORINE, giữ mã và số lượng từng lớp. `mvert_ang` được chia thành bốn cung [0°, 90°), [90°, 180°), [180°, 270°), [270°, 360°); 360° cùng nhóm với 0°. Góc thiếu hoặc ngoài [0°, 360°] có nhóm báo riêng. Các bảng này mô tả phân phối outcome trong nhóm; không áp thứ tự lớn–nhỏ vật lý cho mã lớp hoặc bỏ qua tính vòng của góc.
 
-Ba seed DLinear được giữ thành ba run riêng. Bảng độ phân tán seed tính trung bình và độ lệch chuẩn mẫu của các chỉ số theo cùng lưu vực khi đủ ba giá trị hợp lệ. Ba seed không tạo thêm ba lưu vực độc lập. Trung bình ba chỉ số cũng không phải chỉ số của một dự báo ensemble; notebook không tạo chuỗi dự báo ensemble từ các score.
+Ba seed của mỗi họ DLinear và LSTM A4 được giữ thành các run riêng. Hai bảng độ phân tán tính trung bình, độ lệch chuẩn mẫu, min và max của các hiệu chỉ số so persistence tại cùng lưu vực, chỉ tổng hợp khi đủ ba giá trị hợp lệ. Ba seed không tạo thêm ba lưu vực độc lập. Trung bình ba chỉ số cũng không phải chỉ số của một dự báo ensemble; notebook không tạo chuỗi dự báo ensemble từ các score. Độ phân tán giữa DLinear và LSTM mô tả hai cấu hình/đầu vào đã chạy, không cô lập ảnh hưởng của kiến trúc.
+
+Bảng `BasinAnalysis_seed_association_stability.csv` đối chiếu ρ của từng thuộc tính–outcome qua ba seed so persistence, tách hai họ mô hình. Với đủ 14 run, bảng có **186 hàng = 2 họ × 31 thuộc tính × 3 outcome**. Mỗi hàng giữ riêng ρ từng seed, số ID min/max, trung bình/std mẫu và min/max của ρ; trạng thái phân biệt cùng dương, cùng âm, cùng bằng 0, lẫn dấu/chạm 0 và seed không xác định. Cùng dấu không đồng nghĩa hiệu ứng lớn hoặc có ý nghĩa thống kê. Bảng này không gộp p, không tạo thêm phép thử từ ba seed và không coi range hệ số là khoảng tin cậy.
 
 ## 9. Kiểm độ nhạy với lưu vực lồng nhau
 
@@ -147,19 +157,24 @@ Các bảng dùng tiền tố `BasinAnalysis_`; hình nằm trong `Figures/` v�
 | Nguồn và kiểm thử | Thông tin nguồn, kiểm ID/lịch/mặt nạ, kiểm thử ví dụ số và trạng thái thực thi |
 | Thuộc tính và diagnostics | Giá trị 451 ID, đơn vị, độ phủ, thống kê train/test và cờ không xác định |
 | Contrast | Các chênh lệch theo lưu vực, số ngày và số trận dùng trong phép so |
-| Tương quan tĩnh | 31 thuộc tính × 12 contrast × 3 outcome, kèm n, ρ, permutation p và Holm |
+| Tương quan tĩnh | 31 thuộc tính × 18 contrast × 3 outcome khi có A4; nguồn 11 run dùng 12 contrast; kèm n, ρ, permutation p và Holm |
 | Mô tả nhóm | Biên tứ phân vị, số lượng và phân phối outcome; lớp CORINE và cung góc |
 | Diagnostics và độ nhạy | Tương quan mô tả, độ phân tán ba seed và nhóm đầu nguồn nếu nguồn hợp lệ |
 | Hình | Heatmap hệ số, biểu đồ bốn thuộc tính ưu tiên và phân phối theo nhóm |
 
 Các tệp CSV cần giữ gồm `BasinAnalysis_checks.csv`, `BasinAnalysis_attributes_and_diagnostics.csv`, `BasinAnalysis_attribute_quality.csv`, `BasinAnalysis_paired_contrasts.csv`, `BasinAnalysis_static_associations.csv`, `BasinAnalysis_diagnostic_associations.csv`, `BasinAnalysis_quartile_definitions.csv`, `BasinAnalysis_grouped_skill.csv`, `BasinAnalysis_categorical_summary.csv`, `BasinAnalysis_DLinear_seed_spread.csv`, `BasinAnalysis_topology_sensitivity.csv` và `BasinAnalysis_input_manifest.csv`. Hai JSON là `BasinAnalysis_protocol.json` và `BasinAnalysis_summary.json`.
 
+Phần độ ổn định bổ sung `BasinAnalysis_seed_association_stability.csv` và, khi có A4, `BasinAnalysis_LSTM_A4_seed_spread.csv`. Lần chấm 14 run xuất **14 CSV, hai JSON và năm PNG**. Cờ `complete` chuyển false từ đầu mỗi lần chạy và chỉ thành true sau khi các bảng/hình được xuất đầy đủ.
+
 | Hình PNG trong Figures | Nội dung |
 |---|---|
-| BasinAnalysis_static_delta_NSE_rho.png | Hệ số Spearman của 31 thuộc tính với ΔNSE ở 12 phép so |
+| BasinAnalysis_static_delta_NSE_rho.png | Hệ số Spearman của 31 thuộc tính với ΔNSE ở đủ 18 phép so khi có A4 |
 | BasinAnalysis_priority_scatter.png | Bốn thuộc tính ưu tiên và ΔNSE, giữ mọi điểm âm; ba cặp hiển thị được chọn trước |
-| BasinAnalysis_quartile_delta_NSE.png | ΔNSE trung vị theo nhóm thuộc tính, giữ riêng ba seed DLinear |
+| BasinAnalysis_quartile_delta_NSE.png | ΔNSE trung vị theo cùng nhóm thuộc tính, tách hàng DLinear và LSTM A4, giữ riêng từng seed |
 | BasinAnalysis_quartile_flood_POD.png | POD cộng dồn số trận theo cùng nhóm thuộc tính; đọc cùng mẫu số trong CSV |
+| BasinAnalysis_seed_spread.png | Phân phối std mẫu của ba hiệu chỉ số tại từng ID, so hai họ DLinear/LSTM A4; giữ ngoại lệ |
+
+Khi gửi kết quả mới, giữ hai JSON, bảng checks, static_associations, grouped_skill, quartile_definitions, hai bảng seed_spread, seed_association_stability, attribute_quality, topology_sensitivity và năm hình. Các tệp trực tiếp trong `Tables/BasinAnalysis_*` giữ bộ 11 run gốc; bộ 14 run được lưu riêng ở [Tables/BasinAnalysis_A4_Integrated](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_received_manifest.csv) và `Figures/BasinAnalysis_A4_Integrated/`.
 
 Khi trình bày kết quả cần nêu tên contrast, outcome, hướng và độ lớn hệ số, số ID, khoảng đặc điểm và độ ổn định giữa các seed/nhóm. Chẳng hạn, “mức cải thiện NSE của SeqLSTM_Q so persistence có xu hướng lớn hơn ở các lưu vực có chỉ số khô hạn cao hơn” mô tả đúng đại lượng đã đo. Khẳng định “độ khô hạn làm NSE cao” đòi hỏi bằng chứng khác.
 
@@ -167,7 +182,7 @@ Khi trình bày kết quả cần nêu tên contrast, outcome, hướng và đ�
 
 ### 11.1. Phạm vi thực nghiệm
 
-Notebook đã chạy trên Kaggle với Output bộ đánh giá giao thức 2, A1, A3 và dataset gốc. Có **30 kiểm thử đạt**, giữ 451 ID, trong đó 450 ID có **652.628 ngày–lưu vực** trên giao chung test/S0/hạn một ngày. ID 55 vẫn có mặt với số ngày chấm bằng 0. Kiểm train, mặt nạ và mẫu số quan trắc đạt trước khi tính tương quan.
+Các kết quả trong Mục 11.1–11.7 thuộc nguồn **11 run gốc**, với Output bộ đánh giá giao thức 2, A1, A3 và dataset gốc trên Kaggle. Có **30 kiểm thử đạt**, giữ 451 ID, trong đó 450 ID có **652.628 ngày–lưu vực** trên giao chung test/S0/hạn một ngày. ID 55 vẫn có mặt với số ngày chấm bằng 0. Kiểm train, mặt nạ và mẫu số quan trắc đạt trước khi tính tương quan.
 
 Phân tích có **1.116 hàng = 31 thuộc tính × 12 phép so × 3 outcome**; toàn bộ 1.116 hệ số chính hữu hạn. ΔNSE và ΔPNSE dùng 450 ID; ΔPOD dùng 366 ID có trận thật đủ điều kiện. Cả 33 thuộc tính đều đủ giá trị trên 451 ID, với 31 trường dùng cho tương quan. Thời gian chạy Kaggle khoảng 75,6 giây. [Thông tin lần chạy](Tables/BasinAnalysis_summary.json), [giao thức](Tables/BasinAnalysis_protocol.json), [độ phủ thuộc tính](Tables/BasinAnalysis_attribute_quality.csv).
 
@@ -260,7 +275,62 @@ Những kết quả này xác định được các nhóm cần phân tích và 
 
 [Manifest tệp nhận](Tables/BasinAnalysis_received_manifest.csv), [bảng kiểm](Tables/BasinAnalysis_output_audit.csv) và [biên nhận kiểm tra](Tables/BasinAnalysis_output_verification.json) ghi phạm vi đối chiếu. SHA-256 của bốn đầu vào bộ đánh giá được kiểm bằng các tệp cục bộ tương ứng. Giá trị thuộc tính gốc, NPZ A3 và thành viên nhóm topology được kiểm trong lần chạy Kaggle; kiểm cục bộ sử dụng CSV đã xuất, không nạp lại các nguồn đầy đủ đó hoặc huấn luyện lại mô hình.
 
-## 12. Nguồn tham khảo
+### 11.8. Kiểm phần mở rộng A4
+
+Mã mở rộng qua **41 kiểm thử độc lập**, cùng đường chạy dữ liệu giả cho cả 11 và 14 run. Mười bảng tính toán gốc khớp hoàn toàn bản trước; khi thêm A4, mọi hàng của 12 phép so cũ giữ nguyên, gồm ρ, p hoán vị và Holm. Đường chạy mới xuất đủ 18 phép so, 1.674 hàng tương quan, 186 hàng độ ổn định và năm hình.
+
+Đã kiểm 12 trường hợp từ chối hoặc bảo vệ trạng thái: thiếu từng seed A4, metadata summary sai, cờ ngữ cảnh/hash không đạt, seed chỉ số không khớp, khác mẫu số sự kiện, bảng nguồn có lỗi và chạy lại thất bại sau một lần thành công. Hình được kiểm bố cục trên dữ liệu giả. Những kiểm tra này xác nhận mã và đường dữ liệu; kết quả thực nghiệm A4 trên 451 lưu vực được trình bày ở Mục 12.
+
+## 12. Kết quả phân tích 14 run có A4
+
+### 12.1. Phạm vi và đối chiếu
+
+Phân tích trên Output đánh giá giao thức 3 hoàn thành trong khoảng **40,7 giây** trên Kaggle CPU, với **41 kiểm thử đạt**, 14 run, 18 phép so và 31 thuộc tính dạng số. Giữ đủ 451 ID; 450 ID có 652.628 ngày–lưu vực chấm chung. Có **1.674 hệ số hữu hạn** và **186 hàng độ ổn định giữa seed**. [Thông tin lần chạy](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_summary.json).
+
+Đã lưu nguyên **21 tệp** gồm 14 CSV, hai JSON và năm PNG, tổng 6.614.708 byte. **492 kiểm cục bộ đạt**: tính lại 1.674 hệ số bằng SciPy, 1.674 p-value với 9.999 hoán vị mỗi phép thử và Holm, 270 hệ số diagnostics, 360 hàng bảng nhóm, hai bảng phân tán gồm 2.706 hàng và 186 hàng độ ổn định hệ số. Sai khác |ρ| tối đa **4,44×10⁻¹⁶**, p hoán vị khớp hoàn toàn; kết quả của 12 phép so gốc giữ nguyên.
+
+Các phía lặp lại trong bảng contrast được kiểm nhất quán theo run–ID; 78 hàng tổng hợp sáu chỉ số và 13 hàng sự kiện khớp bộ đánh giá 14 run. Kiểm cục bộ dựa trên CSV đã xuất; không nạp lại thuộc tính gốc, NPZ A3, dự báo ngày hoặc bảng chỉ số/sự kiện từng ID gốc của bộ đánh giá trong lần này. Thành viên nhóm topology và danh tính đầu vào đầy đủ được kiểm tại Kaggle. [Manifest](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_received_manifest.csv), [bảng kiểm](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_output_audit.csv), [phạm vi kiểm chứng](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_output_verification.json).
+
+### 12.2. Liên hệ với thuộc tính được giữ qua ba seed LSTM
+
+| Thuộc tính, outcome ΔNSE so persistence | Seed 111 | Seed 222 | Seed 333 |
+|---|---:|---:|---:|
+| Diện tích area_calc | −0,092 | −0,101 | −0,105 |
+| Độ cao trung bình | −0,415 | −0,423 | −0,417 |
+| Tỷ phần tuyết trong lượng mưa | −0,261 | −0,273 | −0,267 |
+| Chỉ số khô hạn ET0/lượng mưa | 0,183 | 0,201 | 0,212 |
+
+Mỗi hệ số dùng 450 lưu vực. Các liên hệ độ cao, tuyết và khô hạn giữ hướng qua ba seed; cùng kết luận mô tả đã thấy với trọng số tác giả. Diện tích có liên hệ âm yếu, với p Holm **0,3992 / 0,2744 / 0,1856** trong các họ 31 thuộc tính tương ứng; ba thuộc tính còn lại có p Holm 0,0031. Các p này dựa giả định trao đổi ID, không loại trừ phụ thuộc không gian.
+
+Toàn bộ **31/31 thuộc tính có ρ cùng dấu qua ba seed đối với ΔNSE**. Con số tương ứng là 29/31 cho ΔPNSE và 27/31 cho ΔPOD hai năm; cùng dấu chưa bảo đảm hệ số lớn. Kết quả củng cố độ ổn định của hướng liên hệ với mức cải thiện, nhưng không biến tương quan thành đóng góp nhân quả của đầu vào. [Bảng hệ số](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_static_associations.csv), [độ ổn định](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_seed_association_stability.csv).
+
+![Mức cải thiện NSE theo nhóm, gồm ba seed A4](Figures/BasinAnalysis_A4_Integrated/BasinAnalysis_quartile_delta_NSE.png)
+
+*Hình 5. Các run dùng cùng biên nhóm thuộc tính. Hàng dưới giữ riêng ba seed A4 và trọng số tác giả, trên cùng thang tung độ với hàng DLinear. Đường nhóm mô tả median hiệu NSE, không phải phần trăm cải thiện.*
+
+### 12.3. Nhóm độ cao và diện tích cho hai góc nhìn kỹ năng
+
+Ở nhóm độ cao thấp nhất [221; 591,5) m, median ΔNSE của A4 111/222/333 là **0,4281 / 0,4248 / 0,4303**; ở nhóm cao nhất [1.294; 3.122] m là **0,1317 / 0,1319 / 0,1258**. Cả ba lần chạy vẫn cải thiện theo median ở nhóm cao nhất, nhưng mức cải thiện thấp hơn rõ rệt. Với chỉ số khô hạn, median hiệu tăng từ khoảng **0,238–0,245** ở Q1 lên **0,371–0,392** ở Q4; các nhóm giữa không hoàn toàn đơn điệu.
+
+POD đúng ngày ở nhóm diện tích nhỏ nhất là **13,11 / 15,73 / 14,98%**, tương ứng 35/267, 42/267, 40/267 trận. Nhóm diện tích lớn nhất đạt **25,46 / 29,63 / 26,85%**, tương ứng 55/216, 64/216, 58/216 trận. Dù median ΔNSE thấp hơn ở Q4 diện tích so Q1, POD lại cao hơn ở Q4. Phép so hiệu NSE theo lưu vực và tỷ lệ bắt trận cộng dồn có đại lượng cũng như trọng số khác nhau. [Biên nhóm](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_quartile_definitions.csv), [bảng nhóm](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_grouped_skill.csv).
+
+![POD theo nhóm, gồm ba seed A4](Figures/BasinAnalysis_A4_Integrated/BasinAnalysis_quartile_flood_POD.png)
+
+*Hình 6. POD lũ hai năm dùng cùng ngày bắt đầu, cộng số trận trước khi chia. Hàng A4 cho thấy độ biến thiên theo seed và thuộc tính; cần đọc kèm số trận trong từng nhóm.*
+
+### 12.4. Ổn định hướng liên hệ và biến thiên từng lưu vực
+
+Median std mẫu của ΔNSE qua ba seed tại từng ID là **0,02065** với LSTM A4 và **0,00383** với DLinear. Với ΔPNSE, hai giá trị tương ứng là **0,03661** và **0,00591**. Đây là độ phân tán của hiệu chỉ số tại cùng ID, không phải độ lệch chuẩn của ba NSE trung vị toàn tập. Hai mô hình dùng đầu vào và cấu hình khác nhau nên chưa thể quy toàn bộ chênh lệch này cho kiến trúc.
+
+Tại 742 và 758, std mẫu ΔNSE của A4 là **1,818** và **3,912**; phương sai quan trắc nhỏ làm chỉ số nhạy với sai lệch dự báo. Hướng tương quan ổn định ở cấp tập không bảo đảm từng lưu vực ít biến động giữa seed.
+
+Có **126/366 ID có trận thật** mà POD A4 khác nhau giữa ba seed; DLinear chỉ có 2/366 ID như vậy. Median std POD bằng 0 ở cả hai họ, nên cần đọc cả phân phối: DLinear gần như không bắt được trận đúng ngày, tạo độ phân tán nhỏ quanh kết quả kém. Độ ổn định không thay cho chất lượng dự báo. [Phân tán A4](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_LSTM_A4_seed_spread.csv), [phân tán DLinear](Tables/BasinAnalysis_A4_Integrated/BasinAnalysis_DLinear_seed_spread.csv).
+
+![Độ phân tán qua ba seed tại từng lưu vực](Figures/BasinAnalysis_A4_Integrated/BasinAnalysis_seed_spread.png)
+
+*Hình 7. Std mẫu của ba hiệu chỉ số tại mỗi lưu vực; n = 450 cho NSE/PNSE và 366 cho POD. Trục symlog giữ cả giá trị 0 và các ngoại lệ lớn; các seed không được tính thành lưu vực độc lập.*
+
+## 13. Nguồn tham khảo
 
 - [A1 — cấu trúc, ý nghĩa và kiểm thuộc tính](../../02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md), đặc biệt Mục 17.4–17.6, 17.17–17.19.
 - [A3 — dữ liệu DLinear, mặt nạ và chẩn đoán sai số](../../03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md).

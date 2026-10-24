@@ -2,7 +2,7 @@
 # # Bộ đánh giá dự báo lưu lượng — Extended LamaH-CE
 #
 # Mã nguồn duy nhất của notebook. Mỗi đề mục Markdown đi cùng cell theo chức năng.
-# Đọc Output A1/A2/A3 đã Save Version; xuất CSV/PNG/JSON trực tiếp, không tạo ZIP.
+# Đọc Output A1/A2/A3 và A4 Compare Version 2; xuất CSV/PNG/JSON trực tiếp.
 # Chạy kiểm độc lập: python 01_Evaluation_LamaHCEExt.py --self-test
 #
 # Mục lục
@@ -13,7 +13,7 @@
 # 5. Đoạn vượt ngưỡng và cụm USWRC
 # 6. Ghép sự kiện một–một
 # 7. So sánh ghép cặp, Holm và kịch bản
-# 8. Đọc Output A1, A2 và DLinear
+# 8. Đọc Output A1/A2/A3 và ba seed LSTM A4
 # 9. Kiểm thử bằng ví dụ số
 # 10. Chấm, đối chiếu A3 và xuất bảng/hình
 # 11. Chạy notebook và kết luận
@@ -49,12 +49,27 @@ METRICS = ("NSE", "PNSE", "KGE", "r", "alpha", "beta")
 SIGNATURES = ("BiasFHV", "BiasFMS", "BiasFLV")
 LEVEL_NAMES = ("low", "medium", "high", "very_high")
 A2_RUNS = ("SeqLSTM_Q", "SeqLSTM_noQ", "EncDec_Q", "EncDec_noQ", "D_FC", "D_RA")
+A4_SEEDS = (111, 222, 333)
+A4_SEED_VERSIONS = {111: 1, 222: 2, 333: 2}
+A4_COMPARE_VERSION = 2
+A4_LIBRARY_COMMIT = "dda45fcf19ee7ffd481b9d192778539df46fb074"
 RETURN_PERIODS = (1.5, 2.0, 5.0, 10.0)
 LOG_FLOOR_MM_DAY = 1e-6
 TEST_START, TEST_END = "2014-01-01", "2017-12-31"
-PRIMARY_EVENT_TOLERANCE_DAYS = 0
+PRIMARY_EVENT_TOLERANCE_POLICY = "plus_minus_floor_actual_lead_divided_by_3_calendar_days"
 SUPPLEMENTARY_EVENT_TOLERANCE_DAYS = 1
-PROTOCOL_VERSION = 2
+PROTOCOL_VERSION = 3
+
+
+def primary_event_tolerance_days(lead, forecast_horizon=None):
+    """Dung sai của chính hạn đang chấm; tổng số hạn chỉ kiểm hợp đồng."""
+    if not isinstance(lead, int) or isinstance(lead, bool) or not 1 <= lead <= 7:
+        raise ValueError("lead phải là số nguyên 1–7")
+    horizon = lead if forecast_horizon is None else forecast_horizon
+    if (not isinstance(horizon, int) or isinstance(horizon, bool)
+            or not lead <= horizon <= 7):
+        raise ValueError("forecast_horizon phải là số nguyên từ lead đến 7")
+    return lead // 3
 
 
 # %% [markdown]
@@ -100,8 +115,9 @@ class Forecast:
         if not normalized or len(set(normalized)) != len(normalized):
             raise ValueError("ID rỗng hoặc trùng sau chuẩn hóa")
         self.ids = normalized
-        if not isinstance(self.lead, int) or isinstance(self.lead, bool) or not 1 <= self.lead <= 7:
-            raise ValueError("lead phải là số nguyên 1–7")
+        if "forecast_horizon" in self.metadata and self.metadata["forecast_horizon"] is None:
+            raise ValueError("forecast_horizon khai báo trong metadata phải là số nguyên")
+        primary_event_tolerance_days(self.lead, self.metadata.get("forecast_horizon"))
         if not self.name or not self.period or not self.scenario:
             raise ValueError("Thiếu tên, kỳ hoặc kịch bản")
         if any(re.fullmatch(r"[A-Za-z0-9_-]+", value) is None for value in (self.period, self.scenario)):
@@ -364,7 +380,9 @@ def uswrc(values, runs, area_km2):
 # %% [markdown]
 # ## Phần 6 — Ghép sự kiện một–một
 # ### 6.1. Số cặp tối đa, sau đó tổng lệch onset nhỏ nhất
-# Bảng chính yêu cầu cùng ngày bắt đầu (tolerance=0); bảng phụ dùng ±1 ngày.
+# Bảng chính dùng ±floor(hạn đang chấm/3) ngày: 0, 0, 1, 1, 1, 2, 2 cho hạn 1–7.
+# Hạn 1 vẫn yêu cầu cùng ngày bắt đầu; bảng phụ luôn dùng ±1 ngày.
+# Tổng số hạn của mô hình không thay dung sai của từng hạn.
 # NOAA CR TA 98-03 dùng ±1/3 thời gian báo trước: 24 giờ tương ứng ±8 giờ.
 # Với lịch ngày, cùng ngày là lựa chọn của đề tài; không xác nhận độ chính xác dưới ngày.
 # https://repository.library.noaa.gov/view/noaa/30340/noaa_30340_DS1.pdf (Mục III.B)
@@ -410,18 +428,18 @@ def event_rates(hit, missed, false_alarm):
 
 
 def score_events(obs, sim, threshold, area, mask, lead=1, grouped=True, forecast_horizon=None,
-                 tolerance=PRIMARY_EVENT_TOLERANCE_DAYS):
+                 tolerance=None):
+    primary_tolerance = primary_event_tolerance_days(lead, forecast_horizon)
+    if tolerance is None:
+        tolerance = primary_tolerance
+    if not isinstance(tolerance, int) or isinstance(tolerance, bool) or tolerance < 0:
+        raise ValueError("tolerance phải là số nguyên ngày không âm")
     observed, predicted = [np.asarray(x, dtype=float).copy() for x in (obs, sim)]
     if np.asarray(mask).dtype != np.bool_ or np.asarray(mask).shape != observed.shape or predicted.shape != observed.shape:
         raise ValueError("Sai mặt nạ sự kiện")
     if not np.isfinite(observed[mask]).all() or not np.isfinite(predicted[mask]).all():
         raise ValueError("Sự kiện chọn ngày không hữu hạn")
     observed[~mask], predicted[~mask] = np.nan, np.nan
-    horizon = lead if forecast_horizon is None else forecast_horizon
-    if not isinstance(horizon, int) or isinstance(horizon, bool) or not 1 <= lead <= horizon <= 7:
-        raise ValueError("Sai hạn hoặc tổng số hạn của mô hình")
-    if not isinstance(tolerance, int) or isinstance(tolerance, bool) or tolerance < 0:
-        raise ValueError("tolerance phải là số nguyên ngày không âm")
     all_events, eligible, audits = [], [], []
     for values in (observed, predicted):
         events = exceedance_runs(values, threshold)
@@ -531,7 +549,7 @@ def scenario_changes(forecasts):
 
 
 # %% [markdown]
-# ## Phần 8 — Đọc Output A1/A2/A3
+# ## Phần 8 — Đọc Output A1/A2/A3/A4
 # ### 8.1. Chọn nguồn duy nhất và ghi SHA-256
 # Nếu Add Input có nhiều phiên bản cùng tên, chỉ định đường dẫn thay vì tự chọn.
 
@@ -544,6 +562,15 @@ def unique_file(root, pattern, required=True):
     if not found and required:
         raise FileNotFoundError(f"Thiếu {pattern} dưới {root}; Add Input Output đã Save Version")
     return found[0] if found else None
+
+
+def find_a2_root(root):
+    # Nhận diện cấu trúc sáu run, vì A4 cũng có environment.json.
+    found = sorted(path.parent for path in Path(root).rglob("environment.json")
+                   if all((path.parent / "runs" / name).is_dir() for name in A2_RUNS))
+    if len(found) != 1:
+        raise ValueError(f"Cần đúng một export A2 có runs và đủ sáu run, thấy {len(found)}: {found}")
+    return found[0]
 
 
 def sha256(path):
@@ -692,9 +719,9 @@ def read_contract(path):
             raise ValueError("Thiếu metadata hoặc sai đơn vị hợp đồng")
         if not isinstance(meta["clip_to_zero"], bool):
             raise ValueError("clip_to_zero phải boolean")
-        if (not isinstance(meta["forecast_horizon"], int) or isinstance(meta["forecast_horizon"], bool)
-                or not isinstance(meta["lead"], int) or not 1 <= meta["lead"] <= meta["forecast_horizon"] <= 7):
-            raise ValueError("Sai lead/forecast_horizon")
+        if meta["forecast_horizon"] is None:
+            raise ValueError("forecast_horizon trong hợp đồng phải là số nguyên")
+        primary_event_tolerance_days(meta["lead"], meta["forecast_horizon"])
         dates = np.array(data["dates"], dtype="datetime64[D]")
         if (not np.array_equal(data["origin_dates"], dates - np.timedelta64(int(meta["lead"]) - 1, "D"))
                 or not np.array_equal(data["persistence_source_dates"], dates - np.timedelta64(int(meta["lead"]), "D"))):
@@ -709,6 +736,119 @@ def read_contract(path):
                           area=np.array(data["area_gov_km2"]), obs=np.array(data["obs_mm_day"]),
                           persistence=np.array(data["persistence_mm_day"]), sim=sim, raw=raw, metadata=meta)
     return result.validate()
+
+
+# %% [markdown]
+# ### 8.4. Ba seed LSTM A4 từ Output notebook Compare
+# Gắn Output 04_A4_LamaHCEExt_Compare Version 2, không cần ba Output huấn luyện riêng.
+# Kiểm manifest của a4_compare, hash nguồn A3, ba seed và ngữ cảnh trước khi chấm.
+# Số Version Compare là thông tin bàn giao; danh tính tệp được ghi bằng SHA-256.
+
+# %% Phần 8.4 - Kiểm và đọc ba NPZ A4
+# Thiếu tệp, trùng nguồn, sai hash hoặc khác ngữ cảnh => dừng; không tự bỏ seed.
+def read_a4(a4_root, context, context_paths):
+    root = unique_file(a4_root, "a4_summary.json").parent
+    summary_path = root / "a4_summary.json"
+    environment_path = root / "environment.json"
+    manifest_path = root / "manifest.csv"
+    for path in (summary_path, environment_path, manifest_path):
+        if not path.is_file():
+            raise FileNotFoundError(f"A4 thiếu {path.name}; gắn Output Compare Version {A4_COMPARE_VERSION}")
+    manifest = pd.read_csv(manifest_path, dtype=str, keep_default_na=False)
+    if (not {"tệp", "sha256"}.issubset(manifest.columns) or manifest.empty
+            or manifest["tệp"].duplicated().any()):
+        raise ValueError("Manifest A4 cần cột tệp/sha256, không rỗng và không trùng đường dẫn")
+    files, input_rows = {}, []
+    for row in manifest.to_dict("records"):
+        relative = row["tệp"]
+        path = root / relative
+        if (not relative or "\\" in relative or Path(relative).is_absolute()
+                or ".." in Path(relative).parts or not path.resolve().is_relative_to(root.resolve())):
+            raise ValueError(f"Đường dẫn manifest A4 phải nằm trong a4_compare: {relative}")
+        expected = row["sha256"]
+        if not re.fullmatch(r"[0-9a-f]{64}", expected) or not path.is_file():
+            raise ValueError(f"A4 thiếu tệp hoặc digest không hợp lệ: {relative}")
+        observed = sha256(path)
+        if observed != expected:
+            raise ValueError(f"SHA-256 A4 không khớp manifest: {relative}")
+        files[relative] = path
+        input_rows.append(dict(kind="A4_export", file=relative, path=str(path),
+                               expected_sha256=expected, observed_sha256=observed, passed=True))
+    required = {"a4_summary.json", "environment.json"} | {
+        f"contracts/SeqLSTM_Q_A4_seed{seed}_test_S0_lead1.npz" for seed in A4_SEEDS}
+    if not required.issubset(files):
+        raise ValueError(f"Manifest A4 thiếu các tệp bắt buộc: {sorted(required - set(files))}")
+    contract_files = {p.relative_to(root).as_posix() for p in (root / "contracts").glob("*.npz")}
+    if contract_files != {name for name in required if name.endswith(".npz")}:
+        raise ValueError("A4 Compare phải có đúng ba NPZ seed 111/222/333 ở contracts")
+    summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
+    environment = json.loads(environment_path.read_text(encoding="utf-8-sig"))
+    if (environment.get("notebook") != "04_A4_LamaHCEExt_Compare"
+            or environment.get("neuralhydrology_commit_of_runs") != A4_LIBRARY_COMMIT):
+        raise ValueError("Sai notebook nguồn hoặc commit thư viện A4")
+    seed_keys = {str(seed) for seed in A4_SEEDS}
+    for key in ("contracts", "saved_epoch", "seed_test_nse_median"):
+        if not isinstance(summary.get(key), dict) or set(summary[key]) != seed_keys:
+            raise ValueError(f"A4 summary thiếu hoặc thừa seed ở {key}")
+    source_a3 = environment.get("inputs", {}).get("a3", {})
+    if source_a3.get("version") != 1:
+        raise ValueError("A4 cần khai báo nguồn A3 Version 1 như bản bàn giao")
+    by_name = {path.name: path for path in context_paths}
+    for name in ("A3_persistence_predictions.npz", "A3_Q_source_window.npz"):
+        expected = source_a3.get("files", {}).get(name, {}).get("sha256")
+        observed = sha256(by_name[name])
+        if expected != observed:
+            raise ValueError(f"A4 dùng nguồn A3 khác Input hiện tại: {name}")
+        input_rows.append(dict(kind="A3_context_used_by_A4", file=name, path=str(by_name[name]),
+                               expected_sha256=expected, observed_sha256=observed, passed=True))
+    reference = Forecast("A3_context", sim=context["persistence"], raw=context["persistence"], **context).validate()
+    forecasts, contract_rows = [], []
+    for seed in A4_SEEDS:
+        key = str(seed)
+        relative = f"contracts/SeqLSTM_Q_A4_seed{seed}_test_S0_lead1.npz"
+        if not str(summary["contracts"][key]).endswith("/" + relative):
+            raise ValueError(f"A4 summary không trỏ đúng tệp seed {seed}")
+        source_version = environment.get("inputs", {}).get("seeds", {}).get(key, {}).get("version")
+        if type(source_version) is not int or source_version != A4_SEED_VERSIONS[seed]:
+            raise ValueError(f"A4 seed {seed}: Version nguồn không khớp bản bàn giao")
+        forecast = read_contract(files[relative])
+        meta = forecast.metadata
+        selected_epoch = meta.get("selected_epoch")
+        if (forecast.name != f"SeqLSTM_Q_A4_seed{seed}" or type(forecast.seed) is not int
+                or forecast.seed != seed or forecast.group != ("test", "S0", 1)
+                or meta.get("forecast_horizon") != 1 or meta.get("clip_to_zero") is not True
+                or meta.get("library_commit") != A4_LIBRARY_COMMIT
+                or not re.fullmatch(r"[0-9a-f]{64}", str(meta.get("config_sha256")))
+                or type(selected_epoch) is not int or selected_epoch <= 0
+                or summary["saved_epoch"][key] != selected_epoch):
+            raise ValueError(f"A4 seed {seed}: sai run/kỳ/hạn/seed/epoch/commit/config hoặc chính sách clip")
+        check_same_context(reference, forecast)
+        forecast.metadata = dict(meta, source=str(files[relative]), source_file_sha256=sha256(files[relative]),
+                                 compare_version_expected=A4_COMPARE_VERSION, training_notebook_version=source_version)
+        forecasts.append(forecast)
+        contract_rows.append(dict(run=forecast.name, seed=seed, selected_epoch=selected_epoch,
+                                  training_notebook_version=source_version,
+                                  compare_version_expected=A4_COMPARE_VERSION,
+                                  period=forecast.period, scenario=forecast.scenario, lead=forecast.lead,
+                                  IDs=len(forecast.ids), target_days=len(forecast.dates),
+                                  finite_prediction_day_IDs=int(np.isfinite(forecast.sim).sum()),
+                                  paired_obs_prediction_day_IDs=int((np.isfinite(forecast.obs) & np.isfinite(forecast.sim)).sum()),
+                                  sim_raw_negative_day_IDs=int((forecast.raw < 0).sum()),
+                                  config_sha256=meta["config_sha256"], library_commit=meta["library_commit"],
+                                  canonical_context_matches=True, manifest_sha256_matches=True))
+    paths = [manifest_path, *files.values()]
+    return forecasts, paths, pd.DataFrame(input_rows), pd.DataFrame(contract_rows)
+
+
+def show_table(title, table):
+    # Notebook hiển thị bảng; script vẫn đọc được qua stdout.
+    if "ipykernel" in sys.modules:
+        from IPython.display import HTML, display
+        display(HTML(f"<h4>{title}</h4>"))
+        display(table.style.hide(axis="index").format(precision=6, na_rep="-"))
+    else:
+        print(title)
+        print(table.to_string(index=False))
 
 
 # %% [markdown]
@@ -798,9 +938,54 @@ def self_test():
     horizon_score, _ = score_events(horizon_obs, horizon_sim, 4, 101, np.ones(12, dtype=bool),
                                     lead=1, forecast_horizon=7, grouped=False)
     check("H_lead1_keeps_same_day_primary", horizon_score["hit"] == 0 and horizon_score["matching_tolerance_days"] == 0)
-    same_day, _ = score_events(horizon_obs, horizon_obs, 4, 101, np.ones(12, dtype=bool),
-                               lead=7, forecast_horizon=7, grouped=False)
-    check("H_lead7_keeps_same_day_primary", same_day["hit"] == 1 and same_day["matching_tolerance_days"] == 0)
+    # Biên dung sai, hai hướng và bán kính kiểm duyệt cho từng hạn thực tế.
+    lead_obs = np.zeros(48)
+    lead_obs[20] = 5
+    lead_mask = np.ones(48, dtype=bool)
+    for lead, expected in enumerate((0, 0, 1, 1, 1, 2, 2), start=1):
+        check(f"H_lead{lead}_declared_tolerance", primary_event_tolerance_days(lead, 7) == expected)
+        for direction in (-1, 1):
+            within, outside = np.zeros(48), np.zeros(48)
+            within[20 + direction * expected] = 5
+            outside[20 + direction * (expected + 1)] = 5
+            accepted, _ = score_events(lead_obs, within, 4, 101, lead_mask, lead=lead,
+                                       forecast_horizon=7, grouped=False)
+            rejected, _ = score_events(lead_obs, outside, 4, 101, lead_mask, lead=lead,
+                                       forecast_horizon=7, grouped=False)
+            check(f"H_lead{lead}_boundary_direction{direction}", accepted["hit"] == 1
+                  and accepted["matching_tolerance_days"] == expected
+                  and (rejected["hit"], rejected["missed"], rejected["false_alarm"]) == (0, 1, 1))
+        radius_mask = lead_mask.copy()
+        radius_mask[18] = False
+        radius_score, _ = score_events(lead_obs, lead_obs, 4, 101, radius_mask,
+                                       lead=lead, forecast_horizon=7, grouped=False)
+        check(f"H_lead{lead}_missing_radius", radius_score["hit"] == int(expected < 2)
+              and radius_score["observed_censored"] == int(expected == 2))
+        supplementary, _ = score_events(lead_obs, np.roll(lead_obs, 1), 4, 101, lead_mask,
+                                        lead=lead, forecast_horizon=7, grouped=False,
+                                        tolerance=SUPPLEMENTARY_EVENT_TOLERANCE_DAYS)
+        check(f"H_lead{lead}_supplementary_fixed_one_day", supplementary["hit"] == 1
+              and supplementary["matching_tolerance_days"] == 1)
+    explicit, _ = score_events(lead_obs, np.roll(lead_obs, 1), 4, 101, lead_mask,
+                               lead=7, forecast_horizon=7, grouped=False, tolerance=0)
+    check("explicit_zero_not_replaced_by_default", explicit["hit"] == 0 and explicit["matching_tolerance_days"] == 0)
+    edge_obs = np.zeros(48)
+    edge_obs[1] = 5
+    edge_short, _ = score_events(edge_obs, edge_obs, 4, 101, lead_mask, lead=1, forecast_horizon=7, grouped=False)
+    edge_long, _ = score_events(edge_obs, edge_obs, 4, 101, lead_mask, lead=7, forecast_horizon=7, grouped=False)
+    check("long_lead_radius_censors_calendar_edge", edge_short["hit"] == 1
+          and edge_long["hit"] == 0 and edge_long["observed_censored"] == 1)
+    for label, value in (("bool", True), ("fractional", 1.5), ("float", 1.),
+                         ("zero", 0), ("above_seven", 8), ("string", "3")):
+        rejects(f"invalid_lead_{label}_rejected", lambda value=value: score_events(
+            lead_obs, lead_obs, 4, 101, lead_mask, lead=value, forecast_horizon=7))
+    for label, value in (("bool", True), ("fractional", 3.5), ("float", 7.),
+                         ("below_lead", 2), ("above_seven", 8), ("string", "7")):
+        rejects(f"invalid_horizon_{label}_rejected", lambda value=value: score_events(
+            lead_obs, lead_obs, 4, 101, lead_mask, lead=3, forecast_horizon=value))
+    for label, value in (("bool", True), ("fractional", .5), ("string", "1")):
+        rejects(f"invalid_score_tolerance_{label}_rejected", lambda value=value: score_events(
+            lead_obs, lead_obs, 4, 101, lead_mask, tolerance=value))
     check("no_events_not_perfect", np.isnan(event_rates(0, 0, 0)["POD"]))
     check("Holm_known_values", np.allclose(holm([.01, .04, .03]), [.03, .06, .06]))
     check("Holm_excludes_NaN_from_family", np.allclose(holm([.01, np.nan, .03]), [.02, np.nan, .03], equal_nan=True))
@@ -887,6 +1072,15 @@ def self_test():
               and set(tables["events_tolerance1"].matching_tolerance_days) == {1}
               and list(tables["event_matches"].columns) == list(tables["event_matches_tolerance1"].columns)
               and (tables["event_matches"].obs_onset == tables["event_matches"].sim_onset).all())
+        for lead in range(1, 8):
+            lead_model = replace(models[0], lead=lead, metadata={"forecast_horizon": 7}).validate()
+            lead_tables, _ = evaluate_group([lead_model], levels, floods)
+            check(f"H_lead{lead}_separate_table_dispatch",
+                  len(lead_tables["events"]) == len(ids) * len(RETURN_PERIODS) * 2
+                  and len(lead_tables["events_tolerance1"]) == len(lead_tables["events"])
+                  and set(lead_tables["events"].matching_tolerance_days) == {lead // 3}
+                  and set(lead_tables["events_tolerance1"].matching_tolerance_days) == {1}
+                  and (lead // 3 != 1 or lead_tables["events"].equals(lead_tables["events_tolerance1"])))
         test_table = pairwise_tests(tables["metrics"])
         check("Holm_all_pairs_family", set(test_table.family_size) == {45} and set(test_table.planned_family_size) == {45})
         partial = tables["metrics"].copy()
@@ -898,16 +1092,24 @@ def self_test():
         tables["metrics"].to_csv(a3 / "A3_all_metrics_per_basin.csv", index=False)
         checked, _ = check_a3_reference(tables["metrics"], a3)
         check("A3_reference_read_and_join", bool(checked.passed.all()))
-        contract_path = root / "lead3.npz"
-        target = dates[2:].to_numpy(dtype="datetime64[D]")
-        meta = dict(run="future_seed_111", period="test", scenario="S0", lead=3, forecast_horizon=7, seed=111,
-                    unit="mm/day_area_gov", config_sha256="fixture_only", library_commit="fixture_only", clip_to_zero=True)
-        np.savez_compressed(contract_path, dates=target, origin_dates=target - np.timedelta64(2, "D"),
-                            persistence_source_dates=target - np.timedelta64(3, "D"), basin_ids=np.array(ids),
-                            area_gov_km2=area, obs_mm_day=physical[3:], sim_raw_mm_day=physical[3:],
-                            sim_mm_day=physical[3:], persistence_mm_day=physical[:-3], metadata_json=json.dumps(meta))
-        future = read_contract(contract_path)
-        check("multi_lead_persistence_at_origin_minus_one", future.lead == 3 and np.array_equal(future.persistence, physical[:-3], equal_nan=True))
+        for lead in range(1, 8):
+            contract_path = root / f"lead{lead}.npz"
+            target = dates[lead - 1:].to_numpy(dtype="datetime64[D]")
+            meta = dict(run="future_seed_111", period="test", scenario="S0", lead=lead, forecast_horizon=7, seed=111,
+                        unit="mm/day_area_gov", config_sha256="fixture_only", library_commit="fixture_only", clip_to_zero=True)
+            payload = dict(dates=target, origin_dates=target - np.timedelta64(lead - 1, "D"),
+                           persistence_source_dates=target - np.timedelta64(lead, "D"), basin_ids=np.array(ids),
+                           area_gov_km2=area, obs_mm_day=physical[lead:], sim_raw_mm_day=physical[lead:],
+                           sim_mm_day=physical[lead:], persistence_mm_day=physical[:-lead])
+            np.savez_compressed(contract_path, **payload, metadata_json=json.dumps(meta))
+            future = read_contract(contract_path)
+            check(f"H_lead{lead}_persistence_at_origin_minus_one", future.lead == lead
+                  and np.array_equal(future.persistence, physical[:-lead], equal_nan=True))
+        for key, value in (("lead", True), ("forecast_horizon", True), ("lead", 7.0),
+                           ("forecast_horizon", 6), ("forecast_horizon", None)):
+            invalid_meta = dict(meta, **{key: value})
+            np.savez_compressed(contract_path, **payload, metadata_json=json.dumps(invalid_meta))
+            rejects(f"contract_{key}_{value!r}_rejected", lambda: read_contract(contract_path))
     return pd.DataFrame(checks)
 
 
@@ -921,8 +1123,12 @@ def self_test():
 def evaluate_group(forecasts, levels=None, floods=None):
     shared = common_mask(forecasts)
     metric_rows, level_rows, matrix_rows = [], [], []
-    event_rows, match_rows = {0: [], 1: []}, {0: [], 1: []}
+    # Vai trò bảng độc lập với số dung sai: hạn 3–5 có cả hai bảng cùng ±1.
+    event_rows = {role: [] for role in ("primary", "tolerance1")}
+    match_rows = {role: [] for role in event_rows}
     for forecast in forecasts:
+        horizon = forecast.metadata.get("forecast_horizon", forecast.lead)
+        primary_tolerance = primary_event_tolerance_days(forecast.lead, horizon)
         base_meta = dict(run=forecast.name, period=forecast.period, scenario=forecast.scenario,
                          lead=forecast.lead, seed=forecast.seed)
         native_obs = forecast.native_obs if forecast.native_obs is not None else forecast.obs
@@ -953,13 +1159,14 @@ def evaluate_group(forecasts, levels=None, floods=None):
                     for grouped in (True, False):
                         event_meta = dict(**meta, return_period_years=period, grouping="USWRC" if grouped else "consecutive",
                                           n_fit_years=int(threshold.n_years), threshold_mm_day=float(threshold.threshold_mm_day))
-                        for tolerance in (PRIMARY_EVENT_TOLERANCE_DAYS, SUPPLEMENTARY_EVENT_TOLERANCE_DAYS):
+                        for role, tolerance in (("primary", primary_tolerance),
+                                                ("tolerance1", SUPPLEMENTARY_EVENT_TOLERANCE_DAYS)):
                             score, pairs = score_events(obs, sim, threshold.threshold_mm_day, forecast.area[j], mask,
                                                         lead=forecast.lead, grouped=grouped, tolerance=tolerance,
-                                                        forecast_horizon=forecast.metadata.get("forecast_horizon", forecast.lead))
-                            event_rows[tolerance].append(dict(**event_meta, **score))
+                                                        forecast_horizon=horizon)
+                            event_rows[role].append(dict(**event_meta, **score))
                             for pair in pairs:
-                                match_rows[tolerance].append(dict(**event_meta, matching_tolerance_days=tolerance,
+                                match_rows[role].append(dict(**event_meta, matching_tolerance_days=tolerance,
                                     **{key: str(forecast.dates[value].date()) if key != "peak_timing_days" else value
                                        for key, value in pair.items()}))
     # Giữ schema CSV khi không có cặp ghép đúng ngày.
@@ -967,9 +1174,10 @@ def evaluate_group(forecasts, levels=None, floods=None):
                      "grouping", "n_fit_years", "threshold_mm_day", "matching_tolerance_days",
                      "obs_onset", "sim_onset", "obs_peak", "sim_peak", "peak_timing_days"]
     return dict(metrics=pd.DataFrame(metric_rows), levels=pd.DataFrame(level_rows), confusion=pd.DataFrame(matrix_rows),
-                events=pd.DataFrame(event_rows[0]), event_matches=pd.DataFrame(match_rows[0], columns=match_columns),
-                events_tolerance1=pd.DataFrame(event_rows[1]),
-                event_matches_tolerance1=pd.DataFrame(match_rows[1], columns=match_columns)), shared
+                events=pd.DataFrame(event_rows["primary"]),
+                event_matches=pd.DataFrame(match_rows["primary"], columns=match_columns),
+                events_tolerance1=pd.DataFrame(event_rows["tolerance1"]),
+                event_matches_tolerance1=pd.DataFrame(match_rows["tolerance1"], columns=match_columns)), shared
 
 
 def summarize(table):
@@ -1067,6 +1275,12 @@ def check_a3_reference(table, a3_root):
     return result, path
 
 
+# %% [markdown]
+# ### 10.3. Hình CDF trên giao ngày chung
+# Ba seed A4 cùng màu với LSTM nền và khác kiểu nét; chú giải ngoài vùng vẽ.
+
+# %% Phần 10.3 - Vẽ hình và lưu các điểm CDF
+# Giữ toàn bộ điểm hữu hạn, kể cả đuôi âm; số n lấy riêng cho từng run/chỉ số.
 def draw_figures(table, output):
     import matplotlib
     matplotlib.use("Agg")
@@ -1074,45 +1288,65 @@ def draw_figures(table, output):
     rows = []
     for group, part in table.loc[table.scope.eq("common_source_all")].groupby(["period", "scenario", "lead"], sort=False):
         fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-        for ax, metric in zip(axes, ("NSE", "PNSE", "KGE")):
+        styles = {"SeqLSTM_Q": ("#0072B2", "-"), "SeqLSTM_noQ": ("#56B4E9", "--"),
+                  "EncDec_Q": ("#009E73", "-"), "EncDec_noQ": ("#E69F00", "--"),
+                  "D_FC": ("#9467BD", "-"), "D_RA": ("#CC79A7", "-"),
+                  "Persistence_qmax": ("#333333", "--"), "Persistence_qmean_aux": ("#888888", ":")}
+        for seed, linestyle in zip(A4_SEEDS, ("--", "-.", ":")):
+            styles[f"SeqLSTM_Q_A4_seed{seed}"] = ("#0072B2", linestyle)
+            styles[f"DLinear_seed_{seed}"] = ("#D55E00", linestyle)
+        for panel, (ax, metric) in enumerate(zip(axes, ("NSE", "PNSE", "KGE"))):
             for run, data in part.groupby("run", sort=False):
                 finite = np.sort(data.loc[np.isfinite(data[metric]), metric].to_numpy())
                 if len(finite):
                     y = np.arange(1, len(finite) + 1) / len(finite)
-                    ax.step(finite, y, where="post", label=f"{run} (n={len(finite)})")
+                    color, linestyle = styles.get(run, (None, "-"))
+                    label = run.replace("SeqLSTM_Q_A4_seed", "SeqLSTM_Q A4 ")
+                    ax.step(finite, y, where="post", color=color, linestyle=linestyle,
+                            label=f"{label} (n={len(finite)})")
                     rows.extend(dict(period=group[0], scenario=group[1], lead=group[2], run=run, metric=metric,
                                      value=float(x), cumulative_fraction=float(p)) for x, p in zip(finite, y))
             ax.set_xscale("symlog", linthresh=1)
             ax.set(xlabel=metric, ylabel="Fraction of finite basin scores", ylim=(0, 1.02))
+            ax.set_title(f"({chr(97+panel)}) {metric}")
             ax.grid(alpha=.2)
         axes[-1].legend(fontsize=7, loc="center left", bbox_to_anchor=(1.01, .5))
         fig.suptitle(f"Common daily mask | {group[0]} | {group[1]} | lead {group[2]} | all finite scores retained")
         fig.tight_layout()
         fig.savefig(output / f"Evaluation_CDF_{group[0]}_{group[1]}_lead{group[2]}.png", dpi=150, bbox_inches="tight")
         plt.close(fig)
+        print(f"Hình: phân phối NSE, PNSE, KGE theo lưu vực trên giao ngày chung; kỳ {group[0]}, "
+              f"kịch bản {group[1]}, hạn {group[2]}, {part.run.nunique()} run. "
+              "Đường càng về phải có điểm càng cao; n là số lưu vực có chỉ số hữu hạn; giữ toàn bộ điểm âm.")
     return pd.DataFrame(rows)
 
 
 # %% [markdown]
 # ## Phần 11 — Chạy toàn bộ và kết luận
 # ### 11.1. Input, chạy kiểm thử và đánh giá
-# Add Input A1 Outputs, A2 Outputs, A3 Outputs; dataset gốc không bắt buộc ở bước này.
-# Khi nhiều nguồn cùng tên: truyền --a1, --a2, --a3 trỏ vào thư mục tương ứng.
+# Add Input Output A1, A2, A3 và A4 Compare Version 2; dataset gốc không bắt buộc.
+# Notebook tự đọc đủ ba seed A4; script có thể chỉ rõ --a1, --a2, --a3, --a4.
 
 # %% Phần 11.1 — Điều phối và lưu kết quả trực tiếp
 # Mọi dữ liệu giả chỉ ở self_test; trạng thái thực nghiệm chỉ đặt sau khi đọc/chấm thành công.
-def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra_contracts=(), *, expected_ids=451):
+def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra_contracts=(), *,
+        a4_root=None, expected_ids=451):
     output = Path(output_root)
     output.mkdir(parents=True, exist_ok=True)
+    (output / "Evaluation_summary.json").write_text(
+        json.dumps(dict(complete=False, status="incomplete", expected_A4_seeds=list(A4_SEEDS)), indent=2),
+        encoding="utf-8")
     checks = self_test()
     checks.to_csv(output / "Evaluation_checks.csv", index=False, encoding="utf-8-sig")
     a3_root = Path(a3_root) if a3_root else unique_file(input_root, "A3_persistence_predictions.npz").parent
-    a2_root = Path(a2_root) if a2_root else unique_file(input_root, "environment.json").parent
+    a2_root = Path(a2_root) if a2_root else find_a2_root(input_root)
     a1_root = Path(a1_root) if a1_root else unique_file(input_root, "A1_P10_qmax_level_thresholds.csv").parent
+    a4_root = unique_file(a4_root or input_root, "a4_summary.json").parent
     context, paths = read_context(a3_root)
+    context_paths = list(paths)
     if len(context["ids"]) != expected_ids:
         raise ValueError(f"Danh sách có {len(context['ids'])} ID, kỳ vọng {expected_ids}")
-    print("Phần 1–2: kiểm thử đạt; nguồn A1/A2/A3:", a1_root, a2_root, a3_root, sep="\n")
+    print("Phần 1–2: kiểm thử đạt; nguồn A1/A2/A3/A4 Compare:", a1_root, a2_root, a3_root, a4_root, sep="\n")
     levels, floods, threshold_paths = read_thresholds(a1_root, context["ids"])
     paths.extend(threshold_paths)
     forecasts, read_paths = read_a2(a2_root, context)
@@ -1126,6 +1360,13 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
         auxiliary = np.array(data["persistence_qmean_aux_mm_day"], dtype=float)
     forecasts.append(Forecast(name="Persistence_qmean_aux", sim=auxiliary, raw=auxiliary, **context).validate())
     a3_only = list(forecasts)
+    a4_forecasts, read_paths, a4_input_check, a4_contract_check = read_a4(a4_root, context, context_paths)
+    forecasts.extend(a4_forecasts)
+    paths.extend(read_paths)
+    show_table("Phần 8.4 - Manifest A4 và nguồn A3", a4_input_check[["kind", "file", "passed"]])
+    show_table("Phần 8.4 - Ba hợp đồng LSTM A4", a4_contract_check[[
+        "run", "seed", "selected_epoch", "IDs", "target_days", "finite_prediction_day_IDs",
+        "paired_obs_prediction_day_IDs", "sim_raw_negative_day_IDs", "canonical_context_matches"]])
     for path in extra_contracts:
         forecast = read_contract(path)
         if forecast.ids != context["ids"]:
@@ -1166,8 +1407,10 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     results["events_pooled_tolerance1"] = pool_events(results["events_tolerance1"])
     results["scenario_changes"] = scenario_changes(forecasts)
     results["coverage"] = pd.DataFrame(coverages)
+    results["A4_input_check"] = a4_input_check
+    results["A4_contract_check"] = a4_contract_check
     reference_table = results["metrics"]
-    if extra_contracts:
+    if a4_forecasts or extra_contracts:
         shared = common_mask(a3_only)
         reference_table = pd.DataFrame([
             dict(run=f.name, period="test", scenario="S0", lead=1, scope="common_source_all", basin_id=identifier,
@@ -1181,24 +1424,35 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
         table.to_csv(output / f"Evaluation_{name}.csv", index=False, encoding="utf-8-sig")
     input_manifest = pd.DataFrame([dict(path=str(path), bytes=path.stat().st_size, sha256=sha256(path)) for path in sorted(set(paths))])
     input_manifest.to_csv(output / "Evaluation_input_manifest.csv", index=False, encoding="utf-8-sig")
+    actual_leads = sorted({f.lead for f in forecasts})
+    applied_tolerances = {str(lead): primary_event_tolerance_days(lead) for lead in actual_leads}
+    # Giữ trường scalar thuận tiện cho lần chấm một hạn; nhiều hạn dùng bản đồ.
+    scalar_tolerance = next(iter(applied_tolerances.values())) if len(actual_leads) == 1 else None
     protocol = dict(protocol_version=PROTOCOL_VERSION, metric_ddof=0, same_mask_for_six_metrics=True, metric_epsilon=None,
                     level_equality="higher_class", flood_exceedance="strictly_greater",
                     FDC_log_floor_mm_day=LOG_FLOOR_MM_DAY, FDC_quantile_method="linear",
                     FDC_tail_count="ceil_fraction_times_n", event_grouping="USWRC and consecutive",
                     event_matching="maximum_cardinality_then_minimum_total_absolute_onset_error",
-                    event_tolerance="primary_same_day_onset_0_days_supplementary_plus_minus_1_day_all_leads",
-                    event_tolerance_days=PRIMARY_EVENT_TOLERANCE_DAYS,
+                    event_tolerance=PRIMARY_EVENT_TOLERANCE_POLICY,
+                    event_tolerance_days=scalar_tolerance,
+                    event_tolerance_days_by_lead=applied_tolerances,
+                    supported_event_tolerance_days_by_lead={str(lead): primary_event_tolerance_days(lead)
+                                                           for lead in range(1, 8)},
                     supplementary_event_tolerance_days=SUPPLEMENTARY_EVENT_TOLERANCE_DAYS,
                     event_timing_reference=dict(
                         NOAA="https://repository.library.noaa.gov/view/noaa/30340/noaa_30340_DS1.pdf",
                         NOAA_window="plus_minus_one_third_forecast_lead_time_24h_means_8h",
-                        daily_adaptation="same_calendar_day_onset_not_subdaily_verification",
+                        daily_adaptation="floor_actual_lead_divided_by_3_whole_days_not_subdaily_verification",
+                        forecast_horizon_role="contract_validation_only_does_not_set_matching_tolerance",
                         Nearing2024="https://www.nature.com/articles/s41586-024-07145-1",
                         Nearing2024_window_days=2,
                         supplementary_note="one_day_sensitivity_is_not_exact_Nearing_replication"),
                     censored_events="excluded_from_scores_and_counted_separately",
                     holm_family="all_unordered_run_pairs_excluding_qmean_aux_per_metric_period_scenario_lead",
                     holm_family_size="finite_p_values_only_NaN_excluded_planned_size_reported_separately",
+                    A4_compare_version_expected=A4_COMPARE_VERSION,
+                    A4_input_verification="manifest_SHA256_and_same_A3_context",
+                    A3_reference_scope="original_11_runs_common_mask_recomputed_separately",
                     statistics="two_sided_Wilcoxon_auto_and_paired_Cohen_dz",
                     test_used_for_selection=False)
     (output / "Evaluation_protocol.json").write_text(json.dumps(protocol, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -1206,9 +1460,14 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
                       IDs=len(f.ids), days=len(f.dates), **{"source_metadata": f.metadata}) for f in forecasts]
     (output / "Evaluation_run_index.json").write_text(json.dumps(run_index, ensure_ascii=False, indent=2), encoding="utf-8")
     summary = dict(complete=True, protocol_version=PROTOCOL_VERSION,
-                   event_tolerance_days=PRIMARY_EVENT_TOLERANCE_DAYS,
+                   event_tolerance=PRIMARY_EVENT_TOLERANCE_POLICY,
+                   event_tolerance_days=scalar_tolerance,
+                   event_tolerance_days_by_lead=applied_tolerances,
                    supplementary_event_tolerance_days=SUPPLEMENTARY_EVENT_TOLERANCE_DAYS,
                    fixture_checks=int(len(checks)), A3_reference_matched=True,
+                   A4_contracts_matched=bool(a4_contract_check.canonical_context_matches.all()),
+                   A4_runs=[f.name for f in a4_forecasts],
+                   A4_compare_version_expected=A4_COMPARE_VERSION,
                    coverage=coverages, scenarios=sorted({f.scenario for f in forecasts}),
                    leads=sorted({f.lead for f in forecasts}),
                    operational_scenarios_run=any(f.scenario != "S0" for f in forecasts),
@@ -1218,6 +1477,8 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     (output / "Evaluation_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print("Phần 11: hoàn thành; lưu trực tiếp cho Kaggle Save Version.")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
+    print("GỬI LẠI: hai bảng Phần 8.4, log số run/giao ngày và kết luận Phần 11; "
+          "giữ các CSV Evaluation_A4_input_check, Evaluation_A4_contract_check, coverage, summary và paired_tests.")
     return results
 
 
@@ -1229,12 +1490,13 @@ def main():
     parser.add_argument("--a1")
     parser.add_argument("--a2")
     parser.add_argument("--a3")
+    parser.add_argument("--a4")
     parser.add_argument("--extra-contract", action="append", default=[])
     args = parser.parse_args([] if "ipykernel" in sys.modules else None)
     if args.self_test:
         print(self_test().to_string(index=False))
     else:
-        run(args.input, args.output, args.a1, args.a2, args.a3, args.extra_contract)
+        run(args.input, args.output, args.a1, args.a2, args.a3, args.extra_contract, a4_root=args.a4)
 
 
 if __name__ == "__main__":

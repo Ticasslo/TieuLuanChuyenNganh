@@ -1,7 +1,7 @@
 # %% [markdown]
 # # Phân tích kết quả theo đặc điểm lưu vực — Extended LamaH-CE
 #
-# Đọc kết quả A1/A3 và bộ đánh giá đã lưu; không huấn luyện hoặc chọn lại mô hình.
+# Đọc A1/A3 và bộ đánh giá 14 run gồm ba LSTM A4; không huấn luyện hoặc chọn lại mô hình.
 # S0 là không che thêm đầu vào; hạn một ngày dự báo ngày kế tiếp lịch sử quan trắc.
 # Một ngày–lưu vực là một ngày tại một ID. Mặt nạ chọn các cặp được chấm;
 # giao chung giữ các cặp có quan trắc, persistence và mọi dự báo cùng hữu hạn.
@@ -57,11 +57,29 @@ MODELS = ("SeqLSTM_Q", "SeqLSTM_noQ", "EncDec_Q", "EncDec_noQ", "D_FC", "D_RA",
 CONTRASTS = tuple((name, "Persistence_qmax") for name in MODELS) + (
     ("SeqLSTM_Q", "SeqLSTM_noQ"), ("EncDec_Q", "EncDec_noQ"), ("D_RA", "D_FC"),
 )
+SEEDS = (111, 222, 333)
+A4_MODELS = tuple(f"SeqLSTM_Q_A4_seed{seed}" for seed in SEEDS)
+A4_CONTRASTS = tuple((name, "Persistence_qmax") for name in A4_MODELS) + tuple(
+    (name, "SeqLSTM_Q") for name in A4_MODELS)
+SEED_FAMILIES = {
+    "DLinear": tuple(f"DLinear_seed_{seed}" for seed in SEEDS),
+    "LSTM_A4": A4_MODELS,
+}
 ENDPOINTS = ("delta_NSE", "delta_PNSE", "delta_POD_T2")
 PERMUTATIONS, PERMUTATION_SEED, MIN_ASSOCIATION_N = 9999, 20261023, 10
 TRAIN_START, TRAIN_END = "2003-01-01", "2009-12-31"
 TEST_START, TEST_END = "2014-01-01", "2017-12-31"
 METRIC_KEYS = ("NSE", "PNSE", "KGE", "r", "alpha", "beta")
+
+
+def analysis_contrasts(runs):
+    runs = set(runs)
+    baseline = set(MODELS) | {"Persistence_qmax", "Persistence_qmean_aux"}
+    if runs == baseline:
+        return CONTRASTS
+    if runs == baseline | set(A4_MODELS):
+        return CONTRASTS + A4_CONTRASTS
+    raise ValueError("Cần đúng 11 run gốc hoặc đủ 14 run có ba seed A4; không nhận thiếu seed hoặc run lạ")
 
 
 def stable_seed(*parts):
@@ -83,7 +101,7 @@ def finite_median(values):
 # ## Phần 2 — Đọc bảng đánh giá, thuộc tính và kiểm khóa ID
 # ### 2.1. Nguồn duy nhất và ghép theo ID
 # Gắn bốn Input: dataset lamah-ce-ext, Output A1, Output A3, Output bộ đánh giá.
-# Không cần gắn lại A2 vì bảng đánh giá đã chứa chỉ số A2 theo từng lưu vực.
+# Không cần gắn lại A2/A4 Compare vì Output đánh giá đã chứa chỉ số và kiểm hợp đồng A4.
 # Có nhiều tệp cùng tên thì chỉ định đường dẫn, không tự chọn phiên bản mới nhất.
 
 # %% Phần 2.1 — Tìm tệp và kiểm định dạng khóa
@@ -141,9 +159,38 @@ def load_evaluation(root, expected_ids=451):
     selected = lambda frame: frame.loc[frame.period.eq("test") & frame.scenario.eq("S0")
                                      & frame.lead.eq(1) & frame.scope.eq("common_source_all")].copy()
     metrics, events = selected(metrics), selected(events)
-    required_runs = set(MODELS) | {"Persistence_qmax", "Persistence_qmean_aux"}
-    if set(metrics.run) != required_runs or metrics.duplicated(["run", "basin_id"]).any():
-        raise ValueError("Sai tập 11 run hoặc trùng run–ID; cần khai báo thêm mô hình trước khi mở rộng")
+    analysis_contrasts(metrics.run)
+    required_runs = set(metrics.run)
+    if metrics.duplicated(["run", "basin_id"]).any():
+        raise ValueError("Trùng run–ID trong bảng chỉ số")
+    if required_runs & set(A4_MODELS):
+        contract_path = Path(root) / "Evaluation_A4_contract_check.csv"
+        input_path = Path(root) / "Evaluation_A4_input_check.csv"
+        if (version < 3 or summary.get("A4_contracts_matched") is not True
+                or set(summary.get("A4_runs", [])) != set(A4_MODELS)
+                or summary.get("A4_compare_version_expected") != 2):
+            raise ValueError("Nguồn 14 run cần giao thức 3 và xác nhận đủ ba hợp đồng A4 Compare Version 2")
+        contracts, inputs = [pd.read_csv(p) for p in (contract_path, input_path)]
+        if (len(contracts) != 3 or set(contracts.run) != set(A4_MODELS)
+                or contracts.run.duplicated().any() or len(inputs) == 0
+                or not inputs.passed.astype(str).str.lower().eq("true").all()):
+            raise ValueError("Bảng kiểm nguồn hoặc danh sách hợp đồng A4 không đạt")
+        for flag in ("canonical_context_matches", "manifest_sha256_matches"):
+            if not contracts[flag].astype(str).str.lower().eq("true").all():
+                raise ValueError(f"Hợp đồng A4 không đạt {flag}")
+        for seed, name in zip(SEEDS, A4_MODELS):
+            contract = contracts.set_index("run").loc[name]
+            if (contract.seed != seed or contract.IDs != expected_ids
+                    or contract.period != "test" or contract.scenario != "S0" or contract.lead != 1
+                    or contract.compare_version_expected != 2):
+                raise ValueError(f"{name}: metadata trong bảng kiểm A4 không hợp lệ")
+            for frame in (metrics, events):
+                selected_seed = frame.loc[frame.run.eq(name), "seed"]
+                if len(selected_seed) == 0 or not selected_seed.eq(seed).all():
+                    raise ValueError(f"{name}: seed chỉ số/sự kiện không khớp hợp đồng")
+        paths.extend([contract_path, input_path])
+    elif summary.get("A4_runs"):
+        raise ValueError("Summary có A4 nhưng bảng chỉ số không giữ đủ ba seed")
     for frame in (metrics, events):
         frame["basin_id"] = frame.basin_id.map(lambda x: str(int(x)) if re.fullmatch(r"\d+", x) else None)
         if frame.basin_id.isna().any():
@@ -334,7 +381,7 @@ def load_diagnostics(a3_root, ids, features, metrics):
 # %% [markdown]
 # ## Phần 4 — Hiệu kỹ năng và biến thiên ba seed
 # ### 4.1. Các cặp so sánh cố định
-# Chín run trừ persistence, hai cặp có/không Q và D_RA trừ D_FC; tổng 12 cặp.
+# 12 cặp gốc; thêm ba A4 trừ persistence và ba A4 trừ trọng số tác giả thành 18 cặp.
 # Chênh PNSE luôn là PNSE trái trừ PNSE phải, không giả định mốc phải luôn bằng 0.
 # POD T=2 chỉ xác định ở lưu vực có trận thật; không gán 0 cho mẫu số bằng 0.
 
@@ -344,7 +391,7 @@ def build_contrasts(metrics, events, ids):
     m = metrics.set_index(["run", "basin_id"])
     e = events.set_index(["run", "basin_id"])
     rows = []
-    for left, right in CONTRASTS:
+    for left, right in analysis_contrasts(metrics.run):
         a, b = [m.loc[name].reindex(ids) for name in (left, right)]
         ea, eb = [e.loc[name].reindex(ids) for name in (left, right)]
         part = pd.DataFrame(index=ids)
@@ -363,9 +410,12 @@ def build_contrasts(metrics, events, ids):
     return pd.concat(rows, ignore_index=True)
 
 
-def seed_spread(contrasts):
-    data = contrasts.loc[contrasts.left_run.str.startswith("DLinear_seed_")
-                         & contrasts.right_run.eq("Persistence_qmax")]
+def seed_spread(contrasts, family="DLinear"):
+    names = SEED_FAMILIES[family]
+    data = contrasts.loc[contrasts.left_run.isin(names) & contrasts.right_run.eq("Persistence_qmax")]
+    if (set(data.left_run) != set(names) or data.duplicated(["basin_id", "left_run"]).any()
+            or not data.groupby("basin_id").left_run.nunique().eq(len(SEEDS)).all()):
+        raise ValueError(f"{family}: cần đúng ba seed ở từng lưu vực")
     rows = []
     for identifier, part in data.groupby("basin_id", sort=False):
         for outcome in ENDPOINTS:
@@ -377,6 +427,46 @@ def seed_spread(contrasts):
                              minimum=float(values.min()) if complete else np.nan,
                              maximum=float(values.max()) if complete else np.nan,
                              role="three_scores_per_basin_not_prediction_ensemble"))
+    return pd.DataFrame(rows)
+
+
+# %% [markdown]
+# ### 4.2. Hướng liên hệ thuộc tính qua ba seed
+# Tóm tắt rho của cùng thuộc tính/outcome, mỗi seed so persistence trên cùng giao chung.
+# Ba rho không phải ba lưu vực mới; không gộp p hoặc gọi min–max là khoảng tin cậy.
+
+# %% Phần 4.2 — Tổng hợp độ ổn định, giữ rõ seed thiếu/hệ số không xác định
+# Hàm được gọi sau khi tính tương quan tại Phần 5; không chọn seed theo test.
+def seed_association_stability(associations):
+    rows = []
+    for family, names in SEED_FAMILIES.items():
+        wanted = [f"{name}__minus__Persistence_qmax" for name in names]
+        data = associations.loc[associations.contrast.isin(wanted)]
+        if data.empty:
+            continue
+        if set(data.contrast) != set(wanted) or data.duplicated(["contrast", "feature", "outcome"]).any():
+            raise ValueError(f"{family}: thiếu hoặc trùng kết quả liên hệ theo seed")
+        for (feature, outcome), part in data.groupby(["feature", "outcome"], sort=False):
+            if set(part.contrast) != set(wanted):
+                raise ValueError(f"{family}/{feature}/{outcome}: thiếu hàng của seed")
+            part = part.set_index("contrast").reindex(wanted)
+            values = part.rho.to_numpy(dtype=float)
+            if np.isinf(values).any():
+                raise ValueError("rho có vô cực")
+            complete = np.isfinite(values).all()
+            direction = ("undefined_seed" if not complete else "positive" if (values > 0).all()
+                         else "negative" if (values < 0).all() else "all_zero" if (values == 0).all()
+                         else "mixed_or_zero")
+            rows.append(dict(model_family=family, feature=feature, outcome=outcome,
+                finite_seeds=int(np.isfinite(values).sum()), n_min=int(part.n.min()), n_max=int(part.n.max()),
+                same_ID_count=bool(part.n.nunique() == 1), direction=direction,
+                same_nonzero_direction=bool(direction in {"positive", "negative"}) if complete else None,
+                rho_mean=float(values.mean()) if complete else np.nan,
+                rho_sd_sample=float(values.std(ddof=1)) if complete else np.nan,
+                rho_min=float(values.min()) if complete else np.nan,
+                rho_max=float(values.max()) if complete else np.nan,
+                **{f"rho_seed_{seed}": value for seed, value in zip(SEEDS, values)},
+                role="descriptive_seed_stability_no_p_pooling_no_confidence_interval"))
     return pd.DataFrame(rows)
 
 
@@ -470,7 +560,7 @@ def association_tables(contrasts, features, permutations=PERMUTATIONS):
             diagnostic = rank_associations(features[list(DIAGNOSTICS)], part[outcome], 0, 0)
             diagnostic["contrast"], diagnostic["outcome"] = name, outcome
             diagnostics.append(diagnostic)
-        print(f"Liên hệ thuộc tính {number}/{len(CONTRASTS)}: {name}", flush=True)
+        print(f"Liên hệ thuộc tính {number}/{contrasts.contrast.nunique()}: {name}", flush=True)
     return pd.concat(main, ignore_index=True), pd.concat(diagnostics, ignore_index=True)
 
 
@@ -572,7 +662,7 @@ def topology_sensitivity(a1_root, contrasts, features):
 
 # %% Phần 7.1 — Vẽ hệ số, hiệu kỹ năng và POD cộng dồn
 # Chọn trước các cặp hiển thị; mọi cặp và ba seed vẫn có trong CSV đầy đủ.
-def draw_figures(associations, contrasts, grouped, features, output):
+def draw_figures(associations, contrasts, grouped, features, output, spreads=None):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -580,13 +670,15 @@ def draw_figures(associations, contrasts, grouped, features, output):
     figure_dir.mkdir(exist_ok=True)
     files = []
     heat = associations.loc[associations.outcome.eq("delta_NSE")].pivot(index="feature", columns="contrast", values="rho")
-    order = [f"{left}__minus__{right}" for left, right in CONTRASTS]
+    order = list(contrasts.contrast.drop_duplicates())
     heat = heat.reindex(index=NUMERIC_FIELDS, columns=order)
-    fig, ax = plt.subplots(figsize=(16, 12))
+    short = lambda name: name.replace("SeqLSTM_Q_A4_seed", "LSTM A4 ").replace("DLinear_seed_", "DLinear ").replace(
+        "Persistence_qmax", "Persistence").replace("__minus__", " minus ")
+    fig, ax = plt.subplots(figsize=(max(16, len(order)*1.15), 12))
     im = ax.imshow(heat, cmap="coolwarm", vmin=-1, vmax=1, aspect="auto")
-    ax.set_xticks(range(len(order)), [name.replace("__minus__", " minus ") for name in order], rotation=65, ha="right", fontsize=8)
+    ax.set_xticks(range(len(order)), [short(name) for name in order], rotation=65, ha="right", fontsize=8)
     ax.set_yticks(range(len(NUMERIC_FIELDS)), NUMERIC_FIELDS, fontsize=9)
-    ax.set_title("Spearman rho: static attributes vs paired delta NSE | all finite basins")
+    fig.suptitle("Spearman rho: static attributes vs paired delta NSE | all finite basins")
     fig.colorbar(im, ax=ax, label="Spearman rho", shrink=.7)
     fig.tight_layout()
     path = figure_dir / "BasinAnalysis_static_delta_NSE_rho.png"
@@ -596,6 +688,7 @@ def draw_figures(associations, contrasts, grouped, features, output):
     fixed = [("SeqLSTM_Q", "Persistence_qmax"), ("SeqLSTM_Q", "SeqLSTM_noQ"),
              ("DLinear_seed_111", "Persistence_qmax")]
     fig, axes = plt.subplots(3, 4, figsize=(16, 11), squeeze=False)
+    fig.suptitle("Paired delta NSE vs catchment attributes | fixed illustrative contrasts")
     for row, (left, right) in enumerate(fixed):
         part = contrasts.loc[contrasts.left_run.eq(left) & contrasts.right_run.eq(right)].set_index("basin_id").reindex(features.index)
         for col, feature in enumerate(PRIORITY_FIELDS):
@@ -607,29 +700,62 @@ def draw_figures(associations, contrasts, grouped, features, output):
             ax.set_yscale("symlog", linthresh=.1)
             if feature == "area_calc" and (x[valid] > 0).all():
                 ax.set_xscale("log")
-            ax.set(xlabel=FEATURE_LABELS[feature], ylabel="Paired delta NSE", title=f"{left} minus {right}\nn={int(valid.sum())}")
+            panel = chr(ord("a") + row*4 + col)
+            ax.set(xlabel=FEATURE_LABELS[feature], ylabel="Paired delta NSE", title=f"({panel}) {short(left)} minus {short(right)}\nn={int(valid.sum())}")
             ax.grid(alpha=.15)
     fig.tight_layout()
     path = figure_dir / "BasinAnalysis_priority_scatter.png"
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     files.append(path)
-    display_runs = ("SeqLSTM_Q", "EncDec_Q", "DLinear_seed_111", "DLinear_seed_222", "DLinear_seed_333")
+    panels = [("Author and DLinear", ("SeqLSTM_Q", "EncDec_Q", *SEED_FAMILIES["DLinear"]))]
+    if set(A4_MODELS).issubset(set(contrasts.left_run)):
+        panels.append(("Author and LSTM A4", ("SeqLSTM_Q", *A4_MODELS)))
+    styles = {"SeqLSTM_Q": ("#0072B2", "-"), "EncDec_Q": ("#009E73", "-")}
+    for family, color in (("DLinear", "#D55E00"), ("LSTM_A4", "#0072B2")):
+        styles.update({name: (color, style) for name, style in zip(SEED_FAMILIES[family], ("--", "-.", ":"))})
     for endpoint, ylabel, filename in (("delta_NSE_median", "Median paired delta NSE", "quartile_delta_NSE"),
                                        ("left_POD_T2_pooled", "Pooled POD at T=2 years", "quartile_flood_POD")):
-        fig, axes = plt.subplots(1, 4, figsize=(17, 4.6), squeeze=False)
-        for ax, feature in zip(axes[0], PRIORITY_FIELDS):
-            for run in display_runs:
-                name = f"{run}__minus__Persistence_qmax"
-                part = grouped.loc[grouped.feature.eq(feature) & grouped.contrast.eq(name) & grouped.group.ne("missing")]
-                ax.plot(part.group, part[endpoint], marker="o", ms=4, label=run)
-            ax.set(title=FEATURE_LABELS[feature], xlabel="Attribute quartile (ties may reduce bins)", ylabel=ylabel)
-            if endpoint == "delta_NSE_median":
-                ax.axhline(0, color="gray", lw=.8)
-            ax.grid(alpha=.2)
-        axes[0, -1].legend(loc="center left", bbox_to_anchor=(1.02, .5), fontsize=8)
+        fig, axes = plt.subplots(len(panels), 4, figsize=(17, 4.6*len(panels)), squeeze=False, sharey=True)
+        fig.suptitle(f"{ylabel} by catchment attribute | same quartile boundaries and daily mask")
+        for row, (family_label, display_runs) in enumerate(panels):
+            for col, (ax, feature) in enumerate(zip(axes[row], PRIORITY_FIELDS)):
+                for run in display_runs:
+                    name = f"{run}__minus__Persistence_qmax"
+                    part = grouped.loc[grouped.feature.eq(feature) & grouped.contrast.eq(name) & grouped.group.ne("missing")]
+                    color, style = styles[run]
+                    ax.plot(part.group, part[endpoint], marker="o", ms=4, label=short(run), color=color, linestyle=style)
+                panel = chr(ord("a") + row*4 + col)
+                ax.set(title=f"({panel}) {FEATURE_LABELS[feature]}", xlabel="Attribute quartile (ties may reduce bins)",
+                       ylabel=f"{family_label}\n{ylabel}")
+                if endpoint == "delta_NSE_median":
+                    ax.axhline(0, color="gray", lw=.8)
+                ax.grid(alpha=.2)
+            axes[row, -1].legend(loc="center left", bbox_to_anchor=(1.02, .5), fontsize=8)
         fig.tight_layout()
         path = figure_dir / f"BasinAnalysis_{filename}.png"
+        fig.savefig(path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+        files.append(path)
+    if spreads:
+        fig, axes = plt.subplots(1, 3, figsize=(14, 4.8), squeeze=False)
+        fig.suptitle("Variation across three seeds per basin | scores relative to persistence")
+        for col, (ax, outcome) in enumerate(zip(axes[0], ENDPOINTS)):
+            values, labels = [], []
+            for family, table in spreads.items():
+                data = table.loc[table.outcome.eq(outcome), "sd_sample"].dropna().to_numpy()
+                if len(data):
+                    values.append(data)
+                    labels.append(f"{family}\nn={len(data)}")
+            if values:
+                ax.boxplot(values, showfliers=True)
+                ax.set_xticks(range(1, len(labels)+1), labels)
+            ax.set_yscale("symlog", linthresh=.001)
+            ax.set_ylim(bottom=0)
+            ax.set(title=f"({chr(ord('a')+col)}) {outcome}", ylabel="Sample SD across three scores")
+            ax.grid(axis="y", alpha=.2)
+        fig.tight_layout()
+        path = figure_dir / "BasinAnalysis_seed_spread.png"
         fig.savefig(path, dpi=150, bbox_inches="tight")
         plt.close(fig)
         files.append(path)
@@ -659,6 +785,11 @@ def self_test():
     check("33_fields_31_rank_predictors", len(STATIC_FIELDS) == 33 and len(NUMERIC_FIELDS) == 31
           and not {"lc_dom", "mvert_ang"} & set(NUMERIC_FIELDS))
     check("12_contrasts_three_endpoints", len(CONTRASTS) == 12 and len(ENDPOINTS) == 3)
+    baseline_runs = (*MODELS, "Persistence_qmax", "Persistence_qmean_aux")
+    check("legacy_11_run_plan", analysis_contrasts(baseline_runs) == CONTRASTS)
+    check("A4_14_run_18_contrasts", len(analysis_contrasts((*baseline_runs, *A4_MODELS))) == 18)
+    rejects("partial_A4_seeds_rejected", lambda: analysis_contrasts((*baseline_runs, A4_MODELS[0])))
+    rejects("unknown_model_rejected", lambda: analysis_contrasts((*baseline_runs, "new_model")))
     check("normalize_leading_zero", list(normalize_ids(["002", "03"])) == ["2", "3"])
     check("NPZ_calendar_day_resolution_normalized", normalize_calendar(np.array(
         ["2014-01-01", "2014-01-02"], dtype="datetime64[D]")).equals(pd.date_range("2014-01-01", periods=2)))
@@ -699,6 +830,28 @@ def self_test():
         dict(basin_id="1", left_run=f"DLinear_seed_{seed}", right_run="Persistence_qmax",
              delta_NSE=i, delta_PNSE=i, delta_POD_T2=i) for i, seed in enumerate((111, 222, 333))
     ])).sd_sample.eq(1).all())
+    a4_fixture = pd.DataFrame([
+        dict(basin_id="1", left_run=name, right_run="Persistence_qmax",
+             delta_NSE=value, delta_PNSE=value, delta_POD_T2=value)
+        for name, value in zip(A4_MODELS, (0., 1., 2.))])
+    check("A4_seed_spread_sample_SD", seed_spread(a4_fixture, "LSTM_A4").sd_sample.eq(1).all())
+    a4_fixture.loc[0, "delta_POD_T2"] = np.nan
+    check("undefined_seed_not_averaged", np.isnan(seed_spread(a4_fixture, "LSTM_A4").set_index(
+        "outcome").at["delta_POD_T2", "sd_sample"]))
+    rejects("missing_seed_score_row_rejected", lambda: seed_spread(a4_fixture.iloc[:2], "LSTM_A4"))
+    association_fixture = pd.DataFrame([
+        dict(contrast=f"{name}__minus__Persistence_qmax", feature="fixture", outcome="delta_NSE", n=12, rho=value)
+        for name, value in zip(A4_MODELS, (.1, .3, .5))])
+    stability = seed_association_stability(association_fixture).iloc[0]
+    check("rho_seed_range_not_CI", stability.direction == "positive" and np.isclose(stability.rho_min, .1)
+          and np.isclose(stability.rho_max, .5) and np.isclose(stability.rho_sd_sample, .2))
+    association_fixture.loc[0, "rho"] = -.1
+    check("mixed_rho_direction_recorded", seed_association_stability(association_fixture).iloc[0].direction == "mixed_or_zero")
+    association_fixture.loc[0, "rho"] = np.nan
+    stability = seed_association_stability(association_fixture).iloc[0]
+    check("undefined_rho_seed_recorded", stability.direction == "undefined_seed" and np.isnan(stability.rho_mean))
+    rejects("duplicate_seed_association_rejected", lambda: seed_association_stability(pd.concat(
+        [association_fixture, association_fixture.iloc[:1]], ignore_index=True)))
     return pd.DataFrame(rows)
 
 
@@ -706,7 +859,7 @@ def self_test():
 # ## Phần 9 — Chạy phân tích và lưu kết quả
 # ### 9.1. Kiểm đầu vào → tính bảng → vẽ → ghi nguồn
 # Xuất trực tiếp /kaggle/working/basin_analysis_output; không tạo ZIP.
-# Tệp .py là nguồn duy nhất; .ipynb chỉ là bản nhập vào Kaggle.
+# Tệp .py là nguồn chỉnh sửa; .ipynb ở đây là bản nhập, bản chính thức tải từ Save & Run All.
 
 # %% Phần 9.1 — Điều phối, manifest và kết luận đúng phạm vi
 # Không gọi mô hình; chỉ đặt complete sau khi mọi bảng/hình được ghi thành công.
@@ -714,15 +867,20 @@ def run(input_root="/kaggle/input", output_root="/kaggle/working/basin_analysis_
         evaluation_root=None, raw_root=None, a1_root=None, a3_root=None, permutations=PERMUTATIONS,
         expected_ids=451):
     started = time.perf_counter()
+    output = Path(output_root)
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "BasinAnalysis_summary.json").write_text(json.dumps(dict(
+        complete=False, status="started_not_verified", output=str(output)), indent=2), encoding="utf-8")
     checks = self_test()
     evaluation_root = Path(evaluation_root) if evaluation_root else unique_file(input_root, "Evaluation_metrics.csv").parent
     a1_root = Path(a1_root) if a1_root else unique_file(input_root, "A1_P3_static_attribute_sources.csv").parent
     a3_root = Path(a3_root) if a3_root else unique_file(input_root, "A3_DLinear_data_audit.npz").parent
     raw_root = Path(raw_root) if raw_root else Path(input_root)
-    output = Path(output_root)
-    output.mkdir(parents=True, exist_ok=True)
     print("Phần 1–2: nguồn Evaluation, A1, A3:", evaluation_root, a1_root, a3_root, sep="\n")
     metrics, events, ids, evaluation_summary, evaluation_protocol, paths = load_evaluation(evaluation_root, expected_ids)
+    contrast_plan = analysis_contrasts(metrics.run)
+    a4_included = set(A4_MODELS).issubset(set(metrics.run))
+    print(f"Phần 2: {metrics.run.nunique()} run; {len(contrast_plan)} phép so; A4={a4_included}")
     features, quality, used = load_attributes(raw_root, a1_root, ids)
     paths.extend(used)
     diagnostics, used, negatives = load_diagnostics(a3_root, ids, features, metrics)
@@ -731,6 +889,9 @@ def run(input_root="/kaggle/input", output_root="/kaggle/working/basin_analysis_
     print(f"Phần 3: {len(ids)} ID; {int((features.test_common_days > 0).sum())} có ngày chấm; kiểm train/mask/obs_tss đạt")
     contrasts = build_contrasts(metrics, events, ids)
     associations, diagnostic_associations = association_tables(contrasts, features, permutations)
+    stability = seed_association_stability(associations)
+    spreads = {family: seed_spread(contrasts, family) for family in SEED_FAMILIES
+               if family == "DLinear" or a4_included}
     grouped, bins = group_summary(contrasts, features)
     categories = category_summary(contrasts, features)
     topology, topology_status, used = topology_sensitivity(a1_root, contrasts, features)
@@ -739,20 +900,28 @@ def run(input_root="/kaggle/input", output_root="/kaggle/working/basin_analysis_
                   paired_contrasts=contrasts, static_associations=associations,
                   diagnostic_associations=diagnostic_associations, quartile_definitions=bins,
                   grouped_skill=grouped, categorical_summary=categories,
-                  DLinear_seed_spread=seed_spread(contrasts), topology_sensitivity=topology)
+                  DLinear_seed_spread=spreads["DLinear"], topology_sensitivity=topology,
+                  seed_association_stability=stability)
+    if a4_included:
+        tables["LSTM_A4_seed_spread"] = spreads["LSTM_A4"]
     written = []
     for name, table in tables.items():
         path = output / f"BasinAnalysis_{name}.csv"
         table.to_csv(path, index=False, encoding="utf-8-sig")
         written.append(path)
-    written.extend(draw_figures(associations, contrasts, grouped, features, output))
+    figures = draw_figures(associations, contrasts, grouped, features, output, spreads)
+    written.extend(figures)
     manifest = pd.DataFrame([dict(path=str(p), bytes=p.stat().st_size, sha256=hashlib.sha256(p.read_bytes()).hexdigest())
                              for p in sorted(set(paths))])
     manifest.to_csv(output / "BasinAnalysis_input_manifest.csv", index=False, encoding="utf-8-sig")
-    protocol = dict(scope="test/S0/lead1/common_source_all", expected_IDs=expected_ids,
+    protocol = dict(analysis_protocol_version=2, scope="test/S0/lead1/common_source_all", expected_IDs=expected_ids,
         main_event_grouping="USWRC", return_period_years=2, event_tolerance_days=0,
         static_predictors=list(NUMERIC_FIELDS), excluded_rank_predictors=dict(lc_dom="categorical_CORINE", mvert_ang="circular_angle"),
-        priority_attributes=list(PRIORITY_FIELDS), contrasts=[dict(left=a, right=b) for a, b in CONTRASTS],
+        priority_attributes=list(PRIORITY_FIELDS), contrasts=[dict(left=a, right=b) for a, b in contrast_plan],
+        runs=sorted(set(metrics.run)), A4_included=a4_included, A4_runs=list(A4_MODELS) if a4_included else [],
+        seed_families={family: list(SEED_FAMILIES[family]) for family in spreads},
+        seed_stability="rho_sign_and_range_across_three_runs_vs_persistence_no_p_pooling",
+        reference_mask="A3_common_source_all_counts_and_obs_tss_must_match_Evaluation",
         outcomes=list(ENDPOINTS), permutations=permutations, seed=PERMUTATION_SEED,
         permutation_type="permute_outcome_ID_pairings_keep_attributes_fixed",
         two_sided_p="(1+count_abs_permuted_rho_ge_abs_observed_rho)/(B+1)",
@@ -768,10 +937,12 @@ def run(input_root="/kaggle/input", output_root="/kaggle/working/basin_analysis_
     (output / "BasinAnalysis_protocol.json").write_text(json.dumps(protocol, ensure_ascii=False, indent=2), encoding="utf-8")
     summary = dict(complete=True, fixture_checks=len(checks), IDs=len(ids),
         IDs_with_common_days=int((features.test_common_days > 0).sum()),
-        common_day_IDs=int(features.test_common_days.sum()), contrasts=len(CONTRASTS),
+        common_day_IDs=int(features.test_common_days.sum()), runs=int(metrics.run.nunique()),
+        contrasts=len(contrast_plan), A4_included=a4_included, A4_runs=list(A4_MODELS) if a4_included else [],
         static_predictors=len(NUMERIC_FIELDS), association_rows=len(associations),
         finite_rho=int(associations.rho.notna().sum()), permutations=permutations,
-        topology=topology_status, figures=4, evaluation_protocol_version=evaluation_protocol.get("protocol_version"),
+        topology=topology_status, figures=len(figures), evaluation_protocol_version=evaluation_protocol.get("protocol_version"),
+        seed_stability_rows=len(stability), analysis_protocol_version=2,
         input_contract_checked=True, models_retrained=False, causal_feature_importance_claim=False,
         seconds=time.perf_counter()-started, output=str(output),
         python=sys.version.split()[0], numpy=np.__version__, pandas=pd.__version__)
@@ -780,8 +951,9 @@ def run(input_root="/kaggle/input", output_root="/kaggle/working/basin_analysis_
     (output / "BasinAnalysis_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print("Phần 9: hoàn thành; rho/n là kết quả mô tả chính, p có giả định trao đổi ID.")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
-    print("GỬI LẠI: summary/protocol/checks, static_associations, grouped_skill, quartile_definitions, DLinear_seed_spread,")
-    print("attribute_quality, topology_sensitivity và bốn PNG; kèm mọi cảnh báo/traceback.")
+    print("GỬI LẠI: summary/protocol/checks, static_associations, grouped_skill, quartile_definitions,")
+    print("DLinear_seed_spread, LSTM_A4_seed_spread (nếu có), seed_association_stability,")
+    print("attribute_quality, topology_sensitivity và năm PNG; kèm mọi cảnh báo/traceback.")
     return tables
 
 

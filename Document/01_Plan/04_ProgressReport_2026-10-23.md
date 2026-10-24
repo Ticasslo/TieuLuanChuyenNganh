@@ -1,10 +1,10 @@
 # Báo cáo tiến độ: ứng dụng mô hình học sâu trong dự báo lưu lượng dòng chảy
 
-**Thời điểm cập nhật: 23/10/2026. Đợt báo cáo dự kiến: 25/10/2026.**
+**Thời điểm cập nhật: 24/10/2026. Đợt báo cáo dự kiến: 25/10/2026.**
 
 ## 1. Kết quả chính và vị trí hiện tại của đề tài
 
-Đề tài đã hoàn thành khảo sát dữ liệu A1, chạy lại suy luận từ trọng số tác giả ở A2 và xây dựng các mốc so sánh A3, gồm persistence và DLinear với ba hạt giống. Các kết quả tạo cơ sở để đánh giá những mô hình tiếp theo trên cùng dữ liệu, đơn vị và ngày dự báo.
+Đề tài đã hoàn thành khảo sát dữ liệu A1, chạy lại suy luận từ trọng số tác giả ở A2, xây dựng các mốc persistence/DLinear ở A3 và huấn luyện lại LSTM theo cấu hình tác giả ở A4. Nhóm đã thực hiện **sáu lần huấn luyện mới từ đầu: ba seed DLinear và ba seed LSTM**. A2 là suy luận từ trọng số có sẵn, không tính vào sáu lần huấn luyện này. Các kết quả xác lập mốc thực nghiệm để đánh giá các cải tiến tiếp theo; chưa phải kết quả kiểm chứng lợi ích của Mamba.
 
 Đợt đánh giá hiện tại dùng **S0**, tức không che thêm đầu vào theo kịch bản; dữ liệu gốc vẫn có thể thiếu. **Hạn một ngày** nghĩa là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Một **ngày–lưu vực** là một ngày tại một trạm có ID riêng. **Mặt nạ** là bảng chọn hoặc bỏ các cặp ngày–lưu vực khi chấm; **giao chung** chỉ giữ các cặp có quan trắc, persistence và dự báo của mọi mô hình cùng hữu hạn, để các mô hình được so trên cùng dữ liệu.
 
@@ -13,12 +13,13 @@
 | A1 — dữ liệu | Khảo sát 451 lưu vực; xác định độ phủ nhãn, đơn vị, cửa sổ đầu vào; tính ngưỡng bốn mức lưu lượng và ngưỡng lũ theo chu kỳ lặp lại |
 | A2 — tái lập | Chạy lại sáu cấu hình từ trọng số tác giả; cả sáu đạt tiêu chí tái lập, NSE trung vị cao nhất là 0,7053 |
 | A3 — mốc so sánh | Tính lại NSE, PNSE, KGE và các thành phần; persistence qmax có NSE trung vị 0,3500; DLinear đạt 0,3802 ± 0,0024 giữa ba hạt giống |
+| A4 — huấn luyện lại LSTM | Ba seed đạt NSE trung vị test 0,6952 / 0,7038 / 0,7059; trung bình ± std mẫu 0,7016 ± 0,0056; một lần huấn luyện mất khoảng 2,5–3,2 giờ trên T4 |
 | Chẩn đoán | Giải thích các trường hợp NSE âm lớn bằng độ phủ, phương sai quan trắc và sai số dự báo; giữ đầy đủ các lưu vực trong danh sách đánh giá |
-| Bộ đánh giá | Chấm A2/DLinear trên test/S0/hạn một ngày, khớp A3; có bốn mức, sự kiện lũ và kiểm định ghép cặp |
+| Bộ đánh giá | Chấm chung 14 run gồm A2/DLinear/persistence và ba A4 trên test/S0/hạn một ngày; 129 kiểm thử đạt, khớp A3 và hợp đồng A4; có bốn mức, sự kiện và kiểm định |
 
 Trong các cấu hình đã đánh giá, Sequential Forecast LSTM có lưu lượng quá khứ đạt NSE trung vị cao nhất. DLinear cải thiện so với persistence theo NSE và PNSE, nhưng có KGE thấp hơn. Vì vậy, kết quả cần được đọc theo cả sai số tổng thể, tương quan, biên độ và mức lệch trung bình.
 
-**Bộ đánh giá dùng chung** tại `Workspace/06_Evaluation/` đã chạy thành công trên dự báo A2 và DLinear với test/S0/hạn một ngày. Các kịch bản mất dữ liệu và nhiều hạn được bổ sung khi luồng mô hình xuất dự báo tương ứng. Phần tích hợp bộ nạp B2 được thực hiện sau A4 và B1. So sánh chính thức LSTM, GRU, Transformer, S4D và Mamba thuộc giai đoạn tiếp theo.
+**Bộ đánh giá dùng chung** tại `Workspace/06_Evaluation/` đã chạy thành công trên dự báo A2, DLinear và A4 với test/S0/hạn một ngày; giao chung vẫn có 652.628 ngày–lưu vực trên 450 ID có ngày chấm. Các kịch bản mất dữ liệu và nhiều hạn được bổ sung khi luồng mô hình xuất dự báo tương ứng. A4 đã có kết quả; phần tích hợp bộ nạp B2 tiếp tục khi B1 sẵn sàng. So sánh chính thức LSTM, GRU, Transformer, S4D và Mamba thuộc giai đoạn tiếp theo.
 
 ## 2. Bài toán thủy văn và dữ liệu đầu vào
 
@@ -215,17 +216,36 @@ Bộ đánh giá dùng ngưỡng A1 đã chấm cùng giao ngày của A3. Trên
 
 Ở **bảng phụ ±1 ngày**, SeqLSTM_Q có POD **32,65%**, FAR **45,54%**; DLinear có POD **20,83–22,23%**, FAR **30,70–32,52%**. Persistence đạt POD = 1 vì trận trễ một ngày vẫn được ghép; sai số thời điểm đỉnh trung bình tuyệt đối là một ngày. Chênh lệch giữa hai bảng cho thấy cần phân biệt cải thiện sai số cả chuỗi với khả năng bắt đúng ngày khởi phát lũ. [Bảng chính, bảng phụ và quy tắc ghép](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#103-sự-kiện-lũ-chu-kỳ-hai-năm).
 
-Các kiểm định gồm 45 cặp run dự kiến × 3 chỉ số, hiệu chỉnh Holm riêng theo từng chỉ số và **chỉ đếm p-value hữu hạn, bỏ NaN**. Toàn bộ p-value của lần chạy hiện có đều hợp lệ nên số đã báo giữ nguyên. Chênh lệch NSE của DLinear so với persistence có median dương ở cả ba seed; KGE thấp hơn persistence ở 449/450 lưu vực cho mỗi seed. [Bảng mức, sự kiện và kiểm định](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle).
+Lần chấm 11 run gồm 45 cặp run dự kiến × 3 chỉ số, hiệu chỉnh Holm riêng theo từng chỉ số và **chỉ đếm p-value hữu hạn, bỏ NaN**. Toàn bộ p-value trong lần chấm đó đều hợp lệ nên bỏ NaN không làm đổi các p đã báo. Chênh lệch NSE của DLinear so với persistence có median dương ở cả ba seed; KGE thấp hơn persistence ở 449/450 lưu vực cho mỗi seed. [Bảng mức, sự kiện và kiểm định](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle).
+
+### 6.6. A4 — huấn luyện lại mô hình nền và kiểm trên cùng dữ liệu
+
+A4 huấn luyện mới Sequential Forecast LSTM có Q theo cấu hình của tác giả với ba seed 111, 222, 333. Các epoch được chọn bằng validation là 11, 15, 14. Mục đích là kiểm khả năng tự huấn luyện lại và đo biến thiên giữa các lần chạy, không phải thay kiến trúc. [Thiết lập và thời gian A4](https://github.com/Ticasslo/TieuLuanChuyenNganh/blob/b98ad95db47a7ca363740d6696b6b040e5aeabf7/Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.md).
+
+| Run trên giao chung | NSE trung vị | PNSE trung vị | KGE trung vị | POD lũ hai năm, đúng ngày (%) |
+|---|---:|---:|---:|---:|
+| LSTM tác giả, A2 | 0,705259 | 0,495584 | 0,767074 | 19,51 |
+| LSTM A4 seed 111 | 0,695242 | 0,495352 | 0,758090 | 16,89 |
+| LSTM A4 seed 222 | 0,703778 | 0,505573 | 0,790977 | 20,26 |
+| LSTM A4 seed 333 | 0,705890 | 0,501788 | 0,785984 | 17,92 |
+
+NSE trung vị của ba A4 là **0,701636 ± 0,005638** theo trung bình ± độ lệch chuẩn mẫu. Giá trị của tác giả nằm trong khoảng ba lần chạy. Đây là biến thiên giữa ba lần huấn luyện, không phải khoảng tin cậy hoặc chỉ số của một ensemble.
+
+Ở ngưỡng lũ hai năm có 1.066 trận thật đủ điều kiện, ba A4 bắt đúng ngày **180/216/191 trận**, bỏ sót **886/850/875** và báo nhầm **372/446/446**, FAR khoảng **67–70%**. Seed 333 có NSE cao nhất nhưng seed 222 bắt đúng ngày nhiều trận nhất; nâng NSE không tự bảo đảm cải thiện khởi phát lũ. Ở bảng phụ ±1 ngày, POD của ba seed là **28,71/34,05/31,24%**.
+
+Khi chấm 14 run, mỗi họ Holm có **78 cặp dự kiến**, tổng 234 hàng cho NSE/PNSE/KGE. Trên NSE, ba A4 so tác giả có p sau Holm **0,481862 / 0,288877 / 0,530678**: không phát hiện khác biệt ở mức 0,05 trong họ này, nhưng đó không phải chứng minh tương đương. Seed 111 so 333 có p Holm 0,051454 trong họ 78 cặp; p đã điều chỉnh riêng trên ba cặp seed của A4 có thể khác do họ kiểm khác nhau. [Kết quả A4 trên bộ đánh giá chung](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#11-xác-nhận-tích-hợp-a4-trên-kaggle).
 
 ## 7. Đã trả lời được gì về thuộc tính ảnh hưởng đến dự báo?
 
 Các kết quả hiện tại cung cấp ba loại bằng chứng. Thứ nhất, độ phủ và chiều dài lịch sử quyết định một trạm có mẫu hợp lệ hay dự báo hữu hạn hay không. Thứ hai, độ biến thiên của nhãn và khả năng dự báo bằng hôm qua ảnh hưởng trực tiếp đến cách đọc NSE, PNSE. Thứ ba, các cấu hình có Q quá khứ đạt NSE trung vị cao hơn các cấu hình tương ứng không Q trong các run đã khảo sát.
 
-Phân tích **chênh lệch kỹ năng từng lưu vực** đã chạy với 12 phép so và 31 trong 33 thuộc tính dạng số; mã lớp phủ và góc hướng được mô tả theo nhóm. Trên 450 lưu vực có ngày chấm, hệ số tương quan thứ hạng Spearman giữa ΔNSE của SeqLSTM_Q so persistence với độ cao trung bình là **−0,422**, với tỷ phần tuyết **−0,263**, và với chỉ số khô hạn **0,211**. Hệ số dương nghĩa thuộc tính lớn hơn thường đi cùng mức cải thiện lớn hơn; hệ số âm biểu thị xu hướng ngược lại. Median ΔNSE của SeqLSTM_Q so persistence ở nhóm độ cao thấp nhất [221; 591,5) m là **0,4420**, còn nhóm cao nhất [1.294; 3.122] m là **0,1302**. Đây là chênh lệch điểm so mốc, không phải NSE tuyệt đối hoặc phần trăm cải thiện.
+Phân tích **chênh lệch kỹ năng từng lưu vực** đã chạy với **18 phép so trên 14 run**, gồm ba seed LSTM A4, và 31 trong 33 thuộc tính dạng số; mã lớp phủ và góc hướng được mô tả theo nhóm. Trên 450 lưu vực có ngày chấm, hệ số tương quan thứ hạng Spearman giữa ΔNSE của SeqLSTM_Q tác giả so persistence với độ cao trung bình là **−0,422**, với tỷ phần tuyết **−0,263**, và với chỉ số khô hạn **0,211**. Hệ số dương nghĩa thuộc tính lớn hơn thường đi cùng mức cải thiện lớn hơn; hệ số âm biểu thị xu hướng ngược lại. Median ΔNSE của run tác giả so persistence ở nhóm độ cao thấp nhất [221; 591,5) m là **0,4420**, còn nhóm cao nhất [1.294; 3.122] m là **0,1302**. Đây là chênh lệch điểm so mốc, không phải NSE tuyệt đối hoặc phần trăm cải thiện.
 
 Với diện tích, hệ số của SeqLSTM_Q − persistence khá yếu (**−0,075**), nhưng hệ số của SeqLSTM có Q − không Q là **0,274**. Kết luận do đó cần nêu rõ mốc so sánh. Các hướng liên hệ chính còn giữ khi xét 321 lưu vực có ngày chấm và không có lưu vực được chọn khác ở thượng lưu. Riêng kỹ năng bắt đúng ngày khởi phát lũ cần đọc POD và số trận: SeqLSTM_Q đạt **38/267 = 14,23%** ở nhóm diện tích thấp nhất, **62/216 = 28,70%** ở nhóm cao nhất, dù mức cải thiện NSE so persistence thấp hơn ở nhóm cao nhất. [Phương pháp, bảng và hình theo lưu vực](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#11-kết-quả-thực-nghiệm-và-kiểm-chứng).
 
-Các kết quả mô tả mối liên hệ trên một dataset; các thuộc tính có thể đồng biến và lưu vực có thể phụ thuộc không gian. Chúng giúp xác định nhóm cần phân tích tiếp, trong khi đóng góp riêng của từng đầu vào cần kết hợp các thí nghiệm trong [pipeline Mục 6.4 và 6.7](03_Pipeline.md#64-theo-lưu-vực).
+Qua ba seed LSTM A4, liên hệ với độ cao giữ trong khoảng **−0,423 đến −0,415**, với tuyết **−0,273 đến −0,261**, với độ khô hạn **0,183 đến 0,212**. Cả 31 thuộc tính đều giữ dấu của hệ số ΔNSE qua ba seed, dù một số hệ số yếu. Median ΔNSE của A4 ở nhóm độ cao thấp nhất là **0,425–0,430**, so với **0,126–0,132** ở nhóm cao nhất. Kết quả đã qua **41 kiểm thử Kaggle và 492 kiểm cục bộ**, gồm tính lại toàn bộ 1.674 hệ số, p hoán vị và Holm. [Phân tích 14 run có A4](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#12-kết-quả-phân-tích-14-run-có-a4).
+
+Hướng liên hệ ổn định ở cấp tập đi cùng biến thiên ở từng lưu vực: median std mẫu ΔNSE qua seed là **0,02065** với LSTM và **0,00383** với DLinear. Độ phân tán POD nhỏ của DLinear chủ yếu đi cùng khả năng bắt lũ rất thấp, nên không được coi là lợi thế dự báo. Các kết quả mô tả mối liên hệ trên một dataset; các thuộc tính có thể đồng biến và lưu vực có thể phụ thuộc không gian. Đóng góp riêng của từng đầu vào cần kết hợp các thí nghiệm trong [pipeline Mục 6.4 và 6.7](03_Pipeline.md#64-theo-lưu-vực).
 
 Để xác định phần đóng góp của nhóm nguồn, các kịch bản mất Q và độ trễ khí tượng S0–S4 sẽ đo mức suy giảm khi thông tin sẵn có thay đổi. So sánh lõi dùng cùng đầu vào, ngân sách tinh chỉnh và hạt giống giúp phân biệt lợi ích của dữ liệu với lợi ích của kiến trúc. Bằng chứng hiện có áp dụng cho Extended LamaH-CE; kết luận chuyển sang dataset khác cần kiểm chứng riêng.
 
@@ -235,7 +255,7 @@ Các kết quả mô tả mối liên hệ trên một dataset; các thuộc tí
 
 Bộ đánh giá đọc dự báo đã lưu, không cần huấn luyện hoặc chờ B1. Dự báo A2 và DLinear là dữ liệu thử đầu tiên; kết quả A3 là đối chiếu cho các chỉ số liên tục.
 
-Đã có [mã bộ đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py) và [thuyết minh](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md). Lần chạy Kaggle trên Output thật A1/A2/A3 qua **60 kiểm thử** và khớp A3 ở sáu chỉ số cùng số ngày trên **4.961 cặp run–lưu vực**. Các CSV kết quả qua **57 kiểm tra cục bộ** về công thức, tổng hợp, ghép sự kiện và kiểm định. Phạm vi đã xác nhận là test/S0/hạn một ngày.
+Đã có [mã bộ đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py) và [thuyết minh](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md). Lần chấm 11 run trên Output thật A1/A2/A3 qua **60 kiểm thử** và khớp A3 ở sáu chỉ số cùng số ngày trên **4.961 cặp run–lưu vực**; các CSV qua **57 kiểm tra cục bộ** về công thức, tổng hợp, ghép sự kiện và kiểm định. Lần chấm mở rộng 14 run có A4 qua **129 kiểm thử Kaggle và 49 kiểm bảng tổng hợp cục bộ**. Phạm vi đã xác nhận là test/S0/hạn một ngày.
 
 Kết quả đã có đủ bảng lũ chính cùng ngày bắt đầu và bảng phụ ±1, đồng thời bỏ p = NaN khỏi kích thước họ Holm. Các chỉ số liên tục giữ nguyên so với A3; phân mức giữ nguyên so với lần đánh giá trước. Lần cập nhật này chỉ chấm lại các dự báo đã lưu, giữ nguyên A1–A3.
 
@@ -252,7 +272,7 @@ Các bảng ngưỡng và cụm A1, dự báo cùng thông tin cấu hình A2/DL
 
 ### 8.2. Phối hợp với luồng mô hình
 
-Người 2 thực hiện A4 để đo nhiễu hạt giống của mô hình nền và B1 để hoàn thiện quy trình lưu checkpoint, thống nhất Q và bổ sung qmax quá khứ. B2 đã có bản kiểm bộ nạp độc lập đạt các phép kiểm và đếm mẫu; việc tích hợp, rà soát chung và huấn luyện B2 được tiếp tục khi A4/B1 sẵn sàng. [Phân công chi tiết](../../ASSIGNMENT.md).
+A4 đã hoàn thành huấn luyện ba seed và bàn giao dự báo, bộ đánh giá đã chấm chung với các mốc A3. Người 2 tiếp tục B1 để hoàn thiện quy trình lưu checkpoint, thống nhất Q và bổ sung qmax quá khứ. B2 đã có bản kiểm bộ nạp độc lập đạt các phép kiểm và đếm mẫu; việc tích hợp, rà soát chung và huấn luyện B2 tiếp tục khi B1 sẵn sàng. [Phân công chi tiết](../../ASSIGNMENT.md).
 
 Sau đó, bộ đánh giá được dùng lại cho bước B, các lõi ở bước C và các phần mở rộng. Kết quả validation phục vụ lựa chọn theo quy tắc đã định; test phục vụ báo cáo. Các phân tích sự kiện và thuộc tính sẽ bổ sung góc nhìn về bỏ sót lũ và điều kiện mà từng mô hình hoạt động tốt.
 
@@ -265,7 +285,8 @@ Sau đó, bộ đánh giá được dùng lại cho bước B, các lõi ở bư
 | Khảo sát, độ phủ, ngưỡng và cụm | [Thuyết minh A1](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-25) |
 | Đối chiếu chạy lại trọng số tác giả | [LamaH-CE, Mục 6.3](../03_Data/01_LamaHCE.md#63-tái-lập-bằng-trọng-số-tác-giả-bước-a2-kaggle-11102026), [mã A2](../../Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.py) |
 | Mốc so sánh, huấn luyện và chẩn đoán | [Thuyết minh A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#report-part-10), [mã A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.py) |
+| LSTM huấn luyện lại và đánh giá chung | [Thiết lập A4](https://github.com/Ticasslo/TieuLuanChuyenNganh/blob/b98ad95db47a7ca363740d6696b6b040e5aeabf7/Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.md), [kết quả 14 run](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#11-xác-nhận-tích-hợp-a4-trên-kaggle) |
 | Giao thức đánh giá và kế hoạch tiếp theo | [Pipeline](03_Pipeline.md), [giải thích cách đọc chỉ số](../06_Theory/08_EvaluationFigures.md) |
 | Bản thảo báo cáo theo chương | [Chương 4 — Dữ liệu](../07_Report/04_Data.md), [Chương 6 — Thí nghiệm và kết quả](../07_Report/06_ExperimentsAndResults.md) |
 
-Các số liệu trong báo cáo là kết quả đã chạy của A1, A2, A3 và bộ đánh giá trên test/S0/hạn một ngày. Các dãy số nhỏ ghi rõ “ví dụ minh họa” chỉ dùng giải thích đơn vị và công thức. Kịch bản thiếu dữ liệu, nhiều hạn và so sánh các lõi được bổ sung theo tiến độ thực nghiệm.
+Các số liệu trong báo cáo là kết quả đã chạy của A1, A2, A3, A4 và bộ đánh giá trên test/S0/hạn một ngày. Bốn CSV tổng hợp và hình của lần chấm 14 run qua 49 kiểm cục bộ về tính nhất quán và bảo toàn kết quả cũ; đây không phải kiểm lại toàn bộ NPZ hoặc tính lại Wilcoxon từ từng ID. Các dãy số ghi “ví dụ minh họa” chỉ dùng giải thích đơn vị và công thức. Kịch bản thiếu dữ liệu, nhiều hạn và so sánh các lõi được bổ sung theo tiến độ thực nghiệm.

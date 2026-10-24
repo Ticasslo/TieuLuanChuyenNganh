@@ -1,0 +1,36 @@
+{
+  "complete": true,
+  "fixture_checks": 41,
+  "IDs": 451,
+  "IDs_with_common_days": 450,
+  "common_day_IDs": 652628,
+  "runs": 14,
+  "contrasts": 18,
+  "A4_included": true,
+  "A4_runs": [
+    "SeqLSTM_Q_A4_seed111",
+    "SeqLSTM_Q_A4_seed222",
+    "SeqLSTM_Q_A4_seed333"
+  ],
+  "static_predictors": 31,
+  "association_rows": 1674,
+  "finite_rho": 1674,
+  "permutations": 9999,
+  "topology": {
+    "status": "rho_only_not_spatial_independence_proof",
+    "headwater_IDs": 322,
+    "known_nested_IDs": 129
+  },
+  "figures": 5,
+  "evaluation_protocol_version": 3,
+  "seed_stability_rows": 186,
+  "analysis_protocol_version": 2,
+  "input_contract_checked": true,
+  "models_retrained": false,
+  "causal_feature_importance_claim": false,
+  "seconds": 40.688071089999994,
+  "output": "/kaggle/working/basin_analysis_output",
+  "python": "3.13.15",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3"
+}

@@ -4,3 +4,5 @@
 
 # Giữ nguyên byte các bảng đã nhận, khớp manifest kết quả.
 Tables/BasinAnalysis_* -text
+
+Tables/BasinAnalysis_A4_Integrated/* -text whitespace=cr-at-eol
