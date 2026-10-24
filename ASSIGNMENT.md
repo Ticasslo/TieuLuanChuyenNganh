@@ -44,7 +44,7 @@ Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu 
 | # | Bước | Việc | Ra | Cần trước |
 |---|---|---|---|---|
 | 1 | Bước 0 | Cài `mamba-ssm` trên Kaggle T4 (dự phòng `mambapy`); mô hình chung "Sequential Forecast" nhận lõi bất kỳ; các lõi GRU, Transformer, S4D, Mamba; kiểm thử đơn vị Mục 9.2 (nạp trọng số tác giả cho đầu ra trùng, không rò rỉ, đúng trục, số tham số lệch ≤ 1%) | Mã trong fork, wheel ở Output notebook `01_0_MambaSSM_Build` (gắn làm Input) | Fork `research` |
-| 2 | A4 | Notebook `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.py`: đo thời gian 1 epoch trên T4; huấn luyện lại mô hình tốt nhất của bài với hạt giống 111, 222, 333 | Độ lệch chuẩn giữa hạt giống; thời gian mỗi lần chạy để gắn ngày cho lịch | Thư mục Q (A2 Phần 4) |
+| 2 | A4 | Notebook `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain_Seed111/222/333.py` (mỗi hạt giống một notebook) và `04_A4_LamaHCEExt_Compare.py`: đo thời gian trên T4; huấn luyện lại mô hình tốt nhất của bài với hạt giống 111, 222, 333 — **xong**, báo cáo `03_A4_LamaHCEExt_Retrain.md` | Độ lệch chuẩn giữa hạt giống; thời gian mỗi lần chạy để gắn ngày cho lịch; 3 tệp dự báo NPZ cho bộ đánh giá | Thư mục Q (A2 Phần 4) |
 | 3 | B1, B3, B* | B1: sửa lưu mô hình tốt nhất, Q mm/ngày, qmax quá khứ; B2 phần mô hình (nhúng theo nguồn, masked mean); B3: che dữ liệu hai mức; B*: chọn theo luật ghi sẵn; gắn mốc `freeze-C` | Trọng số, nhật ký, tệp dự báo | A4; bộ nạp B2 của người 1 |
 | 4 | C | C1 tinh chỉnh 5 lõi × 8 cấu hình; C2 chạy chính thức 3 hạt giống | Tệp dự báo mọi cấu hình chính thức | `freeze-C` |
 | 5 | Mở rộng | H (dự báo 1–7 ngày) → D (730 ngày) → E (biến thể) → F (CMAL) → GV, cắt theo `03_Pipeline.md` Mục 8.3 khi thiếu thời gian | Tệp dự báo | C xong |
