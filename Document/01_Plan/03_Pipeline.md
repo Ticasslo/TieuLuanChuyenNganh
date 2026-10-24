@@ -230,6 +230,8 @@ Các kịch bản chạy trên cả kỳ validation (dùng để chọn cấu h�
 
 ΔNSE giữa Mamba (và S4D) với LSTM cải tiến; bản đồ; tương quan Spearman với 33 thuộc tính và khoảng cách Wasserstein tái phân tích – dự báo (mã phân tích của tác giả). Kiểm giả thuyết từ Wang và cs. (WRR 2025), Jing và cs. (ESWA 2026), Zhang và cs. (2026): SSM có lợi ở lưu vực tuyết, động lực chậm, bất lợi ở lũ nhanh — dùng tỷ lệ tuyết, độ cao, chỉ số khô hạn, diện tích. Tách nhóm đầu nguồn (72,5%) và lồng nhau (27,5%) theo số liệu của BiasCast (thư trả lời phản biện 1, `PeerReview/ResponseToReferee1.pdf`).
 
+Phân tích các mốc A2/DLinear trước bước C dùng [notebook theo lưu vực](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin.md): 12 cặp so trên giao ngày chung, ΔNSE, ΔPNSE và ΔPOD lũ hai năm. Trong 33 thuộc tính, tương quan thứ hạng dùng 31 trường; mã lớp phủ `lc_dom` và góc vòng `mvert_ang` được mô tả theo nhóm riêng. Rho và số ID là kết quả mô tả chính; p hoán vị và Holm trong từng cặp–outcome có giả định trao đổi ID, không thay bằng chứng nhân quả hoặc kiểm phụ thuộc không gian. Các trường khí hậu/thực vật tổng hợp sẵn không được gọi là thống kê chỉ fit trên train.
+
 ### 6.5. Chi phí tính toán
 
 Số tham số, thời gian mỗi epoch, bộ nhớ GPU, thời gian suy luận cho 365 và 730 ngày — kiểm lập luận "Mamba tuyến tính theo độ dài chuỗi" trên bài toán thật.

@@ -37,9 +37,12 @@ PDF trong `PaperResearch/PaperResearchPDF/` để nhóm tham khảo. Giấy phé
 
 Luồng mô hình tiếp tục A4 và B1; luồng dữ liệu/đánh giá chuẩn bị báo cáo, bàn giao kết quả và tích hợp B2 khi A4/B1 sẵn sàng. Các kịch bản S1–S4, nhiều hạn và so sánh năm lõi được bổ sung khi có dự báo tương ứng.
 
+Phân tích đặc điểm lưu vực đã chạy trên Kaggle: 12 phép so, 31 thuộc tính dạng số, 1.116 hệ số cho ΔNSE, ΔPNSE và ΔPOD lũ hai năm. Có 30 kiểm thử và 143 kiểm tra kết quả cục bộ đạt. Với SeqLSTM_Q so persistence, mức cải thiện NSE liên hệ âm với độ cao trung bình (ρ = −0,422); với SeqLSTM có Q so không Q, chênh lệch NSE liên hệ dương với diện tích (ρ = 0,274). Các hệ số mô tả liên hệ trong Extended LamaH-CE.
+
 ## Tài liệu báo cáo
 
 - [Báo cáo tiến độ cho GVHD](Document/01_Plan/04_ProgressReport_2026-10-23.md): dữ liệu, tái lập, persistence/DLinear, phân mức và sự kiện, có ví dụ giải thích chỉ số.
 - [Chương 4 — Dữ liệu](Document/07_Report/04_Data.md): nguồn theo năm, đơn vị, độ phủ, cửa sổ và ngưỡng.
 - [Chương 6 — Thí nghiệm và kết quả](Document/07_Report/06_ExperimentsAndResults.md): giao thức, các kết quả đã chạy và diễn giải.
 - [Bộ đánh giá và bằng chứng thực nghiệm](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md): mã, notebook, bảng kết quả và kiểm tra.
+- [Phân tích kết quả theo đặc điểm lưu vực](Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin.md): phương pháp, kết quả Kaggle, bốn hình và kiểm đối chiếu CSV.

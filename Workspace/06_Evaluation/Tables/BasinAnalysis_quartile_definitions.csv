@@ -1,0 +1,17 @@
+﻿feature,group,lower,upper,rule
+area_calc,Q1,3.972,51.4725,lower_inclusive_upper_exclusive_last_inclusive
+area_calc,Q2,51.4725,101.465,lower_inclusive_upper_exclusive_last_inclusive
+area_calc,Q3,101.465,219.95,lower_inclusive_upper_exclusive_last_inclusive
+area_calc,Q4,219.95,15025.609,lower_inclusive_upper_exclusive_last_inclusive
+elev_mean,Q1,221.0,591.5,lower_inclusive_upper_exclusive_last_inclusive
+elev_mean,Q2,591.5,794.0,lower_inclusive_upper_exclusive_last_inclusive
+elev_mean,Q3,794.0,1294.0,lower_inclusive_upper_exclusive_last_inclusive
+elev_mean,Q4,1294.0,3122.0,lower_inclusive_upper_exclusive_last_inclusive
+frac_snow,Q1,0.05,0.09,lower_inclusive_upper_exclusive_last_inclusive
+frac_snow,Q2,0.09,0.13,lower_inclusive_upper_exclusive_last_inclusive
+frac_snow,Q3,0.13,0.25,lower_inclusive_upper_exclusive_last_inclusive
+frac_snow,Q4,0.25,0.61,lower_inclusive_upper_exclusive_last_inclusive
+arid_1,Q1,0.37,0.49,lower_inclusive_upper_exclusive_last_inclusive
+arid_1,Q2,0.49,0.67,lower_inclusive_upper_exclusive_last_inclusive
+arid_1,Q3,0.67,0.81,lower_inclusive_upper_exclusive_last_inclusive
+arid_1,Q4,0.81,1.51,lower_inclusive_upper_exclusive_last_inclusive

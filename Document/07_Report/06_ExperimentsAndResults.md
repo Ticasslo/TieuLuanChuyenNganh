@@ -246,21 +246,58 @@ Median hiệu ghép cặp khác hiệu của hai median. Ví dụ, DLinear 111 c
 
 Wilcoxon phản ánh phân phối hạng của các hiệu, còn dz phụ thuộc trung bình và độ lệch chuẩn hiệu. SeqLSTM_Q có đa số ID tốt lên và p rất nhỏ nhưng dz khoảng 0,0103 vì phần đuôi bất lợi ảnh hưởng mạnh đến trung bình/độ phân tán. Trên KGE, mỗi seed DLinear thấp hơn persistence ở **449/450 ID**. Trên PNSE, median DLinear dương nhưng mean âm do một số lưu vực có persistence rất mạnh. Các chỉ số này cần được đọc cùng nhau để tránh diễn giải p nhỏ như lợi ích đồng đều ở mọi lưu vực.
 
-## 6.10. Khả năng đối chiếu và giới hạn của kết quả hiện tại
+## 6.10. Quan hệ giữa đặc điểm lưu vực và mức cải thiện
+
+Phân tích theo lưu vực dùng cùng phạm vi test/S0/hạn một ngày và giao chung đã chấm, giữ mọi chênh lệch âm. Có 12 phép so, 31 thuộc tính dạng số và ba đại lượng kết quả: ΔNSE, ΔPNSE, ΔPOD lũ hai năm. Mã lớp phủ và góc hướng được mô tả theo nhóm riêng. Mỗi hệ số ΔNSE/ΔPNSE dùng 450 ID; ΔPOD dùng 366 ID có trận thật đủ điều kiện. Spearman đo xu hướng theo thứ hạng, nên hệ số dương biểu thị thuộc tính lớn hơn thường đi cùng mức cải thiện lớn hơn. [Giao thức và kết quả đầy đủ](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin.md#11-kết-quả-thực-nghiệm-và-kiểm-chứng).
+
+### 6.10.1. Hướng liên hệ phụ thuộc mốc so sánh
+
+| Phép so, outcome ΔNSE | Diện tích | Độ cao trung bình | Tỷ phần tuyết | Chỉ số khô hạn |
+|---|---:|---:|---:|---:|
+| SeqLSTM_Q − persistence qmax | −0,075 | −0,422 | −0,263 | 0,211 |
+| EncDec_Q − persistence qmax | −0,092 | −0,331 | −0,209 | 0,111 |
+| DLinear 111 − persistence qmax | −0,297 | −0,246 | −0,133 | 0,226 |
+| SeqLSTM_Q − SeqLSTM_noQ | 0,274 | 0,096 | 0,008 | 0,105 |
+| EncDec_Q − EncDec_noQ | 0,194 | 0,170 | 0,053 | −0,058 |
+
+SeqLSTM_Q cải thiện so persistence ít hơn ở các lưu vực cao hơn hoặc có tỷ phần tuyết lớn hơn. Median ΔNSE ở nhóm độ cao thấp nhất [221; 591,5) m là **0,4420** trên 113 ID, còn nhóm cao nhất [1.294; 3.122] m là **0,1302** trên 112 ID. Quan hệ qua các nhóm trung gian không hoàn toàn đơn điệu. Với chỉ số khô hạn, median ΔNSE ở nhóm [0,37; 0,49) là **0,2392**, tăng lên **0,3977** ở nhóm [0,81; 1,51]. Đây là chênh lệch điểm so persistence, không phải mức NSE tuyệt đối hoặc phần trăm cải thiện.
+
+Diện tích có liên hệ yếu với SeqLSTM_Q − persistence, nhưng liên hệ dương với SeqLSTM có Q − không Q. Median ΔNSE của cặp có/không Q theo bốn nhóm diện tích là **0,0417; 0,0533; 0,0912; 0,0876**. Trong 31 thuộc tính, `ndvi_max` có |ρ| lớn nhất với ΔNSE SeqLSTM_Q − persistence (**0,500**); đây là liên hệ đơn biến, chưa tách khỏi các đặc điểm khí hậu và địa hình đi kèm. [Các hệ số](../../Workspace/06_Evaluation/Tables/BasinAnalysis_static_associations.csv), [biên nhóm](../../Workspace/06_Evaluation/Tables/BasinAnalysis_quartile_definitions.csv), [bảng nhóm](../../Workspace/06_Evaluation/Tables/BasinAnalysis_grouped_skill.csv).
+
+![Mức cải thiện NSE theo nhóm thuộc tính](../../Workspace/06_Evaluation/Figures/BasinAnalysis_quartile_delta_NSE.png)
+
+### 6.10.2. Phân mức kỹ năng chuỗi và kỹ năng bắt lũ
+
+POD cộng dồn ở ngưỡng hai năm, cụm USWRC, cùng ngày bắt đầu của SeqLSTM_Q theo bốn nhóm diện tích là **14,23%; 18,15%; 18,93%; 28,70%**, tương ứng 38/267, 55/303, 53/280 và 62/216 trận. Trong khi median ΔNSE so persistence thấp hơn ở nhóm diện tích Q4 so Q1, POD lại cao hơn ở Q4. Mỗi seed DLinear chỉ bắt đúng ngày hai trận trong toàn bộ 1.066 trận; những khác biệt NSE giữa nhóm chưa cung cấp bằng chứng về khả năng cảnh báo khởi phát lũ bằng DLinear.
+
+![POD theo nhóm thuộc tính](../../Workspace/06_Evaluation/Figures/BasinAnalysis_quartile_flood_POD.png)
+
+### 6.10.3. Độ ổn định và ý nghĩa của bằng chứng
+
+Nhóm không có lưu vực được chọn khác ở thượng lưu có 322 ID, trong đó 321 ID có ΔNSE. Với SeqLSTM_Q − persistence, hệ số độ cao, tuyết và khô hạn lần lượt **−0,437; −0,313; 0,266**, giữ cùng hướng với toàn bộ tập. Với SeqLSTM_Q − SeqLSTM_noQ, hệ số diện tích là **0,325**. Việc giảm lồng nhau chưa loại hết phụ thuộc khí hậu và không gian. [Kiểm độ nhạy](../../Workspace/06_Evaluation/Tables/BasinAnalysis_topology_sensitivity.csv).
+
+Ba seed DLinear giữ cùng hướng liên hệ với bốn thuộc tính ưu tiên. Median độ lệch chuẩn mẫu của ΔNSE qua ba seed theo ID là **0,00383**, nhưng tại 742 và 758 đạt **2,753 và 6,477**, cho thấy tính ổn định ở cấp nhóm không bảo đảm ổn định ở từng lưu vực. [Độ phân tán seed](../../Workspace/06_Evaluation/Tables/BasinAnalysis_DLinear_seed_spread.csv).
+
+Tương quan xác định các nhóm lưu vực mà mô hình cải thiện nhiều hoặc ít, giúp đặt giả thuyết về vai trò dữ liệu. p từ 9.999 hoán vị được điều chỉnh Holm riêng trong từng phép so–đại lượng kết quả gồm 31 thuộc tính; kết luận thống kê còn phụ thuộc giả định trao đổi ID. Tách đóng góp của từng nguồn cần thí nghiệm che nguồn và giải thích mô hình. Đánh giá chuyển sang dataset khác cần kết quả trên dataset tương ứng.
+
+## 6.11. Khả năng đối chiếu và giới hạn của kết quả hiện tại
 
 Bộ đánh giá giao thức 2 đã chạy trên Kaggle với Python 3.13.15, NumPy 2.1.3, pandas 2.3.3 và SciPy 1.16.3. Có **60 kiểm thử** trước khi chấm; **7 kiểm đối chiếu A3**, mỗi kiểm trên 4.961 cặp run–ID cho sáu chỉ số và số ngày. Từ 21 tệp được cung cấp, **57 kiểm CSV cục bộ** xác nhận công thức SSE/KGE, bảng tổng hợp, số đếm ma trận, bảo toàn số sự kiện, ghép một–một đúng dung sai, sai số thời gian, kiểm định, Holm và CDF. Bảng tổng hợp ±1 được tính lại từ bảng sự kiện chi tiết đã cung cấp. [Biên nhận kiểm tra](../../Workspace/06_Evaluation/Tables/Evaluation_output_verification.json).
 
 Những kết quả này xác lập một bộ mốc và bộ đánh giá cho **S0, hạn một ngày trên test**. S0 biểu diễn việc không che thêm đầu vào theo kịch bản; dữ liệu nguồn vẫn có thể thiếu và các phạm vi chấm đã xử lý điều đó. Kết quả validation, S1–S4 và nhiều hạn sẽ được chấm khi luồng mô hình cung cấp dự báo tương ứng. Độ biến thiên ba seed DLinear không thay cho phép đo nhiễu LSTM ở A4.
 
-Ảnh hưởng của một thuộc tính lưu vực hoặc một nhóm đầu vào cần được phân biệt với ảnh hưởng kiến trúc. A1/A3 hiện chứng minh độ phủ, cách tạo cửa sổ, độ biến thiên nhãn và giá trị của mốc persistence đều ảnh hưởng việc đọc kết quả. Phân tích chênh lệch theo thuộc tính và giải thích mô hình trong kế hoạch sẽ bổ sung bằng chứng sau các thí nghiệm có kiểm soát. Các kết luận trong chương áp dụng cho Extended LamaH-CE và những cấu hình đã chạy.
+Phân tích thuộc tính trên Kaggle có 30 kiểm thử đạt. Đã kiểm 18 tệp xuất bằng 143 phép đối chiếu cục bộ, gồm tính lại đủ 1.116 hệ số, p hoán vị và Holm; các hệ số khớp trong khoảng sai số số thực 4,44×10⁻¹⁶, p khớp hoàn toàn. [Biên nhận phân tích theo lưu vực](../../Workspace/06_Evaluation/Tables/BasinAnalysis_output_verification.json). Đối chiếu này dựa trên CSV đã xuất và các CSV đánh giá gốc; thuộc tính gốc, NPZ A3 và thành viên nhóm topology được kiểm tại Kaggle.
 
-## 6.11. Nguồn kết quả
+Ảnh hưởng của một thuộc tính lưu vực hoặc một nhóm đầu vào cần được phân biệt với ảnh hưởng kiến trúc. Các kết quả A1/A3 và phân tích thuộc tính cung cấp bằng chứng mô tả về dữ liệu, mốc so sánh và nhóm lưu vực. Thí nghiệm có kiểm soát ở các bước sau bổ sung bằng chứng về đóng góp từng nguồn và từng lõi. Các kết luận trong chương áp dụng cho Extended LamaH-CE và những cấu hình đã chạy.
+
+## 6.12. Nguồn kết quả
 
 | Nội dung | Nguồn đối chiếu |
 |---|---|
 | Tái lập từ trọng số tác giả | [LamaH-CE, Mục 6.3](../03_Data/01_LamaHCE.md#63-tái-lập-bằng-trọng-số-tác-giả-bước-a2-kaggle-11102026) |
 | Persistence, huấn luyện DLinear, chẩn đoán | [Thuyết minh A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks.md#report-part-10) |
 | Giao thức, số liệu bốn mức và sự kiện | [Thuyết minh bộ đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle) |
+| Đặc điểm lưu vực và chênh lệch kỹ năng | [Phân tích theo lưu vực](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin.md#11-kết-quả-thực-nghiệm-và-kiểm-chứng) |
 | Kiểm CSV đã nhận | [Bảng kiểm](../../Workspace/06_Evaluation/Tables/Evaluation_output_audit.csv), [manifest tệp nhận](../../Workspace/06_Evaluation/Tables/Evaluation_received_manifest.csv) |
 | Hợp đồng và mã đánh giá | [Nguồn Python](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.py), [notebook Kaggle](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt.ipynb) |
 

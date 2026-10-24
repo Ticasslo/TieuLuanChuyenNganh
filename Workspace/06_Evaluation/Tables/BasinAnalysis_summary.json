@@ -1,0 +1,27 @@
+{
+  "complete": true,
+  "fixture_checks": 30,
+  "IDs": 451,
+  "IDs_with_common_days": 450,
+  "common_day_IDs": 652628,
+  "contrasts": 12,
+  "static_predictors": 31,
+  "association_rows": 1116,
+  "finite_rho": 1116,
+  "permutations": 9999,
+  "topology": {
+    "status": "rho_only_not_spatial_independence_proof",
+    "headwater_IDs": 322,
+    "known_nested_IDs": 129
+  },
+  "figures": 4,
+  "evaluation_protocol_version": 2,
+  "input_contract_checked": true,
+  "models_retrained": false,
+  "causal_feature_importance_claim": false,
+  "seconds": 75.62779120999994,
+  "output": "/kaggle/working/basin_analysis_output",
+  "python": "3.13.15",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3"
+}

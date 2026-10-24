@@ -1,0 +1,32 @@
+{
+  "complete": true,
+  "received_files": 18,
+  "received_bytes": 4408277,
+  "local_checks": 143,
+  "local_checks_passed": 143,
+  "rho_recomputed": 1116,
+  "permutation_p_recomputed": 1116,
+  "permutations_each": 9999,
+  "max_abs_rho_error": 4.440892098500626e-16,
+  "max_abs_p_error": 0.0,
+  "evaluation_input_hashes_verified": [
+    "Evaluation_events.csv",
+    "Evaluation_metrics.csv",
+    "Evaluation_protocol.json",
+    "Evaluation_summary.json"
+  ],
+  "scope": "test/S0/lead1/common_source_all",
+  "IDs": 451,
+  "IDs_with_days": 450,
+  "common_day_IDs": 652628,
+  "topology_membership_recomputed": false,
+  "raw_attributes_and_A3_NPZ_reloaded": false,
+  "daily_predictions_recomputed": false,
+  "source_hashes_for_unavailable_inputs": "recorded_by_Kaggle_not_independently_verified_here",
+  "validation_basis": "received_CSVs_and_original_evaluation_CSVs",
+  "models_retrained": false,
+  "python": "3.12.6",
+  "numpy": "1.26.4",
+  "pandas": "2.3.3",
+  "seconds": 9.376814700000068
+}
