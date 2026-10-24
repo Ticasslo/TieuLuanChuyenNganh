@@ -13,7 +13,7 @@
 |---|---|
 | Tải Extended LamaH-CE và kết quả của tác giả (Kaggle Dataset `lamah-ce-ext`) | `Document/03_Data/01_LamaHCE.md` Mục 6 |
 | Tỉ lệ thiếu dữ liệu, persistence (NSE trung vị 0,35–0,37) | `01_LamaHCE.md` Mục 6.1 |
-| Fork thư viện `Ticasslo/neuralhydrology`, nhánh `research` tại `dda45fc` (bước 0a) | `03_Pipeline.md` Mục 9.1 |
+| Fork thư viện `Ticasslo/neuralhydrology`, nhánh `research` tại `dda45fc` (bước 0a); B1 lên `e794d7c`: sửa lỗi lưu mô hình tốt nhất, kèm kiểm thử `test/test_best_model.py` | `03_Pipeline.md` Mục 9.1 |
 | Bước 0 (phần cài): `mamba-ssm` 2.3.2.post1 + `causal-conv1d` 1.6.2.post1 dựng cho Kaggle T4, torch 2.11, đạt test chính thức; `mambapy` trùng kết quả GPU/CPU | [Thuyết minh bước 0](Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md) |
 | A2: chạy lại trọng số tác giả, khớp NSE trung vị cả 6 run | [Thuyết minh A2](Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md) |
 | A1: hoàn thành khảo sát và tính ngưỡng đánh giá | [Thuyết minh A1](Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-25) |
@@ -26,7 +26,7 @@
 
 ## 2. Việc theo từng bước
 
-Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên từ 24/10/2026:** Người 1 đã chấm ba NPZ A4 và phân tích thuộc tính qua ba seed; tiếp tục tích hợp bộ nạp B2 (#4) trên mã B1 khi Người 2 xong B1. Người 2 làm B1 (#3), song song phần còn lại của bước 0 (#1). Cột "Cần trước" ghi đầu vào của từng việc.
+Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên từ 24/10/2026:** Người 1 đã chấm ba NPZ A4 và phân tích thuộc tính qua ba seed; tiếp tục tích hợp bộ nạp B2 (#4) trên mã B1 khi Người 2 xong B1. Người 2 làm B1 (#3): notebook 3 hạt giống `Workspace/05_Training/01_B1_LamaHCEExt_Train/` đang chạy chính thức; song song phần còn lại của bước 0 (#1). Cột "Cần trước" ghi đầu vào của từng việc.
 
 ### Người 1 — dữ liệu, bộ nạp, đánh giá, demo D1–D3
 

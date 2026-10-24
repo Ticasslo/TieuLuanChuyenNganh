@@ -3764,9 +3764,9 @@ Phần 10 trình bày ngưỡng đánh giá theo giao thức đã định ở k�
 
 ### 24.1. Cell 10.1 — bốn mức từ qmax quan trắc trước test
 
-Phạm vi fit cố định là **01/01/1981–31/12/2013**, theo [kế hoạch Mục 6.2](../../../Document/01_Plan/03_Pipeline.md#L207). Dùng mọi qmax quan trắc hữu hạn không âm của từng ID trong cache, giữ 0 và dữ liệu thiếu; không dùng dự báo hoặc quan trắc test để fit/chọn ngưỡng. Giai đoạn tham chiếu gồm cả validation; đây là ngưỡng đánh giá theo giao thức đã định trước, không phải scaler hoặc ngưỡng chỉ tính từ train của Phần 8. Reference chứa các kỳ train/validation nên không cộng số ngày các phạm vi này với nhau.
+Phạm vi fit cố định là **01/01/1981–31/12/2013**, theo [kế hoạch Mục 6.2](../../../Document/01_Plan/03_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd). Dùng mọi qmax quan trắc hữu hạn không âm của từng ID trong cache, giữ 0 và dữ liệu thiếu; không dùng dự báo hoặc quan trắc test để fit/chọn ngưỡng. Giai đoạn tham chiếu gồm cả validation; đây là ngưỡng đánh giá theo giao thức đã định trước, không phải scaler hoặc ngưỡng chỉ tính từ train của Phần 8. Reference chứa các kỳ train/validation nên không cộng số ngày các phạm vi này với nhau.
 
-Ba ngưỡng là phân vị mẫu **q30/q80/q98**, nội suy tuyến tính. Chúng tương ứng các mốc xác suất vượt 0,7/0,2/0,02. Đề tài dùng bốn mức để phủ toàn bộ đường duy trì; không nói Yilmaz gốc định nghĩa nguyên xi bốn mức này. Quy ước bằng ngưỡng vào mức cao hơn khớp [tài liệu phân mức hiện có](../../../Document/06_Theory/05_BiasCast3_Data.md#L447):
+Ba ngưỡng là phân vị mẫu **q30/q80/q98**, nội suy tuyến tính. Chúng tương ứng các mốc xác suất vượt 0,7/0,2/0,02. Đề tài dùng bốn mức để phủ toàn bộ đường duy trì; không nói Yilmaz gốc định nghĩa nguyên xi bốn mức này. Quy ước bằng ngưỡng vào mức cao hơn khớp [tài liệu phân mức hiện có](../../../Document/06_Theory/05_BiasCast3_Data.md#bước-2-cắt-đường-thành-bốn-mức):
 
 | Mức | Quy tắc trên giá trị qmax |
 |---|---|
@@ -3831,7 +3831,7 @@ Ngưỡng có đơn vị mm/ngày. 324/600/623 không có nhãn train nhưng có
 
 ### 24.2. Cell 10.2 — độ nhạy ngưỡng theo hai nửa giai đoạn tham chiếu
 
-Hai khoảng cố định **1981–1997** và **1998–2013** lấy từ [danh sách khảo sát A1](../../../Document/06_Theory/05_BiasCast3_Data.md#L991). Chỉ dùng qmax trước test, fit lại q30/q80/q98 cho từng nửa bằng cùng phân vị tuyến tính/quy tắc biên. Bảng ngưỡng chính 1981–2013 của 10.1 giữ nguyên; cell tính lại từ cache để kiểm n và các ngưỡng chính không bị thay đổi. Không chọn giai đoạn, ngưỡng hoặc ID theo mức khớp test.
+Hai khoảng cố định **1981–1997** và **1998–2013** lấy từ [danh sách khảo sát A1](../../../Document/06_Theory/05_BiasCast3_Data.md#bước-a1-danh-sách-kiểm-gộp-từ-phần-3). Chỉ dùng qmax trước test, fit lại q30/q80/q98 cho từng nửa bằng cùng phân vị tuyến tính/quy tắc biên. Bảng ngưỡng chính 1981–2013 của 10.1 giữ nguyên; cell tính lại từ cache để kiểm n và các ngưỡng chính không bị thay đổi. Không chọn giai đoạn, ngưỡng hoặc ID theo mức khớp test.
 
 Mỗi ID ghi số ngày lịch/hợp lệ/thiếu, năm và loại tháng có quan trắc, số ngưỡng phân biệt ở từng nửa. Trạng thái both_halves/early_only/late_only/no_reference_observations tách riêng. Chỉ có một nửa thì các phép chênh/tỷ số/đổi mức cần hai nửa giữ NaN; không gán 0 hoặc thay bằng ngưỡng toàn kỳ. Có một số ngày ở mỗi nửa chưa bảo đảm đủ năm hoặc đủ mùa để coi ngưỡng ổn định.
 
@@ -3890,7 +3890,7 @@ Ngưỡng chính 1981–2013 và danh sách 451 giữ nguyên. Phép so chưa đ
 
 ### 24.3. Cell 10.3 — độ phủ và đỉnh quan trắc theo năm thủy văn
 
-Trước khi fit Gumbel, cell kiểm chuỗi đỉnh năm theo [giao thức năm thủy văn và thiếu quá nửa số ngày](../../../Document/01_Plan/03_Pipeline.md#L209). Một năm chạy **01/10 năm trước đến 30/09 năm kết thúc**, gắn nhãn bằng năm kết thúc. Chỉ đọc quan trắc có ngày trong reference **01/01/1981–31/12/2013**; không dùng ngày test để hoàn thành một năm bị cắt ở rìa.
+Trước khi fit Gumbel, cell kiểm chuỗi đỉnh năm theo [giao thức năm thủy văn và thiếu quá nửa số ngày](../../../Document/01_Plan/03_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd). Một năm chạy **01/10 năm trước đến 30/09 năm kết thúc**, gắn nhãn bằng năm kết thúc. Chỉ đọc quan trắc có ngày trong reference **01/01/1981–31/12/2013**; không dùng ngày test để hoàn thành một năm bị cắt ở rìa.
 
 Do reference theo năm lịch, nó giao 34 năm thủy văn gắn nhãn 1981–2014; chỉ 1982–2013 là 32 năm nằm trọn trong reference. Năm 1981 có 273 ngày trong reference và 92 ngày ngoài; năm 2014 chỉ có 92 ngày cuối 2013 trong reference và 273 ngày ngoài. Cell giữ mẫu số cả năm **365/366 ngày**, đếm riêng ngày thiếu bên trong reference và ngày ngoài reference. Không rút mẫu số xuống lát 273/92 ngày hoặc coi ngày ngoài reference là số quan trắc.
 
@@ -3995,9 +3995,9 @@ Tất cả hồ sơ dưới đây đều giao 34 năm thủy văn và có 32 nă
 
 ### 24.4. Cell 10.4 — Gumbel L-moments và độ nhạy với năm biên
 
-Cell dùng đỉnh quan trắc từ 10.3, không đọc thêm nhãn test. **Mẫu chính half_calendar_primary** giữ năm có 2×valid_days ≥ full_year_days, kể cả năm biên 1981 nếu đủ điều kiện, nhất quán với [phương pháp lấy đỉnh năm](../../../Document/06_Theory/05_BiasCast3_Data.md#L748). Mẫu phụ full_window_sensitivity yêu cầu thêm năm nằm trọn reference, chỉ có nhãn 1982–2013. Đây là hai mẫu thay thế, không cộng đỉnh của chúng với nhau. Năm thủy văn 2014 chỉ có tối đa 92 ngày reference nên không qua quy tắc; không dùng test hoàn thành năm đó.
+Cell dùng đỉnh quan trắc từ 10.3, không đọc thêm nhãn test. **Mẫu chính half_calendar_primary** giữ năm có 2×valid_days ≥ full_year_days, kể cả năm biên 1981 nếu đủ điều kiện, nhất quán với [phương pháp lấy đỉnh năm](../../../Document/06_Theory/05_BiasCast3_Data.md#chi-tiết-kỹ-thuật-cần-khi-viết-code-a1). Mẫu phụ full_window_sensitivity yêu cầu thêm năm nằm trọn reference, chỉ có nhãn 1982–2013. Đây là hai mẫu thay thế, không cộng đỉnh của chúng với nhau. Năm thủy văn 2014 chỉ có tối đa 92 ngày reference nên không qua quy tắc; không dùng test hoàn thành năm đó.
 
-Với n đỉnh năm, l₁ là mean, l₂ là tổng chênh tuyệt đối trên mọi cặp i<j chia n(n−1), bằng nửa mean chênh cặp. Cell kiểm bằng công thức trọng số theo thứ tự của cùng mẫu. Tham số Gumbel α=l₂/ln2 và ξ=l₁−γ×α, γ là hằng số Euler; ngưỡng x_T=ξ−α×ln[−ln(1−1/T)] tại **T=1,5; 2; 5; 10 năm**. Kiểm riêng với hàm phân vị gumbel_r của SciPy, không dùng fit MLE thay cho L-moments. Công thức và ví dụ được đối chiếu với [chi tiết kỹ thuật](../../../Document/06_Theory/05_BiasCast3_Data.md#L750).
+Với n đỉnh năm, l₁ là mean, l₂ là tổng chênh tuyệt đối trên mọi cặp i<j chia n(n−1), bằng nửa mean chênh cặp. Cell kiểm bằng công thức trọng số theo thứ tự của cùng mẫu. Tham số Gumbel α=l₂/ln2 và ξ=l₁−γ×α, γ là hằng số Euler; ngưỡng x_T=ξ−α×ln[−ln(1−1/T)] tại **T=1,5; 2; 5; 10 năm**. Kiểm riêng với hàm phân vị gumbel_r của SciPy, không dùng fit MLE thay cho L-moments. Công thức và ví dụ được đối chiếu với [chi tiết kỹ thuật](../../../Document/06_Theory/05_BiasCast3_Data.md#chi-tiết-kỹ-thuật-cần-khi-viết-code-a1).
 
 Có ít hơn hai đỉnh hoặc l₂=0 thì tham số/ngưỡng giữ NaN với trạng thái riêng; không tự thêm nhiễu hoặc đổi phân phối. **Fit xác định về số học không đồng nghĩa đủ bằng chứng thống kê.** Mẫu dưới 10 năm vẫn được tính nếu xác định, gắn cờ và in toàn bộ ID; không lọc khỏi tập 451. Số năm hoàn chỉnh, năm thiếu nguyên tháng, năm biên, số mức đỉnh phân biệt được lưu. Giữ ties và số 0. Ngưỡng âm nếu có được lưu và gắn cờ, không chặn về 0; T lớn hơn số năm mẫu và ngưỡng cao hơn max mẫu cũng có cờ riêng.
 

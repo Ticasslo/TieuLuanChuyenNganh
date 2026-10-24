@@ -8,7 +8,7 @@ paths:
 
 ## Thư mục và tên tệp
 
-- `Workspace/<NN_Việc>/`: **mỗi thư mục chỉ một loại việc** (`01_Download` chỉ tải, `02_Exploration` khám phá, `03_Baseline` tái lập mốc, `04_Setup` hạ tầng, `06_Evaluation` bộ đánh giá); không để mã phân tích trong thư mục tải. Thư mục cho bước sau thêm khi bắt đầu.
+- `Workspace/<NN_Việc>/`: **mỗi thư mục chỉ một loại việc** (`01_Download` chỉ tải, `02_Exploration` khám phá, `03_Baseline` tái lập mốc, `04_Setup` hạ tầng, `05_Training` huấn luyện từ B1, `06_Evaluation` bộ đánh giá); không để mã phân tích trong thư mục tải. Thư mục cho bước sau thêm khi bắt đầu.
 - **Mỗi notebook Kaggle/Colab một tệp `.py` tự đủ mã**, chia `# %% Phần X`, tên `NN_<Bước>_<BộDữLiệu>_<Việc>.py` (NN là thứ tự chạy trong thư mục, `<Bước>` là mã bước ở `03_Pipeline.md` Mục 7 như `A2`; tệp tải dữ liệu bỏ `<Bước>`). Tên notebook Kaggle trùng tên tệp. **Mỗi notebook một thư mục con cùng tên** trong `Workspace/<NN_Việc>/`, chứa `.py`, `.ipynb`, báo cáo `.md` và `Figures/`, `Tables/` của riêng notebook đó (VD `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/`). Các biến thể của cùng một notebook (VD 3 hạt giống A4) chung một thư mục mang tên gốc (`03_A4_LamaHCEExt_Retrain/` chứa `_Seed111/222/333` và báo cáo); hình nằm ở thư mục của notebook sinh ra hình.
 - **`.py` là mã nguồn** để chạy tương tác và thử; **`.ipynb` cùng tên là bản chính thức** — tải về từ đúng phiên bản Save & Run All trên Kaggle, có output, ghi số Version trong báo cáo. Sửa mã ở `.py`, chạy Save & Run All, tải `.ipynb` mới về thay bản cũ.
 - **Báo cáo `.md` đặt cạnh notebook, cùng tên** (VD `03_A4_LamaHCEExt_Retrain.md`): thuyết minh theo Phần, kết quả, quyết định của bước. Ghi chú theo bộ dữ liệu đặt ở `Document/03_Data/`.
