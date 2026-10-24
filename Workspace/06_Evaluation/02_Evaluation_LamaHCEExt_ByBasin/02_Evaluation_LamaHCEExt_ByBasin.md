@@ -268,7 +268,7 @@ Nhóm không có lưu vực được chọn khác ở thượng lưu gồm **322
 
 Median std mẫu của ΔNSE qua ba seed tại từng ID là **0,02065** với LSTM A4 và **0,00383** với DLinear; với ΔPNSE là **0,03661** và **0,00592**. Đây là độ phân tán của hiệu chỉ số tại cùng ID, không phải độ lệch chuẩn của ba NSE trung vị toàn tập. Tại 742 và 758, std mẫu ΔNSE là **1,818 và 3,912** với A4, **2,753 và 6,477** với DLinear; phương sai quan trắc nhỏ làm chỉ số nhạy với sai lệch dự báo. Hai mô hình dùng đầu vào và cấu hình khác nhau nên chưa thể quy toàn bộ chênh lệch độ phân tán cho kiến trúc.
 
-Có **126/366 ID có trận thật** mà POD A4 khác nhau giữa ba seed; DLinear chỉ có 2/366 ID như vậy. Median std POD bằng 0 ở cả hai họ, nên cần đọc cả phân phối: DLinear gần như không bắt được trận đúng ngày, tạo độ phân tán nhỏ quanh kết quả kém. Độ ổn định không thay cho chất lượng dự báo. [Phân tán A4](Tables/BasinAnalysis_LSTM_A4_seed_spread.csv), [phân tán DLinear](Tables/BasinAnalysis_DLinear_seed_spread.csv).
+Có **123/366 ID có trận thật** mà POD A4 khác nhau giữa ba seed; DLinear chỉ có 2/366 ID như vậy. Median std POD bằng 0 ở cả hai họ, nên cần đọc cả phân phối: DLinear gần như không bắt được trận đúng ngày, tạo độ phân tán nhỏ quanh kết quả kém. Độ ổn định không thay cho chất lượng dự báo. [Phân tán A4](Tables/BasinAnalysis_LSTM_A4_seed_spread.csv), [phân tán DLinear](Tables/BasinAnalysis_DLinear_seed_spread.csv).
 
 ![Độ phân tán qua ba seed tại từng lưu vực](Figures/BasinAnalysis_seed_spread.png)
 
