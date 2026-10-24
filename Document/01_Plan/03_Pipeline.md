@@ -350,7 +350,7 @@ Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook
 | `02_Exploration/` | Khảo sát dữ liệu (A1), ngưỡng | A1 hoàn thành khảo sát và tính ngưỡng; thuyết minh tại `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md` |
 | `03_Baseline/` | A2 tái lập (`01_A2_LamaHCEExt_Reproduce.py`), A3 mốc so sánh gồm persistence, PNSE, KGE, DLinear (`02_A3_LamaHCEExt_Benchmarks.py`), A4 huấn luyện lại và nhiễu hạt giống (`03_A4_LamaHCEExt_Retrain_Seed111/222/333.py`, so sánh `04_A4_LamaHCEExt_Compare.py`) | A2 tái lập đạt; A3 hoàn thành persistence, sáu A2 và DLinear ba hạt giống; A4 huấn luyện lại đạt, xuất 3 tệp dự báo theo hợp đồng của bộ đánh giá |
 | `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Wheel `mamba-ssm` và `causal-conv1d` cho Kaggle T4 dựng xong, đạt bộ test chính thức (`01_0_MambaSSM_Build.py`); mô hình chung, các lõi và kiểm thử đơn vị chưa viết |
-| `05_Training/` | Notebook huấn luyện theo bước B–H | B1: `01_B1_LamaHCEExt_Train_Seed111/222/333.py` (fork `e794d7c`), đang chạy chính thức |
+| `05_Training/` | Notebook huấn luyện theo bước B–H | B1: `01_B1_LamaHCEExt_Train_Seed111/222/333` (fork `e794d7c`; Version 1, 1, 2) |
 | `06_Evaluation/` | Bộ đánh giá Mục 6 | Đã chấm 14 run A2/DLinear/persistence/A4 trên Kaggle theo giao thức 3 (Version 4), test/S0/hạn một ngày; 129 kiểm thử đạt, khớp A3 trên 4.961 cặp run–ID và ba hợp đồng A4; bảng lũ chính cùng ngày bắt đầu, bảng phụ ±1; phân tích theo lưu vực (Version 2) 18 phép so; mở rộng khi có dự báo validation/S1–S4/nhiều hạn |
 | `07_Demo/` | Demo (mục dự án trong trang web của nhóm) | Chưa viết |
 
@@ -397,7 +397,7 @@ Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu
 
 Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.
 
-Bước A đã xong (A1–A4) và bộ đánh giá đã chấm 14 run A2/DLinear/persistence/A4. Ưu tiên hiện tại: Người 2 làm B1 (fork `e794d7c`, ba lần huấn luyện chính thức); Người 1 viết bộ nạp B2 trên mã B1 (B2 sửa tiếp từ B1). Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
+Bước A đã xong (A1–A4) và bộ đánh giá đã chấm 14 run A2/DLinear/persistence/A4. Ưu tiên hiện tại: Người 2 so sánh B1 với A4 (ba lần huấn luyện B1 trên fork `e794d7c` đã xong); Người 1 viết bộ nạp B2 trên mã B1 (B2 sửa tiếp từ B1). Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
 
 | Nội dung học | Nguồn | Học trước bước |
 |---|---|---|

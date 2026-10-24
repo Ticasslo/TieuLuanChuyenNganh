@@ -27,7 +27,7 @@
 
 ## 2. Việc theo từng bước
 
-Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên từ 24/10/2026:** Người 1 đã chấm ba NPZ A4 và phân tích thuộc tính qua ba seed; tiếp tục tích hợp bộ nạp B2 (#4) trên mã B1 khi Người 2 xong B1. Người 2 làm B1 (#3): notebook 3 hạt giống `Workspace/05_Training/01_B1_LamaHCEExt_Train/` đang chạy chính thức; song song phần còn lại của bước 0 (#1). Cột "Cần trước" ghi đầu vào của từng việc.
+Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên từ 24/10/2026:** Người 1 đã chấm ba NPZ A4 và phân tích thuộc tính qua ba seed; tiếp tục tích hợp bộ nạp B2 (#4) trên mã B1 khi Người 2 xong B1. Người 2 làm B1 (#3): 3 run chính thức của `Workspace/05_Training/01_B1_LamaHCEExt_Train/` đã xong (Version 1/1/2), tiếp theo notebook so sánh B1 và báo cáo B1; song song phần còn lại của bước 0 (#1). Cột "Cần trước" ghi đầu vào của từng việc.
 
 ### Người 1 — dữ liệu, bộ nạp, đánh giá, demo D1–D3
 

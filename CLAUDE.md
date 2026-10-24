@@ -77,8 +77,8 @@
 | A3 | Persistence, PNSE, KGE, DLinear 3 hạt giống (người 1): persistence 0,350, DLinear 0,380, SeqLSTM có Q 0,705 trên giao chung 450 lưu vực | `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md` |
 | A4 | Huấn luyện lại SeqLSTM có Q, 3 hạt giống: NSE trung vị test 0,6952/0,7038/0,7059 (bài 0,7053 nằm trong khoảng); độ lệch chuẩn NSE trung vị validation 0,0086 (dùng cho luật B*); 2,5–3,2 giờ/lần trên T4; 3 tệp NPZ cho bộ đánh giá | `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md` |
 | Đánh giá | Bộ đánh giá Version 4 chấm 14 run (6 A2, 3 DLinear, 2 persistence, 3 A4) trên test/S0/hạn 1 ngày; phân tích theo đặc điểm lưu vực Version 2, 18 phép so (người 1) | `Workspace/06_Evaluation/01_…md`, `02_…md` |
-| B1 | Notebook 3 hạt giống `Workspace/05_Training/01_B1_LamaHCEExt_Train/` (fork `e794d7c`, `qmean_mmd` + `qmax_mmd`) chạy thử đủ 8 Phần trên Kaggle; đang chạy Save & Run All chính thức | Báo cáo B1 viết khi có kết quả |
-| Tiếp theo | Người 2: chờ 3 run B1 => notebook so sánh B1 (dựng NPZ), báo cáo B1; song song phần còn lại bước 0. Người 1: bộ nạp B2 trên mã B1 | `ASSIGNMENT.md` |
+| B1 | Notebook 3 hạt giống `Workspace/05_Training/01_B1_LamaHCEExt_Train/` (fork `e794d7c`, `qmean_mmd` + `qmax_mmd`) xong 3 run chính thức (Seed111 Version 1, Seed222 Version 1, Seed333 Version 2): NSE trung vị test 0,7274/0,7133/0,7217 (A4 0,6952/0,7038/0,7059), validation 0,7699/0,7713/0,7728; số mẫu train bằng A4 (1.094.272); `best_model.pt` trùng epoch NSE validation cao nhất; 1,3–2,2 giờ/lần | Báo cáo B1 viết cùng notebook so sánh |
+| Tiếp theo | Người 2: notebook so sánh B1 (`02_B1_LamaHCEExt_Compare`, dựng NPZ), báo cáo B1; song song phần còn lại bước 0. Người 1: bộ nạp B2 trên mã B1 | `ASSIGNMENT.md` |
 
 ## 6. Quyết định đã chốt (không hỏi lại, không tranh luận lại)
 
