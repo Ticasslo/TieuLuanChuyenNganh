@@ -1,16 +1,27 @@
 {
   "complete": true,
-  "protocol_version": 2,
+  "protocol_version": 3,
+  "event_tolerance": "plus_minus_floor_actual_lead_divided_by_3_calendar_days",
   "event_tolerance_days": 0,
+  "event_tolerance_days_by_lead": {
+    "1": 0
+  },
   "supplementary_event_tolerance_days": 1,
-  "fixture_checks": 60,
+  "fixture_checks": 129,
   "A3_reference_matched": true,
+  "A4_contracts_matched": true,
+  "A4_runs": [
+    "SeqLSTM_Q_A4_seed111",
+    "SeqLSTM_Q_A4_seed222",
+    "SeqLSTM_Q_A4_seed333"
+  ],
+  "A4_compare_version_expected": 2,
   "coverage": [
     {
       "period": "test",
       "scenario": "S0",
       "lead": 1,
-      "runs": 11,
+      "runs": 14,
       "common_day_IDs": 652628,
       "IDs_with_days": 450
     }

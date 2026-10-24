@@ -1,6 +1,10 @@
 ﻿case,passed
 33_fields_31_rank_predictors,True
 12_contrasts_three_endpoints,True
+legacy_11_run_plan,True
+A4_14_run_18_contrasts,True
+partial_A4_seeds_rejected,True
+unknown_model_rejected,True
 normalize_leading_zero,True
 NPZ_calendar_day_resolution_normalized,True
 gapped_calendar_rejected,True
@@ -29,3 +33,10 @@ constant_attribute_single_bin,True
 no_events_POD_remains_undefined,True
 negative_NSE_delta_retained,True
 seed_stability_not_ensemble,True
+A4_seed_spread_sample_SD,True
+undefined_seed_not_averaged,True
+missing_seed_score_row_rejected,True
+rho_seed_range_not_CI,True
+mixed_rho_direction_recorded,True
+undefined_rho_seed_recorded,True
+duplicate_seed_association_rejected,True

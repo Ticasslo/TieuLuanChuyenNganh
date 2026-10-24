@@ -1,3 +1,4 @@
 01_Evaluation_LamaHCEExt.py text eol=lf
 01_Evaluation_LamaHCEExt.ipynb text eol=lf
-Tables/A4_Integrated/* -text whitespace=cr-at-eol
+# Giữ nguyên byte các bảng xuất từ Output Kaggle.
+Tables/* -text

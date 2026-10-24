@@ -1,16 +1,14 @@
 # Bộ đánh giá dự báo lưu lượng — Extended LamaH-CE
 
-Tài liệu đi cùng [mã Python](01_Evaluation_LamaHCEExt.py) và [notebook](01_Evaluation_LamaHCEExt.ipynb) (bản chính thức: Version 2 của notebook Kaggle `01_Evaluation_LamaHCEExt`, Save & Run All trên CPU, có output), thực hiện việc #5 trong [phân công](../../../ASSIGNMENT.md) và [pipeline Mục 6](../../../Document/01_Plan/03_Pipeline.md#6-đánh-giá). Bộ đánh giá đọc dự báo đã lưu, tính chỉ số, đánh giá bốn mức và sự kiện lũ, so sánh theo cặp lưu vực, rồi xuất CSV/PNG/JSON trực tiếp cho Kaggle Save Version.
+Tài liệu đi cùng [mã Python](01_Evaluation_LamaHCEExt.py) và [notebook](01_Evaluation_LamaHCEExt.ipynb) (bản chính thức: Version 4 của notebook Kaggle `01_Evaluation_LamaHCEExt`, Save & Run All trên CPU, có output), thực hiện việc #5 trong [phân công](../../../ASSIGNMENT.md) và [pipeline Mục 6](../../../Document/01_Plan/03_Pipeline.md#6-đánh-giá). Bộ đánh giá đọc dự báo đã lưu, tính chỉ số, đánh giá bốn mức và sự kiện lũ, so sánh theo cặp lưu vực, rồi xuất CSV/PNG/JSON trực tiếp cho Kaggle Save Version.
 
 **S0** là kịch bản không che thêm đầu vào; dữ liệu gốc vẫn có thể thiếu. **Hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Một **ngày–lưu vực** là một ngày tại một ID; **mặt nạ** là bảng True/False chọn các cặp đó để chấm. **Giao chung** chỉ giữ ngày–lưu vực có quan trắc, persistence và dự báo của mọi run cùng hữu hạn.
 
-**Bộ đánh giá giao thức 2 đã chạy trên Output A1/A2/A3: 11 run, test 2014–2017, S0, hạn một ngày; 60 kiểm thử Kaggle và 57 kiểm tra CSV cục bộ đạt.** Sáu chỉ số và số ngày chấm khớp A3 ở 4.961 cặp run–lưu vực; giao chung có 652.628 ngày–lưu vực trên 450 ID có cặp hợp lệ. Giao thức dùng **cùng ngày bắt đầu cho bảng lũ chính, ±1 ngày cho bảng phụ và Holm chỉ đếm p hữu hạn**. Ở ngưỡng lũ hai năm, SeqLSTM_Q có POD 19,51%, D_RA 20,54%, DLinear 0,19% và persistence qmax 0%. Kết quả chi tiết ở [Mục 10](#10-kết-quả-thực-nghiệm-trên-kaggle). Phần này triển khai độc lập với B1/B2, không gọi mô hình hoặc huấn luyện lại.
+**Version 4 chấm 14 run trên test 2014–2017, S0, hạn một ngày: sáu A2, ba DLinear, hai persistence và ba LSTM A4; 129 kiểm thử đạt, khớp A3 và ba hợp đồng A4.** Sáu chỉ số và số ngày chấm khớp A3 ở 4.961 cặp run–lưu vực; giao chung có 652.628 ngày–lưu vực trên 450 ID có cặp hợp lệ. Bảng lũ chính yêu cầu **cùng ngày bắt đầu**, bảng phụ cho phép **±1 ngày**, Holm chỉ đếm p hữu hạn. Ở ngưỡng lũ hai năm, SeqLSTM_Q có POD 19,51%, ba A4 16,89–20,26%, D_RA 20,54%, DLinear 0,19% và persistence qmax 0%. Kết quả chi tiết ở [Mục 10](#10-kết-quả-thực-nghiệm-trên-kaggle). Bộ đánh giá chỉ đọc dự báo đã lưu, không gọi mô hình hoặc huấn luyện lại.
 
-Mã hiện tại mở rộng thành **giao thức 3**, dùng dung sai chính ±⌊hạn/3⌋ ngày cho từng hạn 1–7 và giữ bảng phụ ±1 ngày. Phần mở rộng đã qua kiểm thử cục bộ và đường chạy dữ liệu giả đủ bảy hạn. Các kết quả thực nghiệm ở Mục 10 và `Tables/` vẫn thuộc lần chạy giao thức 2; ở hạn một ngày, hai giao thức cùng dùng dung sai chính 0.
+Mã dùng **giao thức 3**: dung sai chính ±⌊hạn/3⌋ ngày cho từng hạn 1–7, bảng phụ ±1 ngày. Ở hạn một ngày, dung sai chính bằng 0. Phần nhiều hạn đã qua kiểm thử cục bộ và đường chạy dữ liệu giả đủ bảy hạn; kết quả thực nghiệm hiện chỉ có hạn một ngày.
 
 ## 1. Đầu vào và cách chạy
-
-**Tích hợp A4 đã chạy thành công trên Kaggle: 14 run, 129 kiểm thử đạt, A3 và hợp đồng A4 đều khớp; giao chung có 652.628 ngày–lưu vực trên 450 ID có ngày chấm.** [Mục 11](#11-xác-nhận-tích-hợp-a4-trên-kaggle) ghi độ phủ và kiểm nguồn của lần chạy này; Mục 10 giữ riêng kết quả điểm số của lần chấm 11 run.
 
 Notebook tự đọc **14 run**: sáu A2, ba DLinear, hai persistence và ba LSTM A4. Gắn bốn nguồn Output đã Save Version: A1, A2, A3 và **`04_A4_LamaHCEExt_Compare` Version 2**. Dataset LamaH-CE gốc và ba Output huấn luyện A4 riêng không bắt buộc, vì A3/A4 Compare đã xuất đủ ngữ cảnh và dự báo. Chỉ chạy lại bộ đánh giá, không huấn luyện lại A1–A4.
 
@@ -28,7 +26,7 @@ Trên Kaggle, dùng CPU và Run All từ đầu sau khi nhập bản mã mới. 
 
 Kiểm độc lập bằng lệnh `python Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py --self-test` từ thư mục repo. Môi trường cần NumPy, pandas, SciPy, xarray, PyYAML; phần vẽ dùng matplotlib. Kaggle A1/A2/A3 đã có các thư viện này. Bộ đánh giá không thay phiên bản thư viện trong phiên chạy.
 
-Mã `.py` dùng các cell `# %%` và cell Markdown `# %% [markdown]`: tiêu đề phần → đề mục → code đúng chức năng. Repo giữ `.ipynb` chính thức Version 2 có output của lần chấm 11 run. Nguồn `.py` hiện bao gồm A4 và kết quả 14 run đã được kiểm ở Mục 11; tệp `.ipynb` tải từ phiên Save & Run All tương ứng với lần chấm này được bổ sung khi có, không thay bản chính thức bằng notebook trống output.
+Mã `.py` dùng các cell `# %%` và cell Markdown `# %% [markdown]`: tiêu đề phần → đề mục → code đúng chức năng. `.ipynb` trong repo là Version 4 tải từ Kaggle, mã trùng từng dòng với `.py`.
 
 ## 2. Hợp đồng dữ liệu và phạm vi chấm
 
@@ -123,7 +121,7 @@ Mỗi NPZ mở rộng chứa một run/seed/kỳ/kịch bản/hạn. Truyền t�
 
 Phần 8.4 đọc `manifest.csv` của `a4_compare` với các cột `tệp`, `sha256`, kiểm mọi tệp được liệt kê, từ chối đường dẫn ra ngoài thư mục và tên trùng. Cần đủ ba NPZ, summary và environment; ba seed không được bỏ qua khi thiếu tệp. Hash hai nguồn `A3_persistence_predictions.npz`, `A3_Q_source_window.npz` trong metadata A4 phải khớp đúng Input A3 đang dùng.
 
-Các trường run, seed, kỳ, hạn, đơn vị, config SHA-256, commit thư viện, chính sách clip và epoch được kiểm trước khi gọi `check_same_context`. Epoch phải trùng `saved_epoch` trong summary. Version nguồn huấn luyện được đối chiếu với bản bàn giao: seed 111 Version 1, seed 222/333 Version 2, A3 Version 1. Version 2 của notebook Compare là phiên bản yêu cầu theo [báo cáo A4](https://github.com/Ticasslo/TieuLuanChuyenNganh/blob/b98ad95db47a7ca363740d6696b6b040e5aeabf7/Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain.md#p5); giá trị băm ghi danh tính tệp thực tế, không gọi đây là truy vấn xác nhận Version trực tiếp từ Kaggle.
+Các trường run, seed, kỳ, hạn, đơn vị, config SHA-256, commit thư viện, chính sách clip và epoch được kiểm trước khi gọi `check_same_context`. Epoch phải trùng `saved_epoch` trong summary. Version nguồn huấn luyện được đối chiếu với bản bàn giao: seed 111 Version 1, seed 222/333 Version 2, A3 Version 1. Version 2 của notebook Compare là phiên bản yêu cầu theo [báo cáo A4](../../03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md#p5); giá trị băm ghi danh tính tệp thực tế, không gọi đây là truy vấn xác nhận Version trực tiếp từ Kaggle.
 
 Ba run có tên `SeqLSTM_Q_A4_seed111`, `SeqLSTM_Q_A4_seed222`, `SeqLSTM_Q_A4_seed333`. Các tệp này được nhận tự động, không cần truyền `--extra-contract` cho A4. Tham số đó vẫn dùng cho dự báo mở rộng khác; trùng tên run/kỳ/kịch bản/hạn làm chương trình dừng.
 
@@ -131,7 +129,7 @@ Ba run có tên `SeqLSTM_Q_A4_seed111`, `SeqLSTM_Q_A4_seed222`, `SeqLSTM_Q_A4_se
 
 Phép kiểm độc lập bao gồm ví dụ NSE/PNSE/KGE và tham chiếu Pearson từ SciPy; chuỗi hằng, phương sai nhỏ, zero-SSE, NaN/mask/vô cực; tính bất biến đổi đơn vị; ngưỡng bằng biên; USWRC với đáy bằng 0,75 và khoảng thiếu; ghép sự kiện không tái sử dụng; persistence trễ một ngày bị loại ở bảng chính hạn 1 nhưng được bắt ở bảng phụ; Holm bỏ NaN và dz với số biết trước; kịch bản cùng ngày chấm. Kiểm nhiều hạn bao phủ cả bảy hạn, biên lệch sớm/trễ trong và ngoài dung sai, kiểm duyệt quanh ngày thiếu/biên lịch, tách bảng chính/phụ khi cùng dung sai, cùng kiểm ngày nguồn persistence tại origin−1.
 
-**129 kiểm thử độc lập của giao thức 3 đều đạt.** Đầu vào hạn, tổng số hạn và dung sai sai kiểu hoặc ngoài phạm vi được từ chối; bool không được xem là số nguyên. Môi trường kiểm cục bộ: Python 3.12.6, NumPy 1.26.4, pandas 2.3.3, SciPy 1.16.3 và xarray 2025.12.0. Kiểm hồi quy thêm 400 ca sự kiện hạn 1, gồm hai cách gộp, dung sai 0/1 và ngày thiếu, khớp chính xác mã giao thức 2. Trước lần sửa dung sai và Holm, đã đối chiếu thêm 120 ca chỉ số với hàm A3 giữ nguyên, 60 ca gộp cụm với hàm A1 giữ nguyên và 80 ca ghép sự kiện với lời giải duyệt hết các cách ghép; tất cả đều khớp.
+**129 kiểm thử độc lập của giao thức 3 đều đạt.** Đầu vào hạn, tổng số hạn và dung sai sai kiểu hoặc ngoài phạm vi được từ chối; bool không được xem là số nguyên. Môi trường kiểm cục bộ: Python 3.12.6, NumPy 1.26.4, pandas 2.3.3, SciPy 1.16.3 và xarray 2025.12.0. Kiểm hồi quy thêm 400 ca sự kiện hạn 1, gồm hai cách gộp, dung sai 0/1 và ngày thiếu, khớp chính xác cách ghép của giao thức 2. Đã đối chiếu thêm 120 ca chỉ số với hàm A3 giữ nguyên, 60 ca gộp cụm với hàm A1 giữ nguyên và 80 ca ghép sự kiện với lời giải duyệt hết các cách ghép; tất cả đều khớp.
 
 Fixture I/O dùng hai ID và lịch test đầy đủ, tạo tệp đúng cấu trúc CSV A1, pickle xarray A2, NPZ DLinear và hợp đồng nhiều hạn; sau đó đi qua bộ đọc, chấm, cộng dồn, ghép bảng tham chiếu và kiểm ngày nguồn persistence. Mọi số liệu fixture được tạo trong thư mục tạm và không được xuất thành kết quả LamaH-CE trong repo.
 
@@ -156,51 +154,72 @@ Khi chạy trên Input thật, bảy kiểm đối chiếu A3 gồm sáu chỉ s
 | Kịch bản và hình | `Evaluation_scenario_changes.csv`, `Evaluation_CDF_points.csv`, PNG CDF từng nhóm |
 | Quy ước và kết luận | `Evaluation_protocol.json`, `Evaluation_run_index.json`, `Evaluation_summary.json` |
 
-Với đầu vào A2/DLinear/A4, phạm vi là test/S0/hạn một ngày. JSON kết luận có `A4_contracts_matched`, danh sách `A4_runs` và `A4_compare_version_expected`; chỉ đặt hoàn thành sau khi chấm và đối chiếu A3 thành công. Cần gửi hai bảng Phần 8.4, số run/giao ngày ở Phần 3–6, kết luận Phần 11 và các tệp `Evaluation_A4_input_check.csv`, `Evaluation_A4_contract_check.csv`, `Evaluation_coverage.csv`, `Evaluation_summary.csv`, `Evaluation_paired_tests.csv`, `Evaluation_summary.json` cùng hình CDF. Mọi cảnh báo/traceback được giữ để đối chiếu.
+Với đầu vào A2/DLinear/A4, phạm vi là test/S0/hạn một ngày. JSON kết luận có `A4_contracts_matched`, danh sách `A4_runs` và `A4_compare_version_expected`; chỉ đặt hoàn thành sau khi chấm và đối chiếu A3 thành công.
 
-Các bảng và hình trong Mục 10 thuộc lần chấm 11 run; Mục 11 trình bày lần chấm 14 run từ các CSV thực nghiệm đã nhận. [Notebook phân tích thuộc tính 02](../02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md) đã chạy trên 14 run với 18 phép so và 1.674 hệ số; ba seed A4 giữ cùng hướng liên hệ ΔNSE với độ cao, tuyết và độ khô hạn. [Kết quả và kiểm chứng theo lưu vực](../02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#12-kết-quả-phân-tích-14-run-có-a4).
+JSON ghi `protocol_version = 3`, tên chính sách `event_tolerance` và `event_tolerance_days_by_lead` cho các hạn thực sự được chấm. Chấm đúng một hạn giữ thêm `event_tolerance_days` là số nguyên; chấm nhiều hạn để trường scalar này là null và dùng bản đồ theo hạn. `matching_tolerance_days` trong từng dòng sự kiện và cặp ghép ghi dung sai đã áp dụng.
 
-Khi bổ sung dự báo của bước B/C/H, giữ cùng các tệp đầu ra để đối chiếu thêm theo kịch bản và hạn. Bảng chênh lệch kịch bản có đầy đủ tên cột ngay cả khi chưa có dòng dữ liệu ngoài S0.
-
-Lần chạy Kaggle đã nhận có `protocol_version = 2`, `event_tolerance_days = 0` và `supplementary_event_tolerance_days = 1` trong JSON. Các bảng tổng hợp trong `Tables/` giữ đúng xuất xứ lần chạy này; ba CSV chi tiết của mỗi dung sai được giữ trong Output Kaggle. Tệp tổng hợp phụ không nằm trong 21 tệp được cung cấp, nên `Evaluation_events_pooled_tolerance1.csv` được tính lại từ bảng chi tiết đầy đủ `Evaluation_events_tolerance1.csv`, có ghi nguồn trong biên nhận kiểm tra.
-
-Lần chạy bằng mã hiện tại xuất `protocol_version = 3`, tên chính sách `event_tolerance` và `event_tolerance_days_by_lead` cho các hạn thực sự được chấm. Chấm đúng một hạn giữ thêm `event_tolerance_days` là số nguyên; chấm nhiều hạn để trường scalar này là null và dùng bản đồ theo hạn. `matching_tolerance_days` trong từng dòng sự kiện và cặp ghép ghi dung sai đã áp dụng. Kết quả Kaggle hạn 1 đã nhận vẫn dùng được, không cần chạy lại chỉ để mở rộng mã cho hạn 2–7.
+[Notebook phân tích thuộc tính 02](../02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md) đọc Output Version 4 này, chạy 18 phép so trên 14 run. Khi bổ sung dự báo của bước B/C/H, giữ cùng các tệp đầu ra để đối chiếu thêm theo kịch bản và hạn. Bảng chênh lệch kịch bản có đầy đủ tên cột ngay cả khi chưa có dòng dữ liệu ngoài S0.
 
 ## 10. Kết quả thực nghiệm trên Kaggle
 
 ### 10.1. Phạm vi và tính nhất quán
 
-Các bảng dưới dùng giao thức 2: cùng ngày bắt đầu ở bảng chính và ±1 ngày ở bảng phụ. Chỉ số liên tục, phân mức và kiểm định không đổi so với lần chạy trước; các tệp metrics, điểm CDF và PNG CDF có cùng SHA-256.
-
-Nguồn thực nghiệm là Output A1 `01-a1-lamahceext-explore`, A2 `01-a2-lamahceext-reproduce` và A3 `02-a3-lamahceext-benchmarks`. Môi trường Kaggle: Python 3.13.15, NumPy 2.1.3, pandas 2.3.3, SciPy 1.16.3. [Kết luận chạy](Tables/Evaluation_summary.json), [nguồn đầu vào](Tables/Evaluation_input_manifest.csv).
+Kết quả dưới đây là Output của **Version 4**, Save & Run All trên CPU (72 giây), giao thức 3, test/S0/hạn một ngày. Input là Output A1 `01-a1-lamahceext-explore`, A2 `01-a2-lamahceext-reproduce`, A3 `02-a3-lamahceext-benchmarks` và A4 `04-a4-lamahceext-compare` Version 2. Môi trường Kaggle: Python 3.13.15, NumPy 2.1.3, pandas 2.3.3, SciPy 1.16.3. [Kết luận chạy](Tables/Evaluation_summary.json), [nguồn đầu vào](Tables/Evaluation_input_manifest.csv).
 
 | Kiểm tra | Kết quả |
 |---|---|
-| Kiểm thử trước khi chấm | 60/60 đạt |
+| Kiểm thử trước khi chấm | 129/129 đạt |
 | Đối chiếu A3 | 7/7 kiểm đạt; mỗi kiểm gồm 4.961 cặp run–ID: NSE, PNSE, KGE, r, α, β và n |
+| Nguồn A4 | Manifest 11 tệp và hai nguồn ngữ cảnh A3 đạt kiểm hash; ba hợp đồng có cùng lịch, ID, diện tích, obs canonical và persistence với A3 |
 | Giao ngày chung | 652.628 ngày–ID; 450 ID có ngày chấm, giữ ID 55 với n = 0 |
-| Chỉ số liên tục | 14.883 dòng, gồm 11 run × 451 ID × 3 scope |
-| Ma trận bốn mức | 79.376 ô đếm; tổng mỗi ma trận khớp số ngày chấm |
-| Sự kiện chính, tolerance = 0 | 39.688 dòng theo run/ID/T/cách gộp; 6.801 cặp ghép một–một |
-| Sự kiện phụ, ±1 ngày | 39.688 dòng; 23.221 cặp ghép một–một, khớp lần chạy trước |
-| Kiểm định | 135 phép so, gồm 45 cặp × 3 chỉ số; Holm tách theo từng chỉ số |
-| Kiểm tra CSV cục bộ | 57/57 kiểm đạt: công thức, tổng hợp, ghép sự kiện, kiểm định và dữ liệu CDF |
+| Chỉ số liên tục | 18.942 dòng = 14 run × 451 ID × 3 scope |
+| Ma trận bốn mức | 101.024 dòng = 14 run × 451 ID × 16 ô; tổng mỗi ma trận khớp số ngày chấm |
+| Sự kiện chính, dung sai 0 | 50.512 dòng theo run/ID/T/cách gộp; 10.823 cặp ghép một–một |
+| Sự kiện phụ, ±1 ngày | 50.512 dòng; 30.074 cặp ghép một–một |
+| Kiểm định | 234 phép so = 78 cặp × 3 chỉ số; Holm tách theo từng chỉ số, mọi p hữu hạn |
 
-NSE/PNSE có 450 ID hữu hạn trên giao chung cho mọi run. KGE/r của EncDec_noQ có 448 ID hữu hạn do đầu ra hằng tại 742 và 758. ID 55 có trạng thái không có cặp hợp lệ ở mọi run trên giao chung. [Bảng đối chiếu A3](Tables/Evaluation_A3_reference_check.csv), [kiểm tra CSV](Tables/Evaluation_output_audit.csv).
+NSE/PNSE có 450 ID hữu hạn trên giao chung cho mọi run. KGE/r của EncDec_noQ có 448 ID hữu hạn do đầu ra hằng tại 742 và 758. ID 55 có trạng thái không có cặp hợp lệ ở mọi run trên giao chung. [Kiểm thử](Tables/Evaluation_checks.csv), [đối chiếu A3](Tables/Evaluation_A3_reference_check.csv), [kiểm nguồn A4](Tables/Evaluation_A4_input_check.csv).
+
+| Run A4 | Epoch chọn | Ngày–ID có dự báo | Ngày–ID có obs/sim hữu hạn | Dự báo âm trước clip |
+|---|---:|---:|---:|---:|
+| Seed 111 | 11 | 652.644 | 652.636 | 1.660 |
+| Seed 222 | 15 | 652.644 | 652.636 | 2.261 |
+| Seed 333 | 14 | 652.644 | 652.636 | 1.978 |
+
+Mỗi hợp đồng A4 giữ 451 ID trên 1.461 ngày đích. Số 652.644 mô tả các dự báo hữu hạn trước khi yêu cầu có obs; 652.636 là số cặp obs/sim của riêng mỗi A4, còn 652.628 là giao để so toàn bộ 14 run. Thêm A4 không làm giảm giao chung so với giao của 11 run gốc. [Bảng hợp đồng A4](Tables/Evaluation_A4_contract_check.csv).
 
 ![Phân phối NSE, PNSE và KGE trên giao ngày chung](Figures/Evaluation_CDF_test_S0_lead1.png)
 
-*Hình 1. Mỗi điểm là chỉ số của một lưu vực; giữ toàn bộ giá trị hữu hạn, kể cả phần đuôi âm. Các trục dùng symlog, tuyến tính trong [−1, 1]. NSE/PNSE của DLinear cao hơn persistence ở trung vị, còn KGE thấp hơn. Đường persistence PNSE nằm tại 0 theo định nghĩa.*
+*Hình 1. Mỗi điểm là chỉ số của một lưu vực; giữ toàn bộ giá trị hữu hạn, kể cả phần đuôi âm. Các trục dùng symlog, tuyến tính trong [−1, 1]. Ba đường A4 màu xanh dùng kiểu nét khác nhau cho từng seed; đường SeqLSTM_Q liền là trọng số tác giả. Số n trong chú giải là số ID có chỉ số hữu hạn. Đường persistence PNSE nằm tại 0 theo định nghĩa.*
 
 ### 10.2. Kết quả liên tục và bốn mức
 
-NSE trung vị SeqLSTM_Q là **0,705259**, persistence qmax **0,350031**; DLinear 111/222/333 lần lượt **0,382799/0,378069/0,379588**. Các giá trị khớp A3. KGE trung vị của ba DLinear khoảng 0,513–0,521, thấp hơn persistence 0,674939. [Bảng đầy đủ](Tables/Evaluation_summary.csv).
+| Run | NSE trung vị | PNSE trung vị | KGE trung vị | %BiasFHV trung vị |
+|---|---:|---:|---:|---:|
+| SeqLSTM_Q, trọng số tác giả | 0,705259 | 0,495584 | 0,767074 | −13,01 |
+| SeqLSTM_noQ | 0,622922 | 0,375311 | 0,688235 | −17,88 |
+| EncDec_Q | 0,662155 | 0,435417 | 0,698093 | −17,31 |
+| EncDec_noQ | 0,567347 | 0,285036 | 0,640148 | −17,13 |
+| D_FC | 0,385892 | 0,076250 | 0,533138 | −22,63 |
+| D_RA | 0,692511 | 0,485222 | 0,737006 | −14,08 |
+| DLinear 111 | 0,382799 | 0,066592 | 0,519476 | −31,35 |
+| DLinear 222 | 0,378069 | 0,055647 | 0,520644 | −30,78 |
+| DLinear 333 | 0,379588 | 0,059714 | 0,513177 | −31,91 |
+| LSTM A4 seed 111 | 0,695242 | 0,495352 | 0,758090 | −15,70 |
+| LSTM A4 seed 222 | 0,703778 | 0,505573 | 0,790977 | −11,71 |
+| LSTM A4 seed 333 | 0,705890 | 0,501788 | 0,785984 | −11,56 |
+| Persistence qmax | 0,350031 | 0 | 0,674939 | 0,00 |
+| Persistence qmean, phụ | 0,366131 | 0,034721 | 0,457145 | −37,15 |
+
+Giá trị A2, DLinear và persistence khớp A3. KGE trung vị của ba DLinear khoảng 0,513–0,521, thấp hơn persistence 0,674939. [Bảng đầy đủ](Tables/Evaluation_summary.csv).
+
+Trung bình ± độ lệch chuẩn mẫu của ba NSE trung vị A4 là **0,701636 ± 0,005638**; khoảng [0,695242; 0,705890] bao quanh mốc tác giả 0,705259. Đây là biến thiên của ba lần huấn luyện, không phải khoảng tin cậy hay chỉ số của một ensemble. Ba seed đều giữ riêng; không chọn seed theo test. NSE của A4 tương đối sát mốc tác giả nhưng KGE thay đổi theo seed: 111 thấp hơn mốc về trung vị, 222 và 333 cao hơn. Với PNSE, cả ba median dương nhưng mean lần lượt **−1,189; −0,508; −0,355**; cần giữ phần đuôi các lưu vực mà persistence mạnh khi đọc kết quả.
 
 Trên giao chung có **194.703 ngày–ID mức thấp** và **11.759 ngày–ID mức rất cao**. Các tỷ lệ dưới đây cộng ô đếm trước khi chia, không phải trung vị chỉ số theo lưu vực.
 
 | Run | Recall mức thấp (%) | Recall mức rất cao (%) | Precision mức rất cao (%) |
 |---|---:|---:|---:|
-| SeqLSTM_Q | 66,93 | 47,58 | 67,58 |
+| SeqLSTM_Q, trọng số tác giả | 66,93 | 47,58 | 67,58 |
 | SeqLSTM_noQ | 65,79 | 36,17 | 63,73 |
 | EncDec_Q | 53,67 | 41,31 | 62,22 |
 | EncDec_noQ | 54,95 | 38,50 | 51,30 |
@@ -209,12 +228,15 @@ Trên giao chung có **194.703 ngày–ID mức thấp** và **11.759 ngày–ID
 | DLinear 111 | 61,83 | 22,18 | 53,33 |
 | DLinear 222 | 67,61 | 22,30 | 53,72 |
 | DLinear 333 | 69,52 | 21,80 | 54,86 |
+| LSTM A4 seed 111 | 71,53 | 43,84 | 69,63 |
+| LSTM A4 seed 222 | 76,29 | 48,39 | 66,53 |
+| LSTM A4 seed 333 | 73,17 | 47,79 | 65,68 |
 | Persistence qmax | 88,07 | 40,11 | 40,28 |
 | Persistence qmean, phụ | 96,27 | 18,40 | 61,53 |
 
-SeqLSTM_Q bắt được 5.595/11.759 ngày rất cao, nhiều hơn persistence qmax 4.716 ngày; precision cũng cao hơn. DLinear đạt khoảng 22% recall mức rất cao, phù hợp với độ co biên độ và hụt dải cao đã thấy ở A3. Accuracy tổng thể của persistence qmax là 82,90%, cao hơn SeqLSTM_Q 77,62%; tỷ lệ đúng chung chịu ảnh hưởng lớn của các mức phổ biến, vì vậy phải đọc riêng recall ở hai đầu dải lưu lượng. [Bảng phân mức](Tables/Evaluation_levels_pooled.csv).
+SeqLSTM_Q bắt được 5.595/11.759 ngày rất cao, nhiều hơn persistence qmax 4.716 ngày; precision cũng cao hơn. Ba A4 bắt được 5.155/5.690/5.620 ngày rất cao, quanh mức của trọng số tác giả. DLinear đạt khoảng 22% recall mức rất cao, phù hợp với độ co biên độ và hụt dải cao đã thấy ở A3. Accuracy tổng thể của persistence qmax là 82,90%, cao hơn SeqLSTM_Q 77,62% và ba A4 79,34/80,54/79,77%; tỷ lệ đúng chung chịu ảnh hưởng lớn của các mức phổ biến, vì vậy phải đọc riêng recall ở hai đầu dải lưu lượng. [Bảng phân mức](Tables/Evaluation_levels_pooled.csv).
 
-Sai lệch FHV trung vị của SeqLSTM_Q là −13,01%; DLinear 111/222/333 là −31,35/−30,78/−31,91%, thể hiện hụt tổng của dải 2% lưu lượng cao nhất theo định nghĩa FHV. FLV của DLinear có trị tuyệt đối trung vị lớn, khoảng 597–754%; chỉ số này đo hình dạng đuôi log, không phải phần trăm thiếu thể tích nước. Trên giao chấm, ba seed có 9.197/12.134/13.218 giá trị sim dưới sàn log, chủ yếu do chặn các dự báo âm về 0. Khi đọc FLV cần giữ cùng sàn 10⁻⁶ mm/ngày và số ngày chịu phép log này.
+%BiasFHV âm ở mọi mô hình học, thể hiện hụt tổng của dải 2% lưu lượng cao nhất theo định nghĩa FHV; DLinear hụt nhiều nhất, khoảng −31%. FLV của DLinear có trị tuyệt đối trung vị lớn, khoảng 597–754%; chỉ số này đo hình dạng đuôi log, không phải phần trăm thiếu thể tích nước. Trên giao chấm, ba seed DLinear có 9.197/12.134/13.218 giá trị sim dưới sàn log, chủ yếu do chặn các dự báo âm về 0. Khi đọc FLV cần giữ cùng sàn 10⁻⁶ mm/ngày và số ngày chịu phép log này.
 
 ### 10.3. Sự kiện lũ chu kỳ hai năm
 
@@ -224,19 +246,22 @@ Theo quy tắc USWRC, có **1.066 cụm quan trắc đủ điều kiện trên 3
 
 | Run | Bắt được | Bỏ sót | Báo nhầm | POD (%) | FAR (%) |
 |---|---:|---:|---:|---:|---:|
-| SeqLSTM_Q | 208 | 858 | 431 | 19,51 | 67,45 |
+| SeqLSTM_Q, trọng số tác giả | 208 | 858 | 431 | 19,51 | 67,45 |
 | SeqLSTM_noQ | 188 | 878 | 304 | 17,64 | 61,79 |
 | EncDec_Q | 126 | 940 | 289 | 11,82 | 69,64 |
 | EncDec_noQ | 174 | 892 | 445 | 16,32 | 71,89 |
 | D_FC | 63 | 1.003 | 286 | 5,91 | 81,95 |
-| D_RA | 219 | 847 | 377 | 20,54 | 63,25 |
+| D_RA | 219 | 847 | 377 | 20,54 | 63,26 |
 | DLinear 111 | 2 | 1.064 | 327 | 0,19 | 99,39 |
 | DLinear 222 | 2 | 1.064 | 340 | 0,19 | 99,42 |
 | DLinear 333 | 2 | 1.064 | 322 | 0,19 | 99,38 |
+| LSTM A4 seed 111 | 180 | 886 | 372 | 16,89 | 67,39 |
+| LSTM A4 seed 222 | 216 | 850 | 446 | 20,26 | 67,37 |
+| LSTM A4 seed 333 | 191 | 875 | 446 | 17,92 | 70,02 |
 | Persistence qmax | 0 | 1.066 | 1.066 | 0,00 | 100,00 |
 | Persistence qmean, phụ | 0 | 1.066 | 201 | 0,00 | 100,00 |
 
-Nguồn: [bảng chính](Tables/Evaluation_events_pooled.csv). D_RA dùng tái phân tích ở ngày đích nên là mốc tham chiếu về nguồn thông tin. SeqLSTM_Q bắt được nhiều trận hơn các cấu hình DLinear, nhưng vẫn bỏ sót 858/1.066 trận. Ba seed DLinear chỉ bắt đúng ngày khởi phát ở hai trận dù NSE trung vị nhỉnh hơn persistence; cải thiện sai số cả chuỗi không bảo đảm cải thiện thời điểm khởi phát lũ. Cùng ngày bắt đầu vẫn có thể khác ngày đỉnh, nên sai số thời điểm đỉnh được báo riêng.
+Nguồn: [bảng chính](Tables/Evaluation_events_pooled.csv). D_RA dùng tái phân tích ở ngày đích nên là mốc tham chiếu về nguồn thông tin. SeqLSTM_Q bắt được nhiều trận hơn các cấu hình DLinear, nhưng vẫn bỏ sót 858/1.066 trận. Ba seed DLinear chỉ bắt đúng ngày khởi phát ở hai trận dù NSE trung vị nhỉnh hơn persistence; cải thiện sai số cả chuỗi không bảo đảm cải thiện thời điểm khởi phát lũ. Seed 333 có NSE trung vị cao nhất trong ba A4, còn seed 222 bắt đúng ngày nhiều trận nhất, nên xếp theo NSE không tự xác định thứ tự về bắt lũ. Cả ba A4 bỏ sót 850–886/1.066 trận, FAR khoảng 67–70%. Cùng ngày bắt đầu vẫn có thể khác ngày đỉnh, nên sai số thời điểm đỉnh được báo riêng.
 
 #### 10.3.2. Bảng phụ: ±1 ngày
 
@@ -244,7 +269,7 @@ Giữ cùng ngưỡng và quy tắc gộp, cho phép onset lệch tối đa mộ
 
 | Run | Bắt được | Bỏ sót | Báo nhầm | POD (%) | FAR (%) |
 |---|---:|---:|---:|---:|---:|
-| SeqLSTM_Q | 348 | 718 | 291 | 32,65 | 45,54 |
+| SeqLSTM_Q, trọng số tác giả | 348 | 718 | 291 | 32,65 | 45,54 |
 | SeqLSTM_noQ | 256 | 810 | 236 | 24,02 | 47,97 |
 | EncDec_Q | 218 | 848 | 197 | 20,45 | 47,47 |
 | EncDec_noQ | 226 | 840 | 393 | 21,20 | 63,49 |
@@ -253,6 +278,9 @@ Giữ cùng ngưỡng và quy tắc gộp, cho phép onset lệch tối đa mộ
 | DLinear 111 | 222 | 844 | 107 | 20,83 | 32,52 |
 | DLinear 222 | 237 | 829 | 105 | 22,23 | 30,70 |
 | DLinear 333 | 222 | 844 | 102 | 20,83 | 31,48 |
+| LSTM A4 seed 111 | 306 | 760 | 246 | 28,71 | 44,57 |
+| LSTM A4 seed 222 | 363 | 703 | 299 | 34,05 | 45,17 |
+| LSTM A4 seed 333 | 333 | 733 | 304 | 31,24 | 47,72 |
 | Persistence qmax | 1.066 | 0 | 0 | 100,00 | 0,00 |
 | Persistence qmean, phụ | 117 | 949 | 84 | 10,98 | 41,79 |
 
@@ -262,67 +290,9 @@ Giữ cùng ngưỡng và quy tắc gộp, cho phép onset lệch tối đa mộ
 
 ### 10.4. So sánh ghép cặp
 
-Trên NSE, DLinear 111/222/333 hơn persistence ở **318/450, 309/450, 317/450** ID; median chênh lệch tương ứng **0,035019/0,031839/0,031465**. p sau Holm lần lượt khoảng 5,79×10⁻²⁹; 2,67×10⁻²⁶; 2,06×10⁻²⁷. Cỡ hiệu ứng dz lần lượt **0,0506/0,4480/0,3933**; khác biệt giữa seed cần được đọc cùng các lưu vực ở phần đuôi âm.
+Mỗi chỉ số có một họ Holm gồm 78 cặp của 13 run (bỏ mốc qmean phụ). Trên NSE, DLinear 111/222/333 hơn persistence ở **318/450, 309/450, 317/450** ID; median chênh lệch tương ứng **0,035019/0,031839/0,031465**. p sau Holm lần lượt khoảng 8,85×10⁻²⁹; 4,27×10⁻²⁶; 3,22×10⁻²⁷. Cỡ hiệu ứng dz lần lượt **0,0506/0,4480/0,3933**; khác biệt giữa seed cần được đọc cùng các lưu vực ở phần đuôi âm.
 
-Trên KGE, mỗi seed DLinear thấp hơn persistence ở **449/450** ID. Trên PNSE, median của ba seed dương nhưng mean âm; một số lưu vực có persistence rất mạnh làm tỷ số sai số lớn. Vì vậy, p nhỏ hoặc đa số lưu vực tốt lên không thay thế việc kiểm mức thiệt hại ở các lưu vực dự báo kém. [Toàn bộ 135 phép so](Tables/Evaluation_paired_tests.csv).
-
-### 10.5. Phạm vi xác nhận và bằng chứng lưu
-
-Lần chạy xác nhận bộ đánh giá trên dự báo thực nghiệm **test/S0/hạn một ngày**, gồm chỉ số liên tục, phân mức, sự kiện và kiểm định. Các kịch bản S1–S4, nhiều hạn và tập validation sẽ được chấm khi có dự báo tương ứng từ luồng mô hình; hai cờ trong JSON hiện giữ false đúng phạm vi này.
-
-Đã kiểm 21 tệp kết quả được cung cấp và tính lại một bảng tổng hợp phụ từ CSV chi tiết; các bảng tổng hợp và hình được giữ trong `Tables`/`Figures`. [Manifest tệp nhận](Tables/Evaluation_received_manifest.csv) ghi SHA-256; [biên nhận kiểm tra](Tables/Evaluation_output_verification.json) ghi 57 phép kiểm cục bộ đạt và nguồn của bảng phụ được tính lại. Các phép kiểm đối chiếu số đếm, ngày ghép, sai số đỉnh, Wilcoxon, dz, Holm và CDF từ CSV; chuỗi dự báo thô và 20 đầu vào Kaggle tiếp tục nằm ở Output/Input Kaggle.
-
-## 11. Xác nhận tích hợp A4 trên Kaggle
-
-Lần chấm test/S0/hạn một ngày gồm đủ **14 run và 451 ID**. Có **129 kiểm thử đạt**, `A3_reference_matched=true` và `A4_contracts_matched=true`. Manifest A4 có 11 tệp, cùng hai nguồn ngữ cảnh A3, đều đạt kiểm hash. Ba hợp đồng LSTM có cùng lịch, ID, diện tích, obs canonical và persistence với A3. Nguồn: [biên nhận nhật ký thực thi](Tables/Evaluation_A4_execution_receipt.json).
-
-| Run A4 | Epoch chọn | Ngày–ID có dự báo | Ngày–ID có obs/sim hữu hạn | Dự báo âm trước clip |
-|---|---:|---:|---:|---:|
-| Seed 111 | 11 | 652.644 | 652.636 | 1.660 |
-| Seed 222 | 15 | 652.644 | 652.636 | 2.261 |
-| Seed 333 | 14 | 652.644 | 652.636 | 1.978 |
-
-Mỗi hợp đồng giữ 451 ID trên 1.461 ngày đích. Giao chung của cả 14 run có **652.628 ngày–lưu vực trên 450 ID có ngày chấm**, bằng số lượng của lần chấm 11 run. Thêm A4 không làm giảm số ngày trong giao này. Số 652.644 mô tả các dự báo hữu hạn trước khi yêu cầu có obs; 652.636 là số cặp obs/sim của riêng mỗi A4, còn 652.628 là giao để so toàn bộ mô hình.
-
-Giao thức 3 giữ dung sai lũ chính **0 ngày ở hạn một ngày**, bảng phụ **±1 ngày**. Lần chấm này chỉ gồm S0 và hạn 1; chưa có kết quả vận hành S1–S4 hoặc nhiều hạn. Môi trường là Python 3.13.15, NumPy 2.1.3, pandas 2.3.3 và SciPy 1.16.3.
-
-Các bảng tổng hợp thực nghiệm của lần chấm 14 run được lưu riêng tại [Tables/A4_Integrated](Tables/A4_Integrated/Evaluation_received_manifest.csv). Bốn CSV có 378 hàng tổng hợp chỉ số, 234 hàng kiểm định và 336 hàng sự kiện cho mỗi dung sai. **49 kiểm cục bộ đạt**: điểm số và bảng sự kiện của 11 run cũ khớp hoàn toàn; thống kê ghép cặp/p gốc của 135 phép so cũ giữ nguyên; tỷ lệ sự kiện khớp số đếm, các nhóm fit bảo toàn tổng và Holm được tính lại trên 78 cặp mỗi chỉ số. [Bảng kiểm](Tables/A4_Integrated/Evaluation_output_audit.csv), [phạm vi kiểm chứng](Tables/A4_Integrated/Evaluation_output_verification.json). Chưa có CSV chỉ số từng ID và NPZ tại máy cho lần này, nên kiểm tổng hợp không được gọi là tính lại Wilcoxon, dz hoặc chạy lại dự báo.
-
-### 11.1. Chỉ số liên tục trên cùng giao ngày
-
-| Run | NSE trung vị | PNSE trung vị | KGE trung vị |
-|---|---:|---:|---:|
-| SeqLSTM_Q, trọng số tác giả | 0,705259 | 0,495584 | 0,767074 |
-| LSTM A4 seed 111 | 0,695242 | 0,495352 | 0,758090 |
-| LSTM A4 seed 222 | 0,703778 | 0,505573 | 0,790977 |
-| LSTM A4 seed 333 | 0,705890 | 0,501788 | 0,785984 |
-| Persistence qmax | 0,350031 | 0 | 0,674939 |
-
-Mỗi chỉ số trong bảng có 450 ID hữu hạn. Trung bình ± độ lệch chuẩn mẫu của ba NSE trung vị A4 là **0,701636 ± 0,005638**; khoảng [0,695242; 0,705890] bao quanh mốc tác giả 0,705259. Đây là biến thiên của ba lần huấn luyện, không phải khoảng tin cậy hay chỉ số của một ensemble. Ba seed đều giữ riêng; không chọn seed theo test. [Bảng chỉ số đầy đủ](Tables/A4_Integrated/Evaluation_summary.csv).
-
-NSE của A4 tương đối sát mốc tác giả nhưng KGE thay đổi theo seed: 111 thấp hơn mốc về trung vị, 222 và 333 cao hơn. FHV trung vị của ba seed là **−15,70%; −11,71%; −11,56%**, cho thấy tổng dải lưu lượng cao theo định nghĩa FHV vẫn bị dự báo hụt. Với PNSE, cả ba median dương nhưng mean lần lượt **−1,189; −0,508; −0,355**; cần giữ phần đuôi các lưu vực mà persistence mạnh khi đọc kết quả.
-
-![CDF trên giao chung của 14 run](Figures/Evaluation_CDF_test_S0_lead1_with_A4.png)
-
-Hình 2. Ba đường A4 màu xanh dùng kiểu nét khác nhau cho từng seed; đường SeqLSTM_Q liền là trọng số tác giả. Số n trong chú giải là số ID có chỉ số hữu hạn; EncDec_noQ có 448 KGE, các run còn lại có 450. Giữ toàn bộ điểm âm.
-
-### 11.2. Khởi phát lũ hai năm: đúng ngày và bảng phụ
-
-Ngưỡng hai năm, cụm USWRC và nhóm tất cả ID có **1.066 trận thật đủ điều kiện trên 366 lưu vực**. Bảng chính yêu cầu cùng ngày bắt đầu.
-
-| Run | Bắt được | Bỏ sót | Báo nhầm | POD (%) | FAR (%) |
-|---|---:|---:|---:|---:|---:|
-| SeqLSTM_Q, trọng số tác giả | 208 | 858 | 431 | 19,51 | 67,45 |
-| A4 seed 111 | 180 | 886 | 372 | 16,89 | 67,39 |
-| A4 seed 222 | 216 | 850 | 446 | 20,26 | 67,37 |
-| A4 seed 333 | 191 | 875 | 446 | 17,92 | 70,02 |
-| Persistence qmax | 0 | 1.066 | 1.066 | 0,00 | 100,00 |
-
-Nguồn: [sự kiện chính](Tables/A4_Integrated/Evaluation_events_pooled.csv). Seed 333 có NSE trung vị cao nhất trong ba seed, còn seed 222 bắt đúng ngày nhiều trận nhất. Vì vậy, xếp theo NSE không tự xác định thứ tự về bắt lũ. Cả ba A4 vẫn bỏ sót 850–886/1.066 trận và có FAR khoảng 67–70%; tái lập NSE không có nghĩa đã giải quyết tốt cảnh báo khởi phát lũ.
-
-Ở bảng phụ ±1 ngày, A4 111/222/333 bắt được **306/363/333 trận**, POD **28,71/34,05/31,24%** và FAR **44,57/45,17/47,72%**. Persistence qmax đạt POD 100% ở bảng phụ do chấp nhận trễ một ngày, trong khi POD ở bảng chính bằng 0. [Bảng phụ](Tables/A4_Integrated/Evaluation_events_pooled_tolerance1.csv).
-
-### 11.3. Kiểm định ghép cặp và ảnh hưởng của họ Holm
+Trên KGE, mỗi seed DLinear thấp hơn persistence ở **449/450** ID. Trên PNSE, median của ba seed dương nhưng mean âm; một số lưu vực có persistence rất mạnh làm tỷ số sai số lớn. Vì vậy, p nhỏ hoặc đa số lưu vực tốt lên không thay thế việc kiểm mức thiệt hại ở các lưu vực dự báo kém.
 
 | A4 trừ SeqLSTM_Q tác giả, trên NSE | ID A4 tốt hơn | Median hiệu | p sau Holm |
 |---|---:|---:|---:|
@@ -330,6 +300,12 @@ Nguồn: [sự kiện chính](Tables/A4_Integrated/Evaluation_events_pooled.csv)
 | Seed 222 | 249/450 | 0,003656 | 0,288877 |
 | Seed 333 | 254/450 | 0,004786 | 0,530678 |
 
-Hướng hiệu trong bảng được đổi từ CSV để thống nhất **A4 trừ tác giả**; p hai phía giữ nguyên. Không phát hiện khác biệt NSE ở mức 0,05 trong họ 78 cặp này; kết quả đó không phải phép thử tương đương. So persistence, ba A4 tốt hơn về NSE ở **418/424/428 trên 450 ID**, với median hiệu **0,327901/0,339101/0,329561**. [234 phép so đầy đủ](Tables/A4_Integrated/Evaluation_paired_tests.csv).
+Hướng hiệu trong bảng được đổi từ CSV để thống nhất **A4 trừ tác giả**; p hai phía giữ nguyên. Không phát hiện khác biệt NSE ở mức 0,05 trong họ 78 cặp này; kết quả đó không phải phép thử tương đương. So persistence, ba A4 tốt hơn về NSE ở **418/424/428 trên 450 ID**, với median hiệu **0,327901/0,339101/0,329561**.
 
-NSE seed 111 so 222 có p Holm **0,025099**, seed 111 so 333 có p Holm **0,051454**, trong khi median hiệu chỉ khoảng −0,00384 và −0,00444. Họ kiểm ở đây có 78 cặp mỗi chỉ số, khác họ ba cặp seed trong báo cáo A4; vì vậy không dùng hoán đổi p đã điều chỉnh của hai bảng. Quyết định về một cải tiến cần đọc cả độ lớn hiệu, biến thiên nhiều seed và phạm vi dữ liệu, không chỉ p < 0,05.
+NSE seed 111 so 222 có p Holm **0,025099**, seed 111 so 333 có p Holm **0,051454**, trong khi median hiệu chỉ khoảng −0,00384 và −0,00444. Họ kiểm ở đây có 78 cặp mỗi chỉ số, khác họ ba cặp seed trong báo cáo A4; vì vậy không dùng hoán đổi p đã điều chỉnh của hai bảng. Quyết định về một cải tiến cần đọc cả độ lớn hiệu, biến thiên nhiều seed và phạm vi dữ liệu, không chỉ p < 0,05. [Toàn bộ 234 phép so](Tables/Evaluation_paired_tests.csv).
+
+### 10.5. Phạm vi xác nhận và tệp lưu
+
+Lần chạy xác nhận bộ đánh giá trên dự báo thực nghiệm **test/S0/hạn một ngày**, gồm chỉ số liên tục, phân mức, sự kiện và kiểm định. Các kịch bản S1–S4, nhiều hạn và tập validation sẽ được chấm khi có dự báo tương ứng từ luồng mô hình; hai cờ `operational_scenarios_run` và `multi_lead_run` trong JSON giữ false đúng phạm vi này.
+
+`Tables/` và `Figures/` giữ nguyên byte 15 trong 24 tệp Output Version 4: các bảng kiểm, bảng tổng hợp, JSON và hình CDF. Chín bảng chi tiết theo từng ID hoặc từng cặp ghép (`Evaluation_metrics.csv`, `Evaluation_confusion.csv`, `Evaluation_levels.csv`, `Evaluation_events.csv`, `Evaluation_event_matches.csv`, hai bản `_tolerance1`, `Evaluation_CDF_points.csv`, `Evaluation_scenario_changes.csv`; khoảng 36 MB) nằm trong Output Kaggle; notebook 02 và các bước sau gắn thẳng Output đó làm Input.

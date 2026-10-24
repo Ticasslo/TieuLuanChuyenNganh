@@ -351,7 +351,7 @@ Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook
 | `03_Baseline/` | A2 tái lập (`01_A2_LamaHCEExt_Reproduce.py`), A3 mốc so sánh gồm persistence, PNSE, KGE, DLinear (`02_A3_LamaHCEExt_Benchmarks.py`), A4 huấn luyện lại và nhiễu hạt giống (`03_A4_LamaHCEExt_Retrain_Seed111/222/333.py`, so sánh `04_A4_LamaHCEExt_Compare.py`) | A2 tái lập đạt; A3 hoàn thành persistence, sáu A2 và DLinear ba hạt giống; A4 huấn luyện lại đạt, xuất 3 tệp dự báo theo hợp đồng của bộ đánh giá |
 | `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Wheel `mamba-ssm` và `causal-conv1d` cho Kaggle T4 dựng xong, đạt bộ test chính thức (`01_0_MambaSSM_Build.py`); mô hình chung, các lõi và kiểm thử đơn vị chưa viết |
 | `05_Training/` | Notebook huấn luyện theo bước B–H | Chưa viết |
-| `06_Evaluation/` | Bộ đánh giá Mục 6 | Đã chấm A2/DLinear trên Kaggle theo giao thức 2, test/S0/hạn một ngày; 60 kiểm thử đạt, khớp A3 trên 4.961 cặp run–ID và qua 57 kiểm CSV cục bộ; bảng lũ chính cùng ngày bắt đầu, bảng phụ ±1; mở rộng khi có dự báo validation/S1–S4/nhiều hạn |
+| `06_Evaluation/` | Bộ đánh giá Mục 6 | Đã chấm 14 run A2/DLinear/persistence/A4 trên Kaggle theo giao thức 3 (Version 4), test/S0/hạn một ngày; 129 kiểm thử đạt, khớp A3 trên 4.961 cặp run–ID và ba hợp đồng A4; bảng lũ chính cùng ngày bắt đầu, bảng phụ ±1; phân tích theo lưu vực (Version 2) 18 phép so; mở rộng khi có dự báo validation/S1–S4/nhiều hạn |
 | `07_Demo/` | Demo (mục dự án trong trang web của nhóm) | Chưa viết |
 
 `05_Training/`, `07_Demo/` là tên đề xuất, đặt khi bắt đầu viết mã.

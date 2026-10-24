@@ -1,4 +1,5 @@
 {
+  "analysis_protocol_version": 2,
   "scope": "test/S0/lead1/common_source_all",
   "expected_IDs": 451,
   "main_event_grouping": "USWRC",
@@ -95,8 +96,68 @@
     {
       "left": "D_RA",
       "right": "D_FC"
+    },
+    {
+      "left": "SeqLSTM_Q_A4_seed111",
+      "right": "Persistence_qmax"
+    },
+    {
+      "left": "SeqLSTM_Q_A4_seed222",
+      "right": "Persistence_qmax"
+    },
+    {
+      "left": "SeqLSTM_Q_A4_seed333",
+      "right": "Persistence_qmax"
+    },
+    {
+      "left": "SeqLSTM_Q_A4_seed111",
+      "right": "SeqLSTM_Q"
+    },
+    {
+      "left": "SeqLSTM_Q_A4_seed222",
+      "right": "SeqLSTM_Q"
+    },
+    {
+      "left": "SeqLSTM_Q_A4_seed333",
+      "right": "SeqLSTM_Q"
     }
   ],
+  "runs": [
+    "DLinear_seed_111",
+    "DLinear_seed_222",
+    "DLinear_seed_333",
+    "D_FC",
+    "D_RA",
+    "EncDec_Q",
+    "EncDec_noQ",
+    "Persistence_qmax",
+    "Persistence_qmean_aux",
+    "SeqLSTM_Q",
+    "SeqLSTM_Q_A4_seed111",
+    "SeqLSTM_Q_A4_seed222",
+    "SeqLSTM_Q_A4_seed333",
+    "SeqLSTM_noQ"
+  ],
+  "A4_included": true,
+  "A4_runs": [
+    "SeqLSTM_Q_A4_seed111",
+    "SeqLSTM_Q_A4_seed222",
+    "SeqLSTM_Q_A4_seed333"
+  ],
+  "seed_families": {
+    "DLinear": [
+      "DLinear_seed_111",
+      "DLinear_seed_222",
+      "DLinear_seed_333"
+    ],
+    "LSTM_A4": [
+      "SeqLSTM_Q_A4_seed111",
+      "SeqLSTM_Q_A4_seed222",
+      "SeqLSTM_Q_A4_seed333"
+    ]
+  },
+  "seed_stability": "rho_sign_and_range_across_three_runs_vs_persistence_no_p_pooling",
+  "reference_mask": "A3_common_source_all_counts_and_obs_tss_must_match_Evaluation",
   "outcomes": [
     "delta_NSE",
     "delta_PNSE",

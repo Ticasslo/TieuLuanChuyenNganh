@@ -144,5 +144,83 @@
     "IDs": 451,
     "days": 1461,
     "source_metadata": {}
+  },
+  {
+    "run": "SeqLSTM_Q_A4_seed111",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 111,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_A4_seed111",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 111,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "4080c8f1a2609331645f9745975222881d6d1dae088befc9a4daebd9bab11704",
+      "library_commit": "dda45fcf19ee7ffd481b9d192778539df46fb074",
+      "clip_to_zero": true,
+      "selected_epoch": 11,
+      "source": "/kaggle/input/notebooks/hunhngcthng/04-a4-lamahceext-compare/a4_compare/contracts/SeqLSTM_Q_A4_seed111_test_S0_lead1.npz",
+      "source_file_sha256": "55845fc937ab2d096b5c034a4951e0b50fc8a4e603661292db951628256f76bf",
+      "compare_version_expected": 2,
+      "training_notebook_version": 1
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_A4_seed222",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 222,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_A4_seed222",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 222,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "8b7be948fccc2ad4e88819130b805b67758f410aa4753b51429d941d27bb449b",
+      "library_commit": "dda45fcf19ee7ffd481b9d192778539df46fb074",
+      "clip_to_zero": true,
+      "selected_epoch": 15,
+      "source": "/kaggle/input/notebooks/hunhngcthng/04-a4-lamahceext-compare/a4_compare/contracts/SeqLSTM_Q_A4_seed222_test_S0_lead1.npz",
+      "source_file_sha256": "14afaea08355c70fe4ae5cb79125d098124e46b2f7dbc7f945b270ffa6936377",
+      "compare_version_expected": 2,
+      "training_notebook_version": 2
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_A4_seed333",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 333,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_A4_seed333",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 333,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "b580f025e13bd8510ce036703df29e34de2f6434a9798d7dc6a3434bc0d88334",
+      "library_commit": "dda45fcf19ee7ffd481b9d192778539df46fb074",
+      "clip_to_zero": true,
+      "selected_epoch": 14,
+      "source": "/kaggle/input/notebooks/hunhngcthng/04-a4-lamahceext-compare/a4_compare/contracts/SeqLSTM_Q_A4_seed333_test_S0_lead1.npz",
+      "source_file_sha256": "cc88ecf033786d8e205e89720a60f00ae574d082f4124d2f4538730388703ae1",
+      "compare_version_expected": 2,
+      "training_notebook_version": 2
+    }
   }
 ]

@@ -1,5 +1,5 @@
 {
-  "protocol_version": 2,
+  "protocol_version": 3,
   "metric_ddof": 0,
   "same_mask_for_six_metrics": true,
   "metric_epsilon": null,
@@ -10,13 +10,26 @@
   "FDC_tail_count": "ceil_fraction_times_n",
   "event_grouping": "USWRC and consecutive",
   "event_matching": "maximum_cardinality_then_minimum_total_absolute_onset_error",
-  "event_tolerance": "primary_same_day_onset_0_days_supplementary_plus_minus_1_day_all_leads",
+  "event_tolerance": "plus_minus_floor_actual_lead_divided_by_3_calendar_days",
   "event_tolerance_days": 0,
+  "event_tolerance_days_by_lead": {
+    "1": 0
+  },
+  "supported_event_tolerance_days_by_lead": {
+    "1": 0,
+    "2": 0,
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 2,
+    "7": 2
+  },
   "supplementary_event_tolerance_days": 1,
   "event_timing_reference": {
     "NOAA": "https://repository.library.noaa.gov/view/noaa/30340/noaa_30340_DS1.pdf",
     "NOAA_window": "plus_minus_one_third_forecast_lead_time_24h_means_8h",
-    "daily_adaptation": "same_calendar_day_onset_not_subdaily_verification",
+    "daily_adaptation": "floor_actual_lead_divided_by_3_whole_days_not_subdaily_verification",
+    "forecast_horizon_role": "contract_validation_only_does_not_set_matching_tolerance",
     "Nearing2024": "https://www.nature.com/articles/s41586-024-07145-1",
     "Nearing2024_window_days": 2,
     "supplementary_note": "one_day_sensitivity_is_not_exact_Nearing_replication"
@@ -24,6 +37,9 @@
   "censored_events": "excluded_from_scores_and_counted_separately",
   "holm_family": "all_unordered_run_pairs_excluding_qmean_aux_per_metric_period_scenario_lead",
   "holm_family_size": "finite_p_values_only_NaN_excluded_planned_size_reported_separately",
+  "A4_compare_version_expected": 2,
+  "A4_input_verification": "manifest_SHA256_and_same_A3_context",
+  "A3_reference_scope": "original_11_runs_common_mask_recomputed_separately",
   "statistics": "two_sided_Wilcoxon_auto_and_paired_Cohen_dz",
   "test_used_for_selection": false
 }
