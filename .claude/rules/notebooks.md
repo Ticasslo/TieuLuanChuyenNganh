@@ -18,7 +18,7 @@ paths:
 
 - **Trình bày kế hoạch notebook trước, chờ duyệt rồi mới viết mã**: cài đặt Kaggle (tên, GPU hay CPU, Internet, Persistence, Input kèm số Version), các Phần, đầu ra, vì sao. Người 2 ghi kế hoạch ở `Plans/NN_<Bước>_….md`.
 - Mỗi việc đi 2 giai đoạn: (1) hiểu cấu trúc, khái niệm — chưa viết mã; (2) viết mã khi đã hiểu chắc giai đoạn 1.
-- **Tra trước khi viết từng cell**: đọc mã nguồn, tài liệu đúng phiên bản đang chạy (fork `research` tại `dda45fc`, phiên bản thư viện trên Kaggle), nêu ngắn đã kiểm gì.
+- **Tra trước khi viết từng cell**: đọc mã nguồn, tài liệu đúng phiên bản đang chạy (fork `research`: `dda45fc` cho bước A, `e794d7c` từ B1, phiên bản thư viện trên Kaggle), nêu ngắn đã kiểm gì.
 - **Mỗi lần chỉ viết đúng 1 cell**, đợi người dùng chạy và gửi output thật rồi mới viết cell tiếp (output cell trước có thể đổi hướng cell sau).
 - Mỗi lần đưa cell: nói tên notebook, Phần mấy, làm gì. Mỗi lần sửa notebook: nói rõ Phần nào mới, Phần nào sửa, cần chạy lại từ Phần nào.
 - **Tệp chính thức chạy nguyên bằng Save & Run All**: người dùng chép nguyên tệp vào Kaggle, không sửa dòng nào — không công tắc, không hằng số phải đổi tay, không cell phải xóa. Nhiều biến thể (VD 3 hạt giống) => mỗi biến thể một tệp chạy được ngay (`..._Seed111.py`, `..._Seed222.py`, `..._Seed333.py`).
