@@ -20,7 +20,6 @@
 | A3: persistence, sáu run A2, DLinear 3 hạt giống và chẩn đoán | [Thuyết minh A3](Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#report-part-10) |
 | A4: huấn luyện lại mô hình tốt nhất với 3 hạt giống (NSE trung vị test 0,6952/0,7038/0,7059, bài 0,7053 nằm trong khoảng), nhiễu hạt giống theo lưu vực, 3 tệp NPZ cho bộ đánh giá | [Thuyết minh A4](Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md) |
 | Báo cáo tiến độ A1–A4, cập nhật 24/10/2026 | [Báo cáo gửi GVHD](Document/01_Plan/04_ProgressReport_2026-10-23.md) |
-| Kịch bản trình bày tiến độ 25/10/2026: phân vai hai người, lời nói, câu hỏi có thể gặp | [Kịch bản trình bày](Document/01_Plan/05_PresentationGuide_2026-10-25.md) |
 | Bộ đánh giá: đã chấm 14 run A2/DLinear/persistence/A4 trên test/S0/hạn một ngày; 129 kiểm thử đạt (Version 4) | [Kết quả bộ đánh giá](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle) |
 | Phân tích thuộc tính: 18 phép so, 31 trường dạng số, gồm ba seed A4; 41 kiểm thử Kaggle đạt (Version 2) | [Kết quả theo lưu vực](Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#11-kết-quả-thực-nghiệm-và-kiểm-chứng) |
 | Ghi chú học BiasCast Phần 1–5 | `Document/06_Theory/03_…` tới `07_…` |
