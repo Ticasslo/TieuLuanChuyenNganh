@@ -223,8 +223,8 @@ Trọng số mọi epoch, kết quả validation mỗi epoch, kết quả test `
 <a id="limits"></a>
 ## Hạn chế
 
-- **Chưa tách riêng tác dụng của hai thay đổi đầu vào**: B1 đổi đơn vị `qmean` và thêm `qmax` cùng lúc, nên chưa biết phần cải thiện chia cho mỗi thay đổi bao nhiêu. Kế hoạch tách bằng bước B1a (chỉ đổi đơn vị Q, ba hạt giống; `03_Pipeline.md` Mục 7).
-- **Số epoch khác nhau giữa các run**: B1 và A4 dừng sớm theo quy tắc của tác giả (B1 ở epoch 8–13, A4 ở 16–20), nên đường học trên Hình 1 không cùng độ dài và lịch cosine bị cắt giữa chừng. Kế hoạch chạy lại LSTM nền (B0) và B1 đủ 30 epoch để so cùng số epoch (`03_Pipeline.md` Mục 5.1).
+- **Chưa tách riêng tác dụng của hai thay đổi đầu vào**: B1 đổi đơn vị `qmean` và thêm `qmax` cùng lúc, nên chưa biết phần cải thiện chia cho mỗi thay đổi bao nhiêu. Kế hoạch tách thành B1a (chỉ đổi đơn vị Q) và B1b (thêm `qmax`), mỗi bước ba hạt giống (`03_Pipeline.md` Mục 7).
+- **Số epoch khác nhau giữa các run**: B1 và A4 dừng sớm theo quy tắc của tác giả (B1 ở epoch 8–13, A4 ở 16–20), nên đường học trên Hình 1 không cùng độ dài và lịch cosine bị cắt giữa chừng. Kế hoạch chạy LSTM nền (B0), B1a, B1b đủ 30 epoch để so cùng số epoch (`03_Pipeline.md` Mục 5.1).
 - **Ba hạt giống mỗi bước**: độ lệch chuẩn qua ba lần chạy là ước lượng thô; kết luận dựa thêm vào khoảng [nhỏ nhất; lớn nhất] không chồng nhau và phép so theo từng lưu vực.
 - **Chỉ số ở đây là chỉ số thư viện trên mặt nạ quan trắc của từng run**, chưa gồm PNSE, chỉ số theo mức lưu lượng, sự kiện lũ và kịch bản S1–S4; các chỉ số đó do bộ đánh giá chấm từ ba tệp NPZ.
 
@@ -235,8 +235,8 @@ Trọng số mọi epoch, kết quả validation mỗi epoch, kết quả test `
 |---|---|
 | Fork `e794d7c` (bản sửa lưu mô hình, kiểm thử `test/test_best_model.py`) | Mã nền của B2, B3 và các lõi ở bước C |
 | Thư mục dữ liệu `qmean_mmd`, `qmax_mmd` (Phần 3 notebook huấn luyện) | Bộ nạp B2 dùng lại cùng nhóm Q theo mm/ngày |
-| NSE trung vị validation B1: trung bình 0,7713, độ lệch chuẩn 0,0015 | Đối chiếu với B1 chạy lại 30 epoch; ứng viên của luật chọn B* là bản 30 epoch (`03_Pipeline.md` Mục 7) |
+| NSE trung vị validation B1: trung bình 0,7713, độ lệch chuẩn 0,0015 | Đối chiếu với B1b (cùng hai thay đổi, 30 epoch); ứng viên của luật chọn B* là B1b (`03_Pipeline.md` Mục 7) |
 | Ba tệp NPZ test S0 | Bộ đánh giá chấm B1 cùng 14 run đã có (`--extra-contract`) |
 | Một lần huấn luyện 1,3–2,2 giờ + đánh giá test mọi epoch khoảng 0,5–0,8 giờ; khoảng 9,6 phút/epoch | Ngân sách và lịch (`03_Pipeline.md` Mục 8.1, 9.7): với 30 epoch khoảng 4,8 giờ huấn luyện |
-| Mã notebook huấn luyện 3 hạt giống | Dựng notebook B0, B1a và B1 chạy lại 30 epoch (`03_Pipeline.md` Mục 7) |
+| Mã notebook huấn luyện 3 hạt giống | Dựng notebook B0, B1a, B1b 30 epoch (`03_Pipeline.md` Mục 7) |
 | Hai lưu vực 742, 758 chi phối trung bình hiệu và Cohen's dz | Khi so mô hình ở B, C, đọc trung vị hiệu và số lưu vực tốt hơn/kém hơn kèm Cohen's dz |
