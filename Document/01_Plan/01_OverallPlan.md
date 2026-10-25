@@ -73,7 +73,7 @@ Không dùng trực tiếp: checkpoint có lớp đầu vào cố định theo 1
 | LSTM cải tiến và lõi SSM tốt nhất dự báo 1–7 ngày (chỉ quá khứ, lai, dự báo hoàn hảo) | Mở rộng sang dự báo nhiều ngày bằng dữ liệu sẵn có |
 | Biến thể Mamba (quét hai chiều) và Transformer (patch như PatchTST) | Kiểm chứng một ý cải tiến cho mỗi lõi |
 
-Câu hỏi nghiên cứu, đóng góp, tính mới, giao thức so sánh và ma trận thí nghiệm (tối đa 139 lần huấn luyện): `Document/01_Plan/03_Pipeline.md` Mục 1, 5, 7.
+Câu hỏi nghiên cứu, đóng góp, tính mới, giao thức so sánh và ma trận thí nghiệm (tối đa 136 lần huấn luyện): `Document/01_Plan/03_Pipeline.md` Mục 1, 5, 7.
 
 ---
 

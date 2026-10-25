@@ -52,7 +52,7 @@ Khảo sát A1 giữ các phép ghép theo cùng **ngày–ID**, tức một ng�
 
 ### 4.3.2. Nhãn qmax và biến qmean
 
-Lưu lượng Q, đơn vị m³/s, là thể tích nước qua mặt cắt trong một giây. Trong dữ liệu ngày, **qmean** là lưu lượng trung bình ngày và **qmax** là cực đại của các số đo giờ trong ngày. Nghiên cứu dự báo **qmax ngày t**; lịch sử qmean được dùng làm đầu vào ở các cấu hình có Q. B1 trong kế hoạch sẽ bổ sung qmax quá khứ và thống nhất quy trình Q cho những thí nghiệm tiếp theo.
+Lưu lượng Q, đơn vị m³/s, là thể tích nước qua mặt cắt trong một giây. Trong dữ liệu ngày, **qmean** là lưu lượng trung bình ngày và **qmax** là cực đại của các số đo giờ trong ngày. Nghiên cứu dự báo **qmax ngày t**; lịch sử qmean được dùng làm đầu vào ở các cấu hình có Q. Bước B1a, B1b trong kế hoạch đổi qmean quá khứ sang mm/ngày và bổ sung qmax quá khứ cho những thí nghiệm tiếp theo.
 
 Để quy đổi theo diện tích trạm:
 

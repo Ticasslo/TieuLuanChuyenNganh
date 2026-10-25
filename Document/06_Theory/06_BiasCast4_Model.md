@@ -173,7 +173,7 @@ Ví dụ (thống kê của `qmax` ở đây là số giả định; số thật
 4. Mạng xuất ŷ = −0,3; thống kê `qmax` (giả định) trung bình 2,5, độ lệch chuẩn 4,0; lưu vực 500 km². Tính qmax theo mm/ngày và m³/s.
 5. Vì sao lớp đầu vào phải đổi trục (256, 364, 32) thành (364, 256, 32)?
 
-**Đáp án (Mục 4.1):** (1) Tính trên kỳ test là rò rỉ dữ liệu: dùng thông tin của kỳ mà khi vận hành thật chưa có; ngoài ra mô hình đã học trên thang chuẩn hóa của kỳ train, đổi thang ở kỳ test thì cùng một con số mang nghĩa khác. (2) z = (50 − 4,5778) / 16,1461 ≈ 2,813; z = (1 − 4,5778) / 16,1461 ≈ −0,222; mọi suối nhỏ dồn vào khoảng hẹp quanh −0,28…−0,2 (`qmean` = 0 cho z ≈ −0,284), nên khác biệt giữa các suối nhỏ rất nhỏ so với sông lớn — một thang chung cho cả 451 lưu vực làm mô hình khó phân biệt suối nhỏ (lý do bước B1 đưa Q về mm/ngày theo diện tích). (3) Mọi mẫu có cửa sổ 365 ngày chứa 10/3/2005, tức ngày t từ 10/3/2005 đến 9/3/2006: 365 mẫu (không phải 364, vì bộ lọc kiểm cả ô `qmean` của chính ngày t dù mô hình không dùng); chỉ ở kỳ train. (4) qmax = −0,3 × 4,0 + 2,5 = 1,3 mm/ngày; Q = 1,3 × 500 / 86,4 ≈ 7,52 m³/s. (5) `nn.LSTM` của PyTorch mặc định `batch_first=False`, nhận (ngày, mẫu, biến) và đi lần lượt theo trục đầu; NeuralHydrology giữ mặc định này nên đổi trục trước khi đưa vào.
+**Đáp án (Mục 4.1):** (1) Tính trên kỳ test là rò rỉ dữ liệu: dùng thông tin của kỳ mà khi vận hành thật chưa có; ngoài ra mô hình đã học trên thang chuẩn hóa của kỳ train, đổi thang ở kỳ test thì cùng một con số mang nghĩa khác. (2) z = (50 − 4,5778) / 16,1461 ≈ 2,813; z = (1 − 4,5778) / 16,1461 ≈ −0,222; mọi suối nhỏ dồn vào khoảng hẹp quanh −0,28…−0,2 (`qmean` = 0 cho z ≈ −0,284), nên khác biệt giữa các suối nhỏ rất nhỏ so với sông lớn — một thang chung cho cả 451 lưu vực làm mô hình khó phân biệt suối nhỏ (lý do bước B1a đưa Q về mm/ngày theo diện tích). (3) Mọi mẫu có cửa sổ 365 ngày chứa 10/3/2005, tức ngày t từ 10/3/2005 đến 9/3/2006: 365 mẫu (không phải 364, vì bộ lọc kiểm cả ô `qmean` của chính ngày t dù mô hình không dùng); chỉ ở kỳ train. (4) qmax = −0,3 × 4,0 + 2,5 = 1,3 mm/ngày; Q = 1,3 × 500 / 86,4 ≈ 7,52 m³/s. (5) `nn.LSTM` của PyTorch mặc định `batch_first=False`, nhận (ngày, mẫu, biến) và đi lần lượt theo trục đầu; NeuralHydrology giữ mặc định này nên đổi trục trước khi đưa vào.
 
 ---
 
@@ -496,7 +496,7 @@ Nếu **không** dừng sớm, mô hình chạy đủ 30 epoch: tốn thêm GPU 
 | 6 | 0,703 | 0,700 | có (0,703 > 0,700) | 6 | không → tốt nhất vẫn 0,700 |
 | 7 | 0,701 | 0,700 | có (0,701 > 0,700) | **7** | không |
 
-Epoch 7 (0,701) ghi đè epoch 6 (0,703) dù kém hơn: `best_model.pt` có thể là một epoch kém hơn epoch tốt nhất thật tối đa 0,005 NSE validation. Ảnh hưởng nhỏ nhưng có hệ thống; đề tài sửa ở bước B1 (so cùng một giá trị tốt nhất thật cho cả hai việc).
+Epoch 7 (0,701) ghi đè epoch 6 (0,703) dù kém hơn: `best_model.pt` có thể là một epoch kém hơn epoch tốt nhất thật tối đa 0,005 NSE validation. Ảnh hưởng nhỏ nhưng có hệ thống; đề tài sửa từ bước B0 (so cùng một giá trị tốt nhất thật cho cả hai việc).
 
 **Bước 4 — Test chỉ chạy một lần.** Sau khi huấn luyện xong, `eval_run(run_dir, "test")` nạp `best_model.pt` và dự báo 2014–2017 ([Mã] `evaluation/tester.py`; [Cơ sở] Mục 11.1 bước 10). Đây là con số báo cáo (Phần 2). Ba kỳ có ba vai trò tách bạch:
 
@@ -510,7 +510,7 @@ Góp ý của GVHD (buổi họp 27/9/2026, `Meeting_2026-09-27.md`): sau mỗi 
 
 **Bước 5 — Chọn siêu tham số.** Siêu tham số (số chiều ẩn, dropout, nhiễu nhãn, batch…) là những thứ gradient không học được, phải chọn từ bên ngoài. Tác giả dùng tối ưu Bayes 100 lần thử, mỗi lần huấn luyện một mô hình rồi chấm trên validation, mục tiêu NSE\* ([Bài] dòng 98 và Phụ lục D; [Cơ sở] Mục 5). Không gian tìm: số chiều ẩn 64/128/256, dropout 0,1–0,3, nhiễu nhãn, batch 64/128/256. Tối ưu Bayes khác thử ngẫu nhiên ở chỗ: sau mỗi lần thử, nó dựng một mô hình xấp xỉ "siêu tham số → điểm validation" và chọn lần thử kế tiếp ở chỗ vừa hứa hẹn vừa chưa thử nhiều. Kết quả cuối với Sequential Forecast LSTM: 128 chiều, dropout 0,3, batch 256, không nhiễu nhãn ([Cơ sở] Mục 11.3). Đề tài không có ngân sách 100 lần thử cho mỗi lõi; bước C tinh chỉnh 8 cấu hình mỗi lõi (`03_Pipeline.md` Mục 5).
 
-**Tóm tắt ý chính:** mỗi epoch chấm NSE trung vị trên validation 2010–2013 → 5 epoch không tăng quá 0,005 thì dừng → `best_model.pt` lưu theo so sánh không có ngưỡng nên có thể là epoch kém hơn tối đa 0,005 (sửa ở B1) → test 2014–2017 chỉ chạy một lần với `best_model.pt` → siêu tham số chọn bằng tối ưu Bayes 100 lần thử trên validation.
+**Tóm tắt ý chính:** mỗi epoch chấm NSE trung vị trên validation 2010–2013 → 5 epoch không tăng quá 0,005 thì dừng → `best_model.pt` lưu theo so sánh không có ngưỡng nên có thể là epoch kém hơn tối đa 0,005 (sửa từ B0) → test 2014–2017 chỉ chạy một lần với `best_model.pt` → siêu tham số chọn bằng tối ưu Bayes 100 lần thử trên validation.
 
 **Câu hỏi tự kiểm tra (Mục 4.7):**
 
@@ -594,11 +594,11 @@ Ngoài mức cùng tham số, mỗi lõi còn được thử ở mức dung lư�
 | Điểm | Mục | Bước xử lý |
 |---|---|---|
 | Bộ lọc mẫu kiểm cả ô không dùng; thiếu một ngày `qmean` mất 365 mẫu train | 4.1 | B2 |
-| Một thang chuẩn hóa chung cho `qmean` làm suối nhỏ dồn quanh z ≈ −0,28 | 4.1 | B1 |
+| Một thang chuẩn hóa chung cho `qmean` làm suối nhỏ dồn quanh z ≈ −0,28 | 4.1 | B1a |
 | Nhúng "đơn giản" trong mã không có tanh, khác câu trong bài | 4.2 | ghi theo mã khi viết báo cáo |
 | Đầu ra tuyến tính có thể cho `qmax` âm | 4.4 | đếm ở A3 |
 | Lưu vực gần hằng số (742, 758) có trọng số NSE\* rất lớn | 4.5 | xem phân phối s(b) ở A1 |
-| `best_model.pt` có thể là epoch kém hơn tối đa 0,005 | 4.7 | B1 |
+| `best_model.pt` có thể là epoch kém hơn tối đa 0,005 | 4.7 | B0 (fork `e794d7c`) |
 | Một hạt giống; ngân sách tinh chỉnh LSTM 100 lần thử | 4.6, 4.7 | A4, C (mọi lõi 8 cấu hình, 3 hạt giống) |
 
 **Câu hỏi ôn Phần 4** (mỗi câu cần ghép ít nhất hai mục):

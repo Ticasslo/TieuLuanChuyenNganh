@@ -461,7 +461,7 @@ Tái lập ở A2 khớp bài: Sequential có `qmean` 0,7053, không `qmean` 0,6
 #### Chi tiết kỹ thuật (đọc sau, không bắt buộc)
 
 - Bộ nạp đọc `qmean` thẳng từ tệp khí tượng của từng lưu vực, cột do tác giả dựng sẵn trong thư mục `LamaH_expanded_q_input` ([LamaH] Mục 6.3).
-- Đề tài giữ `qmean` trong mọi mô hình chính và sửa thêm ở bước B (`03_Pipeline.md` Mục 7): B1 đưa Q về cùng đơn vị với nhãn và thêm `qmax` quá khứ; B2 xử lý ô trống bằng masked mean thay vì bỏ mẫu; B3 cố ý che ngẫu nhiên một phần Q khi huấn luyện, để mô hình chịu được lúc trạm mất số liệu. Kịch bản vận hành S0–S4 (`03_Pipeline.md` Mục 6.3) đo mô hình khi Q và tái phân tích đến trễ.
+- Đề tài giữ `qmean` trong mọi mô hình chính và sửa thêm ở bước B (`03_Pipeline.md` Mục 7): B1a đưa Q về cùng đơn vị với nhãn, B1b thêm `qmax` quá khứ; B2 xử lý ô trống bằng masked mean thay vì bỏ mẫu; B3 cố ý che ngẫu nhiên một phần Q khi huấn luyện, để mô hình chịu được lúc trạm mất số liệu. Kịch bản vận hành S0–S4 (`03_Pipeline.md` Mục 6.3) đo mô hình khi Q và tái phân tích đến trễ.
 
 **Câu hỏi tự kiểm tra (Mục 5.6):**
 

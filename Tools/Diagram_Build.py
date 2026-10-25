@@ -29,7 +29,7 @@ EDGE = "endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;
 SEQUENCE = [
     ("0", "0. Hạ tầng: fork riêng, mamba-ssm trên T4, kiểm thử đơn vị, đo thời gian"),
     ("A", "A. Tái lập, persistence, PNSE, DLinear, nhiễu 3 hạt giống (6 lần)"),
-    ("B", "B. LSTM cải tiến, thêm từng thay đổi: B0 nền 30 epoch, B1a đơn vị Q, B1b qmax, B2 masked mean, B3 che dữ liệu (21 lần)"),
+    ("B", "B. LSTM cải tiến, thêm từng thay đổi: B0 nền 30 epoch, B1a đơn vị Q, B1b qmax, B2 masked mean, B3 che dữ liệu (18 lần)"),
     ("C", "C. 5 lõi cùng tham số, tinh chỉnh 8 cấu hình, 3 hạt giống (tối đa 70 lần)"),
     ("C", "H → D → E → F → GV. Dự báo 1–7 ngày, 730 ngày, biến thể, CMAL, kiểm chứng lấy mẫu lũ (42 lần)"),
     ("EV", "Đánh giá: mức, sự kiện lũ, kịch bản vận hành, kiểm định"),
