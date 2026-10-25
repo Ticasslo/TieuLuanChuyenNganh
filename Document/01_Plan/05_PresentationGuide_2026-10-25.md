@@ -2,7 +2,7 @@
 
 Tài liệu dùng để tập nói và điều khiển màn hình khi báo cáo. Những đoạn trích dẫn là lời có thể đọc trực tiếp; phần **Mở**, **Chỉ vào** và **Chuyển màn hình** là hướng dẫn thao tác, không đọc thành lời. Các số liệu lấy từ kết quả đã kiểm trong repo, cập nhật ngày 25/10/2026. Bản thuyết minh gửi giảng viên là [báo cáo tiến độ](04_ProgressReport_2026-10-23.md).
 
-Thông điệp xuyên suốt: **nhóm đã hiểu dữ liệu, tái lập suy luận, tự huấn luyện các mốc và xây dựng bộ đánh giá; LSTM có kỹ năng chuỗi khá tốt nhưng khả năng bắt đúng ngày khởi phát lũ còn hạn chế. Đặc điểm lưu vực có liên hệ với mức cải thiện và các xu hướng chính giữ qua ba seed.** Kết quả hiện có là nền thực nghiệm cho bước cải tiến và so sánh các lõi, chưa phải kết quả chứng minh lợi ích của Mamba.
+Thông điệp xuyên suốt: **nhóm đã hiểu dữ liệu, tái lập suy luận, tự huấn luyện các mốc và xây dựng bộ đánh giá; LSTM có kỹ năng chuỗi khá tốt nhưng khả năng bắt đúng ngày khởi phát lũ còn hạn chế. Đặc điểm lưu vực có liên hệ với mức cải thiện và các xu hướng chính giữ qua ba seed. Bước cải tiến đầu tiên B1 (Q quá khứ cùng đơn vị nhãn, thêm qmax quá khứ, sửa lưu checkpoint) tăng NSE trung vị test khoảng 0,019, lớn hơn mức dao động giữa seed của A4.** Kết quả hiện có là nền thực nghiệm cho bước cải tiến và so sánh các lõi, chưa phải kết quả chứng minh lợi ích của Mamba.
 
 ## 1. Phân vai và đường đi của buổi trình bày
 
@@ -13,9 +13,9 @@ Thông điệp xuyên suốt: **nhóm đã hiểu dữ liệu, tái lập suy lu
 | 1 | Người 1 — Huỳnh Thanh Nhân | Mở đầu, bài toán; A1: dữ liệu, độ thiếu, ngưỡng; A3: persistence, DLinear, kết quả và chuỗi dự báo | 9–10 phút |
 | 2 | Người 2 — Huỳnh Ngọc Thắng | A2: tái lập từ trọng số tác giả; A4: ba LSTM huấn luyện từ đầu, thời gian, biến thiên giữa seed | 6–7 phút |
 | 3 | Người 1 | Bộ đánh giá: phạm vi chung, CDF, bốn mức và sự kiện lũ | 6–7 phút |
-| 4 | Người 2 | Phân tích theo lưu vực: nhóm thuộc tính, tương quan, biến thiên seed và kết luận | 7–8 phút |
+| 4 | Người 2 | Phân tích theo lưu vực: nhóm thuộc tính, tương quan, biến thiên seed; B1 so với A4; kết luận | 9–10 phút |
 
-Kịch bản đầy đủ dự kiến khoảng 30–35 phút, chưa tính hỏi đáp. [Mục 10](#10-lộ-trình-rút-gọn-15-phút) chỉ rõ những điểm dừng giữ lại khi có 15 phút. Số phút là lịch tập, không phải thời gian chạy notebook.
+Kịch bản đầy đủ dự kiến khoảng 32–37 phút, chưa tính hỏi đáp. [Mục 10](#10-lộ-trình-rút-gọn-15-phút) chỉ rõ những điểm dừng giữ lại khi có 15 phút. Số phút là lịch tập, không phải thời gian chạy notebook.
 
 Phân vai này là phân công **trình bày**, không thay đổi người thực hiện hay chủ tài khoản của các notebook. Khi Người 2 trình bày phân tích lưu vực, vẫn ghi nguồn notebook thuộc tài khoản `hunhthanhnhn`.
 
@@ -28,17 +28,18 @@ Phân vai này là phân công **trình bày**, không thay đổi người th�
 | C — Evaluation | `01_Evaluation_LamaHCEExt`, `hunhthanhnhn`, **Version 4** | Bản chấm **14 run**; output cell 11.1 và thư mục `evaluation_output/` |
 | D — ByBasin | `02_Evaluation_LamaHCEExt_ByBasin`, `hunhthanhnhn`, **Version 2** | Bản có **18 phép so**, `A4=True`; output cell 9.1 và `basin_analysis_output/Figures/` |
 | E — dự phòng huấn luyện | `03_A4_LamaHCEExt_Retrain_Seed111`, `hunhngcthng`, Version 1 | Log huấn luyện và kết quả checkpoint; dùng khi thầy muốn xem bằng chứng chạy thật |
+| G — B1 | `02_B1_LamaHCEExt_Compare`, `hunhngcthng`, **Version 1** | Output Phần 2, 3 và 4; hai hình `B1_Compare.png`, `B1_BasinDelta.png` cho P2-10b |
 | F — A1 và A2 | `01_A1_LamaHCEExt_Explore` Version 2; `01_A2_LamaHCEExt_Reproduce`, `hunhngcthng`, Version 2 | Hình bản đồ, thiếu qmax, bốn mức cho P1-01b; hình A2_CDF cho P2-00 |
 
 Các tab A–D có thể đặt trên cùng một máy. Người đang cầm chuột chuyển màn hình theo lời người nói; tập trước cả thao tác chuyển tab và cuộn đến đầu ra. Nếu dùng hai máy, kiểm trước quyền mở notebook của nhau.
 
 ### 1.3. Xác nhận đúng phiên bản trước buổi báo cáo
 
-Trong tab C, output kết luận phải có `runs: 14`, `A4_contracts_matched: true` và `common_day_IDs: 652628`. Trong tab D phải có `runs: 14`, `contrasts: 18`, `A4_included: true` và `association_rows: 1674`.
+Trong tab C, output kết luận phải có `runs: 14`, `A4_contracts_matched: true` và `common_day_IDs: 652628`. Trong tab D phải có `runs: 14`, `contrasts: 18`, `A4_included: true` và `association_rows: 1674`. Trong tab G, Phần 1 phải báo sha256 khớp 42/42, ba run B1 cùng commit `e794d7c`, ba run A4 cùng `dda45fc`.
 
 Bản chính thức là **Evaluation Version 4** và **ByBasin Version 2**; `.ipynb` trong repo là đúng hai bản này, mã trùng `.py`. `Tables/` và `Figures/` trong repo là Output nguyên byte của hai bản đó (một bộ 14 run duy nhất), nên mở repo hay mở Kaggle đều cùng số.
 
-Các kết quả đã có sẵn để trình bày; mở bản lưu có output. Không bấm chạy lại cell huấn luyện trong buổi báo cáo. Huấn luyện LSTM mất khoảng 2,5–3,2 giờ một lần; dùng log và checkpoint đã lưu để chứng minh kết quả.
+Các kết quả đã có sẵn để trình bày; mở bản lưu có output. Không bấm chạy lại cell huấn luyện trong buổi báo cáo. Huấn luyện LSTM mất khoảng 2,5–3,2 giờ một lần ở A4 và 1,3–2,2 giờ ở B1; dùng log và checkpoint đã lưu để chứng minh kết quả.
 
 ## 2. Cách tìm đúng cell và kết quả thật
 
@@ -463,7 +464,7 @@ Nguồn: [báo cáo A4, kết quả Phần 2](../../Workspace/03_Baseline/03_A4_
 
 **Nếu được hỏi lỗi lưu best model:**
 
-> “Ở A4, nhóm giữ quy trình gốc để đo mốc nền. Riêng ba lần A4 này, nhóm so trọng số `best_model.pt` với trọng số từng epoch: epoch được lưu trùng epoch có NSE validation cao nhất, nên lỗi không ảnh hưởng kết quả A4. Bản sửa đã đưa vào thư viện của nhóm ở bước B1, kèm kiểm thử tự động; ba lần huấn luyện B1 đã hoàn tất; NSE trung vị test lần lượt là 0,7274; 0,7133; 0,7217, còn bộ đánh giá 14 run dưới đây chưa gồm B1.”
+> “Ở A4, nhóm giữ quy trình gốc để đo mốc nền. Riêng ba lần A4 này, nhóm so trọng số `best_model.pt` với trọng số từng epoch: epoch được lưu trùng epoch có NSE validation cao nhất, nên lỗi không ảnh hưởng kết quả A4. Bản sửa đã đưa vào thư viện của nhóm ở bước B1, kèm kiểm thử tự động; ba lần huấn luyện B1 đã hoàn tất; NSE trung vị test lần lượt là 0,7274; 0,7133; 0,7217, còn bộ đánh giá 14 run dưới đây chưa gồm B1. Kết quả B1 trình bày ở cuối Lượt 4.”
 
 Giải thích lỗi chi tiết ở Q19 (Mục 8).
 
@@ -796,6 +797,37 @@ Nguồn: [phân tán LSTM](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEEx
 
 > “Mỗi chấm là một lưu vực. Chấm ở trên đường 0 nghĩa mô hình bên trái có NSE cao hơn mốc so ở lưu vực đó; chấm dưới 0 nghĩa kém hơn. Có thể thấy các điểm phân tán khá rộng, nên một hệ số tương quan không có nghĩa mọi lưu vực đều đi theo cùng một quy luật.”
 
+### P2-10b. B1: LSTM cải tiến đầu tiên so với ba seed A4
+
+**Mở:** tab G, notebook `02_B1_LamaHCEExt_Compare` Version 1, output **Phần 4 — Hình**, hình **B1_Compare.png** rồi **B1_BasinDelta.png**. [Mở hình B1_Compare cục bộ](../../Workspace/05_Training/02_B1_LamaHCEExt_Compare/Figures/B1_Compare.png), [mở hình B1_BasinDelta cục bộ](../../Workspace/05_Training/02_B1_LamaHCEExt_Compare/Figures/B1_BasinDelta.png).
+
+**Chỉ vào (B1_Compare):** ô (a) ba đường xanh nằm trên ba đường cam và ngôi sao ở epoch 10, 8, 3; ô (c) ba điểm B1 nằm trên dải A4 và trên nét chấm của tác giả.
+
+**Lời nói:**
+
+> “Từ mốc A4, nhóm làm bước cải tiến đầu tiên là B1, giữ nguyên kiến trúc LSTM và siêu tham số, chỉ đổi ba điểm: sửa lỗi lưu checkpoint tốt nhất, đưa Q quá khứ về cùng đơn vị mm/ngày với nhãn, và thêm qmax quá khứ làm đầu vào. Số tham số gần như không đổi, 84.801 so với 84.785, và số mẫu train bằng đúng A4.
+>
+> Ô bên trái là NSE validation theo epoch: ba đường B1 nằm trên ba đường A4 ở gần như mọi epoch và dừng sớm hơn. Ô bên phải là NSE trung vị test của checkpoint được chọn: B1 là 0,7274; 0,7133; 0,7217, trung bình 0,7208, so với A4 trung bình 0,7016 và tác giả 0,7053.
+>
+> Mức tăng khoảng 0,019 NSE. Để biết mức này có lớn hơn dao động do seed không, nhóm so với độ lệch chuẩn giữa ba seed A4: 0,019 bằng khoảng 3,4 lần độ lệch chuẩn đó, và khoảng ba seed B1 không chồng lên khoảng ba seed A4.”
+
+**Chuyển sang B1_BasinDelta, chỉ vào:** ô (b), đường đen trung vị ΔNSE theo mức NSE; chấm xanh và cam.
+
+> “Nhìn theo từng lưu vực, B1 tốt hơn A4 ở 326 trên 450 lưu vực. Nếu đòi chặt hơn, cả ba seed B1 cùng cao hơn cả ba seed A4, thì có 121 lưu vực, còn chiều ngược lại chỉ 19. Mức cải thiện lớn nhất ở lưu vực khó, trung vị +0,034 ở nhóm NSE 0–0,5, và nhỏ dần còn khoảng +0,010 ở lưu vực đã dự báo tốt. B1 cũng ổn định hơn khi đổi seed: trung vị độ lệch chuẩn NSE theo lưu vực giảm từ 0,0207 xuống 0,0148.”
+
+**Câu kết điểm dừng:**
+
+> “Nhóm kiểm thêm: áp quy tắc lưu checkpoint cũ lên đúng đường validation của B1 vẫn ra cùng epoch, nên mức tăng ở đây đến từ đầu vào Q, không đến từ bản sửa checkpoint. Kết quả này mới tính trong notebook so sánh B1; dự báo B1 đã xuất theo hợp đồng của bộ đánh giá và sẽ được chấm cùng 14 run bằng các chỉ số phân mức và sự kiện lũ.”
+
+**Cần nói đúng:**
+
+- Khoảng ba seed không phải khoảng tin cậy; dùng “3,4 lần độ lệch chuẩn seed A4” và “khoảng không chồng”, không nói “chắc chắn tốt hơn”.
+- KGE trung vị gần như không đổi (+0,0014); chỉ khẳng định cải thiện NSE.
+- Bảng 14 run, POD và FAR ở Lượt 3 **chưa gồm B1**; không suy ra B1 bắt lũ tốt hơn.
+- Seed 222 có NSE test cao nhất ở epoch 4 (0,7283), cao hơn epoch được chọn; nhóm vẫn giữ checkpoint theo validation.
+
+Nguồn: [báo cáo B1, Phần 2–4](../../Workspace/05_Training/01_B1_LamaHCEExt_Train/01_B1_LamaHCEExt_Train.md#p4), output notebook `02_B1_LamaHCEExt_Compare` Version 1.
+
 ### P2-11. Kết luận và hướng tiếp theo
 
 **Mở:** [báo cáo tiến độ, Mục 8](04_ProgressReport_2026-10-23.md#8-công-việc-tiếp-theo-và-sản-phẩm-bàn-giao), hoặc giữ hình cuối và nói kết luận.
@@ -806,7 +838,7 @@ Nguồn: [phân tán LSTM](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEEx
 >
 > Khi đánh giá sâu hơn, nhóm thấy kỹ năng cả chuỗi chưa đồng nghĩa bắt tốt ngày khởi phát lũ. Phân tích thuộc tính cho biết mức cải thiện còn thay đổi theo loại lưu vực; các liên hệ chính với độ cao, tuyết và độ khô hạn giữ qua ba seed.
 >
-> B1 gồm ba thay đổi trên LSTM nền: sửa lưu checkpoint tốt nhất, đưa Q quá khứ về cùng đơn vị mm/ngày với nhãn, và thêm qmax quá khứ làm đầu vào. Bản sửa checkpoint đã có trong thư viện của nhóm kèm kiểm thử; B1 đã hoàn tất ba seed, có NSE trung vị test 0,7274; 0,7133; 0,7217 theo output chính thức. Bảng 14 run trong buổi trình bày này chưa gồm B1; bước tiếp theo là đưa dự báo B1 qua cùng bộ đánh giá để so với A4. Luồng bộ nạp B2 viết tiếp trên mã B1, tổ chức đầu vào theo nguồn và xử lý nhóm bị thiếu. Sau khi có khung dữ liệu và đánh giá thống nhất, nhóm mới so sánh các lõi LSTM, GRU, Transformer, S4D và Mamba.
+> B1 gồm ba thay đổi trên LSTM nền: sửa lưu checkpoint tốt nhất, đưa Q quá khứ về cùng đơn vị mm/ngày với nhãn, và thêm qmax quá khứ làm đầu vào. Bản sửa checkpoint đã có trong thư viện của nhóm kèm kiểm thử; B1 tăng NSE trung vị test từ 0,7016 lên 0,7208, khoảng 3,4 lần độ lệch chuẩn seed A4, và ổn định hơn khi đổi seed. Bảng 14 run trong buổi trình bày này chưa gồm B1; bước tiếp theo là đưa ba dự báo B1 đã xuất qua cùng bộ đánh giá để xem phân mức và sự kiện lũ. Luồng bộ nạp B2 viết tiếp trên mã B1, tổ chức đầu vào theo nguồn và xử lý nhóm bị thiếu. Sau khi có khung dữ liệu và đánh giá thống nhất, nhóm mới so sánh các lõi LSTM, GRU, Transformer, S4D và Mamba.
 >
 > Các kết quả hôm nay xác lập mốc thực nghiệm và các câu hỏi cần kiểm chứng ở bước cải tiến.”
 
@@ -995,6 +1027,32 @@ Nguồn: [A1 Mục 10](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/0
 
 > “Ngày thiếu nhãn không được dùng để tính loss hay chỉ số; nhóm không tự điền giá trị vào đó. Ảnh hưởng chính là một số trạm có ít mẫu train, như 324, 600, 623 không có nhãn train và 800 chỉ có 38 ngày. Vì vậy, khi đọc kết quả theo từng trạm, nhóm đánh dấu riêng các trạm này thay vì loại khỏi bảng.”
 
+### Q22. B1 thêm qmax quá khứ có làm lộ nhãn ngày đích không?
+
+**Người trả lời chính: Người 2.**
+
+> “Không ạ. qmax quá khứ chỉ đưa vào pha quá khứ, kết thúc ở ngày t−1; ngày t chỉ có dự báo ECMWF HRES. Nhãn là qmax ngày t nên mô hình không thấy nhãn. Số mẫu train cũng bằng đúng A4, 1.094.272, vì cột mới thiếu đúng những ngày qmean thiếu.”
+
+Nguồn: [báo cáo B1, Phần 1](../../Workspace/05_Training/01_B1_LamaHCEExt_Train/01_B1_LamaHCEExt_Train.md); `datasetzoo/basedataset.py` dòng 158–164 ở fork `e794d7c`.
+
+### Q23. NSE tăng mà KGE gần như không đổi thì hiểu thế nào?
+
+**Người trả lời chính: Người 2.**
+
+> “NSE đo sai số bình phương, nên B1 giảm sai số từng ngày. KGE tổng hợp tương quan, tỷ lệ độ biến động và tỷ lệ trung bình; trung vị KGE chỉ tăng 0,0014, khoảng 0,1 lần độ lệch chuẩn seed. Vì vậy nhóm chỉ nói B1 cải thiện NSE, chưa nói cải thiện toàn diện; phân mức và sự kiện lũ của B1 sẽ có khi chấm bằng bộ đánh giá chung.”
+
+### Q24. Cohen's dz của B1 so với A4 chỉ 0,016, có phải hiệu rất nhỏ không?
+
+**Người trả lời chính: Người 2.**
+
+> “Con số đó bị hai lưu vực 742 và 758 làm sai lệch. Hai trạm này có qmax kỳ test gần như hằng số, mẫu số NSE gần 0, nên hiệu NSE ở đó hàng đơn vị và làm độ lệch chuẩn của hiệu rất lớn. Vì vậy nhóm đọc trung vị hiệu, khoảng +0,013 đến +0,017 ở mọi cặp, và số lưu vực tốt hơn, 326 trên 450.”
+
+### Q25. Seed 222 có test cao nhất ở epoch 4, sao không lấy epoch đó?
+
+**Người trả lời chính: Người 2.**
+
+> “Vì chọn theo test là dùng test để điều chỉnh mô hình, kết quả test khi đó không còn khách quan. Nhóm chọn checkpoint bằng NSE validation theo giao thức. Chênh 0,015 ở seed 222 là cái giá của việc không nhìn test, và nằm trong mức dao động test giữa các epoch liền nhau.”
+
 ## 9. Những câu diễn đạt cần sửa khi tập
 
 | Cách nói dễ gây hiểu nhầm | Cách nói dùng trong báo cáo |
@@ -1010,6 +1068,9 @@ Nguồn: [A1 Mục 10](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/0
 | “Ba seed cho thêm ba lần số lượng lưu vực” | “Ba seed là ba kết quả trên cùng tập lưu vực” |
 | “Trung bình ba score là ensemble” | “Đó là tổng hợp chỉ số qua ba lần chạy; chưa tạo dự báo ensemble” |
 | “Từ mô hình có Q cao hơn là chứng minh Q gây cải thiện đúng từng đó” | “Các run hiện có cho chênh lệch; tách riêng ảnh hưởng đầu vào còn cần kiểm soát cấu hình và nhiễu seed” |
+| “B1 chắc chắn tốt hơn A4” | “Trên ba seed, B1 hơn A4 khoảng 0,019 NSE trung vị test, bằng 3,4 lần độ lệch chuẩn seed A4, khoảng hai bước không chồng” |
+| “B1 bắt lũ tốt hơn” | “B1 cải thiện NSE; phân mức và sự kiện lũ của B1 chưa chấm bằng bộ đánh giá chung” |
+| “Sửa lỗi checkpoint làm B1 tốt hơn” | “Bản sửa không đổi epoch được chọn ở seed nào; cải thiện đến từ hai thay đổi đầu vào Q” |
 | “Dataset có thuộc tính này nên chắc chắn qua dataset khác NSE thấp” | “Cần kiểm chứng chuyển miền trên dataset tương ứng” |
 
 ## 10. Lộ trình rút gọn 15 phút
@@ -1021,8 +1082,9 @@ Nguồn: [A1 Mục 10](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/0
 | 2,5–4,5 phút | Người 1 | P1-02 ngắn; bảng 10.7 ở P1-04 | P1-03 chỉ nói một câu; bỏ P1-05 nếu không hỏi NSE âm |
 | 4,5–7 phút | Người 2 | P2-00 một câu "cả sáu đạt, 0,7053"; P2-01 bảng ba seed; P2-02 hình A4_Seeds | Bảng sáu cấu hình A2; P2-03 và bảng kiểm định chi tiết |
 | 7–11 phút | Người 1 | P1-06 phạm vi; P1-07 CDF; P1-09 bảng lũ, thêm một câu từ P1-10 | Bốn mức chỉ nói 1–2 câu; không đọc toàn bộ CSV |
-| 11–14 phút | Người 2 | P2-04/05 định nghĩa ΔNSE/Q1–Q4; P2-06 hình nhóm; P2-07 ba hệ số | Bỏ scatter; POD theo nhóm và seed spread chỉ nói kết luận ngắn |
-| 14–15 phút | Người 2 | P2-11: ba kết luận và bước B1/B2 tiếp theo | Không đọc lại tất cả số liệu |
+| 11–13 phút | Người 2 | P2-04/05 định nghĩa ΔNSE/Q1–Q4; P2-06 hình nhóm; P2-07 ba hệ số | Bỏ scatter; POD theo nhóm và seed spread chỉ nói kết luận ngắn |
+| 13–14,5 phút | Người 2 | P2-10b: hình B1_Compare ô (c) và một câu từ B1_BasinDelta (326/450, 121 so với 19) | Ô (a), (b); kiểm định ghép cặp |
+| 14,5–15 phút | Người 2 | P2-11: kết luận và bước B2 tiếp theo | Không đọc lại tất cả số liệu |
 
 Nếu chỉ có một hình cho phần thuộc tính, ưu tiên **BasinAnalysis_quartile_delta_NSE.png**, vì nhóm thấp/cao và ba seed dễ giải thích trước. Heatmap và seed spread giữ làm bằng chứng bổ sung.
 
@@ -1034,8 +1096,8 @@ Nếu chỉ có một hình cho phần thuộc tính, ưu tiên **BasinAnalysis_
 2. Người 1 nói P1-01, P1-01b rồi P1-02 đến P1-05, tự bấm đến đúng output; Người 2 theo dõi xem có hiểu người nói đang chứng minh điều gì không.
 3. Người 2 nói P2-00 đến P2-03 và chuyển lời; Người 1 mở đúng tab C ngay sau câu chuyển.
 4. Người 1 nói P1-06 đến P1-10; tập đọc POD và FAR đúng mẫu số.
-5. Người 2 nói P2-04 đến P2-11; tập chỉ đúng hàng/cột A4 và phân biệt ΔNSE với NSE.
-6. Mỗi người đặt ba câu hỏi từ Mục 8 cho người kia. Khi không nhớ số lẻ, dùng khoảng đã làm tròn trong kịch bản và mở bảng nguồn để tra.
+5. Người 2 nói P2-04 đến P2-11, gồm P2-10b; tập chỉ đúng hàng/cột A4, phân biệt ΔNSE với NSE và nói rõ bảng 14 run chưa gồm B1.
+6. Mỗi người đặt ba câu hỏi từ Mục 8 (Người 1 hỏi thêm một câu trong Q22–Q25) cho người kia. Khi không nhớ số lẻ, dùng khoảng đã làm tròn trong kịch bản và mở bảng nguồn để tra.
 
 ### 11.2. Trước giờ báo cáo
 
@@ -1044,9 +1106,9 @@ Nếu chỉ có một hình cho phần thuộc tính, ưu tiên **BasinAnalysis_
 - Mở sẵn các tệp CSV với đúng scope, kỳ, hạn, ngưỡng, grouping và cohort; tránh cuộn tìm hàng giữa lúc nói.
 - Người 2 mở được tab ByBasin của Người 1 hoặc Người 1 giữ màn hình đó khi Người 2 thuyết trình.
 - Hình và bảng cục bộ ở repo dùng làm bản trình bày dự phòng; không chép hình số liệu sang thư mục Document.
-- Mở sẵn tab F (A1, A2) cho P1-01b và P2-00; notebook Seed111 để ở tab dự phòng, chỉ mở khi được hỏi.
+- Mở sẵn tab G (B1 Compare) cho P2-10b, tab F (A1, A2) cho P1-01b và P2-00; notebook Seed111 để ở tab dự phòng, chỉ mở khi được hỏi.
 - Bấm giờ một lần theo bản đầy đủ, một lần theo bản 15 phút.
-- Nhớ bốn câu chốt: **đã huấn luyện sáu lần mới; LSTM gần mốc tác giả; NSE tốt chưa đủ cho bắt lũ; liên hệ thuộc tính ổn định chưa phải quan hệ nhân quả.**
+- Nhớ năm câu chốt: **đã huấn luyện chín lần mới; LSTM gần mốc tác giả; NSE tốt chưa đủ cho bắt lũ; liên hệ thuộc tính ổn định chưa phải quan hệ nhân quả; B1 hơn A4 khoảng 0,019 NSE, lớn hơn dao động seed.**
 
 ## 12. Nguồn để tra khi tập nói
 
@@ -1058,6 +1120,7 @@ Nếu chỉ có một hình cho phần thuộc tính, ưu tiên **BasinAnalysis_
 | Tái lập từ trọng số tác giả | [A2](../../Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md) |
 | Huấn luyện DLinear, bảng và chẩn đoán | [A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md), Phần 7–11 |
 | A4, thời gian, epoch, nhiễu seed | [Báo cáo A4](../../Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md), [notebook Compare chính thức](../../Workspace/03_Baseline/04_A4_LamaHCEExt_Compare/04_A4_LamaHCEExt_Compare.ipynb) |
+| B1, so với A4, kiểm định theo lưu vực | [Báo cáo B1](../../Workspace/05_Training/01_B1_LamaHCEExt_Train/01_B1_LamaHCEExt_Train.md), [notebook Compare chính thức](../../Workspace/05_Training/02_B1_LamaHCEExt_Compare/02_B1_LamaHCEExt_Compare.ipynb) |
 | Giao thức và kết quả đánh giá chung | [Evaluation](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md), Mục 10 |
 | Kết luận chạy Evaluation Version 4 | [Evaluation_summary.json](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_summary.json), [kiểm thử](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_checks.csv) |
 | Thuộc tính, nhóm và độ ổn định A4 | [ByBasin, Mục 11](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#11-kết-quả-thực-nghiệm-và-kiểm-chứng) |
