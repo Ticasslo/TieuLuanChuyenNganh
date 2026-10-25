@@ -71,13 +71,13 @@
 | Bước | Trạng thái | Báo cáo |
 |---|---|---|
 | Dữ liệu | Extended LamaH-CE trên Kaggle Dataset `lamah-ce-ext`; LamaH-CE gốc theo giờ ở `lamah-ce-core`, `lamah-ce-extra` (giữ cho khóa luận) | `Document/03_Data/01_LamaHCE.md` |
-| 0 | `fork research` tại `dda45fc` (thêm #280, #264, #295), bước B lên `e794d7c` (sửa lưu mô hình tốt nhất, kiểm thử `test/test_best_model.py`); `mamba-ssm` 2.3.2.post1 + `causal-conv1d` 1.6.2.post1 dựng cho T4, torch 2.11 — xong. Mô hình chung nhận lõi bất kỳ, các lõi, kiểm thử đơn vị — chưa làm | `Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md` |
+| 0 | `fork research` tại `dda45fc` (thêm #280, #264, #295), bước B lên `e794d7c` (sửa lưu mô hình tốt nhất, kiểm thử `test/test_best_model.py`); `mamba-ssm` 2.3.2.post1 + `causal-conv1d` 1.6.2.post1 dựng cho T4, torch 2.11 — xong. Đo bộ nạp (Version 1, 25/10/2026): một epoch B1b kể cả chấm test 12,7 phút, 56% chờ/đọc dữ liệu; để sẵn dữ liệu trên GPU ước 4,6 phút (khóa `data_on_gpu`, nhánh fork `gpu-loader`, đang kiểm). Mô hình chung nhận lõi bất kỳ, các lõi, kiểm thử đơn vị — chưa làm | `Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md`, `02_0_DataLoader_Benchmark/02_0_DataLoader_Benchmark.md` |
 | A2 | Tái lập bằng trọng số tác giả, khớp NSE trung vị cả 6 run (SeqLSTM có Q 0,7053) | `Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md` |
 | A1 | Khảo sát dữ liệu, ngưỡng 4 mức và ngưỡng lũ (người 1) | `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md` |
 | A3 | Persistence, PNSE, KGE, DLinear 3 hạt giống (người 1): persistence 0,350, DLinear 0,380, SeqLSTM có Q 0,705 trên giao chung 450 lưu vực | `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md` |
 | A4 | Huấn luyện lại SeqLSTM có Q, 3 hạt giống: NSE trung vị test 0,6952/0,7038/0,7059 (bài 0,7053 nằm trong khoảng); độ lệch chuẩn NSE trung vị validation 0,0086 (giao thức dừng sớm của tác giả; luật B* dùng độ lệch chuẩn của B0 30 epoch); 2,5–3,2 giờ/lần trên T4; 3 tệp NPZ cho bộ đánh giá | `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md` |
 | Đánh giá | Bộ đánh giá Version 4 chấm 14 run (6 A2, 3 DLinear, 2 persistence, 3 A4) trên test/S0/hạn 1 ngày; phân tích theo đặc điểm lưu vực Version 2, 18 phép so (người 1) | `Workspace/06_Evaluation/01_…md`, `02_…md` |
-| Tiếp theo | Người 1: bộ nạp B2 (dùng thư mục Q `qmean_mmd`, `qmax_mmd`); chấm NPZ B0, B1a, B1b khi người 2 giao. Người 2: notebook đo tốc độ bộ nạp (báo GVHD); B0, B1a, B1b 30 epoch (giao thức mới sau họp 25/10); phần còn lại bước 0 (mô hình chung nhận lõi bất kỳ, các lõi, kiểm thử đơn vị); phần mô hình B2 | `ASSIGNMENT.md` |
+| Tiếp theo | Người 1: bộ nạp B2 (dùng thư mục Q `qmean_mmd`, `qmax_mmd`); chấm NPZ B0, B1a, B1b khi người 2 giao. Người 2: kiểm `data_on_gpu` (kiểm thử đơn vị trên Kaggle CPU, notebook `03_0_GPUData_Check`), báo GVHD kết quả đo bộ nạp; B0, B1a, B1b 30 epoch (giao thức mới sau họp 25/10); phần còn lại bước 0 (mô hình chung nhận lõi bất kỳ, các lõi, kiểm thử đơn vị); phần mô hình B2 | `ASSIGNMENT.md` |
 
 ## 6. Quyết định đã chốt (không hỏi lại, không tranh luận lại)
 
