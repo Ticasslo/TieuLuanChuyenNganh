@@ -164,7 +164,7 @@ Bộ nạp phải bảo đảm cách (b) không đưa dự báo hạn 1 ngày c�
 
 ## 5. Huấn luyện và giao thức so sánh
 
-### 5.1. Cấu hình chung (giữ như bài)
+### 5.1. Cấu hình chung (giữ như bài, trừ dừng sớm)
 
 Theo cấu hình của tác giả (BiasCast Mục 2.2; `02_BasePaper.md` Mục 11): NSE*, Adam lr 10⁻³, CosineAnnealing 30 epoch (nhỏ nhất 10⁻⁵), batch 256, cắt gradient 1, dropout đầu ra 0,3, đã sửa lỗi lưu mô hình tốt nhất.
 
@@ -260,7 +260,7 @@ Số lần huấn luyện ghi dạng "cấu hình × hạt giống". Mỗi bư�
 | A3 | Mốc so sánh, sau A1: persistence (tính lại), PNSE, KGE (r, α, β) cho 6 cấu hình của A2 và persistence, tính trên dự báo đã lưu ở A2; DLinear bản gốc trên `qmean` quá khứ (Mục 4.2), cách chuẩn hóa `qmean` (chung mọi lưu vực hay riêng từng lưu vực) và xử lý ô trống trong 365 ngày quá khứ quyết theo kết quả khảo sát của A1; liệt kê lưu vực có NSE âm lớn ở từng run (Sequential Forecast LSTM có Q, lớp nhúng đơn giản: trung vị 0,71 nhưng trung bình 0,40 theo Bảng F1 — `06_Theory/07_BiasCast5_Experiments.md` Mục 5.6) và so với danh sách lưu vực bất thường của A1 | 1 × 3 | |
 | A4 | Đo thời gian 1 epoch trên T4 (phần đo thời gian của bước 0) rồi huấn luyện lại Sequential Forecast LSTM có lưu lượng quá khứ theo cấu hình tác giả, giữ nguyên cả lỗi lưu mô hình tốt nhất (sửa ở B1) và cách chạy không tất định của thư viện (các bước B, C chạy cùng cách nên nhiễu đo phải gồm phần không tất định của GPU), hạt giống 111 (của tác giả), 222, 333 — đo nhiễu hạt giống dưới giao thức của tác giả; mỗi lần chạy nằm trọn trong một phiên Kaggle vì chạy tiếp không khôi phục trạng thái dừng sớm và lập lịch learning rate (`training/basetrainer.py`) | 1 × 3 | Có độ lệch chuẩn NSE trung vị test và validation giữa hạt giống; 0,7053 của bài nằm trong khoảng [nhỏ nhất, lớn nhất] của 3 hạt giống hoặc cách trung bình không quá 2 độ lệch chuẩn (bài chỉ chạy 1 hạt giống nên không có khoảng của tác giả để so) |
 | B0 | LSTM nền của A4 (cấu hình tác giả, `qmean` theo m³/s) trên fork `e794d7c` (đã sửa lưu mô hình tốt nhất), chạy đủ 30 epoch (Mục 5.1), hạt giống 111, 222, 333 — mốc của bước B và thước đo nhiễu hạt giống cùng giao thức | 1 × 3 | Có độ lệch chuẩn NSE trung vị validation giữa hạt giống (dùng cho B*) |
-| B1a | B0 + Q quá khứ cùng đơn vị mm/ngày với nhãn (`qmean_mmd`; A2 xác nhận tác giả đưa `qmean` theo m³/s, `01_LamaHCE.md` Mục 6.3) — tách riêng đóng góp của đơn vị Q | 1 × 3 | |
+| B1a | B0 + Q quá khứ cùng đơn vị mm/ngày với nhãn (`qmean_mmd`; A2 xác nhận tác giả đưa `qmean` theo m³/s, `01_LamaHCE.md` Mục 6.3) — tách riêng đóng góp của đơn vị Q (bước ablation, không là ứng viên B*) | 1 × 3 | |
 | B1 | B1a + thêm `qmax` quá khứ (`qmax_mmd`) vào nhóm Q. Bản đầu (dừng sớm, `Workspace/05_Training/01_B1_LamaHCEExt_Train/`) cho NSE trung vị test trung bình 0,7208 so với A4 0,7016; chạy lại 30 epoch để so cùng giao thức với B0, B1a | 1 × 3 | |
 | B2 | B1 + nhúng theo nguồn, masked mean + sửa bộ lọc mẫu | 1 × 3 | |
 | B3 | B2 + che dữ liệu khi huấn luyện, hai mức xác suất (0,1/0,12 và 0,05/0,05) | 2 × 3 | |
