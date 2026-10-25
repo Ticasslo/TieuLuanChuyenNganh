@@ -1,6 +1,6 @@
 # Giới thiệu bài cơ sở — BiasCast (HESS 2026)
 
-> Tài liệu trình bày bài báo được chọn làm bài cơ sở cho đề tài *Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy*: nội dung bài, mô hình, chỉ số đánh giá, kết quả, lý do chọn, hạn chế phát hiện khi đọc mã nguồn và phản biện, hướng cải tiến. Pipeline của đề tài: `Document/01_Plan/03_Pipeline.md`.
+> Tài liệu trình bày bài báo được chọn làm bài cơ sở cho đề tài *Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy*: nội dung bài, mô hình, chỉ số đánh giá, kết quả, lý do chọn, hạn chế phát hiện khi đọc mã nguồn và phản biện, hướng cải tiến. Pipeline của đề tài: `Document/01_Plan/02_Pipeline.md`.
 
 ## 1. Thông tin bài báo
 
@@ -154,19 +154,19 @@ Các hạn chế trên không làm sai số liệu công bố, và phần lớn 
 **Phần cốt lõi:**
 
 1. Tái lập bài gốc bằng trọng số của tác giả; bổ sung mốc persistence, PNSE và mốc tuyến tính DLinear; đo nhiễu giữa các hạt giống.
-2. Cải tiến LSTM của bài (tầng 1): giữ mẫu có dữ liệu thiếu bằng masked mean thay vì bỏ cả mẫu; hoàn thiện đầu vào lưu lượng quan trắc (cùng đơn vị với nhãn, Q các ngày trước, xử lý Q thiếu); huấn luyện có bỏ ngẫu nhiên lưu lượng quan trắc để một mô hình dùng được cả khi trạm mất số liệu (hướng tiếp theo do chính tác giả nêu); tổ hợp nhiều hạt giống. Mỗi bước chỉ thêm một thay đổi để đo đóng góp riêng (ablation), mọi lần huấn luyện chạy đủ 30 epoch như lịch cosine của tác giả thay vì dừng sớm, để các mô hình so trên cùng số epoch (`03_Pipeline.md` Mục 5.1, 7).
+2. Cải tiến LSTM của bài (tầng 1): giữ mẫu có dữ liệu thiếu bằng masked mean thay vì bỏ cả mẫu; hoàn thiện đầu vào lưu lượng quan trắc (cùng đơn vị với nhãn, Q các ngày trước, xử lý Q thiếu); huấn luyện có bỏ ngẫu nhiên lưu lượng quan trắc để một mô hình dùng được cả khi trạm mất số liệu (hướng tiếp theo do chính tác giả nêu); tổ hợp nhiều hạt giống. Mỗi bước chỉ thêm một thay đổi để đo đóng góp riêng (ablation), mọi lần huấn luyện chạy đủ 30 epoch như lịch cosine của tác giả thay vì dừng sớm, để các mô hình so trên cùng số epoch (`02_Pipeline.md` Mục 5.1, 7).
 3. Thay lõi LSTM bằng GRU, Transformer, S4D và Mamba ở dạng thuần trên quy trình đã cải tiến (tầng 2), cùng dữ liệu, cùng chia tập, cùng số tham số và cùng ngân sách tinh chỉnh, 3 hạt giống, kiểm định Wilcoxon theo lưu vực; sau đó một biến thể cải tiến cho Mamba và một cho Transformer, mỗi biến thể so với bản thuần của chính nó. S4D là đối chứng để phân biệt "Mamba không phù hợp" với "SSM nói chung không phù hợp".
 4. Thử chuỗi quá khứ 730 ngày cho LSTM, Mamba và S4D — nơi Mamba được kỳ vọng có lợi thế chi phí.
 5. Mở rộng sang dự báo 1–7 ngày bằng dữ liệu sẵn có (chỉ ngày đầu có dự báo ECMWF HRES thật), so ba cách cấp đầu vào: chỉ quá khứ, lai, dự báo hoàn hảo làm cận trên — trả lời hạn chế lớn nhất người phản biện nêu.
 6. Đầu ra xác suất (CMAL) trên cấu hình tốt nhất để có xác suất vượt ngưỡng lũ.
-7. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và dữ liệu đến trễ theo đúng độ trễ của từng nguồn (ERA5-Land khoảng 5 ngày, GLEAM phát hành mỗi năm một lần — `03_Pipeline.md` Mục 3.2); đánh giá theo mức lưu lượng và theo sự kiện lũ chu kỳ lặp lại 1,5; 2; 5; 10 năm; so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
+7. Đánh giá sát vận hành và theo loại lưu vực: kịch bản mất lưu lượng quan trắc 1–7 ngày và dữ liệu đến trễ theo đúng độ trễ của từng nguồn (ERA5-Land khoảng 5 ngày, GLEAM phát hành mỗi năm một lần — `02_Pipeline.md` Mục 3.2); đánh giá theo mức lưu lượng và theo sự kiện lũ chu kỳ lặp lại 1,5; 2; 5; 10 năm; so sánh Mamba với LSTM theo từng lưu vực, tương quan với thuộc tính lưu vực để biết Mamba hơn ở loại lưu vực nào.
 
 **Phần đáp ứng yêu cầu tiểu luận:**
 
 8. Giải thích mô hình (XAI) bằng Integrated Gradients (thư viện Captum) và dò trạng thái ẩn: ngày nào trong quá khứ và nhóm biến nào (tái phân tích, dự báo thời tiết, lưu lượng quan trắc) ảnh hưởng tới dự báo.
-9. Demo (một mục trong trang web của nhóm trên VPS) bản đồ dự báo 1–7 ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực; mô hình chạy thật trên CPU cho lưu vực và ngày được chọn, có thử "nếu… thì…" với dự báo ECMWF HRES (`03_Pipeline.md` Mục 9.6).
+9. Demo (một mục trong trang web của nhóm trên VPS) bản đồ dự báo 1–7 ngày cho 451 lưu vực, tô màu theo ngưỡng chu kỳ lặp lại (return period) của lưu lượng, xem chuỗi lưu lượng và giải thích XAI từng lưu vực; mô hình chạy thật trên CPU cho lưu vực và ngày được chọn, có thử "nếu… thì…" với dự báo ECMWF HRES (`02_Pipeline.md` Mục 9.6).
 
-**Giai đoạn khóa luận:** dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Câu hỏi nghiên cứu, đóng góp, tính mới và ma trận thí nghiệm: `Document/01_Plan/03_Pipeline.md` Mục 1, 7; khóa luận: Mục 11.
+**Giai đoạn khóa luận:** dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật; kết hợp dữ liệu giờ của LamaH-CE gốc; ưu tiên đỉnh lũ trong hàm mất mát; đồ thị mạng sông giữa các lưu vực lồng nhau (ý tưởng từ Kirschstein & Sun); thêm các biến thể lai; nâng demo thành phần mềm ứng dụng. Câu hỏi nghiên cứu, đóng góp, tính mới và ma trận thí nghiệm: `Document/01_Plan/02_Pipeline.md` Mục 1, 7; khóa luận: Mục 11.
 
 ## 11. Pipeline và kiến trúc chi tiết của bài (đọc từ mã)
 

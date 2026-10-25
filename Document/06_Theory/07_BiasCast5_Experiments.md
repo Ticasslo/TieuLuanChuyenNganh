@@ -7,7 +7,7 @@ Ký hiệu nguồn giữ như Phần 4:
 - **[Bài]**: bản chữ `PaperResearch/PaperResearchPDF/BasePaper/Konold2026_HESS_BiasCast_FullText.md`, kèm số dòng.
 - **[Mã]**: mã NeuralHydrology trong bản fork của tác giả, thư mục `PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/`, ghi tên tệp và số dòng.
 - **[Mã tác giả]**: mã phân tích và chạy thí nghiệm của tác giả, thư mục `PaperResearch/PaperResearchCode/BiasCast/`.
-- **[Cơ sở]**: `02_BasePaper.md`, kèm mục.
+- **[Cơ sở]**: `01_BasePaper.md`, kèm mục.
 - **[LamaH]**: `01_LamaHCE.md`, kèm mục.
 
 Thuật ngữ tiếng Anh dùng trong Phần 5 (tên trong mã để trong ngoặc):
@@ -92,7 +92,7 @@ Hai số đầu khớp đúng số tham số đếm từ trọng số tác giả
 
 *(a) Vì sao gọi là "CUDA LSTM".* Tên mô hình trong NeuralHydrology là `cudalstm`, vì nó dùng `nn.LSTM` của PyTorch (chạy bằng thư viện cuDNN trên GPU, có bản CPU), khác `customlstm` viết tay từng cổng để đọc được trạng thái bên trong ([Mã] `modelzoo/cudalstm.py`, `modelzoo/customlstm.py`). Không liên quan tới việc "chỉ chạy được trên GPU".
 
-*(b) Ý nghĩa cho đề tài.* Đề tài giữ 𝒟FC và 𝒟RA làm mốc dưới, mốc trên cho mọi lõi (A2 đã tái lập), thêm persistence và DLinear ở A3 làm mốc "không cần học sâu" (`03_Pipeline.md` Mục 7). Cách (c) "dự báo hoàn hảo" ở bước H (dự báo 1–7 ngày) chính là ý của 𝒟RA mở rộng ra nhiều ngày: thay dự báo bằng tái phân tích để biết cận trên.
+*(b) Ý nghĩa cho đề tài.* Đề tài giữ 𝒟FC và 𝒟RA làm mốc dưới, mốc trên cho mọi lõi (A2 đã tái lập), thêm persistence và DLinear ở A3 làm mốc "không cần học sâu" (`02_Pipeline.md` Mục 7). Cách (c) "dự báo hoàn hảo" ở bước H (dự báo 1–7 ngày) chính là ý của 𝒟RA mở rộng ra nhiều ngày: thay dự báo bằng tái phân tích để biết cận trên.
 
 **Câu hỏi tự kiểm tra (Mục 5.1):**
 
@@ -153,7 +153,7 @@ Lưu ý: bài không chạy thí nghiệm "chỉ ngày t là ECMWF HRES" với �
 
 #### Điều 3 — Đề tài dùng lại ở đâu
 
-Ở bước H (dự báo 1–7 ngày), cách (c) "dự báo hoàn hảo" dùng 5 biến tái phân tích này cho các ngày tương lai để làm cận trên, riêng cặp bức xạ đổi sang `EOBS_qq` (bức xạ tới mặt đất, cùng đại lượng với `ECMWF_ssrd`) (`03_Pipeline.md` Mục 4.4). Cross-Domain cho thấy trước: khoảng cách giữa "thời tiết đúng" và "thời tiết dự báo" có thể lớn cỡ 0,25 NSE.
+Ở bước H (dự báo 1–7 ngày), cách (c) "dự báo hoàn hảo" dùng 5 biến tái phân tích này cho các ngày tương lai để làm cận trên, riêng cặp bức xạ đổi sang `EOBS_qq` (bức xạ tới mặt đất, cùng đại lượng với `ECMWF_ssrd`) (`02_Pipeline.md` Mục 4.4). Cross-Domain cho thấy trước: khoảng cách giữa "thời tiết đúng" và "thời tiết dự báo" có thể lớn cỡ 0,25 NSE.
 
 Câu hỏi "lưu vực nào bị hại nhiều nhất và vì sao" (khoảng cách phân phối, địa hình) để ở Phần 6.
 
@@ -238,7 +238,7 @@ Có `qmean` (32 biến quá khứ, nhúng quá khứ 528) thì mỗi mô hình t
 - Bài chạy ba biến thể Encoder–Decoder ([Bài] dòng 134): (1) cơ bản; (2) thêm `qmean` vào pha quá khứ (Mục 5.6); (3) thêm dự báo lưu trữ vào pha quá khứ (Mục 5.5).
 - Mọi cấu hình Sequential và Encoder–Decoder dùng chung một bộ siêu tham số: 128 chiều ẩn, lô 256, dropout 0,3 ([Cơ sở] Mục 11.3). Bài không nói tối ưu Bayes chạy riêng cho từng kiến trúc hay không.
 - A2 tái lập hai run Encoder–Decoder (nhúng phức tạp): có `qmean` 0,6622, không `qmean` 0,569, khớp bài ([LamaH] Mục 6.3). Run không `qmean` có cảnh báo hệ số tương quan r của KGE không xác định ở ít nhất 1 lưu vực, sẽ xem ở bước A3.
-- Đề tài **không** đưa Encoder–Decoder vào so sánh lõi ở bước C: khung chung của đề tài là Sequential Forecast nhận lõi bất kỳ (`03_Pipeline.md` Mục 4), vì Sequential là mô hình tốt nhất của bài.
+- Đề tài **không** đưa Encoder–Decoder vào so sánh lõi ở bước C: khung chung của đề tài là Sequential Forecast nhận lõi bất kỳ (`02_Pipeline.md` Mục 4), vì Sequential là mô hình tốt nhất của bài.
 
 **Câu hỏi tự kiểm tra (Mục 5.3):**
 
@@ -389,7 +389,7 @@ Bài không tách nguyên nhân. Một số lý do hợp lý, đều chưa kiể
 #### Chi tiết kỹ thuật (đọc sau, không bắt buộc)
 
 - Từ đây, Bảng F1 cùng các tệp cấu hình cho phép đọc ra quy ước tên run: "Encoder Decoder LSTM" không ghi gì là bản lớp nhúng phức tạp (0,57; A2 tái lập 0,569 cho run `..._Complex_Embedding`), còn "Sequential Forecast LSTM" không ghi gì là bản lớp nhúng đơn giản (0,63; tệp cấu hình trên trỏ `..._Simple_Embedding`). Hai mô hình chính của bài vì thế không cùng loại lớp nhúng.
-- Đề tài không đưa dự báo lưu trữ vào pha quá khứ ở bước B–C. Pha quá khứ của đề tài được làm khác: nhúng theo nguồn và masked mean (bước B2, `03_Pipeline.md`).
+- Đề tài không đưa dự báo lưu trữ vào pha quá khứ ở bước B–C. Pha quá khứ của đề tài được làm khác: nhúng theo nguồn và masked mean (bước B2, `02_Pipeline.md`).
 
 **Câu hỏi tự kiểm tra (Mục 5.5):**
 
@@ -461,7 +461,7 @@ Tái lập ở A2 khớp bài: Sequential có `qmean` 0,7053, không `qmean` 0,6
 #### Chi tiết kỹ thuật (đọc sau, không bắt buộc)
 
 - Bộ nạp đọc `qmean` thẳng từ tệp khí tượng của từng lưu vực, cột do tác giả dựng sẵn trong thư mục `LamaH_expanded_q_input` ([LamaH] Mục 6.3).
-- Đề tài giữ `qmean` trong mọi mô hình chính và sửa thêm ở bước B (`03_Pipeline.md` Mục 7): B1a đưa Q về cùng đơn vị với nhãn, B1b thêm `qmax` quá khứ; B2 xử lý ô trống bằng masked mean thay vì bỏ mẫu; B3 cố ý che ngẫu nhiên một phần Q khi huấn luyện, để mô hình chịu được lúc trạm mất số liệu. Kịch bản vận hành S0–S4 (`03_Pipeline.md` Mục 6.3) đo mô hình khi Q và tái phân tích đến trễ.
+- Đề tài giữ `qmean` trong mọi mô hình chính và sửa thêm ở bước B (`02_Pipeline.md` Mục 7): B1a đưa Q về cùng đơn vị với nhãn, B1b thêm `qmax` quá khứ; B2 xử lý ô trống bằng masked mean thay vì bỏ mẫu; B3 cố ý che ngẫu nhiên một phần Q khi huấn luyện, để mô hình chịu được lúc trạm mất số liệu. Kịch bản vận hành S0–S4 (`02_Pipeline.md` Mục 6.3) đo mô hình khi Q và tái phân tích đến trễ.
 
 **Câu hỏi tự kiểm tra (Mục 5.6):**
 

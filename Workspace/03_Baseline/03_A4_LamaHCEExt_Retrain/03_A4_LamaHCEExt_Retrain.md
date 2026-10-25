@@ -207,9 +207,9 @@ Trọng số mọi epoch, kết quả validation mỗi epoch, kết quả test v
 
 | Số đo ở A4 | Dùng ở |
 |---|---|
-| Độ lệch chuẩn NSE trung vị validation giữa hạt giống: 0,0086 | Mức nhiễu dưới giao thức dừng sớm của tác giả; luật chọn B* dùng độ lệch chuẩn đo lại ở B0 theo giao thức 30 epoch (`03_Pipeline.md` Mục 5.3, 7) |
+| Độ lệch chuẩn NSE trung vị validation giữa hạt giống: 0,0086 | Mức nhiễu dưới giao thức dừng sớm của tác giả; luật chọn B* dùng độ lệch chuẩn đo lại ở B0 theo giao thức 30 epoch (`02_Pipeline.md` Mục 5.3, 7) |
 | Độ lệch chuẩn NSE trung vị test: 0,0056; khoảng 0,0106 | Đọc chênh lệch NSE trung vị giữa các mô hình ở B, C |
 | Trung vị độ lệch chuẩn NSE theo lưu vực: 0,0207 (0,009–0,034 tùy mức NSE) | Đọc chênh lệch từng lưu vực, phân tích theo lưu vực |
 | Hai lần chạy chỉ khác hạt giống vẫn khác nhau với p Holm < 0,05 | So sánh mô hình phải kèm độ lớn hiệu và nhiều hạt giống, không chỉ p |
-| Một lần huấn luyện 2,5–3,2 giờ (khoảng 9,5 phút/epoch, validation chiếm khoảng 38%), tối đa khoảng 4,7 giờ nếu chạy đủ 30 epoch | Ngân sách và lịch (`03_Pipeline.md` Mục 8.1, 9.7) |
+| Một lần huấn luyện 2,5–3,2 giờ (khoảng 9,5 phút/epoch, validation chiếm khoảng 38%), tối đa khoảng 4,7 giờ nếu chạy đủ 30 epoch | Ngân sách và lịch (`02_Pipeline.md` Mục 8.1, 9.7) |
 | Ba tệp NPZ của mô hình nền | Bộ đánh giá chấm mô hình nền huấn luyện lại cùng các mốc A3; mốc so sánh cho bước B |

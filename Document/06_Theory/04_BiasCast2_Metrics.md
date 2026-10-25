@@ -4,7 +4,7 @@ Phần 2 của ghi chú học BiasCast (Phần 1: `03_BiasCast1_Overview.md`). K
 
 - **[Bài]**: bản chữ `PaperResearch/PaperResearchPDF/BasePaper/Konold2026_HESS_BiasCast_FullText.md`, kèm số dòng.
 - **[Mã]**: mã NeuralHydrology trong bản fork của tác giả, thư mục `PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/`, ghi tên tệp và số dòng.
-- **[Cơ sở]**: `01_Plan/02_BasePaper.md`, kèm mục.
+- **[Cơ sở]**: `01_Plan/01_BasePaper.md`, kèm mục.
 - **[LamaH]**: `03_Data/01_LamaHCE.md` (ghi chú dữ liệu của đề tài), kèm mục.
 
 Nội dung Phần 2: chỉ số NSE; cách bài tổng hợp NSE của 451 lưu vực; mốc trên và mốc dưới; độ suy giảm khi đổi miền dữ liệu; chênh lệch NSE theo lưu vực; giới hạn của NSE và các chỉ số đề tài thêm (KGE, persistence và PNSE, kiểm định Wilcoxon). Mỗi mục có ví dụ số tự đặt, ghi rõ "minh họa".
@@ -384,7 +384,7 @@ Kết quả của bài ([Bài] dòng 320):
 | Không có cận dưới: một lưu vực hỏng kéo trung bình sập | Mục 2.2 |
 | Một con số cho mọi kiểu sai: nhìn NSE không biết mô hình sai kiểu gì | mục này |
 
-BiasCast chỉ báo cáo NSE. Đề tài giữ NSE để so trực tiếp với bài, và thêm các chỉ số dưới đây (`01_Plan/03_Pipeline.md` Mục 6.1, 6.2).
+BiasCast chỉ báo cáo NSE. Đề tài giữ NSE để so trực tiếp với bài, và thêm các chỉ số dưới đây (`01_Plan/02_Pipeline.md` Mục 6.1, 6.2).
 
 **Bước 1 — chuỗi ví dụ.** Một lưu vực, 10 ngày, qmax đo thật (mm/ngày, minh họa): 2; 2; 3; 8; 12; 7; 4; 3; 2; 2. Nước lên từ ngày 3, đỉnh 12 vào ngày 5, rút dần tới ngày 10. Trung bình 4,5; mẫu số của NSE (sai số của "luôn đoán 4,5") = 104,5.
 
@@ -548,7 +548,7 @@ Ví dụ đọc một lưu vực (minh họa): NSE 0,80; NSEₚ 0,75; PNSE 0,20;
 
 Các hình của mục này sinh bằng `Tools/Theory_Figures.py`.
 
-**Các cách đánh giá khác đề tài thêm** (chi tiết ở `01_Plan/03_Pipeline.md` Mục 6):
+**Các cách đánh giá khác đề tài thêm** (chi tiết ở `01_Plan/02_Pipeline.md` Mục 6):
 
 | Cách | Hỏi điều gì |
 |---|---|
@@ -568,7 +568,7 @@ Các hình của mục này sinh bằng `Tools/Theory_Figures.py`.
 3. Nếu A và B ngang nhau thì W⁺ và W⁻ phải xấp xỉ nhau. Kiểm định tính p: xác suất ra kết quả lệch như vậy hoặc hơn khi hai mô hình thật ra ngang nhau. Ở đây p = 0,0625.
 4. Quy ước thường dùng: p < 0,05 thì coi chênh lệch là thật. Ở đây chưa đủ bằng chứng dù A thắng 5/6 lưu vực, vì 6 lưu vực quá ít (với 6 lưu vực, p nhỏ nhất có thể là 0,03125). Nếu A thắng 3, thua 3 (đổi dấu lưu vực 2 và 6) thì W⁺ = 9, W⁻ = 12, p = 0,84: không có khác biệt.
 
-Ghép cặp loại được chênh lệch do lưu vực dễ hay khó; dùng hạng nên một lưu vực NSE rất âm không làm sai kết quả (cùng lý do bài dùng trung vị). Với 451 lưu vực, chênh lệch rất nhỏ cũng có thể cho p nhỏ, nên đề tài báo cáo kèm cỡ hiệu ứng (chênh lệch lớn hay nhỏ); khi so nhiều cặp mô hình cùng lúc, hiệu chỉnh Holm làm ngưỡng chặt hơn để tránh "so nhiều lần kiểu gì cũng trúng một lần" (`01_Plan/03_Pipeline.md` Mục 6).
+Ghép cặp loại được chênh lệch do lưu vực dễ hay khó; dùng hạng nên một lưu vực NSE rất âm không làm sai kết quả (cùng lý do bài dùng trung vị). Với 451 lưu vực, chênh lệch rất nhỏ cũng có thể cho p nhỏ, nên đề tài báo cáo kèm cỡ hiệu ứng (chênh lệch lớn hay nhỏ); khi so nhiều cặp mô hình cùng lúc, hiệu chỉnh Holm làm ngưỡng chặt hơn để tránh "so nhiều lần kiểu gì cũng trúng một lần" (`01_Plan/02_Pipeline.md` Mục 6).
 
 ### 2.7. Tóm tắt Phần 2
 

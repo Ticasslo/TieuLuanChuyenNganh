@@ -94,7 +94,7 @@ Cell tự đủ, không dùng biến của Phần 1–8: tìm `build_info.json` 
 - Lõi Mamba chạy được trên Kaggle T4 với torch 2.11; nhân CUDA tính đúng theo bộ test của tác giả.
 - Huấn luyện Mamba trên GPU không lặp lại y hệt từng bit kể cả khi cùng hạt giống và bật chế độ tất định (mức lệch đạo hàm khoảng 1e-5). Khi đọc nhiễu giữa các hạt giống ở A4 và bước C, phần lệch này nằm trong nhiễu của lõi Mamba.
 - Ở kích thước của đề tài, một lượt xuôi + ngược của khối Mamba chậm hơn `nn.LSTM` (cuDNN) khoảng 2,3 lần và dùng ít bộ nhớ hơn.
-- Trọng số huấn luyện bằng `mamba_ssm` nạp thẳng vào `mambapy` cho demo chạy CPU (D2–D4, `03_Pipeline.md` Mục 9.6) và cho cùng kết quả.
+- Trọng số huấn luyện bằng `mamba_ssm` nạp thẳng vào `mambapy` cho demo chạy CPU (D2–D4, `02_Pipeline.md` Mục 9.6) và cho cùng kết quả.
 
 <a id="5"></a>
 ## 5. Cách dùng ở notebook khác

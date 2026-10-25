@@ -217,7 +217,7 @@ def fig_persistence():
 
 # %% Phần 3 - Hình của Phần 3 BiasCast
 QMAX_10 = [1.2, 0.8, 5.0, 2.1, 1.0, 0.9, 3.4, 1.5, 0.7, 1.1]   # 10 ngày qmax của ví dụ Mục 3.5 (mm/ngày)
-LEVELS = [  # (tên, p đầu, p cuối, màu nền, số ngày trung bình mỗi năm) - bốn mức của 03_Pipeline.md Mục 6.2
+LEVELS = [  # (tên, p đầu, p cuối, màu nền, số ngày trung bình mỗi năm) - bốn mức của 02_Pipeline.md Mục 6.2
     ("Very high", 0.0, 0.02, "#f4cccc", 7),
     ("High", 0.02, 0.2, "#fce5cd", 66),
     ("Medium", 0.2, 0.7, "#d9ead3", 183),

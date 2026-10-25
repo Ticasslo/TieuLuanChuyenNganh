@@ -1,6 +1,6 @@
 # Bộ đánh giá dự báo lưu lượng — Extended LamaH-CE
 
-Tài liệu đi cùng [mã Python](01_Evaluation_LamaHCEExt.py) và [notebook](01_Evaluation_LamaHCEExt.ipynb) (bản chính thức: Version 4 của notebook Kaggle `01_Evaluation_LamaHCEExt`, Save & Run All trên CPU, có output), thực hiện việc #5 trong [phân công](../../../ASSIGNMENT.md) và [pipeline Mục 6](../../../Document/01_Plan/03_Pipeline.md#6-đánh-giá). Bộ đánh giá đọc dự báo đã lưu, tính chỉ số, đánh giá bốn mức và sự kiện lũ, so sánh theo cặp lưu vực, rồi xuất CSV/PNG/JSON trực tiếp cho Kaggle Save Version.
+Tài liệu đi cùng [mã Python](01_Evaluation_LamaHCEExt.py) và [notebook](01_Evaluation_LamaHCEExt.ipynb) (bản chính thức: Version 4 của notebook Kaggle `01_Evaluation_LamaHCEExt`, Save & Run All trên CPU, có output), thực hiện việc #5 trong [phân công](../../../ASSIGNMENT.md) và [pipeline Mục 6](../../../Document/01_Plan/02_Pipeline.md#6-đánh-giá). Bộ đánh giá đọc dự báo đã lưu, tính chỉ số, đánh giá bốn mức và sự kiện lũ, so sánh theo cặp lưu vực, rồi xuất CSV/PNG/JSON trực tiếp cho Kaggle Save Version.
 
 **S0** là kịch bản không che thêm đầu vào; dữ liệu gốc vẫn có thể thiếu. **Hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Một **ngày–lưu vực** là một ngày tại một ID; **mặt nạ** là bảng True/False chọn các cặp đó để chấm. **Giao chung** chỉ giữ ngày–lưu vực có quan trắc, persistence và dự báo của mọi run cùng hữu hạn.
 
@@ -68,7 +68,7 @@ Ma trận nhầm lẫn có hàng là mức quan trắc, cột là mức dự bá
 
 ## 5. Sự kiện lũ và cờ kiểm duyệt
 
-Ngưỡng lấy từ `half_calendar_primary` của A1 cho T = 1,5; 2; 5; 10 năm, giữ số năm fit theo từng lưu vực. Bộ đánh giá áp cùng ngưỡng và quy tắc cho obs/sim; xuất cả đoạn liên tiếp và cụm USWRC. [Giao thức đã chốt](../../../Document/01_Plan/03_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd).
+Ngưỡng lấy từ `half_calendar_primary` của A1 cho T = 1,5; 2; 5; 10 năm, giữ số năm fit theo từng lưu vực. Bộ đánh giá áp cùng ngưỡng và quy tắc cho obs/sim; xuất cả đoạn liên tiếp và cụm USWRC. [Giao thức đã chốt](../../../Document/01_Plan/02_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd).
 
 Một đoạn gồm các ngày liên tiếp có Q **lớn hơn** ngưỡng. Quy tắc gộp xét khoảng cách đỉnh tối thiểu ceil[5 + ln(A dặm vuông)] và yêu cầu đáy giữa hai đỉnh thấp hơn 0,75 lần đỉnh nhỏ hơn; chưa đủ một trong hai điều kiện thì gộp. Sau gộp, kiểm lại cụm kề. Đồng đỉnh dùng ngày đỉnh cuối bên trái và đầu bên phải để tính khoảng cách gần nhất. [HEC-USACE giải thích khoảng cách theo diện tích](https://www.hec.usace.army.mil/confluence/sspdocs/sspum/latest/peaks-over-threshold-analysis/peaks-over-threshold-filtering).
 

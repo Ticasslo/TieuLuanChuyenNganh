@@ -106,7 +106,7 @@ A2 chỉ kiểm suy luận trên trọng số có sẵn. A4 huấn luyện lại
 | Hạt giống 333 | 14 | 19 | 3,08 | 0,7574 | 0,7059 | 0,7860 |
 | Tác giả | – | – | – | – | 0,7053 | 0,7671 |
 
-Ba hạt giống cho NSE trung vị test 0,7016 ± 0,0056 (trung bình ± độ lệch chuẩn); giá trị của tác giả nằm trong khoảng [0,6952; 0,7059] nên A4 đạt. Độ lệch chuẩn NSE trung vị validation giữa ba hạt giống là **0,0086**, đo dưới giao thức dừng sớm của tác giả; luật chọn cấu hình B* dùng độ lệch chuẩn đo lại ở B0 theo giao thức 30 epoch (`03_Pipeline.md` Mục 5.3, 7). Cùng hạt giống 111 với tác giả nhưng không cho cùng mô hình, vì phiên bản thư viện, phần cứng và phép tính GPU khác nhau.
+Ba hạt giống cho NSE trung vị test 0,7016 ± 0,0056 (trung bình ± độ lệch chuẩn); giá trị của tác giả nằm trong khoảng [0,6952; 0,7059] nên A4 đạt. Độ lệch chuẩn NSE trung vị validation giữa ba hạt giống là **0,0086**, đo dưới giao thức dừng sớm của tác giả; luật chọn cấu hình B* dùng độ lệch chuẩn đo lại ở B0 theo giao thức 30 epoch (`02_Pipeline.md` Mục 5.3, 7). Cùng hạt giống 111 với tác giả nhưng không cho cùng mô hình, vì phiên bản thư viện, phần cứng và phép tính GPU khác nhau.
 
 Theo lưu vực, trung vị độ lệch chuẩn NSE qua ba hạt giống là 0,021 và giảm dần khi lưu vực được dự báo tốt hơn: 0,034 ở nhóm NSE 0–0,5, 0,027 ở 0,5–0,7, 0,020 ở 0,7–0,85 và 0,009 ở nhóm từ 0,85 trở lên. Mô hình của tác giả nằm trong khoảng của ba hạt giống ở 52,2% lưu vực, gần mức 50% kỳ vọng nếu nó chỉ là một lần chạy nữa cùng phân phối. Hai lưu vực 742 và 758 có nhãn gần như hằng số nên NSE dao động rất lớn giữa các lần chạy (Mục 6.7).
 

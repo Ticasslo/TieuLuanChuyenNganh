@@ -1,6 +1,6 @@
 # Kiến trúc và pipeline của đề tài
 
-> Tài liệu gốc của đề tài: câu hỏi nghiên cứu, đóng góp và tính mới, dữ liệu và bộ nạp, kiến trúc mô hình, giao thức huấn luyện và so sánh công bằng, bộ đánh giá, ma trận thí nghiệm theo bước, ngân sách tính toán, rủi ro, phạm vi tiểu luận và khóa luận. Bài cơ sở: BiasCast (Konold và cs., HESS 2026) — `Document/01_Plan/02_BasePaper.md`. Dữ liệu: `Document/03_Data/01_LamaHCE.md`. Ý tưởng và căn cứ: `Document/04_Ideas/01_Ideas.md`. Ghi chú từng tài liệu: `Document/05_Survey/03_PaperNotes.md`. Các mục ghi "chưa chốt" chờ quyết định. Mọi nhận định "chưa có công trình nào" dựa trên tra cứu tới ngày 7/10/2026 và được ghi kèm công trình gần nhất đã biết.
+> Tài liệu gốc của đề tài: câu hỏi nghiên cứu, đóng góp và tính mới, dữ liệu và bộ nạp, kiến trúc mô hình, giao thức huấn luyện và so sánh công bằng, bộ đánh giá, ma trận thí nghiệm theo bước, ngân sách tính toán, rủi ro, phạm vi tiểu luận và khóa luận. Bài cơ sở: BiasCast (Konold và cs., HESS 2026) — `Document/01_Plan/01_BasePaper.md`. Dữ liệu: `Document/03_Data/01_LamaHCE.md`. Ý tưởng và căn cứ: `Document/04_Ideas/01_Ideas.md`. Ghi chú từng tài liệu: `Document/05_Survey/03_PaperNotes.md`. Các mục ghi "chưa chốt" chờ quyết định. Mọi nhận định "chưa có công trình nào" dựa trên tra cứu tới ngày 7/10/2026 và được ghi kèm công trình gần nhất đã biết.
 
 ---
 
@@ -132,7 +132,7 @@ Bản fork đã có `nan_step_probability`, `nan_sequence_probability` (`basedat
 
 | Khối | Đầu vào → đầu ra | Ghi chú |
 |---|---|---|
-| Nhúng hindcast | Mỗi nhóm nguồn → d chiều; masked mean qua các nhóm; nối nhúng thuộc tính tĩnh | Lớp tuyến tính như cấu hình tốt nhất của bài (`02_BasePaper.md` Mục 11; 16 chiều + 16 chiều tĩnh) |
+| Nhúng hindcast | Mỗi nhóm nguồn → d chiều; masked mean qua các nhóm; nối nhúng thuộc tính tĩnh | Lớp tuyến tính như cấu hình tốt nhất của bài (`01_BasePaper.md` Mục 11; 16 chiều + 16 chiều tĩnh) |
 | Nhúng forecast | 5 biến ECMWF HRES → d chiều; nối nhúng tĩnh | Cùng số chiều với hindcast |
 | Lõi thời gian | Chuỗi 365 bước (364 hindcast + 1 forecast) → biểu diễn bước cuối | Thay được: LSTM, GRU, Transformer, S4D, Mamba |
 | Đầu ra | Bước cuối → qmax ngày t | Hồi quy hoặc CMAL (bước F) |
@@ -143,14 +143,14 @@ Bản fork đã có `nan_step_probability`, `nan_sequence_probability` (`basedat
 
 | Lõi | Cài đặt | Vai trò |
 |---|---|---|
-| LSTM | `nn.LSTM`, forget bias 3 như bài (`02_BasePaper.md` Mục 11.2) | Mốc chính |
+| LSTM | `nn.LSTM`, forget bias 3 như bài (`01_BasePaper.md` Mục 11.2) | Mốc chính |
 | GRU | `nn.GRU` | Mốc hồi quy rút gọn (3 khối cổng so với 4 của LSTM): tách lợi thế của cấu trúc cổng LSTM khỏi lợi thế của họ hồi quy nói chung. Bằng chứng trái chiều: GRU ngang LSTM với ít tham số hơn (Gao và cs., J. Hydrol. 589:125188, 2020), kém LSTM khi cùng độ sâu và số chiều ẩn (Demiray & Demir, Scientific Reports 2026); Demiray & Demir (EarthArXiv) dùng bộ mốc LSTM, GRU, Transformer khi so với Mamba. Ở cùng số tham số GRU được số chiều ẩn lớn hơn nên không kỳ vọng nhanh hơn LSTM; thời gian đo ở Mục 6.5 |
 | Transformer | Bộ mã hóa pre-LayerNorm, mặt nạ nhân quả, mã hóa vị trí sin, lấy đầu ra bước cuối; khởi điểm từ `transformer.py` của NeuralHydrology | Mốc attention; Liu và cs. (2024) cho thấy bản cơ bản thua LSTM |
 | S4D | Khối S4D (Gu và cs., NeurIPS 2022) có kết nối tắt và LayerNorm; siêu tham số khởi điểm theo S4D-FT (d_state, min_dt 0,01, max_dt 0,1, lr riêng cho tham số SSM) | Đối chứng SSM bất biến thời gian — tách "Mamba không hợp" khỏi "SSM không hợp" |
 | Mamba | Khối `mamba_ssm.Mamba` có kết nối tắt và LayerNorm, đầu vào dạng (batch, length, dim); dự phòng `mambapy` (PyTorch thuần) nếu không cài được kernel CUDA | Lõi chính của đề tài |
 | DLinear | Đúng bản gốc (Zeng và cs., AAAI 2023; mã `cure-lab/LTSF-Linear`, `models/DLinear.py`): mỗi biến tự dự báo từ quá khứ của chính nó, không trộn biến, nên không dùng được thời tiết. Đầu vào `qmean` 365 ngày t − 365 … t − 1 (dịch lùi 1 ngày bằng `lagged_features` để không rò rỉ `qmean` ngày t), trung bình trượt 25 ngày tách xu hướng – dao động, mỗi phần một lớp tuyến tính 365 → 1, cộng lại ra `qmax` ngày t | Mốc tuyến tính trên lưu lượng quá khứ (giữa persistence và học sâu), không phải lõi so sánh |
 
-Lớp `mamba.py` có sẵn của NeuralHydrology quét sai trục (`02_BasePaper.md` Mục 11.5) nên không dùng.
+Lớp `mamba.py` có sẵn của NeuralHydrology quét sai trục (`01_BasePaper.md` Mục 11.5) nên không dùng.
 
 ### 4.3. Biến thể cải tiến (bước E)
 
@@ -183,7 +183,7 @@ Bộ nạp phải bảo đảm cách (b) không đưa dự báo hạn 1 ngày c�
 
 ### 5.1. Cấu hình chung (giữ như bài, trừ dừng sớm)
 
-Theo cấu hình của tác giả (BiasCast Mục 2.2; `02_BasePaper.md` Mục 11): NSE*, Adam lr 10⁻³, CosineAnnealing 30 epoch (nhỏ nhất 10⁻⁵), batch 256, cắt gradient 1, dropout đầu ra 0,3, đã sửa lỗi lưu mô hình tốt nhất.
+Theo cấu hình của tác giả (BiasCast Mục 2.2; `01_BasePaper.md` Mục 11): NSE*, Adam lr 10⁻³, CosineAnnealing 30 epoch (nhỏ nhất 10⁻⁵), batch 256, cắt gradient 1, dropout đầu ra 0,3, đã sửa lỗi lưu mô hình tốt nhất.
 
 Khác bài gốc ở một điểm: **không dừng sớm, mọi lần huấn luyện chạy đủ 30 epoch**. Bài dừng khi NSE validation không tăng quá 0,005 trong 5 epoch (BiasCast, phụ lục tối ưu siêu tham số), nên các lần chạy dừng ở số epoch khác nhau (A4: 16–20) và lịch cosine (T_max 30) bị cắt giữa chừng. Chạy đủ 30 epoch là hết đúng một chu kỳ cosine của tác giả, các mô hình được so trên cùng số epoch và đường học đủ dài để thấy có tụt sau đỉnh hay không (góp ý GVHD, biên bản 25/10/2026 Mục 2.2, 2.3). `best_model.pt` vẫn là epoch có NSE trung vị validation cao nhất. Cách đặt trong thư viện: `early_stopping_patience: 30` (bằng số epoch) — bộ đếm không đạt 30 trong 30 epoch nên không dừng, còn hàm lưu mô hình tốt nhất (sửa ở `e794d7c`) vẫn chạy; bỏ hẳn khóa này thì thư viện không lưu `best_model.pt` (`training/basetrainer.py` dòng 210–223, 339–347). Mỗi epoch ghi NSE trung vị validation; lần chạy chính thức chấm thêm test mọi epoch từ trọng số từng epoch đã lưu, chỉ để theo dõi (yêu cầu GVHD); lần tinh chỉnh C1 chỉ chấm validation. Checkpoint chọn theo validation.
 
@@ -439,7 +439,7 @@ Báo cáo tiểu luận viết tiếng Việt; chữ trong hình và sơ đồ v
 |---|---|---|
 | 1. Mở đầu | Bài toán dự báo qmax, câu hỏi nghiên cứu RQ1–RQ6, đóng góp C1–C6 | Mục 1 |
 | 2. Cơ sở lý thuyết | LSTM, GRU, Transformer, SSM, S4D, Mamba; NSE, KGE, PNSE, chỉ số theo mức và theo sự kiện | `06_Theory/` |
-| 3. Công trình liên quan | BiasCast; các công trình so sánh tính mới (Mục 1.3); khảo sát theo yêu cầu GVHD | `02_BasePaper.md`, `05_Survey/` |
+| 3. Công trình liên quan | BiasCast; các công trình so sánh tính mới (Mục 1.3); khảo sát theo yêu cầu GVHD | `01_BasePaper.md`, `05_Survey/` |
 | 4. Dữ liệu | Liệt kê bộ dữ liệu theo năm phát hành, rồi đoạn thảo luận thống kê từ A1 (khuôn GVHD, biên bản 27/9/2026 Mục 3.1); đoạn lý thuyết thủy văn về năm nhóm thuộc tính lưu vực (khí hậu, địa hình, đất, thực vật, địa chất) và vai trò của chúng với dòng chảy, có nguồn, đối chiếu với kết quả phân tích theo lưu vực (biên bản 27/9/2026 Mục 2.1, biên bản 11/10/2026 Mục 2.1) | [Bản thảo Chương 4](../07_Report/04_Data.md); `03_Data/01_LamaHCE.md` |
 | 5. Phương pháp | Khung chung, khối giữ nguyên và khối sửa đổi (sơ đồ), giao thức so sánh cùng tham số | Mục 3–5, `Diagrams/ProjectDiagram.drawio` |
 | 6. Thí nghiệm và kết quả | Bước A, B, C, mở rộng; đánh giá Mục 6; giải thích mô hình | [Bản thảo Chương 6](../07_Report/06_ExperimentsAndResults.md); Mục 6, 7 |
@@ -507,7 +507,7 @@ Hướng công bố sau khóa luận: SOICT (mời mở rộng sang *Multimedia 
 | Siêu tham số khởi điểm S4D | Wang và cs., WRR 2025, phụ lục S4D-FT |
 | PatchTST, DLinear | Nie và cs. (ICLR 2023); Zhang và cs. (J. Hydrol. 2026) |
 | Trạng thái chạy liên tục thay vì handoff | BiasCast Mục 3.6 |
-| Chạy đủ 30 epoch không dừng sớm; ablation thêm từng thay đổi (B0 → B1a → B1b → B2 → B3) | Lịch cosine T_max 30 trong config tác giả (`02_BasePaper.md` Mục 11); Meyes và cs. (arXiv 1901.08644, 2019); biên bản họp 25/10/2026 (`Meeting_2026-10-25.md` Mục 2.2, 3.3, 3.6) |
+| Chạy đủ 30 epoch không dừng sớm; ablation thêm từng thay đổi (B0 → B1a → B1b → B2 → B3) | Lịch cosine T_max 30 trong config tác giả (`01_BasePaper.md` Mục 11); Meyes và cs. (arXiv 1901.08644, 2019); biên bản họp 25/10/2026 (`Meeting_2026-10-25.md` Mục 2.2, 3.3, 3.6) |
 
 ---
 

@@ -1,6 +1,6 @@
 # BiasCast — Phần 3: Dữ liệu Extended LamaH-CE, nhìn từ phía lưu lượng
 
-Phần 3 của ghi chú học BiasCast (Phần 1: `03_BiasCast1_Overview.md`, Phần 2: `04_BiasCast2_Metrics.md`). Phần 1 đã đi qua phía đầu vào (năm nguồn khí tượng, 31 biến, 33 thuộc tính, hình dạng một mẫu, cách chọn 451 lưu vực); Phần 3 đi vào phía lưu lượng: dữ liệu lưu lượng được làm ra thế nào, nó trông ra sao theo thời gian, thiếu và sai ở đâu, và các khái niệm thủy văn dùng để chia mức lưu lượng, xác định lũ. Đây là phần nền cho bước khảo sát dữ liệu A1 (`01_Plan/03_Pipeline.md` Mục 7).
+Phần 3 của ghi chú học BiasCast (Phần 1: `03_BiasCast1_Overview.md`, Phần 2: `04_BiasCast2_Metrics.md`). Phần 1 đã đi qua phía đầu vào (năm nguồn khí tượng, 31 biến, 33 thuộc tính, hình dạng một mẫu, cách chọn 451 lưu vực); Phần 3 đi vào phía lưu lượng: dữ liệu lưu lượng được làm ra thế nào, nó trông ra sao theo thời gian, thiếu và sai ở đâu, và các khái niệm thủy văn dùng để chia mức lưu lượng, xác định lũ. Đây là phần nền cho bước khảo sát dữ liệu A1 (`01_Plan/02_Pipeline.md` Mục 7).
 
 Ký hiệu nguồn giữ như Phần 1, 2:
 
@@ -8,7 +8,7 @@ Ký hiệu nguồn giữ như Phần 1, 2:
 - **[LamaH-CE]**: Klingler, Schulz, Herrnegger, *LamaH-CE: LArge-SaMple DAta for Hydrology and Environmental Sciences for Central Europe*, Earth System Science Data 13, 4529–4565, 2021, DOI `10.5194/essd-13-4529-2021`; PDF ở `PaperResearch/PaperResearchPDF/Evidence/Klingler2021_ESSD_LamaHCE.pdf`, kèm mục và trang tạp chí.
 - **[LamaH]**: `03_Data/01_LamaHCE.md` (ghi chú dữ liệu của đề tài), kèm mục.
 - **[Mã]**: mã NeuralHydrology trong bản fork của tác giả, thư mục `PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/`, ghi tên tệp và số dòng.
-- **[Cơ sở]**: `01_Plan/02_BasePaper.md`, kèm mục.
+- **[Cơ sở]**: `01_Plan/01_BasePaper.md`, kèm mục.
 - **[Yilmaz]**: Yilmaz, Gupta, Wagener, *A process-based diagnostic approach to model evaluation: Application to the NWS distributed hydrologic model*, Water Resources Research 44, W09417, 2008, DOI `10.1029/2007WR006716`; PDF ở `PaperResearch/PaperResearchPDF/Evidence/Yilmaz2008_WRR_FlowDurationSegments.pdf`, trang theo số "x of 18" của bài.
 - **[Nearing]**: Nearing và cs., *Global prediction of extreme floods in ungauged watersheds*, Nature 627, 559–563, 2024, DOI `10.1038/s41586-024-07145-1`; PDF ở `PaperResearch/PaperResearchPDF/Evidence/Nearing2024_Nature_GlobalFloods.pdf`.
 - **[Nearing-mã]**: mã công bố kèm bài Nearing 2024, `github.com/google-research-datasets/global_streamflow_model_paper`, thư mục `notebooks/backend/` (nhánh `main`, đọc ngày 17/10/2026).
@@ -114,7 +114,7 @@ Lưu lượng tăng gần gấp ba trong một ngày nhưng mất bốn ngày m�
 
 **Ba giá trị trong một ngày.** `qmin` ≤ `qmean` ≤ `qmax` luôn đúng vì cùng tính từ các giá trị giờ của một ngày. Ngày nước ổn định thì ba giá trị gần nhau; ngày có lũ lên nhanh thì `qmax` vượt xa `qmean` (VD ở Phần 1, Mục 1.4: `qmean` 30,7, `qmax` 61,5 m³/s). Lưu vực nhỏ, dốc phản ứng nhanh nên đỉnh nhọn, tỉ số `qmax`/`qmean` trong ngày lũ lớn; lưu vực lớn gộp nước từ nhiều nhánh về trạm vào những thời điểm khác nhau nên đỉnh tù, tỉ số nhỏ (lý giải định tính; bước A1 đo tỉ số này theo diện tích lưu vực trên 451 lưu vực).
 
-**Hệ quả cho đầu vào.** Điều này liên quan tới đầu vào, không phải đầu ra (đầu ra vẫn là `qmax` ngày t, [Bài] dòng 74): phần quá khứ của bài chỉ có `qmean` (Phần 1, Mục 1.10), mà `qmean` và `qmax` chênh nhau nhiều nhất đúng ở ngày lũ, nên mô hình không thấy đỉnh của các ngày trước cao tới đâu. Bước B1b của đề tài thêm `qmax` quá khứ (t − 364 … t − 1) làm đầu vào; không rò rỉ vì các giá trị này đã đo xong lúc dự báo (`01_Plan/03_Pipeline.md` Mục 3.2, 7).
+**Hệ quả cho đầu vào.** Điều này liên quan tới đầu vào, không phải đầu ra (đầu ra vẫn là `qmax` ngày t, [Bài] dòng 74): phần quá khứ của bài chỉ có `qmean` (Phần 1, Mục 1.10), mà `qmean` và `qmax` chênh nhau nhiều nhất đúng ở ngày lũ, nên mô hình không thấy đỉnh của các ngày trước cao tới đâu. Bước B1b của đề tài thêm `qmax` quá khứ (t − 364 … t − 1) làm đầu vào; không rò rỉ vì các giá trị này đã đo xong lúc dự báo (`01_Plan/02_Pipeline.md` Mục 3.2, 7).
 
 **Mùa dòng chảy và năm thủy văn.** Thủy văn thường không chia năm từ 1/1 mà dùng **năm thủy văn**; LamaH-CE lấy mốc 1/10 tới 30/9 năm sau ([LamaH-CE] mục 5.3, Bảng A5). Lý do là giữ trọn một vòng nước trong cùng một năm: ở vùng có tuyết, tuyết rơi và tích lại suốt mùa đông rồi tan thành dòng chảy vào xuân, hè. VD tuyết rơi tháng 12/2015 và tan tháng 5/2016: chia theo dương lịch thì bị tách thành hai năm; theo năm thủy văn 1/10/2015 – 30/9/2016 thì nằm cùng một năm. Đầu tháng 10 lại là cuối mùa khô, nước tích trong lưu vực đang thấp, nên lượng nước mang từ năm trước sang ít, tổng của từng năm tách bạch hơn.
 
@@ -240,11 +240,11 @@ Ví dụ minh họa — hai lưu vực ở trên, một ngày bình thường (2
 | Suối nhỏ 50 km² | (1,16 − 4,58) / 16,15 ≈ −0,21 | (3,47 − 4,58) / 16,15 ≈ −0,07 | 0,14 | (2 − 2,09) / 3,52 ≈ −0,02 | (6 − 2,09) / 3,52 ≈ 1,11 | 1,14 |
 | Sông lớn 5 000 km² | (115,7 − 4,58) / 16,15 ≈ 6,89 | (347,2 − 4,58) / 16,15 ≈ 21,2 | 14,3 | −0,02 | 1,11 | 1,14 |
 
-Theo m³/s, trận lũ gấp ba của suối nhỏ chỉ làm đầu vào nhích 0,14 đơn vị — gần như không thấy — còn sông lớn nhảy 14,3 đơn vị, lệch hẳn khỏi khoảng giá trị thường gặp. Theo mm/ngày, hai lưu vực cho cùng tín hiệu. Đây là lý do bước B1a của đề tài đổi `qmean` đầu vào sang mm/ngày như nhãn (`01_Plan/03_Pipeline.md` Mục 3.3), và là một trong hai câu hỏi bước A1 phải trả lời cho DLinear ở A3: chuẩn hóa `qmean` chung cho mọi lưu vực hay riêng từng lưu vực (`01_Plan/03_Pipeline.md` Mục 7).
+Theo m³/s, trận lũ gấp ba của suối nhỏ chỉ làm đầu vào nhích 0,14 đơn vị — gần như không thấy — còn sông lớn nhảy 14,3 đơn vị, lệch hẳn khỏi khoảng giá trị thường gặp. Theo mm/ngày, hai lưu vực cho cùng tín hiệu. Đây là lý do bước B1a của đề tài đổi `qmean` đầu vào sang mm/ngày như nhãn (`01_Plan/02_Pipeline.md` Mục 3.3), và là một trong hai câu hỏi bước A1 phải trả lời cho DLinear ở A3: chuẩn hóa `qmean` chung cho mọi lưu vực hay riêng từng lưu vực (`01_Plan/02_Pipeline.md` Mục 7).
 
 **Chuẩn hóa riêng từng lưu vực.** Cách khác là mỗi lưu vực tự trừ trung bình, chia độ lệch chuẩn của chính nó. Khi đó mọi lưu vực có cùng thang đo, nhưng mất thông tin lưu vực nào ướt hơn, lưu vực nào khô hơn (mọi lưu vực đều có trung bình 0). Mô hình chung của bài giữ thông tin này nhờ đơn vị mm/ngày và thuộc tính tĩnh (`p_mean`, `arid_1`…; Phần 1, Mục 1.7). Bước A1 đo trung bình, độ lệch chuẩn `qmean` của từng lưu vực theo cả hai đơn vị để thấy hai cách khác nhau bao nhiêu trên dữ liệu thật.
 
-**Hàm mất mát cũng phải tính tới khác biệt giữa lưu vực.** Ngay cả theo mm/ngày, lưu vực ướt, nhiều lũ có sai số tuyệt đối lớn hơn lưu vực khô. Nếu hàm mất mát cộng thẳng bình phương sai số, lưu vực ướt sẽ chi phối việc học. NSE* của bài chia sai số mỗi mẫu cho độ lệch chuẩn `qmax` của chính lưu vực đó để cân lại (`01_Plan/03_Pipeline.md` Mục 3.1); chi tiết ở Phần 4.
+**Hàm mất mát cũng phải tính tới khác biệt giữa lưu vực.** Ngay cả theo mm/ngày, lưu vực ướt, nhiều lũ có sai số tuyệt đối lớn hơn lưu vực khô. Nếu hàm mất mát cộng thẳng bình phương sai số, lưu vực ướt sẽ chi phối việc học. NSE* của bài chia sai số mỗi mẫu cho độ lệch chuẩn `qmax` của chính lưu vực đó để cân lại (`01_Plan/02_Pipeline.md` Mục 3.1); chi tiết ở Phần 4.
 
 **Câu hỏi tự kiểm tra (Mục 3.3):**
 
@@ -320,7 +320,7 @@ Hai trường hợp thật ([LamaH] Mục 6.3):
 | 800 | chỉ có số từ 24/11/2009, kỳ train hết 31/12/2009 | mẫu đầu tiên đủ 364 ngày quá khứ có số rơi vào cuối năm 2010, sau kỳ train, nên **không có mẫu train nào** |
 | 55 | ở kỳ test (cộng 364 ngày khởi động) chỉ có `qmean` ở 1025 trên 1825 ngày | mẫu nào cũng có ngày thiếu trong quá khứ, nên **không có dự báo nào**; kết quả các run có `qmean` đầu vào chỉ còn 450 lưu vực |
 
-Bài không báo cáo còn lại bao nhiêu mẫu train sau khi lọc; bước A1 sẽ đếm. Bước B2 của đề tài sửa đúng chỗ này: khi mô hình có cách xử lý ô thiếu (masked mean), chỉ bỏ mẫu thiếu nhãn, giữ lại mẫu có ô quá khứ thiếu (`01_Plan/03_Pipeline.md` Mục 3.3).
+Bài không báo cáo còn lại bao nhiêu mẫu train sau khi lọc; bước A1 sẽ đếm. Bước B2 của đề tài sửa đúng chỗ này: khi mô hình có cách xử lý ô thiếu (masked mean), chỉ bỏ mẫu thiếu nhãn, giữ lại mẫu có ô quá khứ thiếu (`01_Plan/02_Pipeline.md` Mục 3.3).
 
 #### Sai
 
@@ -433,7 +433,7 @@ Yilmaz và cs. (2008) cắt đường duy trì thành ba đoạn, mỗi đoạn 
 | Giữa | 0,2–0,7 | mưa vừa, nước ngầm nông xả dần |
 | Thấp | 0,7–1,0 | dòng chảy kiệt kéo dài: nước ngầm nuôi sông, bốc hơi ven sông lúc khô hạn |
 
-Khoảng 0,02–0,2 nằm giữa hai đoạn, không thuộc đoạn nào. Đề tài cần **mọi ngày đều có mức**, nên tách khoảng này thành một mức riêng, được bốn mức (`01_Plan/03_Pipeline.md` Mục 6.2):
+Khoảng 0,02–0,2 nằm giữa hai đoạn, không thuộc đoạn nào. Đề tài cần **mọi ngày đều có mức**, nên tách khoảng này thành một mức riêng, được bốn mức (`01_Plan/02_Pipeline.md` Mục 6.2):
 
 | Mức | Xác suất vượt | Nghĩa là | Trung bình mỗi năm |
 |---|---|---|---|
@@ -460,7 +460,7 @@ Ngày nào cũng xếp được mức chỉ bằng cách so với ba ngưỡng: 
 - **Mức thật** = so `qmax` quan trắc ngày đó với ngưỡng.
 - **Mức mô hình báo** = so số dự báo ngày đó với **cùng ngưỡng đó**.
 
-Hai bên dùng chung một cây thước nên so được công bằng. (Kế hoạch có thêm một phân tích phụ tính ngưỡng riêng từ chuỗi dự báo của mô hình, theo Nearing và cs. 2024 và AIFL, nhưng chỉ cho ngưỡng lũ ở Mục 3.6, không cho bốn mức này — `01_Plan/03_Pipeline.md` Mục 6.2, dòng "Ngưỡng kép".)
+Hai bên dùng chung một cây thước nên so được công bằng. (Kế hoạch có thêm một phân tích phụ tính ngưỡng riêng từ chuỗi dự báo của mô hình, theo Nearing và cs. 2024 và AIFL, nhưng chỉ cho ngưỡng lũ ở Mục 3.6, không cho bốn mức này — `01_Plan/02_Pipeline.md` Mục 6.2, dòng "Ngưỡng kép".)
 
 **Ba điểm cần nhớ về cách dựng ngưỡng:**
 
@@ -612,7 +612,7 @@ Mã thay giá trị 0 của quan trắc, giá trị 0 và giá trị âm của d
 
 ### 3.6. Lũ và chu kỳ lặp lại
 
-Đây là **nhóm chỉ số thứ tư, cũng là nhóm cuối** của đề tài (`01_Plan/03_Pipeline.md` Mục 6.2):
+Đây là **nhóm chỉ số thứ tư, cũng là nhóm cuối** của đề tài (`01_Plan/02_Pipeline.md` Mục 6.2):
 
 | Nhóm | Hỏi | Ở đâu |
 |---|---|---|
@@ -739,13 +739,13 @@ Ví dụ 15 ngày, ngưỡng 12:
 | **F1** | 2 × precision × recall / (precision + recall) | 0,5 | gộp precision và recall thành một số |
 | **CSI** | B / (B + S + N) | 1 / 3 ≈ 0,33 | trong mọi trận có liên quan (thật hoặc báo), bao nhiêu trận trúng |
 
-Như ở Mục 3.5, ưu tiên của GVHD là ít bỏ sót, nên đọc **POD** trước. Kết quả chính cộng dồn số trận B, S, N của cả 451 lưu vực ở mỗi mức T rồi mới tính chỉ số; phân bố chỉ số theo từng lưu vực báo cáo kèm (chi tiết kỹ thuật (h)). Định nghĩa POD, FAR, CSI theo [Kiểm định]; precision = 1 − FAR như [AIFL] mục 4.2, tr. 16; F1 là trung bình điều hòa của precision và recall như [Nearing]. Kế hoạch còn đo **sai số thời điểm đỉnh** (`01_Plan/03_Pipeline.md` Mục 6.2).
+Như ở Mục 3.5, ưu tiên của GVHD là ít bỏ sót, nên đọc **POD** trước. Kết quả chính cộng dồn số trận B, S, N của cả 451 lưu vực ở mỗi mức T rồi mới tính chỉ số; phân bố chỉ số theo từng lưu vực báo cáo kèm (chi tiết kỹ thuật (h)). Định nghĩa POD, FAR, CSI theo [Kiểm định]; precision = 1 − FAR như [AIFL] mục 4.2, tr. 16; F1 là trung bình điều hòa của precision và recall như [Nearing]. Kế hoạch còn đo **sai số thời điểm đỉnh** (`01_Plan/02_Pipeline.md` Mục 6.2).
 
 **Tóm tắt ý chính:** đỉnh các năm cũ → khớp Gumbel → ngưỡng lũ 1,5; 2; 5; 10 năm → đếm trận lũ thật và trận mô hình báo → ghép đúng ngày bắt đầu (bảng phụ ±1 ngày) → POD, precision, FAR, F1, CSI.
 
 #### Chi tiết kỹ thuật (cần khi viết code A1)
 
-**(a) Lấy đỉnh năm thế nào.** **Lựa chọn của đề tài: lấy đỉnh theo năm thủy văn 1/10 – 30/9**, bỏ năm có dưới một nửa số ngày có số liệu, như mã Nearing; lý do bên dưới. Với kỳ 1981–2013: năm thủy văn đầu tiên (1/10/1980 – 30/9/1981) chỉ có tối đa 273 ngày trong reference, được giữ trong mẫu chính nếu chính ID đó có đủ ít nhất nửa cả lịch năm (183/365 ngày); năm cuối là 1/10/2012 – 30/9/2013; ba tháng 10–12/2013 thuộc năm thủy văn 2014, chỉ có tối đa 92 ngày reference nên không đủ nửa cả năm và không dùng. Không lấy ngày test hoàn thành năm này. Mẫu chỉ gồm các năm nằm trọn reference (nhãn 1982–2013) được tính riêng để kiểm độ nhạy với năm biên; không thay mẫu chính theo độ khớp. Năm nhuận cần ít nhất 183/366 ngày; đủ quy tắc ngày chưa bảo đảm quan trắc đủ mùa hoặc đúng đỉnh năm. Mã của Nearing và cs. (2024) lấy đỉnh theo **năm thủy văn bắt đầu 1/10** (như LamaH-CE, Mục 3.2) — để một trận lũ lúc giao năm không bị tách vào hai năm — và bỏ năm có dưới một nửa số ngày có số liệu ([Nearing-mã] `extract_peaks_utilities.py`: `water_year`, `_MIN_FRACTION_OF_WATER_YEAR_IN_RECORD = 1/2`); chỉ tính khi có ít nhất 5 năm ([Nearing-mã] `return_period_calculator.py`: `_MIN_YEARS_OF_RECORD = 5`). Kế hoạch đề tài ghi số năm dùng để tính cho từng lưu vực và báo cáo riêng lưu vực dưới 10 năm (`01_Plan/03_Pipeline.md` Mục 6.2), vì 27 trạm bắt đầu đo muộn (Mục 3.4). Mỗi năm chỉ lấy một số để các số gần như độc lập (hai ngày liền nhau trong cùng một trận lũ thì không độc lập).
+**(a) Lấy đỉnh năm thế nào.** **Lựa chọn của đề tài: lấy đỉnh theo năm thủy văn 1/10 – 30/9**, bỏ năm có dưới một nửa số ngày có số liệu, như mã Nearing; lý do bên dưới. Với kỳ 1981–2013: năm thủy văn đầu tiên (1/10/1980 – 30/9/1981) chỉ có tối đa 273 ngày trong reference, được giữ trong mẫu chính nếu chính ID đó có đủ ít nhất nửa cả lịch năm (183/365 ngày); năm cuối là 1/10/2012 – 30/9/2013; ba tháng 10–12/2013 thuộc năm thủy văn 2014, chỉ có tối đa 92 ngày reference nên không đủ nửa cả năm và không dùng. Không lấy ngày test hoàn thành năm này. Mẫu chỉ gồm các năm nằm trọn reference (nhãn 1982–2013) được tính riêng để kiểm độ nhạy với năm biên; không thay mẫu chính theo độ khớp. Năm nhuận cần ít nhất 183/366 ngày; đủ quy tắc ngày chưa bảo đảm quan trắc đủ mùa hoặc đúng đỉnh năm. Mã của Nearing và cs. (2024) lấy đỉnh theo **năm thủy văn bắt đầu 1/10** (như LamaH-CE, Mục 3.2) — để một trận lũ lúc giao năm không bị tách vào hai năm — và bỏ năm có dưới một nửa số ngày có số liệu ([Nearing-mã] `extract_peaks_utilities.py`: `water_year`, `_MIN_FRACTION_OF_WATER_YEAR_IN_RECORD = 1/2`); chỉ tính khi có ít nhất 5 năm ([Nearing-mã] `return_period_calculator.py`: `_MIN_YEARS_OF_RECORD = 5`). Kế hoạch đề tài ghi số năm dùng để tính cho từng lưu vực và báo cáo riêng lưu vực dưới 10 năm (`01_Plan/02_Pipeline.md` Mục 6.2), vì 27 trạm bắt đầu đo muộn (Mục 3.4). Mỗi năm chỉ lấy một số để các số gần như độc lập (hai ngày liền nhau trong cùng một trận lũ thì không độc lập).
 
 **(b) Công thức Gumbel và L-moments.** Gumbel có hai tham số: ξ (vị trí — đỉnh năm "điển hình" nằm quanh đâu) và α (độ trải). Ngưỡng lũ T năm ([lmomco] `quagum`):
 
@@ -776,7 +776,7 @@ L-moments dùng trung bình và độ chênh (không bình phương, không lậ
 | Nearing và cs. (2024) — bài báo ghi "1-year" | 1,01; 2; 5; 10; 20; 50 ([Nearing-mã] `evaluation_utils.py`: `RETURN_PERIODS = [1.01, 2, 5, 10, 20, 50]`) |
 | AIFL | 1,5; 2; 5; 10; 20; 50; 100 ([AIFL] Bảng 4, tr. 17) |
 
-**Lựa chọn của đề tài: mức thấp nhất là 1,5 năm (như AIFL), tức các mức 1,5; 2; 5; 10 năm** (`01_Plan/03_Pipeline.md` Mục 6.2). Lý do: (1) ngưỡng 1,01 năm thấp hơn khoảng 99% đỉnh năm (theo định nghĩa: mỗi năm chỉ 1% khả năng đỉnh năm dưới nó; ở ví dụ 5,0 so với đỉnh nhỏ nhất 8), có thể bị vượt nhiều lần trong một năm, nên trùng vai trò với mức "rất cao" của nhóm 3 (Mục 3.5) — chấm lại cùng một thứ; (2) ở T rất gần 1, ngưỡng nằm ở đuôi dưới của phân phối, ngoài vùng có đỉnh năm, nên ước lượng kém tin cậy; (3) lũ 1,5 năm vẫn là mức đỉnh năm vượt ở khoảng 2/3 số năm (1/1,5) — thường gặp nhưng đã là một trận lũ thật; trong thủy văn sông, lưu lượng đầy bờ (nước vừa chạm mép bờ, sắp tràn ra bãi) thường được ước bằng lũ khoảng 1,5 năm của chuỗi đỉnh năm, dao động 1–2 năm (USGS SIR 2004-5247, dẫn Dunne và Leopold), nên mức 1,5 năm tương ứng gần đúng với "nước bắt đầu tràn bờ". Đây là xấp xỉ trung bình; đầy bờ thật của từng trạm cần số liệu mặt cắt, LamaH-CE không có. Kết quả không so trực tiếp được với "lũ 1 năm" của Nearing, nhưng hai bài cũng khác dữ liệu nên vốn không so trực tiếp được. Ví dụ ở bước 2: ngưỡng 1,5 năm = 10,2.
+**Lựa chọn của đề tài: mức thấp nhất là 1,5 năm (như AIFL), tức các mức 1,5; 2; 5; 10 năm** (`01_Plan/02_Pipeline.md` Mục 6.2). Lý do: (1) ngưỡng 1,01 năm thấp hơn khoảng 99% đỉnh năm (theo định nghĩa: mỗi năm chỉ 1% khả năng đỉnh năm dưới nó; ở ví dụ 5,0 so với đỉnh nhỏ nhất 8), có thể bị vượt nhiều lần trong một năm, nên trùng vai trò với mức "rất cao" của nhóm 3 (Mục 3.5) — chấm lại cùng một thứ; (2) ở T rất gần 1, ngưỡng nằm ở đuôi dưới của phân phối, ngoài vùng có đỉnh năm, nên ước lượng kém tin cậy; (3) lũ 1,5 năm vẫn là mức đỉnh năm vượt ở khoảng 2/3 số năm (1/1,5) — thường gặp nhưng đã là một trận lũ thật; trong thủy văn sông, lưu lượng đầy bờ (nước vừa chạm mép bờ, sắp tràn ra bãi) thường được ước bằng lũ khoảng 1,5 năm của chuỗi đỉnh năm, dao động 1–2 năm (USGS SIR 2004-5247, dẫn Dunne và Leopold), nên mức 1,5 năm tương ứng gần đúng với "nước bắt đầu tràn bờ". Đây là xấp xỉ trung bình; đầy bờ thật của từng trạm cần số liệu mặt cắt, LamaH-CE không có. Kết quả không so trực tiếp được với "lũ 1 năm" của Nearing, nhưng hai bài cũng khác dữ liệu nên vốn không so trực tiếp được. Ví dụ ở bước 2: ngưỡng 1,5 năm = 10,2.
 
 **(d) Ngưỡng đơn và ngưỡng kép.** Ngưỡng chính của đề tài tính từ quan trắc rồi dùng chung cho quan trắc lẫn dự báo (**ngưỡng đơn**, như bốn mức ở Mục 3.5). Nearing và cs. (2024) và AIFL dùng **ngưỡng kép**: ngưỡng của mô hình tính trên chính chuỗi mô hình ([Nearing] Methods: *"Return periods were calculated separately … on both modelled and observed time series"*; [AIFL] mục 4.2, tr. 16) — vì mô hình hay hụt đỉnh, so với ngưỡng của chính nó thì hợp với cách phát cảnh báo hơn. Chọn khung ngưỡng làm kết quả đổi nhiều; AIFL báo cả hai cho lũ 1,5 năm ([AIFL] Bảng 4, tr. 17):
 
@@ -785,7 +785,7 @@ L-moments dùng trung bình và độ chênh (không bình phương, không lậ
 | Kép | 0,847 | 0,390 | 0,153 |
 | Đơn | 0,420 | 0,500 | 0,580 |
 
-Đề tài dùng ngưỡng đơn làm kết quả chính, ngưỡng kép làm phân tích phụ, vì chuỗi dự báo của mô hình chỉ có 2003–2017 (gồm cả kỳ train) — quá ngắn để khớp Gumbel tin cậy (`01_Plan/03_Pipeline.md` Mục 6.2, dòng "Ngưỡng kép").
+Đề tài dùng ngưỡng đơn làm kết quả chính, ngưỡng kép làm phân tích phụ, vì chuỗi dự báo của mô hình chỉ có 2003–2017 (gồm cả kỳ train) — quá ngắn để khớp Gumbel tin cậy (`01_Plan/02_Pipeline.md` Mục 6.2, dòng "Ngưỡng kép").
 
 **(e) Cửa sổ ghép và cách đếm trong mã.**
 
@@ -794,7 +794,7 @@ L-moments dùng trung bình và độ chênh (không bình phương, không lậ
 | Nearing và cs. (2024) | trong vòng 2 ngày ([Nearing] Methods: *"within two days of each other"*; mã tính cả 0, 1, 2 ngày) |
 | AIFL | 0 ngày — phải trùng đúng ngày ([AIFL] mục 4.2, tr. 16) |
 | NOAA (kiểm định cảnh báo lũ) | đối xứng ±1/3 hạn dự báo quanh thời điểm dự báo vượt ngưỡng; VD hạn 12 giờ thì cửa sổ 8–16 giờ (Central Region Technical Attachment 98-03, [repository.library.noaa.gov/view/noaa/30340](https://repository.library.noaa.gov/view/noaa/30340)) |
-| Đề tài | 0 ngày cho dự báo trước 1 ngày (±1/3 × 24 giờ = ±8 giờ, trên lịch ngày là cùng ngày); bước H ±⌊hạn/3⌋ ngày; bảng phụ ±1 ngày để so với Nearing (`01_Plan/03_Pipeline.md` Mục 6.2, 6.6) |
+| Đề tài | 0 ngày cho dự báo trước 1 ngày (±1/3 × 24 giờ = ±8 giờ, trên lịch ngày là cùng ngày); bước H ±⌊hạn/3⌋ ngày; bảng phụ ±1 ngày để so với Nearing (`01_Plan/02_Pipeline.md` Mục 6.2, 6.6) |
 
 Lý do không lấy ±1 ngày làm chính: persistence chép qmax hôm qua nên mọi trận của nó bắt đầu trễ đúng một ngày; cửa sổ ±1 tính các trận trễ đó là bắt được, persistence đạt POD gần 1 dù báo sau khi lũ đã tới, không có giá trị cảnh báo. Với cửa sổ 0 ngày, persistence có POD bằng 0.
 

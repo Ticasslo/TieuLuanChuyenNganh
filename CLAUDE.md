@@ -9,8 +9,8 @@
 ## 1. Đề tài
 
 - Tiểu luận chuyên ngành → khóa luận tốt nghiệp: dự báo **lưu lượng dòng chảy** (Q) bằng **Mamba** (State Space Model), so sánh với các kiến trúc học sâu khác. Bằng chứng Mamba cho dòng chảy chưa thống nhất (`01_Datasets.md` 7.1, `02_LiteratureReview.md` Mục 1) => đóng khung là **nghiên cứu so sánh**, không lập luận "chọn Mamba vì Mamba luôn tốt hơn".
-- **Bài cơ sở: BiasCast** (Konold và cs., HESS 30:5067–5096, 2026; chốt 6/10/2026 sau góp ý của GVHD ở buổi họp 27/9/2026): dự báo `qmax` ngày t (trước 1 ngày) cho 451 lưu vực **Extended LamaH-CE theo ngày**, dùng dự báo ECMWF HRES thật và Q quan trắc; một mô hình chung cho 451 lưu vực. Mã `github.com/conestone/biascast` + fork NeuralHydrology, trọng số Zenodo 17292895, dữ liệu Zenodo 17119635 (0,95 GB, CC BY-NC). Giới thiệu và lý do chọn: `02_BasePaper.md` (Mục 8, 9, 11).
-- **Tài liệu gốc của đề tài: `Document/01_Plan/03_Pipeline.md`** (câu hỏi nghiên cứu, đóng góp, các bước, ma trận tối đa 136 lần huấn luyện, thứ tự cắt Mục 8.3, việc chưa chốt Mục 12). Đổi phạm vi hay quyết định => sửa cả `02_BasePaper.md`, `03_Pipeline.md` và sơ đồ.
+- **Bài cơ sở: BiasCast** (Konold và cs., HESS 30:5067–5096, 2026; chốt 6/10/2026 sau góp ý của GVHD ở buổi họp 27/9/2026): dự báo `qmax` ngày t (trước 1 ngày) cho 451 lưu vực **Extended LamaH-CE theo ngày**, dùng dự báo ECMWF HRES thật và Q quan trắc; một mô hình chung cho 451 lưu vực. Mã `github.com/conestone/biascast` + fork NeuralHydrology, trọng số Zenodo 17292895, dữ liệu Zenodo 17119635 (0,95 GB, CC BY-NC). Giới thiệu và lý do chọn: `01_BasePaper.md` (Mục 8, 9, 11).
+- **Tài liệu gốc của đề tài: `Document/01_Plan/02_Pipeline.md`** (câu hỏi nghiên cứu, đóng góp, các bước, ma trận tối đa 136 lần huấn luyện, thứ tự cắt Mục 8.3, việc chưa chốt Mục 12). Đổi phạm vi hay quyết định => sửa cả `01_BasePaper.md`, `02_Pipeline.md` và sơ đồ.
 - **Tên:** tiểu luận dùng tên đăng ký với GVHD *"Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy"* (chốt 19/8/2026, giữ 18/10/2026); tên khóa luận **chưa chốt**. Tên **không** có chữ "lũ lụt": đầu ra là Q, không phải vùng ngập hay mực nước; "nguy cơ lũ" chỉ suy gián tiếp qua ngưỡng chu kỳ lặp lại trên Q (Gumbel L-moments từng trạm), không quy ra mét (cần đường quan hệ mực nước–lưu lượng riêng từng mặt cắt).
 - **Chỉ tham khảo, không chạy:** RiverMamba (kiến trúc, loss), Kirschstein & Sun ICML 2024 (hướng đồ thị cho khóa luận), OpenHydroNet — chi tiết ở `.claude/rules/references.md`.
 - ⛔ **Không làm, không đề xuất, không nhắc lại bất cứ thứ gì liên quan tới lưu vực Vu Gia–Thu Bồn** (yêu cầu dứt khoát 25/9/2026).
@@ -21,7 +21,7 @@
 
 - **Người 1: Huỳnh Thanh Nhân** (Kaggle `hunhthanhnhn`) — dữ liệu, bộ nạp, đánh giá, demo D1–D3.
 - **Người 2: Huỳnh Ngọc Thắng** (Kaggle `hunhngcthng`, GitHub `Ticasslo`, chủ VPS) — thư viện, các lõi mô hình, huấn luyện, giải thích mô hình (XAI), demo D4 trên VPS.
-- Việc theo từng bước, điểm bàn giao, quy ước chung: `ASSIGNMENT.md`; lịch hai luồng `03_Pipeline.md` Mục 9.7; dàn ý báo cáo Mục 9.8.
+- Việc theo từng bước, điểm bàn giao, quy ước chung: `ASSIGNMENT.md`; lịch hai luồng `02_Pipeline.md` Mục 9.7; dàn ý báo cáo Mục 9.8.
 - Bộ nhớ Claude (`~/.claude/projects/...`) chỉ ở máy từng người; quy tắc chung của nhóm nằm ở tệp này và `.claude/rules/`.
 
 ## 3. Cấu trúc repo
@@ -32,13 +32,13 @@
 | `Workspace/<NN_Việc>/<notebook>/` | Notebook Kaggle, mỗi thư mục một việc, mỗi notebook một thư mục con cùng tên (`.py`, `.ipynb` chính thức có output, báo cáo `.md`, `Figures/`, `Tables/`): `01_Download`, `02_Exploration` (A1), `03_Baseline` (A2–A4), `04_Setup` (bước 0), `05_Training` (B0 trở đi), `06_Evaluation` (bộ đánh giá); `07_Demo` thêm khi bắt đầu |
 | `Diagrams/ProjectDiagram.drawio` | Sơ đồ duy nhất của đề tài, sinh bằng `Tools/Diagram_Build.py` (sửa Phần 2 của script rồi chạy lại, không sửa tay tệp drawio) |
 | `Tools/` | Công cụ phụ trợ: chép lời buổi họp, sinh sơ đồ, sinh hình lý thuyết |
-| `NeuralHydrology/` | Submodule fork `Ticasslo/neuralhydrology`: `master` = mã tác giả `9d94908`, `research` = phần đề tài viết thêm (mốc `freeze-C`, `freeze-E` theo `03_Pipeline.md` Mục 9.1) |
+| `NeuralHydrology/` | Submodule fork `Ticasslo/neuralhydrology`: `master` = mã tác giả `9d94908`, `research` = phần đề tài viết thêm (mốc `freeze-C`, `freeze-E` theo `02_Pipeline.md` Mục 9.1) |
 | `PaperResearch/` | PDF tham khảo và mã tác giả BiasCast (2 submodule chỉ đọc) |
 | `Plans/` | Kế hoạch từng bước của người 2, chỉ ở máy (loại bằng `.git/info/exclude`) |
 | Gốc repo | `README.md`, `CLAUDE.md`, `ASSIGNMENT.md`, `LICENSE`, `.gitmodules` |
 
 - Tên thư mục và tệp viết **tiếng Anh**, nội dung tiếng Việt. Tệp mới trong `Document/` đánh số tiếp theo thứ tự đọc (biên bản họp `Meeting_<ngày>.md`); PDF đặt tên `AuthorYear_Venue_Topic.pdf`.
-- Trong ghi chú, tên tệp `.md` trần (VD `03_Pipeline.md` Mục 6.2) là tệp trong `Document/`; đường dẫn `PaperResearch/...` tính từ gốc repo.
+- Trong ghi chú, tên tệp `.md` trần (VD `02_Pipeline.md` Mục 6.2) là tệp trong `Document/`; đường dẫn `PaperResearch/...` tính từ gốc repo.
 - Quá trình chọn bài cơ sở (137 bài, `CHECKPDF.md`, `CHECKCODE.md`) đã xóa 7/10/2026; xem lại bằng `git show 247769a:Document/6-ChonBaiCoSo/<tên tệp>`.
 
 ## 4. Quy tắc làm việc — BẮT BUỘC
@@ -81,14 +81,14 @@
 
 ## 6. Quyết định đã chốt (không hỏi lại, không tranh luận lại)
 
-**Phạm vi tiểu luận** (`03_Pipeline.md` Mục 7; viết lại 7/10/2026 theo yêu cầu "pipeline tốt nhất, làm kĩ": ưu tiên chất lượng, nhấn mạnh tính mới)
+**Phạm vi tiểu luận** (`02_Pipeline.md` Mục 7; viết lại 7/10/2026 theo yêu cầu "pipeline tốt nhất, làm kĩ": ưu tiên chất lượng, nhấn mạnh tính mới)
 - 0 hạ tầng → A tái lập + mốc + nhiễu 3 hạt giống → B LSTM cải tiến, mỗi bước thêm một thay đổi, 30 epoch (B0 nền đã sửa lưu mô hình tốt nhất; B1a Q cùng đơn vị mm/ngày; B1b thêm `qmax` quá khứ; B2 nhúng theo nguồn, masked mean, sửa `_validate_samples`; B3 che dữ liệu 0,1/0,12 và 0,05/0,05; B* chọn theo luật ghi sẵn) → C 5 lõi (LSTM, GRU, Transformer, S4D, Mamba) trong mô hình chung Sequential Forecast, số tham số lệch ≤ 1%, tinh chỉnh 8 cấu hình/lõi, chạy chính thức 3 hạt giống → **H dự báo 1–7 ngày** (chốt 7/10/2026, ưu tiên hơn E: LSTM + lõi SSM tốt nhất × 3 cách: chỉ quá khứ; lai — ngày đầu ECMWF HRES thật, ngày sau để trống xử lý bằng masked mean; dự báo hoàn hảo bằng tái phân tích làm cận trên) → D 730 ngày (LSTM, Mamba, S4D; so với 365 ngày, cả hai dùng bộ lọc đã sửa để cùng tập mẫu — chốt 18/10/2026) → E Mamba hai chiều, Transformer patch → F CMAL → GV kiểm chứng lấy mẫu nhiều ngày lũ (Y7) → đánh giá → G XAI (Integrated Gradients + dò trạng thái ẩn Y4, chốt 7/10/2026) và demo.
 - **Giao thức huấn luyện (chốt 25/10/2026 theo góp ý GVHD họp 25/10, người dùng giao chọn cách tốt nhất):** mọi lần huấn luyện chạy đủ 30 epoch (hết chu kỳ cosine T_max 30 của tác giả), không dừng sớm, `best_model.pt` theo NSE trung vị validation (`early_stopping_patience: 30`; bỏ khóa thì thư viện không lưu `best_model.pt`). Thêm B0 (LSTM nền A4 trên `e794d7c`, 30 epoch, thước đo nhiễu hạt giống cho B*), B1a (B0 + đơn vị Q, ablation), B1b (B1a + `qmax` quá khứ). A4 giữ làm kết quả tái lập; B* chọn trong B1b–B3. Bản B1 dừng sớm (đổi cùng lúc hai thay đổi) đã xóa khỏi repo 25/10/2026, xem lại ở commit `a06a224`. Test mọi epoch cho lần chạy chính thức, không cho tinh chỉnh C1.
-- Tối đa 136 lần huấn luyện; cứ chạy theo kế hoạch, không cắt vì ngân sách (giao thức 30 epoch: khoảng 6,8 giờ/lần chính thức, 5 giờ/lần C1, khoảng 850 giờ GPU); thứ tự cắt khi thiếu thời gian: `03_Pipeline.md` Mục 8.3.
-- Tính mới đóng khung trung thực so với Shahriar (SSRN 2026), Zhang 2026, Demiray, Dubey 2025, MF²LSTM, HydroDiffusion (WRR 2026), Saint-Fleur (HESS 2026) — `03_Pipeline.md` Mục 1.3.
+- Tối đa 136 lần huấn luyện; cứ chạy theo kế hoạch, không cắt vì ngân sách (giao thức 30 epoch: khoảng 6,8 giờ/lần chính thức, 5 giờ/lần C1, khoảng 850 giờ GPU); thứ tự cắt khi thiếu thời gian: `02_Pipeline.md` Mục 8.3.
+- Tính mới đóng khung trung thực so với Shahriar (SSRN 2026), Zhang 2026, Demiray, Dubey 2025, MF²LSTM, HydroDiffusion (WRR 2026), Saint-Fleur (HESS 2026) — `02_Pipeline.md` Mục 1.3.
 - Khóa luận: dữ liệu giờ, dự báo nhiều ngày với dự báo thời tiết nhiều hạn thật (GEFSv12 hoặc kho ECMWF), loss ưu tiên đỉnh, đồ thị, biến thể lai, xLSTM.
 
-**Đánh giá** (`03_Pipeline.md` Mục 6)
+**Đánh giá** (`02_Pipeline.md` Mục 6)
 - Ba tầng chỉ số (đồng ý 18/10/2026): **chỉ NSE trung vị validation dùng để chọn** (checkpoint, cấu hình, B*, mô hình demo); so các lõi trên test bằng nhiều chỉ số; %BiasFHV báo cả trung vị có dấu và trung vị trị tuyệt đối.
 - NSE, KGE, PNSE; Wilcoxon + Cohen's d + Holm. A4 cho thấy hai lần chạy chỉ khác hạt giống vẫn có p Holm < 0,05 => so mô hình phải kèm độ lớn hiệu, so với mốc nhiễu hạt giống, không dùng p một mình.
 - 4 mức Yilmaz; sự kiện lũ chu kỳ lặp lại 1,5/2/5/10 năm, Gumbel L-moments trên đỉnh năm thủy văn 1/10–30/9, bỏ năm thiếu quá nửa (Claude chọn 17/10/2026 khi được giao: 1,5 thay 1,01 của Nearing vì ngưỡng 1,01 thấp hơn khoảng 99% đỉnh năm, trùng mức "rất cao").
@@ -102,15 +102,15 @@
 - A4: không bật chế độ tất định để đo đúng nhiễu B, C sẽ gặp; mỗi lần huấn luyện trọn 1 phiên Kaggle (chi tiết `.claude/rules/library.md`).
 
 **Demo và XAI**
-- Demo là một mục trong trang web nhiều mục của người 2 (giới thiệu, hồ sơ, dự án), chạy 24/7 trên VPS Oracle Cloud Always Free (từ 12/6/2026 hạn mức A1 còn 2 OCPU/12 GB; máy rảnh 7 ngày dưới 20% CPU/mạng/bộ nhớ có thể bị thu hồi — docs.oracle.com). Mức 2 (chọn 10/10/2026): mô hình chạy thật trên CPU, thử "nếu… thì…" với ECMWF HRES ngày t; 4 bước D1 Kaggle GPU → D2 Kaggle CPU (Mamba dùng `mambapy`) → D3 laptop → D4 VPS, bản laptop dự phòng ngày bảo vệ (`03_Pipeline.md` Mục 9.6). Không thuê GPU phục vụ web, không làm giao diện trên Kaggle; công nghệ giao diện, Cloudflare Tunnel, tên miền tra khi có demo chạy thử (Mục 12).
+- Demo là một mục trong trang web nhiều mục của người 2 (giới thiệu, hồ sơ, dự án), chạy 24/7 trên VPS Oracle Cloud Always Free (từ 12/6/2026 hạn mức A1 còn 2 OCPU/12 GB; máy rảnh 7 ngày dưới 20% CPU/mạng/bộ nhớ có thể bị thu hồi — docs.oracle.com). Mức 2 (chọn 10/10/2026): mô hình chạy thật trên CPU, thử "nếu… thì…" với ECMWF HRES ngày t; 4 bước D1 Kaggle GPU → D2 Kaggle CPU (Mamba dùng `mambapy`) → D3 laptop → D4 VPS, bản laptop dự phòng ngày bảo vệ (`02_Pipeline.md` Mục 9.6). Không thuê GPU phục vụ web, không làm giao diện trên Kaggle; công nghệ giao diện, Cloudflare Tunnel, tên miền tra khi có demo chạy thử (Mục 12).
 - XAI: feature attribution qua Captum (Integrated Gradients/SHAP), **không** fine-tune LLM viết báo cáo, thay bằng câu mẫu điền số (23/8/2026). Demiray & Demir (preprint 2025, WaterBench-Iowa) đã làm Mamba + SHAP => cần đóng góp khác biệt.
 
 **Góp ý GVHD** (`Document/02_Meetings/Meeting_2026-09-27.md`, `Meeting_2026-10-11.md`, `Meeting_2026-10-25.md`)
 - Mục dữ liệu: gạch đầu dòng theo năm phát hành + đoạn thảo luận thống kê để biện luận.
 - Kiến trúc tách rõ khối giữ của bài gốc và khối thêm/sửa; không khẳng định điều không kiểm soát được; không dùng LLM.
-- **Đánh giá theo mức lưu lượng** như bài toán phân loại, ưu tiên báo động nhầm hơn bỏ sót lũ (`03_Pipeline.md` Mục 6.2).
+- **Đánh giá theo mức lưu lượng** như bài toán phân loại, ưu tiên báo động nhầm hơn bỏ sót lũ (`02_Pipeline.md` Mục 6.2).
 - Theo dõi chỉ số tập test mỗi epoch (đề tài vẫn chọn checkpoint theo validation); khuyến khích viết tiếng Anh.
 - Y7 (lấy mẫu nhiều ngày lũ, bằng chứng trái chiều) đưa vào bước GV; Y8 (đóng băng có chọn lọc theo XAI) chưa đưa vào.
-- Họp 11/10/2026 (`Meeting_2026-10-11.md`): thêm đoạn lý thuyết thuộc tính lưu vực vào Chương 4 (`03_Pipeline.md` Mục 9.8); khởi tạo ưu tiên đặc trưng ghi thành Y22, không đưa vào tiểu luận; vẽ training loss; không chọn seed theo kết quả.
+- Họp 11/10/2026 (`Meeting_2026-10-11.md`): thêm đoạn lý thuyết thuộc tính lưu vực vào Chương 4 (`02_Pipeline.md` Mục 9.8); khởi tạo ưu tiên đặc trưng ghi thành Y22, không đưa vào tiểu luận; vẽ training loss; không chọn seed theo kết quả.
 - Họp 25/10/2026 (`Meeting_2026-10-25.md`): so sánh cùng số epoch (=> giao thức 30 epoch); ablation thêm từng thay đổi (=> B0, B1a, B1b); đo tốc độ bộ nạp chỉ lặp dữ liệu, không mô hình, rồi báo thầy (notebook `Workspace/04_Setup/02_0_DataLoader_Benchmark/`); test trong từng epoch để theo dõi; tự đề xuất hướng, không hỏi "làm gì tiếp".
 - Khảo sát bài báo: không MDPI, không chỉ preprint, trích dẫn ≥ 5, ưu tiên Scimago Q1/Q2 và venue CNTT/AI (điểm cộng, không bắt buộc — đính chính 26/9/2026). Tiểu luận **phải có demo**; khóa luận nâng thành phần mềm có tính ứng dụng.

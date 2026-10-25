@@ -1,6 +1,6 @@
 # Quan hệ giữa đặc điểm lưu vực và kết quả dự báo — Extended LamaH-CE
 
-Tài liệu đi cùng [mã Python](02_Evaluation_LamaHCEExt_ByBasin.py) và [notebook Kaggle](02_Evaluation_LamaHCEExt_ByBasin.ipynb), mở rộng phân tích theo lưu vực ở [pipeline Mục 6.4](../../../Document/01_Plan/03_Pipeline.md#64-theo-lưu-vực). Phân tích sử dụng các dự báo A2, DLinear, LSTM A4 và persistence đã lưu để trả lời: **mức cải thiện dự báo thay đổi thế nào theo diện tích, độ cao, tỷ phần tuyết, độ khô hạn và mức đầy đủ dữ liệu; các liên hệ có ổn định qua ba seed LSTM hay không?**
+Tài liệu đi cùng [mã Python](02_Evaluation_LamaHCEExt_ByBasin.py) và [notebook Kaggle](02_Evaluation_LamaHCEExt_ByBasin.ipynb), mở rộng phân tích theo lưu vực ở [pipeline Mục 6.4](../../../Document/01_Plan/02_Pipeline.md#64-theo-lưu-vực). Phân tích sử dụng các dự báo A2, DLinear, LSTM A4 và persistence đã lưu để trả lời: **mức cải thiện dự báo thay đổi thế nào theo diện tích, độ cao, tỷ phần tuyết, độ khô hạn và mức đầy đủ dữ liệu; các liên hệ có ổn định qua ba seed LSTM hay không?**
 
 Bản chính thức là **Version 2** của notebook Kaggle `02_Evaluation_LamaHCEExt_ByBasin` (Save & Run All trên CPU, có output), chạy trên Output [bộ đánh giá](../01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md) Version 4 với **14 run, 18 phép so**, giữ 451 ID và giao chung 652.628 ngày–lưu vực; 41 kiểm thử đạt. **Ba seed LSTM A4 giữ liên hệ âm của ΔNSE với độ cao và tuyết, dương với độ khô hạn**, đồng thời cho thấy biến thiên đáng kể ở một số lưu vực.
 

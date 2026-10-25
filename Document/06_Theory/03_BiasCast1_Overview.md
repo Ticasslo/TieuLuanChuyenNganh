@@ -7,7 +7,7 @@ Ký hiệu nguồn dùng trong tệp:
 - **[Bài]**: bản chữ `PaperResearch/PaperResearchPDF/BasePaper/Konold2026_HESS_BiasCast_FullText.md`, kèm số dòng.
 - **[Mã]**: mã nạp dữ liệu của tác giả `PaperResearch/PaperResearchCode/BiasCast_NH/neuralhydrology/datasetzoo/lamah.py`, kèm số dòng; các tệp mã khác trong cùng thư mục `neuralhydrology/` ghi tên tệp đầy đủ.
 - **[LamaH]**: `03_Data/01_LamaHCE.md` (ghi chú dữ liệu của đề tài), kèm số dòng.
-- **[Cơ sở]**: `01_Plan/02_BasePaper.md` (giới thiệu bài cơ sở), kèm mục.
+- **[Cơ sở]**: `01_Plan/01_BasePaper.md` (giới thiệu bài cơ sở), kèm mục.
 
 Ghi chú học chia thành bảy phần, mỗi phần một tệp trong `06_Theory/`, đánh số tiếp theo thứ tự đọc: (1) BiasCast nói về gì — tệp này; (2) đo chất lượng dự báo — NSE và độ suy giảm khi đổi miền dữ liệu; (3) dữ liệu Extended LamaH-CE; (4) mô hình tốt nhất: LSTM, hàm mất mát NSE*, huấn luyện; (5) mọi thí nghiệm của bài: baseline, Cross-Domain, Encoder–Decoder, học chuyển giao, thêm dự báo lưu trữ, thêm `qmean`; (6) lệch miền và kết quả theo lưu vực (khoảng cách Wasserstein, địa hình, ΔNSE theo thuộc tính); (7) hạn chế của bài và phản biện.
 
@@ -258,7 +258,7 @@ Bài gọi chung dữ liệu quá khứ là "reanalysis" (VD [Bài] dòng 248: *
 - ở quy mô nhiều lưu vực như bài, dùng số đo trạm gặp khó vì số trạm mỗi lưu vực rất khác nhau (lưu vực lớn hàng chục trạm, lưu vực nhỏ một trạm), số chiều đầu vào khác nhau giữa các lưu vực; mạng nhúng có thể giúp nhưng ảnh hưởng tới chất lượng và độ ổn định là câu hỏi mở;
 - giảm phụ thuộc vào dữ liệu trễ hoặc không có được nêu là hướng cần làm ([Bài] dòng 340).
 
-Mỗi nguồn trễ khác nhau (bản hằng ngày của E-OBS khoảng 1 ngày, MSWEP gần thời gian thực khoảng 2–3 giờ, GLEAM cập nhật mỗi năm một lần — bản 4.3b phát hành 21/09/2026 phủ tới hết 2025, nên khi vận hành không có GLEAM cho năm đang chạy (trang gleam.eu)); đề tài đo tác động của độ trễ thật bằng các kịch bản S0–S4 (`01_Plan/03_Pipeline.md` Mục 6.3).
+Mỗi nguồn trễ khác nhau (bản hằng ngày của E-OBS khoảng 1 ngày, MSWEP gần thời gian thực khoảng 2–3 giờ, GLEAM cập nhật mỗi năm một lần — bản 4.3b phát hành 21/09/2026 phủ tới hết 2025, nên khi vận hành không có GLEAM cho năm đang chạy (trang gleam.eu)); đề tài đo tác động của độ trễ thật bằng các kịch bản S0–S4 (`01_Plan/02_Pipeline.md` Mục 6.3).
 
 So sánh bằng hình ảnh kỳ thi: quan trắc là điểm thật nhưng chỉ biết của vài người; tái phân tích là chấm lại cả lớp sau khi có đáp án — đầy đủ, sát thực tế hơn dự báo nhưng vẫn có sai số, và chỉ làm được sau kỳ thi; dự báo là đoán điểm trước khi thi — có ngay nhưng sai nhiều hơn.
 

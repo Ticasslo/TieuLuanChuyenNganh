@@ -18,14 +18,14 @@ paths:
   - `Evidence/`: căn cứ cho pipeline — Kratzert 2019 (NSE*), Kratzert 2024, Nearing 2022, Nearing 2024, Klotz 2022 (CMAL), Gauch 2025, Martel 2025, Baste 2025, Yang 2025, Yilmaz 2008, Klingler 2021 (bài dữ liệu LamaH-CE), Liu 2024 (giới hạn Transformer).
   - `MambaSSM/`: Mamba gốc, S4D gốc, RiverMamba, ResBi-Mamba Plus, S4D-FT, S4D/S5D, PatchTST, Zhang 2026 (so sánh LSTM/PatchTST/Mamba).
   - `Survey/`: bài của `02_LiteratureReview.md` (`MambaTimeSeries/` Mục 1.1, `StreamflowAsia/` Mục 2.1).
-  - `Related/`: công trình trích dẫn BiasCast (AIFL, MF²LSTM — `02_BasePaper.md` Mục 12).
+  - `Related/`: công trình trích dẫn BiasCast (AIFL, MF²LSTM — `01_BasePaper.md` Mục 12).
   - `Thesis/`: hướng khóa luận (Kirschstein & Sun, Mosaffa, Wang FloodGNNs — đồ thị trên LamaH; MF-LSTM — dữ liệu giờ).
 - Bài chỉ nhắc qua trong ghi chú (Frame 2022, xLSTM, Zhou 2026, Sun 2026…) không giữ PDF. Thêm PDF mới => thêm dòng vào bảng tương ứng ở `05_Survey/03_PaperNotes.md`.
 - Mã: `PaperResearch/PaperResearchCode/BiasCast` (mã tác giả), `BiasCast_NH` (fork NeuralHydrology của tác giả) — 2 submodule trỏ `conestone/biascast`, `conestone/neuralhydrology`, chỉ đọc.
 
 ## BiasCast
 
-- Konold và cs., HESS 30:5067–5096, 2026; 1 hạt giống; 3 trích dẫn Google Scholar (khi chọn). Đọc fork + 24 cấu hình + kết quả: không có lỗi làm sai số liệu, trung vị tự tính khớp bài (`02_BasePaper.md` Mục 9, 11).
+- Konold và cs., HESS 30:5067–5096, 2026; 1 hạt giống; 3 trích dẫn Google Scholar (khi chọn). Đọc fork + 24 cấu hình + kết quả: không có lỗi làm sai số liệu, trung vị tự tính khớp bài (`01_BasePaper.md` Mục 9, 11).
 - Persistence NSE trung vị 0,35–0,37 so với mô hình tốt nhất 0,705; bài không có baseline persistence (phản biện 1 đề nghị).
 
 ## Kirschstein & Sun (ICML 2024)
@@ -52,7 +52,7 @@ paths:
 - Kết quả "dự báo 24 giờ ngang EA-LSTM 14 giờ nhờ đồ thị reachability" thuộc Wang et al., npj Natural Hazards 2025 (DOI `10.1038/s44304-025-00083-6`, mô hình **GNN, không Mamba**) — không phải G-Mamba. G-Mamba thật (Chen & Tang, Neurocomputing 680, 2026, DOI `10.1016/j.neucom.2026.133280`) là mô hình không gian–thời gian tổng quát (giao thông, điện, khí tượng, tỷ giá, ETT), **không có dữ liệu dòng chảy**.
 - Bài SST là **CIKM 2025** (không phải 2024).
 
-## Công trình gần nhất (đóng khung tính mới, `03_Pipeline.md` Mục 1.3)
+## Công trình gần nhất (đóng khung tính mới, `02_Pipeline.md` Mục 1.3)
 
 - Shahriar (SSRN 2026; so cùng tham số lệch < 0,5%), Zhang 2026, Demiray & Demir (preprint 2025, WaterBench-Iowa, Mamba + SHAP), Dubey 2025, MF²LSTM, HydroDiffusion (WRR 2026, arXiv 2512.12183: S4D-FT so với LSTM với GEFSv12, không Q), Saint-Fleur (HESS 2026).
 - Bằng chứng Mamba cho dòng chảy chưa thống nhất (`01_Datasets.md` 7.1, `02_LiteratureReview.md` Mục 1).

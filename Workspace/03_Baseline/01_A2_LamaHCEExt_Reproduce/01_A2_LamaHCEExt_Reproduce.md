@@ -78,7 +78,7 @@ Dòng đối chứng `qmax` khớp ở mm/ngày theo `MATCH_TOL` = 0,01 (1%) c�
 - Tác giả đưa `qmean` vào mô hình theo **m³/s**, trong khi nhãn `qmax` theo mm/ngày.
 - Giá trị `qmean` lấy nguyên từ tệp trạm `D_gauges`, ngày thiếu để trống, không điền: thống kê khớp tới chữ số thứ tư. Hàm đọc tệp trạm của thư viện đổi số âm (mã ghi chú −999 là giá trị thiếu) thành ô trống (`lamah.py` dòng 228–229), còn hàm đọc tệp khí tượng không đổi, nên khi chép `qmean` sang tệp khí tượng cũng đổi số âm thành ô trống; ở 3 lưu vực kiểm ngẫu nhiên (788, 330, 698) tệp trạm không có −999, ngày thiếu là ô trống.
 - Thư mục dữ liệu có Q của tác giả tên `LamaH_expanded_q_input`, không công bố trên Zenodo.
-- A2 và A4 dựng thư mục Q theo đúng cách này; bước B1a đổi `qmean` sang mm/ngày cho cùng đơn vị với nhãn (`03_Pipeline.md` Mục 3.3, 7).
+- A2 và A4 dựng thư mục Q theo đúng cách này; bước B1a đổi `qmean` sang mm/ngày cho cùng đơn vị với nhãn (`02_Pipeline.md` Mục 3.3, 7).
 
 <a id="p4"></a>
 ## Phần 4. Thư mục dữ liệu có `qmean`

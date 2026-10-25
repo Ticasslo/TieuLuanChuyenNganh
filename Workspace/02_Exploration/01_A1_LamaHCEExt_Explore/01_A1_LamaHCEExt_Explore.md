@@ -3764,7 +3764,7 @@ Phần 10 trình bày ngưỡng đánh giá theo giao thức đã định ở k�
 
 ### 24.1. Cell 10.1 — bốn mức từ qmax quan trắc trước test
 
-Phạm vi fit cố định là **01/01/1981–31/12/2013**, theo [kế hoạch Mục 6.2](../../../Document/01_Plan/03_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd). Dùng mọi qmax quan trắc hữu hạn không âm của từng ID trong cache, giữ 0 và dữ liệu thiếu; không dùng dự báo hoặc quan trắc test để fit/chọn ngưỡng. Giai đoạn tham chiếu gồm cả validation; đây là ngưỡng đánh giá theo giao thức đã định trước, không phải scaler hoặc ngưỡng chỉ tính từ train của Phần 8. Reference chứa các kỳ train/validation nên không cộng số ngày các phạm vi này với nhau.
+Phạm vi fit cố định là **01/01/1981–31/12/2013**, theo [kế hoạch Mục 6.2](../../../Document/01_Plan/02_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd). Dùng mọi qmax quan trắc hữu hạn không âm của từng ID trong cache, giữ 0 và dữ liệu thiếu; không dùng dự báo hoặc quan trắc test để fit/chọn ngưỡng. Giai đoạn tham chiếu gồm cả validation; đây là ngưỡng đánh giá theo giao thức đã định trước, không phải scaler hoặc ngưỡng chỉ tính từ train của Phần 8. Reference chứa các kỳ train/validation nên không cộng số ngày các phạm vi này với nhau.
 
 Ba ngưỡng là phân vị mẫu **q30/q80/q98**, nội suy tuyến tính. Chúng tương ứng các mốc xác suất vượt 0,7/0,2/0,02. Đề tài dùng bốn mức để phủ toàn bộ đường duy trì; không nói Yilmaz gốc định nghĩa nguyên xi bốn mức này. Quy ước bằng ngưỡng vào mức cao hơn khớp [tài liệu phân mức hiện có](../../../Document/06_Theory/05_BiasCast3_Data.md#bước-2-cắt-đường-thành-bốn-mức):
 
@@ -3890,7 +3890,7 @@ Ngưỡng chính 1981–2013 và danh sách 451 giữ nguyên. Phép so chưa đ
 
 ### 24.3. Cell 10.3 — độ phủ và đỉnh quan trắc theo năm thủy văn
 
-Trước khi fit Gumbel, cell kiểm chuỗi đỉnh năm theo [giao thức năm thủy văn và thiếu quá nửa số ngày](../../../Document/01_Plan/03_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd). Một năm chạy **01/10 năm trước đến 30/09 năm kết thúc**, gắn nhãn bằng năm kết thúc. Chỉ đọc quan trắc có ngày trong reference **01/01/1981–31/12/2013**; không dùng ngày test để hoàn thành một năm bị cắt ở rìa.
+Trước khi fit Gumbel, cell kiểm chuỗi đỉnh năm theo [giao thức năm thủy văn và thiếu quá nửa số ngày](../../../Document/01_Plan/02_Pipeline.md#62-theo-mức-lưu-lượng-và-theo-sự-kiện-yêu-cầu-gvhd). Một năm chạy **01/10 năm trước đến 30/09 năm kết thúc**, gắn nhãn bằng năm kết thúc. Chỉ đọc quan trắc có ngày trong reference **01/01/1981–31/12/2013**; không dùng ngày test để hoàn thành một năm bị cắt ở rìa.
 
 Do reference theo năm lịch, nó giao 34 năm thủy văn gắn nhãn 1981–2014; chỉ 1982–2013 là 32 năm nằm trọn trong reference. Năm 1981 có 273 ngày trong reference và 92 ngày ngoài; năm 2014 chỉ có 92 ngày cuối 2013 trong reference và 273 ngày ngoài. Cell giữ mẫu số cả năm **365/366 ngày**, đếm riêng ngày thiếu bên trong reference và ngày ngoài reference. Không rút mẫu số xuống lát 273/92 ngày hoặc coi ngày ngoài reference là số quan trắc.
 

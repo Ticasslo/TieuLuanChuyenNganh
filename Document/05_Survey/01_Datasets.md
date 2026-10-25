@@ -347,7 +347,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | Kết quả trọng số vật lý (xuôi dòng) | ResGCN: chiều dài dòng 81,64% ± 1,45 · chênh lệch độ cao 82,16% ± 1,85<br>ResGAT: chiều dài dòng 80,21% ± 4,85 · chênh lệch độ cao 80,58% ± 5,00 |
 | Kết luận | Mọi cấu hình đồ thị đều **không vượt rõ** MLP không dùng đồ thị; chênh lệch nằm trong khoảng dao động giữa các fold |
 | Kết luận | *"the model fails to benefit from the river network topology information, both on the entire network and small subgraphs"*. Trọng số cạnh học được không tương quan với các định nghĩa tĩnh; GNN gặp khó khi dự báo **đỉnh lưu lượng đột ngột và hẹp** |
-| Lưu ý về mã | Mã công bố tính NSE sai mẫu số, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train (`Document/01_Plan/02_BasePaper.md` Mục 8); các con số trên nên đọc kèm lưu ý này |
+| Lưu ý về mã | Mã công bố tính NSE sai mẫu số, nhiễu giữa các lần huấn luyện lớn cỡ toàn bộ chênh lệch trong bảng kết quả, validation lấy lẫn trong train (`Document/01_Plan/01_BasePaper.md` Mục 8); các con số trên nên đọc kèm lưu ý này |
 | Ý nghĩa với đề tài | Là bằng chứng ở venue hạng cao cho thấy đồ thị mạng lưới sông **dạng thô** không tự động cải thiện dự báo. Cần tính đến khi thiết kế mô hình kết hợp đồ thị (xem Mục 7.2) |
 
 #### 6.1.2 A GNN routing module is all you need for LSTM rainfall–runoff models
@@ -387,7 +387,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 | Mô hình | Sequential Forecast LSTM, Encoder-Decoder LSTM, transfer learning với mạng embedding riêng cho đầu vào tĩnh và động |
 | Chỉ số | NSE, KGE theo lưu vực (báo cáo trung vị, phân vị, CDF) |
 | Kết quả | Khi chuyển từ dữ liệu tái phân tích sang dữ liệu dự báo khí tượng thực, **NSE trung vị giảm từ 0,58 xuống 0,33**. Sequential Forecast LSTM đạt NSE trung vị **0,71** khi có thêm lưu lượng quan trắc |
-| Ý nghĩa với đề tài | Bài cơ sở của đề tài (`Document/01_Plan/02_BasePaper.md`): định lượng mức suy giảm khi mô hình huấn luyện bằng tái phân tích được chạy với dự báo thời tiết thật, và cách huấn luyện trực tiếp trên dự báo để bù sai lệch |
+| Ý nghĩa với đề tài | Bài cơ sở của đề tài (`Document/01_Plan/01_BasePaper.md`): định lượng mức suy giảm khi mô hình huấn luyện bằng tái phân tích được chạy với dự báo thời tiết thật, và cách huấn luyện trực tiếp trên dự báo để bù sai lệch |
 
 ---
 
@@ -641,7 +641,7 @@ Bài báo gốc đánh giá hồi quy tuyến tính, LSTM, GRU và Seq2Seq cho b
 
 Cả SSM và GNN đều yếu ở loại sự kiện quan trọng nhất với cảnh báo lũ. Đề xuất:
 - Đánh giá riêng đỉnh lũ bằng **FHV**, không chỉ dùng NSE tổng thể
-- Dùng hàm mất mát có **trọng số theo chu kỳ lặp lại** (return period), như RiverMamba — để cho khóa luận vì có đánh đổi với kỹ năng chung (`Document/01_Plan/03_Pipeline.md` Mục 11)
+- Dùng hàm mất mát có **trọng số theo chu kỳ lặp lại** (return period), như RiverMamba — để cho khóa luận vì có đánh đổi với kỹ năng chung (`Document/01_Plan/02_Pipeline.md` Mục 11)
 
 ### 7.4 Khoảng trống nghiên cứu
 

@@ -1,6 +1,6 @@
 # Phân công công việc
 
-> Việc của từng thành viên theo từng bước, từ nay tới hết tiểu luận. Nội dung kỹ thuật của mỗi bước, điều kiện chuyển bước và số lần huấn luyện: `Document/01_Plan/03_Pipeline.md` Mục 7; lịch hai luồng: Mục 9.7; dàn ý báo cáo: Mục 9.8.
+> Việc của từng thành viên theo từng bước, từ nay tới hết tiểu luận. Nội dung kỹ thuật của mỗi bước, điều kiện chuyển bước và số lần huấn luyện: `Document/01_Plan/02_Pipeline.md` Mục 7; lịch hai luồng: Mục 9.7; dàn ý báo cáo: Mục 9.8.
 
 | | Thành viên | Mảng |
 |---|---|---|
@@ -13,7 +13,7 @@
 |---|---|
 | Tải Extended LamaH-CE và kết quả của tác giả (Kaggle Dataset `lamah-ce-ext`) | `Document/03_Data/01_LamaHCE.md` Mục 6 |
 | Tỉ lệ thiếu dữ liệu, persistence (NSE trung vị 0,35–0,37) | `01_LamaHCE.md` Mục 6.1 |
-| Fork thư viện `Ticasslo/neuralhydrology`, nhánh `research` tại `dda45fc` (bước 0a); bước B lên `e794d7c`: sửa lỗi lưu mô hình tốt nhất, kèm kiểm thử `test/test_best_model.py` | `03_Pipeline.md` Mục 9.1 |
+| Fork thư viện `Ticasslo/neuralhydrology`, nhánh `research` tại `dda45fc` (bước 0a); bước B lên `e794d7c`: sửa lỗi lưu mô hình tốt nhất, kèm kiểm thử `test/test_best_model.py` | `02_Pipeline.md` Mục 9.1 |
 | Bước 0 (phần cài): `mamba-ssm` 2.3.2.post1 + `causal-conv1d` 1.6.2.post1 dựng cho Kaggle T4, torch 2.11, đạt test chính thức; `mambapy` trùng kết quả GPU/CPU | [Thuyết minh bước 0](Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md) |
 | A2: chạy lại trọng số tác giả, khớp NSE trung vị cả 6 run | [Thuyết minh A2](Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md) |
 | A1: hoàn thành khảo sát và tính ngưỡng đánh giá | [Thuyết minh A1](Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#sec-25) |
@@ -25,7 +25,7 @@
 
 ## 2. Việc theo từng bước
 
-Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên từ 25/10/2026:** Người 1 đã chấm ba NPZ A4 và phân tích thuộc tính qua ba seed; tiếp tục bộ nạp B2 (#4) trên fork `e794d7c`, dùng thư mục Q `qmean_mmd`, `qmax_mmd` (Phần 3 notebook huấn luyện B1b). Sau buổi họp 25/10/2026 (`Document/02_Meetings/Meeting_2026-10-25.md`), mọi lần huấn luyện chạy đủ 30 epoch và bước B thêm từng thay đổi B0, B1a, B1b (`03_Pipeline.md` Mục 5.1, 7): Người 2 đo tốc độ bộ nạp (#1), chạy B0, B1a, B1b 30 epoch (#3), rồi phần còn lại của bước 0 và phần mô hình B2. Người 1 viết bộ nạp B2 (#4), chấm NPZ B0, B1a, B1b khi người 2 giao (#6). Cột "Cần trước" ghi đầu vào của từng việc.
+Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên từ 25/10/2026:** Người 1 đã chấm ba NPZ A4 và phân tích thuộc tính qua ba seed; tiếp tục bộ nạp B2 (#4) trên fork `e794d7c`, dùng thư mục Q `qmean_mmd`, `qmax_mmd` (Phần 3 notebook huấn luyện B1b). Sau buổi họp 25/10/2026 (`Document/02_Meetings/Meeting_2026-10-25.md`), mọi lần huấn luyện chạy đủ 30 epoch và bước B thêm từng thay đổi B0, B1a, B1b (`02_Pipeline.md` Mục 5.1, 7): Người 2 đo tốc độ bộ nạp (#1), chạy B0, B1a, B1b 30 epoch (#3), rồi phần còn lại của bước 0 và phần mô hình B2. Người 1 viết bộ nạp B2 (#4), chấm NPZ B0, B1a, B1b khi người 2 giao (#6). Cột "Cần trước" ghi đầu vào của từng việc.
 
 ### Người 1 — dữ liệu, bộ nạp, đánh giá, demo D1–D3
 
@@ -48,14 +48,14 @@ Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu 
 | 2 | A4 — **xong** | Notebook `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain_Seed111/222/333.py` (mỗi hạt giống một notebook) và `04_A4_LamaHCEExt_Compare.py`: đo thời gian trên T4; huấn luyện lại mô hình tốt nhất của bài với hạt giống 111, 222, 333 | Độ lệch chuẩn giữa hạt giống; thời gian mỗi lần chạy để gắn ngày cho lịch; 3 tệp dự báo NPZ cho bộ đánh giá | Thư mục Q (A2 Phần 4) |
 | 3 | B0–B3, B* | B0 (LSTM nền 30 epoch, fork `e794d7c` đã sửa lưu mô hình tốt nhất), B1a (B0 + đơn vị Q mm/ngày), B1b (B1a + `qmax` quá khứ); B2 (trên B1b) phần mô hình (nhúng theo nguồn, masked mean); B3: che dữ liệu hai mức; B*: chọn theo luật ghi sẵn; gắn mốc `freeze-C` | Trọng số, nhật ký, tệp dự báo | A4; bộ nạp B2 của người 1 |
 | 4 | C | C1 tinh chỉnh 5 lõi × 8 cấu hình; C2 chạy chính thức 3 hạt giống | Tệp dự báo mọi cấu hình chính thức | `freeze-C` |
-| 5 | Mở rộng | H (dự báo 1–7 ngày) → D (730 ngày) → E (biến thể) → F (CMAL) → GV, cắt theo `03_Pipeline.md` Mục 8.3 khi thiếu thời gian | Tệp dự báo | C xong |
+| 5 | Mở rộng | H (dự báo 1–7 ngày) → D (730 ngày) → E (biến thể) → F (CMAL) → GV, cắt theo `02_Pipeline.md` Mục 8.3 khi thiếu thời gian | Tệp dự báo | C xong |
 | 6 | G | Integrated Gradients (Captum), dò trạng thái ẩn; xuất kết quả theo lưu vực cho demo | Hình, tệp kết quả XAI | Mô hình chính thức |
 | 7 | Demo D4 | Đưa khối demo D3 vào trang web trên VPS Oracle (CPU ARM): cài PyTorch bản CPU cho ARM, Docker, tên miền và cách đưa ra Internet (Mục 9.6, 12); giữ máy chạy liên tục (VPS rảnh 7 ngày có thể bị thu hồi) | Đường dẫn công khai của demo | Khối demo D3 của người 1 |
 | 8 | Báo cáo | Chương Cơ sở lý thuyết, Phương pháp, Thí nghiệm; slide phần tương ứng | | Kết quả các bước |
 
 ### Cả hai
 
-- Học BiasCast Phần 6 (theo lưu vực) và Phần 7 (hạn chế, phản biện), cùng các nội dung học trước từng bước theo bảng ở `03_Pipeline.md` Mục 9.7 (DLinear trước A3, masked mean trước B2, đọc hình các chỉ số, Cohen's d và Holm trước đánh giá — `Document/06_Theory/08_EvaluationFigures.md`, CMAL trước F, Integrated Gradients trước G).
+- Học BiasCast Phần 6 (theo lưu vực) và Phần 7 (hạn chế, phản biện), cùng các nội dung học trước từng bước theo bảng ở `02_Pipeline.md` Mục 9.7 (DLinear trước A3, masked mean trước B2, đọc hình các chỉ số, Cohen's d và Holm trước đánh giá — `Document/06_Theory/08_EvaluationFigures.md`, CMAL trước F, Integrated Gradients trước G).
 - Chương Mở đầu, Công trình liên quan, Kết luận; slide và hỏi đáp bảo vệ (`Document/05_Survey/02_LiteratureReview.md`).
 - Xem lại kết quả của nhau trước khi ghi vào báo cáo.
 - Khi bước C và các bước mở rộng cần nhiều GPU, người 1 chạy một phần thí nghiệm trên tài khoản Kaggle của mình bằng tệp cấu hình và mã commit do người 2 cung cấp (mỗi tài khoản một nhóm thí nghiệm).
@@ -65,10 +65,10 @@ Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu 
 | Từ | Đến | Thứ bàn giao | Khi nào |
 |---|---|---|---|
 | Người 1 | Người 2 | Tệp ngưỡng, số mẫu hợp lệ, danh sách lưu vực bất thường (A1) | Sau A1 |
-| Người 2 | Người 1 | Thời gian 1 lần huấn luyện (A4): khoảng 9,5 phút/epoch, 2,5–3,2 giờ/lần trên T4 — **đã bàn giao** (`03_Pipeline.md` Mục 8.1) | Sau A4 — cả nhóm gắn ngày cho lịch |
+| Người 2 | Người 1 | Thời gian 1 lần huấn luyện (A4): khoảng 9,5 phút/epoch, 2,5–3,2 giờ/lần trên T4 — **đã bàn giao** (`02_Pipeline.md` Mục 8.1) | Sau A4 — cả nhóm gắn ngày cho lịch |
 | Người 2 | Người 1 | 3 tệp NPZ của A4 (`contracts/SeqLSTM_Q_A4_seed{111,222,333}_test_S0_lead1.npz`, Output notebook `04_A4_LamaHCEExt_Compare` Version 2) — **đã sẵn sàng** | Sau A4 |
 | Người 1 | Người 2 | Bộ nạp B2 đã qua kiểm thử | Trước B2 |
-| Người 2 | Người 1 | Tệp dự báo theo định dạng chung (`03_Pipeline.md` Mục 9.5), kèm mã cấu hình và mã commit thư viện | Sau mỗi bước huấn luyện |
+| Người 2 | Người 1 | Tệp dự báo theo định dạng chung (`02_Pipeline.md` Mục 9.5), kèm mã cấu hình và mã commit thư viện | Sau mỗi bước huấn luyện |
 | Người 2 | Người 1 | Trọng số, thông số chuẩn hóa, kết quả XAI cho demo | Trước demo D1 |
 | Người 1 | Người 2 | Khối demo D3 đã chạy trên laptop | Trước demo D4 |
 
@@ -76,13 +76,13 @@ Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu 
 
 Quy tắc đầy đủ cho Claude Code nằm ở `CLAUDE.md` và `.claude/rules/` (cả hai thành viên dùng chung, theo dõi trong git); phần dưới là tóm tắt cho người.
 
-- **Đọc trước:** `Document/01_Plan/03_Pipeline.md`, `Document/01_Plan/02_BasePaper.md`, `CLAUDE.md`.
+- **Đọc trước:** `Document/01_Plan/02_Pipeline.md`, `Document/01_Plan/01_BasePaper.md`, `CLAUDE.md`.
 - **Lập kế hoạch trước khi viết mã:** mỗi notebook, bước có kế hoạch (cài đặt Kaggle, các Phần, đầu ra, vì sao) được duyệt trước; viết từng cell, chạy, xem output rồi mới viết cell sau.
 - **Notebook:** mỗi notebook Kaggle là một tệp `.py` tự đủ trong thư mục con cùng tên `Workspace/<NN_Việc>/<notebook>/` (mỗi thư mục `<NN_Việc>` một việc; thư mục con chứa `.py`, `.ipynb`, báo cáo `.md`, `Figures/`, `Tables/`), tên `NN_<Bước>_<BộDữLiệu>_<Việc>.py` trùng tên notebook Kaggle, chia cell `# %% Phần X`, có mục lục ở đầu. Báo cáo `.md` cùng tên đặt cạnh notebook.
 - **`.py` và `.ipynb`:** `.py` là mã nguồn để chạy tương tác và thử; `.ipynb` cùng tên là **bản chính thức**, tải từ đúng phiên bản Save & Run All trên Kaggle, có output, số Version ghi trong báo cáo. Tệp chính thức chạy được bằng Save & Run All mà không sửa dòng nào; nhiều biến thể (VD 3 hạt giống) thì mỗi biến thể một tệp.
 - **Thử nghiệm:** đoạn mã thử, đo thời gian là cell tạm, chạy xong xóa, không ghi vào tệp chính thức.
 - **Hình:** chữ trong hình tiếng Anh, số dấu chấm; có tiêu đề chung và tiêu đề từng ô (a), (b)…; chú giải đặt ngoài vùng vẽ; dưới hình in một chú thích tiếng Việt; tải về đặt ở `Workspace/<NN_Việc>/<notebook>/Figures/`, tên bắt đầu bằng mã bước.
-- **Thư viện:** sửa trong `NeuralHydrology/` (nhánh `research`), mỗi thay đổi một commit; notebook cài theo mã commit; sau mốc `freeze-C` không đổi mã dùng chung (`03_Pipeline.md` Mục 9.1).
+- **Thư viện:** sửa trong `NeuralHydrology/` (nhánh `research`), mỗi thay đổi một commit; notebook cài theo mã commit; sau mốc `freeze-C` không đổi mã dùng chung (`02_Pipeline.md` Mục 9.1).
 - **Kết quả:** trọng số và nhật ký nằm ở Output của bản Save Version; notebook sau gắn Output đó làm Input, ghi số Version và kiểm sha256 theo `manifest.csv`; kết quả giữa các bước không chuyển thành Kaggle Dataset; chia sẻ notebook cho thành viên kia; mỗi lần huấn luyện lưu kèm tệp cấu hình và mã commit.
 - **Ghi chú:** kết quả và quyết định ghi vào `.md` tương ứng, văn phong báo cáo, có nguồn; hỏi nhau trước khi tạo tệp `.md` mới ngoài kế hoạch.
 - **Git:** trước khi push chạy `git fetch` và xem commit mới của thành viên kia, có thì `git pull --ff-only` trước; lời nhắn commit, mô tả PR chỉ ghi nội dung thay đổi, không ghi công cụ AI (không dòng `Co-Authored-By: Claude`, không "Generated with Claude Code"). `Plans/` là kế hoạch cá nhân, không đưa lên git.

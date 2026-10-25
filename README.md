@@ -6,7 +6,7 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 
 | Thư mục | Nội dung |
 |---|---|
-| `Document/01_Plan/` | Giới thiệu bài cơ sở BiasCast (`02_BasePaper.md`); tài liệu gốc của đề tài: tên, câu hỏi nghiên cứu, pipeline, kiến trúc, phạm vi (`03_Pipeline.md`) |
+| `Document/01_Plan/` | Giới thiệu bài cơ sở BiasCast (`01_BasePaper.md`); tài liệu gốc của đề tài: tên, câu hỏi nghiên cứu, pipeline, kiến trúc, phạm vi (`02_Pipeline.md`) |
 | `Document/02_Meetings/` | Biên bản họp với GVHD và việc cần làm |
 | `Document/03_Data/` | Ghi chú thực thi dữ liệu LamaH-CE và Extended LamaH-CE: tải, kiểm tra, kết quả |
 | `Document/04_Ideas/` | Ý tưởng cho đề tài: căn cứ, chi phí, vị trí trong lộ trình |
@@ -24,7 +24,7 @@ PDF trong `PaperResearch/PaperResearchPDF/` để nhóm tham khảo. Giấy phé
 ## Làm việc chung
 
 - **Phân công:** `ASSIGNMENT.md` — việc của từng người theo từng bước, điểm bàn giao, quy ước chung.
-- **Đọc trước:** `Document/01_Plan/03_Pipeline.md` (tài liệu gốc: câu hỏi nghiên cứu, đóng góp, các bước, ma trận thí nghiệm), sau đó `02_BasePaper.md` và sơ đồ `Diagrams/ProjectDiagram.drawio` (mở bằng draw.io).
+- **Đọc trước:** `Document/01_Plan/02_Pipeline.md` (tài liệu gốc: câu hỏi nghiên cứu, đóng góp, các bước, ma trận thí nghiệm), sau đó `01_BasePaper.md` và sơ đồ `Diagrams/ProjectDiagram.drawio` (mở bằng draw.io).
 - **Tải repo kèm mã tác giả:** `git clone --recurse-submodules <link repo>`; nếu đã clone rồi thì chạy `git submodule update --init`.
 - **Thư viện huấn luyện:** fork `github.com/Ticasslo/neuralhydrology` — nhánh `master` là mã tác giả, nhánh `research` là phần đề tài viết thêm; notebook cài theo mã commit. Sửa thư viện: làm trong `NeuralHydrology/`, commit và push trong thư mục đó (nhánh `research`), rồi commit lại thư mục `NeuralHydrology` ở repo đề tài để cập nhật con trỏ submodule.
 - **Dữ liệu:** Kaggle Dataset `hunhngcthng/lamah-ce-ext` (công khai), tải bằng `Workspace/01_Download/01_LamaHCEExt_Download/01_LamaHCEExt_Download.py`.

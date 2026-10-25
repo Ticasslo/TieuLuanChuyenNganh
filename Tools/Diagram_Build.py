@@ -1,5 +1,5 @@
 # Sinh sơ đồ đề tài Diagrams/ProjectDiagram.drawio từ nội dung khai báo bên dưới.
-# Chạy: python Tools/Diagram_Build.py (từ gốc repo). Nội dung khớp Document/01_Plan/03_Pipeline.md.
+# Chạy: python Tools/Diagram_Build.py (từ gốc repo). Nội dung khớp Document/01_Plan/02_Pipeline.md.
 #
 # Mục lục:
 #   Phần 1 - Màu theo bước và kiểu hình

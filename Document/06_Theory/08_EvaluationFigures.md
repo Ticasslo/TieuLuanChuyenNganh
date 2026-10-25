@@ -1,6 +1,6 @@
 # Đánh giá mô hình: đọc hình các chỉ số
 
-Ghi chú học cách đọc mọi chỉ số đánh giá của đề tài (`01_Plan/03_Pipeline.md` Mục 6) qua 10 hình minh họa. Khái niệm nền đã học ở BiasCast Phần 2 (`04_BiasCast2_Metrics.md`: NSE, CDF, KGE, persistence, PNSE, Wilcoxon) và Phần 3 (`05_BiasCast3_Data.md` Mục 3.5: bốn mức, %BiasFHV/FMS/FLV; Mục 3.6: lũ theo chu kỳ lặp lại); tệp này không nhắc lại công thức đã có ở đó, chỉ tập trung vào **cách đọc hình** và **cách gộp 451 lưu vực**.
+Ghi chú học cách đọc mọi chỉ số đánh giá của đề tài (`01_Plan/02_Pipeline.md` Mục 6) qua 10 hình minh họa. Khái niệm nền đã học ở BiasCast Phần 2 (`04_BiasCast2_Metrics.md`: NSE, CDF, KGE, persistence, PNSE, Wilcoxon) và Phần 3 (`05_BiasCast3_Data.md` Mục 3.5: bốn mức, %BiasFHV/FMS/FLV; Mục 3.6: lũ theo chu kỳ lặp lại); tệp này không nhắc lại công thức đã có ở đó, chỉ tập trung vào **cách đọc hình** và **cách gộp 451 lưu vực**.
 
 ## 0. Dữ liệu của các hình và quy ước chung
 
@@ -88,7 +88,7 @@ PNSE = 1 − Σ(sai số mô hình)² / Σ(sai số persistence)², với sai s�
 | (b) | Trung vị có dấu: A −15%, B +1,9%. Đường A gần như nằm hẳn bên trái 0 (lưu vực nào cũng hụt); đường B vắt qua 0 |
 | (c) | Trung vị trị tuyệt đối: A 15,1%, B 15,6% — **B sai đỉnh lớn không kém A** |
 
-**Vì sao cần trị tuyệt đối.** Khi gộp nhiều lưu vực, lệch dương ở lưu vực này và lệch âm ở lưu vực kia triệt tiêu nhau: VD nửa số lưu vực +30%, nửa kia −30%, trung vị có dấu gần 0 trông như hoàn hảo, nhưng lưu vực nào cũng sai 30%. Trung vị có dấu cho biết **hướng lệch chung**, trung vị trị tuyệt đối cho biết **sai lớn cỡ nào**; đề tài báo cáo cả hai (`03_Pipeline.md` Mục 6.1).
+**Vì sao cần trị tuyệt đối.** Khi gộp nhiều lưu vực, lệch dương ở lưu vực này và lệch âm ở lưu vực kia triệt tiêu nhau: VD nửa số lưu vực +30%, nửa kia −30%, trung vị có dấu gần 0 trông như hoàn hảo, nhưng lưu vực nào cũng sai 30%. Trung vị có dấu cho biết **hướng lệch chung**, trung vị trị tuyệt đối cho biết **sai lớn cỡ nào**; đề tài báo cáo cả hai (`02_Pipeline.md` Mục 6.1).
 
 ## 5. Bốn mức lưu lượng
 
@@ -106,7 +106,7 @@ Mỗi ngày được xếp vào một trong bốn mức theo ngưỡng riêng c�
 | (b) | Cộng dồn 451 lưu vực: recall mức rất cao của A 49%, mức thấp 57%; của B lần lượt 69% và 75%. B bắt mức rất cao tốt hơn nhưng báo nhầm nhiều hơn (precision mức rất cao: A 93%, B 64%) |
 | (c) | Recall mức rất cao tính riêng từng lưu vực: trung vị A 0,48, B 0,81; đường B nằm hẳn bên phải |
 
-**Rút ra:** đây là đánh giá theo mức mà GVHD yêu cầu: đọc recall ở mức rất cao và mức thấp trước, chấp nhận báo động nhầm nhiều hơn (`03_Pipeline.md` Mục 6.2). Theo tiêu chí đó B tốt hơn A, dù NSE trung vị bằng nhau.
+**Rút ra:** đây là đánh giá theo mức mà GVHD yêu cầu: đọc recall ở mức rất cao và mức thấp trước, chấp nhận báo động nhầm nhiều hơn (`02_Pipeline.md` Mục 6.2). Theo tiêu chí đó B tốt hơn A, dù NSE trung vị bằng nhau.
 
 ## 6. Sự kiện lũ
 
@@ -114,7 +114,7 @@ Mỗi ngày được xếp vào một trong bốn mức theo ngưỡng riêng c�
 
 *Hình 6. Sự kiện lũ: (a) một lưu vực, ngưỡng chu kỳ 2 năm, đánh dấu trận bắt được, bỏ sót và báo nhầm; (b) POD, precision, F1, CSI của mô hình A khi cộng dồn số trận 451 lưu vực, theo bốn ngưỡng; (c) CDF POD theo lưu vực, chỉ tính lưu vực có trận.*
 
-Một trận lũ bắt đầu ở ngày lưu lượng vượt ngưỡng từ dưới lên. Giao thức chính yêu cầu trận dự báo bắt đầu **cùng ngày** trận thật; bảng phụ cho phép ±1 ngày (`03_Pipeline.md` Mục 6.2). Trận quan trắc không có cặp khớp là **bỏ sót**; trận dự báo không khớp trận thật nào là **báo nhầm**. Hình dưới minh họa cửa sổ ±1 của bảng phụ và chưa áp tiêu chí gộp trận độc lập USWRC.
+Một trận lũ bắt đầu ở ngày lưu lượng vượt ngưỡng từ dưới lên. Giao thức chính yêu cầu trận dự báo bắt đầu **cùng ngày** trận thật; bảng phụ cho phép ±1 ngày (`02_Pipeline.md` Mục 6.2). Trận quan trắc không có cặp khớp là **bỏ sót**; trận dự báo không khớp trận thật nào là **báo nhầm**. Hình dưới minh họa cửa sổ ±1 của bảng phụ và chưa áp tiêu chí gộp trận độc lập USWRC.
 
 | Chỉ số | Công thức (h bắt được, m bỏ sót, f báo nhầm) | Nghĩa |
 |---|---|---|
@@ -158,7 +158,7 @@ So B với A ở ngưỡng 2 năm: B bắt 954 trận (POD 0,66) nhưng báo nh�
 
 *Hình 8. Kịch bản vận hành: (a) NSE của hai mô hình ở lưu vực mẫu trong từng kịch bản; (b) trung vị và dải 50% giữa của 451 lưu vực.*
 
-Các kịch bản chỉ thay **đầu vào lúc dự báo** (không huấn luyện lại) để mô phỏng tình huống thực tế (`03_Pipeline.md` Mục 6.3):
+Các kịch bản chỉ thay **đầu vào lúc dự báo** (không huấn luyện lại) để mô phỏng tình huống thực tế (`02_Pipeline.md` Mục 6.3):
 
 | Kịch bản | Tình huống |
 |---|---|
@@ -183,7 +183,7 @@ Các kịch bản chỉ thay **đầu vào lúc dự báo** (không huấn luy�
 
 *Hình 9. Theo hạn: (a) NSE ở lưu vực mẫu cho từng hạn 1–7 ngày; (b) trung vị và dải 50% giữa của 451 lưu vực.*
 
-Bước H dự báo 1–7 ngày tới (`03_Pipeline.md` Mục 4.4, 6.6). Mỗi hạn được chấm như một bộ dự báo riêng: hạn 3 ngày là chuỗi các dự báo làm trước 3 ngày, so với quan trắc, ra một NSE cho mỗi lưu vực.
+Bước H dự báo 1–7 ngày tới (`02_Pipeline.md` Mục 4.4, 6.6). Mỗi hạn được chấm như một bộ dự báo riêng: hạn 3 ngày là chuỗi các dự báo làm trước 3 ngày, so với quan trắc, ra một NSE cho mỗi lưu vực.
 
 | Ô | Đọc |
 |---|---|
@@ -209,11 +209,11 @@ Câu hỏi: **B hơn A ở loại lưu vực nào?** Với mỗi thuộc tính, 
 
 Trong hình: chỉ số dòng chảy nền +0,26, tỉ lệ tuyết +0,21, độ cao +0,19 (B có lợi ở lưu vực chảy chậm, nhiều tuyết, cao); diện tích +0,10, lưu lượng trung bình +0,13 (yếu); chỉ số khô hạn −0,04 (không liên quan). Các thuộc tính trong hình là giả lập; riêng chỉ số dòng chảy nền là yếu tố được dùng để tạo nhiễu của B nên tương quan với hiệu NSE.
 
-**Khi làm thật** (`03_Pipeline.md` Mục 6.4): kiểm giả thuyết của các nghiên cứu trước rằng SSM có lợi ở lưu vực có tuyết, động lực chậm và bất lợi ở lũ nhanh. Tương quan yếu (rho khoảng 0,2) chỉ là xu hướng, không phải quy luật; một thuộc tính có thể tương quan vì đi kèm thuộc tính khác (độ cao đi kèm tuyết).
+**Khi làm thật** (`02_Pipeline.md` Mục 6.4): kiểm giả thuyết của các nghiên cứu trước rằng SSM có lợi ở lưu vực có tuyết, động lực chậm và bất lợi ở lũ nhanh. Tương quan yếu (rho khoảng 0,2) chỉ là xu hướng, không phải quy luật; một thuộc tính có thể tương quan vì đi kèm thuộc tính khác (độ cao đi kèm tuyết).
 
 ## 11. Ưu tiên chỉ số nào: ba tầng
 
-Mọi chỉ số tính từ cùng một tệp dự báo nên tính thêm gần như không tốn; điều cần tránh là dùng nhiều chỉ số ngang hàng để chọn mô hình. Đề tài chia ba tầng (`03_Pipeline.md` Mục 6.1):
+Mọi chỉ số tính từ cùng một tệp dự báo nên tính thêm gần như không tốn; điều cần tránh là dùng nhiều chỉ số ngang hàng để chọn mô hình. Đề tài chia ba tầng (`02_Pipeline.md` Mục 6.1):
 
 | Tầng | Chỉ số | Dùng để |
 |---|---|---|
