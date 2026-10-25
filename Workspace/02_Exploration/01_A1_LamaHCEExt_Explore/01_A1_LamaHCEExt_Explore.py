@@ -6324,6 +6324,296 @@ print("Đã lưu hình:", center_figure, "; đã lưu năm CSV vào:", TABLE_DIR
 print(f"Thời gian kiểm tương quan trừ mean tháng train: {time.perf_counter() - started_pair_center:.1f} giây.")
 
 # %% [markdown]
+# ### 6.5. Ba mốc nâng lưới HRES: hiệu và W1 theo năm, tháng, trước/sau
+#
+# Cell độc lập: chỉ cần Input `lamah-ce-ext`, chạy được trong phiên CPU mới mà không chạy lại Phần 1–6.4.
+# Giữ năm cặp tác giả, thêm mưa/bốc hơi đối chiếu ERA5-Land; chỉ mô tả thay đổi, không hiệu chỉnh dữ liệu.
+# Các vạch ngày nâng lưới là mốc đối chiếu, không phải kết quả kiểm định nguyên nhân.
+
+# %% Phần 6.5 - Ba mốc nâng lưới HRES, cùng ngày và cùng lưu vực
+# Đọc khí tượng 451 ID một lần; mean/W1 theo năm, tháng và cửa sổ trước/sau, giữ đơn vị lưu trữ.
+# Không dùng kết quả test để chọn mô hình/scaler; bức xạ net/downward và dấu ET được ghi riêng.
+import hashlib
+import json
+import os
+import platform
+import re
+import time
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import scipy
+from IPython.display import display
+from scipy.stats import wasserstein_distance
+
+hres_started = time.perf_counter()
+hres_search = Path(os.environ.get("LAMAH_ROOT", "/kaggle/input" if Path("/kaggle/input").exists() else "."))
+hres_candidates = [p for p in hres_search.rglob("LamaH_extended") if p.is_dir()]
+if hres_search.name == "LamaH_extended":
+    hres_candidates.append(hres_search)
+if "LAMAH_DIR" in globals() and Path(LAMAH_DIR).is_dir():
+    hres_candidates = [Path(LAMAH_DIR)]
+hres_candidates = sorted(set(p.resolve() for p in hres_candidates))
+if len(hres_candidates) != 1:
+    raise ValueError(f"Cần đúng một nguồn LamaH_extended; thấy {hres_candidates}. Kiểm Input hoặc LAMAH_ROOT.")
+hres_root = hres_candidates[0]
+hres_id_files = sorted(hres_search.rglob("basins_filtered.txt"))
+if "EXP_DIR" in globals() and (Path(EXP_DIR) / "basins_filtered.txt").is_file():
+    hres_id_files = [Path(EXP_DIR) / "basins_filtered.txt"]
+if not hres_id_files:
+    raise FileNotFoundError("Thiếu basins_filtered.txt của thí nghiệm BiasCast trong Input.")
+hres_id_lists = [tuple(str(int(x)) for x in p.read_text(encoding="utf-8-sig").split()) for p in hres_id_files]
+if any(len(x) != 451 or len(set(x)) != 451 for x in hres_id_lists):
+    raise ValueError("Danh sách phải có đúng 451 ID không trùng.")
+if any(set(x) != set(hres_id_lists[0]) for x in hres_id_lists):
+    raise ValueError("Có nhiều danh sách 451 ID khác nhau; không tự chọn nguồn.")
+hres_ids = sorted(hres_id_lists[0], key=int)
+hres_daily = hres_root / "A_basins_total_upstrm" / "2_timeseries" / "daily"
+hres_paths = {}
+for hres_path in sorted(hres_daily.glob("ID_*.csv")):
+    hres_match = re.fullmatch(r"ID_(\d+)\.csv", hres_path.name)
+    if hres_match:
+        hres_id = str(int(hres_match.group(1)))
+        if hres_id in hres_paths:
+            raise ValueError(f"Trùng tệp khí tượng ID {hres_id}.")
+        hres_paths[hres_id] = hres_path
+if set(hres_ids) - set(hres_paths):
+    raise FileNotFoundError(f"Thiếu tệp khí tượng: {sorted(set(hres_ids) - set(hres_paths), key=int)}")
+hres_work = Path(globals().get("WORK_DIR", "/kaggle/working" if Path("/kaggle/working").exists() else "explore_output"))
+hres_tables = hres_work / "Tables"
+hres_figures = hres_work / "Figures"
+hres_tables.mkdir(parents=True, exist_ok=True)
+hres_figures.mkdir(parents=True, exist_ok=True)
+hres_contract = pd.DataFrame([
+    ("temperature", "ERA5L_2m_temp_mean", "ECMWF_t2m", "Temperature", "degC", "ERA5-Land", "comparable_stored_columns"),
+    ("dewpoint", "ERA5L_2m_dp_temp_mean", "ECMWF_d2m", "Dew point", "degC", "ERA5-Land", "comparable_stored_columns"),
+    ("precipitation_era5l", "ERA5L_prec", "ECMWF_tp", "Precipitation", "mm/day", "ERA5-Land", "accumulation_convention_to_trace"),
+    ("evaporation_era5l", "ERA5L_total_et", "ECMWF_e", "Evaporation", "stored mm/day", "ERA5-Land", "sign_components_to_trace_no_flip"),
+    ("solar", "ERA5L_surf_net_solar_rad_mean", "ECMWF_ssrd", "Solar: net vs downward", "stored raw units", "ERA5-Land", "different_quantities_not_physical_bias"),
+    ("precipitation", "MSWEP_RR", "ECMWF_tp", "Precipitation vs MSWEP", "mm/day", "MSWEP", "author_pair"),
+    ("evaporation", "GLEAM_ETA", "ECMWF_e", "Evaporation vs GLEAM", "stored mm/day", "GLEAM", "author_pair_sign_components_to_trace"),
+], columns=["pair_id", "reference_variable", "forecast_variable", "label", "unit", "reference_source", "interpretation"])
+hres_events = pd.DataFrame([
+    ("2006", "2006-02-01", "40_to_25_km"),
+    ("2010", "2010-01-26", "25_to_16_km"),
+    ("2016", "2016-03-08", "16_to_9_km"),
+], columns=["event", "cut_date", "grid_change"])
+hres_years = list(range(2002, 2018))
+hres_months = sorted(set(m for cut in hres_events.cut_date for m in pd.period_range(
+    pd.Timestamp(cut).to_period("M") - 12, pd.Timestamp(cut).to_period("M") + 11, freq="M")))
+
+
+def a1_hres_metrics(reference, forecast, expected):
+    valid = np.isfinite(reference) & np.isfinite(forecast)
+    x = reference[valid]
+    y = forecast[valid]
+    n = len(x)
+    result = {"expected_days": int(expected), "paired_days": n,
+              "reference_mean": np.nan, "forecast_mean": np.nan, "mean_delta": np.nan,
+              "w1": np.nan, "mae": np.nan, "reference_negative_days": int((x < 0).sum()),
+              "forecast_negative_days": int((y < 0).sum())}
+    if n:
+        result.update(reference_mean=float(x.mean()), forecast_mean=float(y.mean()),
+                      mean_delta=float((y - x).mean()), w1=float(np.abs(np.sort(y) - np.sort(x)).mean()),
+                      mae=float(np.abs(y - x).mean()))
+        tol = 1e-10 * (1 + max(abs(result["mean_delta"]), result["w1"], result["mae"]))
+        if abs(result["mean_delta"]) > result["w1"] + tol or result["w1"] > result["mae"] + tol:
+            raise AssertionError("Không thỏa |mean delta| <= W1 <= MAE.")
+    return result
+
+
+# Kiểm công thức W1 khi hai dãy có cùng số cặp; không dùng kiểm giả lập thay kết quả dataset.
+for hres_x, hres_y in [([0., 1., 4.], [1., 2., 7.]), ([-2., 0., 3.], [3., -2., 0.])]:
+    hres_probe = a1_hres_metrics(np.array(hres_x), np.array(hres_y), 3)
+    if not np.isclose(hres_probe["w1"], wasserstein_distance(hres_x, hres_y), rtol=1e-12, atol=1e-12):
+        raise AssertionError("W1 không khớp SciPy.")
+
+hres_annual_rows = []
+hres_monthly_rows = []
+hres_window_rows = []
+hres_inputs = []
+hres_fields = sorted(set(hres_contract.reference_variable) | set(hres_contract.forecast_variable))
+print("Phần 6.5 - HRES: chỉ đọc khí tượng, không huấn luyện; nguồn:", hres_root)
+for hres_no, hres_id in enumerate(hres_ids, 1):
+    hres_path = hres_paths[hres_id]
+    hres_raw = pd.read_csv(hres_path, sep=";", dtype=str, encoding="utf-8-sig",
+                           usecols=["YYYY", "MM", "DD"] + hres_fields, keep_default_na=False, na_filter=False)
+    hres_dates = pd.DatetimeIndex(pd.to_datetime(hres_raw[["YYYY", "MM", "DD"]].rename(
+        columns={"YYYY": "year", "MM": "month", "DD": "day"}), errors="raise"))
+    if hres_dates.duplicated().any() or not hres_dates.is_monotonic_increasing:
+        raise ValueError(f"ID {hres_id}: lịch trùng hoặc không tăng.")
+    hres_keep = (hres_dates >= "2002-01-01") & (hres_dates <= "2017-12-31")
+    hres_dates = hres_dates[hres_keep]
+    hres_values = {}
+    for field in hres_fields:
+        tokens = hres_raw.loc[hres_keep, field].str.strip()
+        numbers = pd.to_numeric(tokens, errors="coerce").to_numpy(dtype=float)
+        if (tokens.ne("").to_numpy() & np.isnan(numbers)).any() or np.isinf(numbers).any():
+            raise ValueError(f"ID {hres_id}/{field}: token lạ hoặc vô cực; kiểm trước khi tính.")
+        hres_values[field] = np.where(numbers == -999, np.nan, numbers)
+    hres_year_idx = {year: np.flatnonzero(hres_dates.year == year) for year in hres_years}
+    hres_month_idx = {str(month): np.flatnonzero((hres_dates.year == month.year) & (hres_dates.month == month.month))
+                      for month in hres_months}
+    for pair in hres_contract.itertuples(index=False):
+        reference = hres_values[pair.reference_variable]
+        forecast = hres_values[pair.forecast_variable]
+        for year, idx in hres_year_idx.items():
+            expected = len(pd.date_range(f"{year}-01-01", f"{year}-12-31"))
+            hres_annual_rows.append({"basin_id": hres_id, "pair_id": pair.pair_id, "year": year,
+                                    **a1_hres_metrics(reference[idx], forecast[idx], expected)})
+        for month in hres_months:
+            idx = hres_month_idx[str(month)]
+            hres_monthly_rows.append({"basin_id": hres_id, "pair_id": pair.pair_id, "month": str(month),
+                                     **a1_hres_metrics(reference[idx], forecast[idx], month.days_in_month)})
+        # Ngày chuyển đổi không được xem là kỳ mới chắc chắn của CSV: đối chiếu thêm dịch mốc +/-1 ngày.
+        for event in hres_events.itertuples(index=False):
+            for days, shift, year_shift in [(90, 0, -1), (90, 0, 0), (90, 0, 1), (365, 0, 0),
+                                            (90, -1, 0), (90, 1, 0)]:
+                cut = pd.Timestamp(event.cut_date) + pd.DateOffset(years=year_shift) + pd.Timedelta(days=shift)
+                for side, left, right in [("before", cut - pd.Timedelta(days=days), cut),
+                                           ("after", cut, cut + pd.Timedelta(days=days))]:
+                    idx = np.flatnonzero((hres_dates >= left) & (hres_dates < right))
+                    hres_window_rows.append({"basin_id": hres_id, "pair_id": pair.pair_id,
+                        "event": event.event, "window_days": days, "cut_shift_days": shift,
+                        "control_year_shift": year_shift, "cut_date": str(cut.date()), "side": side,
+                        "start_date": str(left.date()), "end_date": str((right - pd.Timedelta(days=1)).date()),
+                        **a1_hres_metrics(reference[idx], forecast[idx], days)})
+    hres_inputs.append({"basin_id": hres_id, "path": str(hres_path), "bytes": hres_path.stat().st_size,
+                        "sha256": hashlib.sha256(hres_path.read_bytes()).hexdigest()})
+    if hres_no % 50 == 0 or hres_no == len(hres_ids):
+        print(f"Đã đọc {hres_no}/{len(hres_ids)} ID; {time.perf_counter() - hres_started:.1f}s", flush=True)
+A1_HRES_ANNUAL = pd.DataFrame(hres_annual_rows)
+A1_HRES_MONTHLY = pd.DataFrame(hres_monthly_rows)
+A1_HRES_WINDOWS = pd.DataFrame(hres_window_rows)
+
+
+def a1_hres_summarize(frame, keys):
+    rows = []
+    for key, part in frame.groupby(keys, sort=True):
+        if not isinstance(key, tuple):
+            key = (key,)
+        n = part.paired_days.to_numpy(dtype=float)
+        row = dict(zip(keys, key))
+        row.update(IDs=len(part), expected_day_IDs=int(part.expected_days.sum()), paired_day_IDs=int(n.sum()),
+                   IDs_with_pairs=int((n > 0).sum()))
+        for metric in ["reference_mean", "forecast_mean", "mean_delta", "w1"]:
+            vals = part[metric].to_numpy(dtype=float)
+            good = np.isfinite(vals) & (n > 0)
+            row[metric + "_median"] = float(np.median(vals[good])) if good.any() else np.nan
+            if metric != "w1":
+                row[metric + "_pooled"] = float(np.average(vals[good], weights=n[good])) if good.any() else np.nan
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+A1_HRES_ANNUAL_SUMMARY = a1_hres_summarize(A1_HRES_ANNUAL, ["pair_id", "year"])
+A1_HRES_MONTHLY_SUMMARY = a1_hres_summarize(A1_HRES_MONTHLY, ["pair_id", "month"])
+hres_window_keys = ["basin_id", "pair_id", "event", "window_days", "cut_shift_days", "control_year_shift"]
+hres_before = A1_HRES_WINDOWS.loc[A1_HRES_WINDOWS.side.eq("before")]
+hres_after = A1_HRES_WINDOWS.loc[A1_HRES_WINDOWS.side.eq("after")]
+hres_changes = hres_before.merge(hres_after, on=hres_window_keys, suffixes=("_before", "_after"), validate="one_to_one")
+hres_changes["complete_both_windows"] = hres_changes.paired_days_before.eq(hres_changes.expected_days_before) & hres_changes.paired_days_after.eq(hres_changes.expected_days_after)
+for metric in ["mean_delta", "w1"]:
+    hres_changes[metric + "_change"] = (hres_changes[metric + "_after"] - hres_changes[metric + "_before"]).where(hres_changes.complete_both_windows)
+hres_change_rows = []
+for key, part in hres_changes.groupby(hres_window_keys[1:], sort=True):
+    row = dict(zip(hres_window_keys[1:], key))
+    row.update(IDs=len(part), complete_IDs=int(part.complete_both_windows.sum()))
+    for metric in ["mean_delta", "w1"]:
+        for suffix in ["before", "after", "change"]:
+            vals = part.loc[part.complete_both_windows, metric + "_" + suffix].dropna()
+            row[metric + "_" + suffix + "_median"] = float(vals.median()) if len(vals) else np.nan
+        vals = part[metric + "_change"].dropna()
+        row[metric + "_change_p05"] = float(vals.quantile(.05)) if len(vals) else np.nan
+        row[metric + "_change_p95"] = float(vals.quantile(.95)) if len(vals) else np.nan
+        row[metric + "_positive_change_IDs"] = int(vals.gt(0).sum())
+    hres_change_rows.append(row)
+A1_HRES_CHANGE_SUMMARY = pd.DataFrame(hres_change_rows)
+hres_checks = {"IDs": len(hres_ids), "annual_rows": len(A1_HRES_ANNUAL),
+    "monthly_rows": len(A1_HRES_MONTHLY), "window_rows": len(A1_HRES_WINDOWS),
+    "annual_rows_expected": 451 * 7 * 16, "W1_scipy_fixture_matched": True,
+    "annual_groups_all_451": bool(A1_HRES_ANNUAL_SUMMARY.IDs.eq(451).all()),
+    "annual_complete_all_pairs": bool(A1_HRES_ANNUAL.paired_days.eq(A1_HRES_ANNUAL.expected_days).all()),
+    "computed_on_dataset": True, "causal_upgrade_effect_established": False}
+if len(A1_HRES_ANNUAL) != hres_checks["annual_rows_expected"] or not hres_checks["annual_groups_all_451"]:
+    raise AssertionError("Sai số hàng/ID của bảng năm.")
+# Nếu phiên đã có 6.1, kiểm năm cặp cũ so cùng nguồn; phiên mới không cần chạy lại 6.1.
+if "A1_METEO_PAIR_SCOPED_SUMMARY" in globals():
+    old = A1_METEO_PAIR_SCOPED_SUMMARY.loc[A1_METEO_PAIR_SCOPED_SUMMARY.scope_kind.eq("year")].copy()
+    old["year"] = old.scope.astype(int)
+    old = old.loc[old.year.between(2002, 2017)]
+    same = old.merge(A1_HRES_ANNUAL_SUMMARY, on=["pair_id", "year"], validate="one_to_one")
+    if len(same) != 80 or not same.paired_cells.eq(same.paired_day_IDs).all():
+        raise AssertionError("Nguồn năm cặp cũ không khớp 6.1.")
+    for old_col, new_col in [("reference_mean_raw", "reference_mean_pooled"), ("forecast_mean_raw", "forecast_mean_pooled")]:
+        if not np.allclose(same[old_col], same[new_col], rtol=1e-10, atol=1e-10, equal_nan=True):
+            raise AssertionError("Mean năm khác 6.1.")
+    hres_checks["old_part6_1"] = "matched"
+else:
+    hres_checks["old_part6_1"] = "not_run_in_this_session"
+for stem, frame in [("contract", hres_contract), ("events", hres_events), ("annual_by_basin", A1_HRES_ANNUAL),
+    ("annual_summary", A1_HRES_ANNUAL_SUMMARY), ("monthly_by_basin", A1_HRES_MONTHLY),
+    ("monthly_summary", A1_HRES_MONTHLY_SUMMARY), ("windows_by_basin", A1_HRES_WINDOWS),
+    ("changes_by_basin", hres_changes), ("change_summary", A1_HRES_CHANGE_SUMMARY),
+    ("input_manifest", pd.DataFrame(hres_inputs))]:
+    frame.to_csv(hres_tables / f"A1_P6_HRES_{stem}.csv", index=False, encoding="utf-8-sig")
+hres_plot_pairs = hres_contract.iloc[:5]
+for resolution, data, time_key in [("annual", A1_HRES_ANNUAL_SUMMARY, "year"), ("monthly", A1_HRES_MONTHLY_SUMMARY, "month")]:
+    fig, axes = plt.subplots(5, 2, figsize=(15, 18))
+    for index, pair in enumerate(hres_plot_pairs.itertuples(index=False)):
+        part = data.loc[data.pair_id.eq(pair.pair_id)].copy()
+        if resolution == "monthly":
+            # Các khoảng tháng quanh ba mốc không được nối qua đoạn chưa tính.
+            full = pd.period_range(min(hres_months), max(hres_months), freq="M").astype(str)
+            part = part.set_index("month").reindex(full).rename_axis("month").reset_index()
+        x = pd.to_datetime(part[time_key].astype(str) + ("-07-01" if resolution == "annual" else "-01"))
+        for col, metric, title in [(0, "mean_delta_pooled", "Mean HRES minus reference"), (1, "w1_median", "Median per-basin W1")]:
+            ax = axes[index, col]
+            ax.plot(x, part[metric], marker="o", ms=2, color="#247a99")
+            if col == 0:
+                ax.axhline(0, color="grey", lw=.8)
+            for event in hres_events.itertuples(index=False):
+                ax.axvline(pd.Timestamp(event.cut_date), color="#cd7634", ls="--", lw=.8)
+            ax.set(title=f"({chr(97 + 2 * index + col)}) {pair.label} | {title}", ylabel=pair.unit, xlabel="Calendar date")
+            ax.ticklabel_format(axis="y", style="plain", useOffset=False)
+            if col == 1:
+                ax.set_ylim(bottom=0)
+            ax.grid(alpha=.2)
+    fig.suptitle(f"HRES vs ERA5-Land | {resolution} | common dates per basin", fontsize=15)
+    fig.text(.5, .015, "Dashed lines: documented operational upgrades, not detected causal breaks.\n"
+             "Solar net vs downward: stored-value diagnostic only. Evaporation: signs/components not harmonized.\n"
+             "Mean: pooled paired basin-days. W1: median of per-basin distances; never averaged from monthly W1.",
+             ha="center", fontsize=9)
+    fig.tight_layout(rect=(0, .06, 1, .97))
+    fig.savefig(hres_figures / f"A1_P6_HRES_{resolution}_changes.png", dpi=150, bbox_inches="tight")
+    plt.show()
+    plt.close(fig)
+    print(f"Hình: hiệu HRES trừ ERA5-Land và W1 theo {resolution}, {len(hres_ids)} lưu vực. "
+          "Vạch đứt là ngày nâng lưới đã công bố; W1 là trung vị chỉ số từng lưu vực, không phải W1 gộp. "
+          "Bức xạ chỉ so giá trị lưu trữ; dấu/thành phần ET chưa đồng nhất.")
+hres_checks["basin_list_sha256"] = hashlib.sha256(hres_id_files[0].read_bytes()).hexdigest()
+hres_checks["python"] = platform.python_version()
+hres_checks["numpy"] = np.__version__
+hres_checks["pandas"] = pd.__version__
+hres_checks["scipy"] = scipy.__version__
+hres_checks["seconds"] = time.perf_counter() - hres_started
+(hres_tables / "A1_P6_HRES_checks.json").write_text(json.dumps(hres_checks, ensure_ascii=False, indent=2), encoding="utf-8")
+print("6.5.1. Các cặp đối chiếu và ba mốc:")
+display(hres_contract)
+display(hres_events)
+print("6.5.2. Năm liền kề mỗi mốc; W1 median ngang 451 ID, mean gộp ngày-ID:")
+display(A1_HRES_ANNUAL_SUMMARY.loc[A1_HRES_ANNUAL_SUMMARY.year.isin([2005, 2006, 2007, 2009, 2010, 2011, 2015, 2016, 2017])])
+print("6.5.3. Hiệu sau-trước theo từng ID rồi lấy median; chỉ ID đủ cả hai cửa sổ:")
+display(A1_HRES_CHANGE_SUMMARY)
+print("6.5.4. Kiểm dữ liệu:", json.dumps(hres_checks, ensure_ascii=False))
+print("Không có nhãn 'có/không bước nhảy' tự động hoặc kết luận do nâng lưới từ một hiệu trước-sau.")
+print("GỬI LẠI: annual_summary, monthly_summary, change_summary, checks.json và hai PNG; kèm warning/traceback.")
+print("Output trực tiếp:", hres_tables, "và", hres_figures, "- dùng Kaggle Save Version, không đóng ZIP.")
+
+
+# %% [markdown]
 # ## Phần 7. Hợp đồng cửa sổ và số mẫu trên CSV
 #
 # Đếm theo cấu hình và ô từng pha sử dụng; phân biệt CSV hiện tại với cache và số mẫu huấn luyện lịch sử.

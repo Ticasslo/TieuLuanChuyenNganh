@@ -3,3 +3,5 @@
 Figures/*.png -text
 Tables/*.csv -text -whitespace
 Tables/*.txt -text -whitespace
+# Preserve JSON receipts together with the original CSV/log evidence.
+Tables/A1_P6_HRES_*.json -text -whitespace

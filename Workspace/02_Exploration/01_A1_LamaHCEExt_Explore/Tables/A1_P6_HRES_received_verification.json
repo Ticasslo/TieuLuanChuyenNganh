@@ -1,0 +1,311 @@
+{
+  "complete": true,
+  "checks_passed": 34,
+  "checks": [
+    {
+      "check": "annual_rows",
+      "passed": true
+    },
+    {
+      "check": "annual_unique_keys",
+      "passed": true
+    },
+    {
+      "check": "annual_seven_pairs",
+      "passed": true
+    },
+    {
+      "check": "annual_all_451_IDs",
+      "passed": true
+    },
+    {
+      "check": "annual_numeric_finite",
+      "passed": true
+    },
+    {
+      "check": "annual_complete_paired_calendar",
+      "passed": true
+    },
+    {
+      "check": "annual_pooled_mean_identity",
+      "passed": true
+    },
+    {
+      "check": "annual_W1_bound_median",
+      "passed": true
+    },
+    {
+      "check": "annual_leap_year_counts",
+      "passed": true
+    },
+    {
+      "check": "monthly_rows",
+      "passed": true
+    },
+    {
+      "check": "monthly_unique_keys",
+      "passed": true
+    },
+    {
+      "check": "monthly_seven_pairs",
+      "passed": true
+    },
+    {
+      "check": "monthly_all_451_IDs",
+      "passed": true
+    },
+    {
+      "check": "monthly_numeric_finite",
+      "passed": true
+    },
+    {
+      "check": "monthly_complete_paired_calendar",
+      "passed": true
+    },
+    {
+      "check": "monthly_pooled_mean_identity",
+      "passed": true
+    },
+    {
+      "check": "monthly_W1_bound_median",
+      "passed": true
+    },
+    {
+      "check": "monthly_leap_year_counts",
+      "passed": true
+    },
+    {
+      "check": "changes_rows",
+      "passed": true
+    },
+    {
+      "check": "changes_unique_keys",
+      "passed": true
+    },
+    {
+      "check": "changes_seven_pairs",
+      "passed": true
+    },
+    {
+      "check": "changes_all_451_IDs",
+      "passed": true
+    },
+    {
+      "check": "changes_numeric_finite",
+      "passed": true
+    },
+    {
+      "check": "changes_complete_all_IDs",
+      "passed": true
+    },
+    {
+      "check": "mean_delta_change_quantile_order",
+      "passed": true
+    },
+    {
+      "check": "mean_delta_positive_count_range",
+      "passed": true
+    },
+    {
+      "check": "w1_change_quantile_order",
+      "passed": true
+    },
+    {
+      "check": "w1_positive_count_range",
+      "passed": true
+    },
+    {
+      "check": "annual_calendar_2002_2017",
+      "passed": true
+    },
+    {
+      "check": "monthly_calendar_matches_contract",
+      "passed": true
+    },
+    {
+      "check": "windows_and_controls",
+      "passed": true
+    },
+    {
+      "check": "receipt_row_counts",
+      "passed": true
+    },
+    {
+      "check": "receipt_flags",
+      "passed": true
+    },
+    {
+      "check": "pasted_log_matches_checks_json",
+      "passed": true
+    }
+  ],
+  "files": [
+    {
+      "file": "Tables/A1_P6_HRES_checks.json",
+      "bytes": 543,
+      "sha256": "f71901405781f85bae8f723d2c15d32169e6ec020853e8c9d28a3ee8ad67700b"
+    },
+    {
+      "file": "Tables/A1_P6_HRES_annual_summary.csv",
+      "bytes": 19544,
+      "sha256": "dd48b3953f89ede1ae1d67c9fa02567d78c8e645bd1b1d81719a646557476bd3"
+    },
+    {
+      "file": "Tables/A1_P6_HRES_monthly_summary.csv",
+      "bytes": 86720,
+      "sha256": "7ab5bcf7832eb0520f924fa73c446bcc9f4d0b81b0e531b69de66c704b418f83"
+    },
+    {
+      "file": "Tables/A1_P6_HRES_change_summary.csv",
+      "bytes": 29844,
+      "sha256": "4cbedf946765594a7a1a1810319ff519b4165a3918b7a1be729dbee897d49736"
+    },
+    {
+      "file": "Figures/A1_P6_HRES_annual_changes.png",
+      "bytes": 463970,
+      "sha256": "8e44e901e4cca29f143ee84a1ecb411f81cb2f246c2525635af1c2602a285eeb"
+    },
+    {
+      "file": "Figures/A1_P6_HRES_monthly_changes.png",
+      "bytes": 550853,
+      "sha256": "8098cba63f07bf0c5bad4bf37f1308e78d0e1327c785de7c154e854d9e6c7954"
+    },
+    {
+      "file": "Tables/A1_P6_HRES_output.txt",
+      "bytes": 5208,
+      "sha256": "1adcad9b0ad5a9e366597fc28451da647aca493c86e80d2edf887668478ac5ef"
+    }
+  ],
+  "period_mean_derivation": "weighted annual pooled mean differences by paired day-ID counts; no aggregation of annual W1",
+  "period_means": [
+    {
+      "pair_id": "dewpoint",
+      "period": "train",
+      "paired_day_IDs": 1153207,
+      "mean_delta_pooled": 0.13368681424930648
+    },
+    {
+      "pair_id": "dewpoint",
+      "period": "validation",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": -0.1632553713627485
+    },
+    {
+      "pair_id": "dewpoint",
+      "period": "test",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": -0.24363501292283776
+    },
+    {
+      "pair_id": "evaporation",
+      "period": "train",
+      "paired_day_IDs": 1153207,
+      "mean_delta_pooled": 0.15207095517110109
+    },
+    {
+      "pair_id": "evaporation",
+      "period": "validation",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 0.1412088430759237
+    },
+    {
+      "pair_id": "evaporation",
+      "period": "test",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 0.0027214601061448566
+    },
+    {
+      "pair_id": "evaporation_era5l",
+      "period": "train",
+      "paired_day_IDs": 1153207,
+      "mean_delta_pooled": 0.11845709399960282
+    },
+    {
+      "pair_id": "evaporation_era5l",
+      "period": "validation",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 0.10248710372113987
+    },
+    {
+      "pair_id": "evaporation_era5l",
+      "period": "test",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": -0.03299173940031352
+    },
+    {
+      "pair_id": "precipitation",
+      "period": "train",
+      "paired_day_IDs": 1153207,
+      "mean_delta_pooled": 0.19858768633905272
+    },
+    {
+      "pair_id": "precipitation",
+      "period": "validation",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 0.37142920667586365
+    },
+    {
+      "pair_id": "precipitation",
+      "period": "test",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 0.24389588275199528
+    },
+    {
+      "pair_id": "precipitation_era5l",
+      "period": "train",
+      "paired_day_IDs": 1153207,
+      "mean_delta_pooled": -0.2321574964425293
+    },
+    {
+      "pair_id": "precipitation_era5l",
+      "period": "validation",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": -0.0603182068595
+    },
+    {
+      "pair_id": "precipitation_era5l",
+      "period": "test",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": -0.1334989095644176
+    },
+    {
+      "pair_id": "solar",
+      "period": "train",
+      "paired_day_IDs": 1153207,
+      "mean_delta_pooled": 32.102838857204304
+    },
+    {
+      "pair_id": "solar",
+      "period": "validation",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 36.51557425813198
+    },
+    {
+      "pair_id": "solar",
+      "period": "test",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 31.042677584681392
+    },
+    {
+      "pair_id": "temperature",
+      "period": "train",
+      "paired_day_IDs": 1153207,
+      "mean_delta_pooled": 0.5323705718054087
+    },
+    {
+      "pair_id": "temperature",
+      "period": "validation",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 0.29993748776390133
+    },
+    {
+      "pair_id": "temperature",
+      "period": "test",
+      "paired_day_IDs": 658911,
+      "mean_delta_pooled": 0.14166286493927102
+    }
+  ],
+  "validation_scope": "CSV structure, coverage, arithmetic, internal receipt consistency; raw CSV and per-basin metric recomputation not performed locally",
+  "official_A1_ipynb_version": 2,
+  "new_Kaggle_version_number_provided": false
+}

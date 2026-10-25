@@ -924,10 +924,10 @@ Kỳ test 2014–2017 có trận lớn cỡ đó không thì **chưa kiểm**; b
 |---|---|---|
 | 2002 (đầu dữ liệu) | T511, khoảng 40 km (quy đổi thường dùng cho T511; tài liệu nguồn chỉ ghi T511) | [ECMWF-2006] |
 | 1/2/2006 (chu kỳ 30r1) | T799, 25 km | [ECMWF-2006], [ECMWF-2010] |
-| tháng 1/2010 | 16 km | [ECMWF-2010] |
+| 26/1/2010 | 16 km | [ECMWF-2010] |
 | 8/3/2016 (chu kỳ 41r2) | 9 km | [ECMWF-2016] |
 
-Bài lấy ECMWF HRES từ kho lưu trữ vận hành của ECMWF (*operational archive*, [Bài] dòng 486) rồi gộp theo lưu vực ([Bài] dòng 80); bài không nêu bước hiệu chỉnh nào để các năm làm bằng phiên bản khác nhau trở nên đồng nhất, nên dữ liệu giữ nguyên các bước nhảy này. Kỳ train dùng lưới khoảng 40 km (tới 1/2/2006) rồi 25 km, tức chính kỳ train đã có một bước nhảy; còn gần nửa kỳ test (3/2016–2017) dùng lưới 9 km. Lưới mịn hơn mô tả núi rõ hơn, nên mưa và nhiệt độ ở lưu vực núi có thể khác đi **dù thời tiết thật y hệt**. Nói cách khác, ngay trong ECMWF HRES đã có một lệch miền nhỏ giữa train và test, bên cạnh lệch miền giữa tái phân tích và dự báo mà bài nghiên cứu (Phần 1). Tái phân tích thì khác: ERA5 chạy lại toàn bộ kỳ bằng **một** phiên bản mô hình cố định (Hersbach và cs., QJRMS 146, 1999–2049, 2020), ERA5-Land dựng từ ERA5, nên không có bước nhảy kiểu này. Bài BiasCast không nhắc tới các lần nâng lưới (đã tìm "resolution" trong [Bài]: chỉ có câu chung dòng 64 rằng sai lệch dự báo một phần do độ phân giải mô hình).
+Bài lấy ECMWF HRES từ kho lưu trữ vận hành của ECMWF (*operational archive*, [Bài] dòng 486) rồi gộp theo lưu vực ([Bài] dòng 80); bài không nêu bước hiệu chỉnh để đồng nhất các phiên bản qua năm. Vì vậy nguồn vận hành gồm các phiên bản khác nhau; có đổi bậc trong các cột đã gộp theo lưu vực hay không phải kiểm thực nghiệm, không suy chỉ từ lịch nâng lưới. Kỳ train dùng lưới khoảng 40 km (tới 1/2/2006) rồi 25 km, tức có một lần thay đổi lưới bên trong kỳ train; còn gần nửa kỳ test (3/2016–2017) dùng lưới 9 km. Lưới mịn hơn mô tả núi rõ hơn, nên mưa và nhiệt độ ở lưu vực núi có thể khác đi **dù thời tiết thật y hệt**. Đây là khả năng lệch miền giữa các phiên bản ECMWF HRES ở train và test, bên cạnh khác biệt tái phân tích–dự báo mà bài nghiên cứu (Phần 1); A1 Mục 20.6 đã kiểm mean hiệu và W1 theo năm/tháng/cửa sổ: dấu hiệu đổi mức rõ hơn ở điểm sương quanh 2006, nhiệt độ thu hẹp độ lệch dần; chưa thấy bước nhảy đồng loạt bền vững ở mọi biến tại 2010/2016. Khác biệt mưa mùa xuân–hè 2016 giảm trở lại ở năm sau; không quy mọi thay đổi cho riêng nâng lưới. Tái phân tích thì khác: ERA5 chạy lại toàn bộ kỳ bằng **một** phiên bản mô hình cố định (Hersbach và cs., QJRMS 146, 1999–2049, 2020), ERA5-Land dựng từ ERA5, nên không có bước nhảy kiểu này. Bài BiasCast không nhắc tới các lần nâng lưới (đã tìm "resolution" trong [Bài]: chỉ có câu chung dòng 64 rằng sai lệch dự báo một phần do độ phân giải mô hình).
 
 **Bước 3 — Khác nhau thì điểm số bị ảnh hưởng thế nào.**
 
@@ -997,7 +997,7 @@ Gộp các bảng "Bước A1 kiểm gì" của từng mục, xếp theo nhóm v
 | Ngưỡng lũ | Gumbel L-moments trên đỉnh năm thủy văn 1981–2013, mức 1,5; 2; 5; 10 năm; số năm đủ số liệu (đánh dấu dưới 10 năm); hình khớp Gumbel; so ngưỡng 1,5 năm với ngưỡng "rất cao" | 3.6 |
 | Đếm trận | số trận mỗi mức T ở từng kỳ, trước và sau khi gộp USWRC; số lưu vực có ít nhất một trận ở kỳ test; lưu vực nào vượt mức 10 năm trong trận 6/2013 | 3.6, 3.7 |
 | So các kỳ | trung vị, phân vị 0,98, độ lệch chuẩn `qmax` theo kỳ, tỉ số test / train; số ngày "rất cao" ở kỳ test so với ≈ 29; tương quan độ lệch chuẩn kỳ test với NSE của run tác giả (A2) | 3.5, 3.7 |
-| Bước nhảy ECMWF HRES | chênh lệch ECMWF HRES so với ERA5-Land theo từng năm 2002–2017 (trung bình chênh lệch, khoảng cách Wasserstein), xem có đổi ở 2010 và 2016 không | 3.7 |
+| Bước nhảy ECMWF HRES | Chênh lệch HRES–ERA5-Land theo năm 2002–2017 (mean hiệu, W1), quanh 01/02/2006, 26/01/2010 và 08/03/2016; kiểm thêm tháng và cửa sổ trước/sau. Phạm vi và trạng thái thực nghiệm: A1 Mục 20.6 | 3.7 |
 
 Mọi ngưỡng (bốn mức, lũ) lưu thành một bảng theo lưu vực để A3 và các bước sau dùng chung, bảo đảm mọi mô hình được chấm bằng cùng ngưỡng.
 

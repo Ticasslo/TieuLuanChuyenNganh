@@ -3119,11 +3119,101 @@ Hình đọc rõ, n=451 ở tất cả đường ECDF test, không chữ cắt/c
 
 ### 20.5. Tổng kết Phần 6 và bàn giao
 
-Khảo sát định lượng Phần 6 hoàn thành trên năm cặp của mã tác giả: lịch/ngữ nghĩa tham chiếu và mean theo năm/kỳ (6.1), phân phối và ghép cùng ngày (6.2), tháng/dấu từng ngày (6.3), tương quan sau trừ mean tháng train (6.4). Năm cặp đều đủ dữ liệu trong ba kỳ mô hình, do đó các khác biệt r của 6.4 không do đổi tập ngày/ID. Đối chiếu theo nguồn và các thang đo giữ riêng, không xếp khoảng cách chéo đơn vị.
+Khảo sát định lượng 6.1–6.4 bao gồm năm cặp của mã tác giả: lịch/ngữ nghĩa tham chiếu và mean theo năm/kỳ (6.1), phân phối và ghép cùng ngày (6.2), tháng/dấu từng ngày (6.3), tương quan sau trừ mean tháng train (6.4). Năm cặp đều đủ dữ liệu trong ba kỳ mô hình, do đó các khác biệt r của 6.4 không do đổi tập ngày/ID. Đối chiếu theo nguồn và các thang đo giữ riêng, không xếp khoảng cách chéo đơn vị. Phép kiểm bổ sung 6.5 đã tính hiệu và W1 theo năm, tháng và cửa sổ quanh ba mốc nâng lưới ECMWF HRES; kết luận ở 20.6 phân biệt đổi mức theo thời kỳ với mùa và biến động ngắn hạn.
 
 Các giới hạn được giữ trong bàn giao: chuyển đổi CSV và quy ước ngày dự báo chưa truy đầy đủ; net ERA5L/downward ECMWF và nhãn W/m²/J/m² chưa thống nhất; không tự đảo dấu ET, đổi cp×1000, trừ nền SWE hoặc chọn hiệu chỉnh bằng test. Kết quả khớp số học/phân phối/tương quan không xác nhận toàn bộ ngữ nghĩa nguồn hay quan trắc độc lập. Các câu hỏi cần provenance được ghi ở đây thay vì dùng thống kê để tự quyết phép đổi.
 
 Phần 7 kiểm ô đầu vào theo từng pha và cửa sổ cùng điều kiện nhãn để đếm mẫu. Những tỷ lệ thiếu ô ở Phần 4 không thể tự đổi thành số mẫu mất. Phần 8 tiếp tục so kỳ/đỉnh với kết quả mô hình; Phần 9 giữ hồ sơ ID. Không dùng những khác biệt test vừa khảo sát làm điều kiện lọc hoặc chọn mô hình.
+
+### 20.6. Các mốc nâng lưới ECMWF HRES: kết quả cell 6.5
+
+**Kết luận:** quan hệ giữa HRES và ERA5-Land thay đổi theo thời gian, nhưng không có bằng chứng về một bước nhảy đồng loạt, bền vững ở mọi biến tại cả ba mốc nâng lưới. Dấu hiệu đổi mức quanh **2006 rõ nhất ở điểm sương**, còn nhiệt độ giảm độ lệch dần qua các năm. **2010** không cho một bước nhảy chung rõ ngay mốc; **2016** có đợt HRES hụt mưa so với ERA5-Land nhưng không giữ thành mức mới trong toàn năm 2017. Đây là chẩn đoán mô tả theo giai đoạn, không phải ước lượng tác động nhân quả riêng của nâng lưới.
+
+#### 20.6.1. Mốc đối chiếu, dữ liệu và phép tính
+
+| Ngày đưa vào vận hành | Thay đổi lưới HRES | Vị trí trong các kỳ | Nguồn chính thức |
+|---|---|---|---|
+| 01/02/2006 | T511, khoảng 40 km → T799, khoảng 25 km | Bên trong train 2003–2009 | [ECMWF, Untch và cs., Newsletter 108](https://www.ecmwf.int/sites/default/files/elibrary/2006/17954-towards-global-meso-scale-model-high-resolution-system-t799l91-and-t399l62-eps.pdf) |
+| 26/01/2010 | T799, khoảng 25 km → T1279, khoảng 16 km | Đầu validation 2010–2013 | [ECMWF, Horizontal resolution increase](https://www.ecmwf.int/en/about/media-centre/news/2010/horizontal-resolution-increase) |
+| 08/03/2016 | Khoảng 16 km → 9 km, chu kỳ 41r2 | Bên trong test 2014–2017 | [ECMWF, New model cycle brings higher resolution](https://www.ecmwf.int/en/newsletter/147/meteorology/new-model-cycle-brings-higher-resolution) |
+
+Cell 6.5 đã chạy trên **451 ID**, mất **187,3 giây**. Cả bảy cặp đều đủ ngày trong từng năm 2002–2017; năm cặp cũ khớp mean năm và số cặp của 6.1. Ngoài nhiệt độ, điểm sương và bức xạ, cell bổ sung `ECMWF_tp`–`ERA5L_prec`, `ECMWF_e`–`ERA5L_total_et`; giữ HRES–MSWEP và HRES–GLEAM làm đối chiếu phụ. Mọi giá trị hữu hạn khác −999, kể cả số âm, được giữ nguyên.
+
+Mean hiệu là **HRES trừ nguồn đối chiếu**, gộp trên cùng ngày–ID. W1 trong các bảng tổng hợp là **trung vị W1 tính riêng từng lưu vực**, không phải W1 của phân phối gộp và không được cộng/trung bình W1 tháng thành W1 năm. Mean và W1 đo hai mặt khác nhau: mức trung bình có thể gần nhau trong khi phân phối vẫn khác.
+
+Phép kiểm gồm năm 2002–2017; 72 tháng–năm quanh ba mốc; cửa sổ trước/sau 90 và 365 ngày. Trước không gồm ngày mốc, sau bắt đầu tại ngày mốc. Bảng thay đổi lấy hiệu sau−trước **của từng ID rồi mới lấy trung vị**. Cửa sổ 90 ngày còn được đối chiếu cùng ngày/tháng ở năm trước, năm sau và dịch ngày mốc −1/+1 ngày. Cả 126 tổ hợp cặp/mốc/cửa sổ đều có đủ 451 ID ở hai phía. Các đối chiếu này kiểm mùa và độ nhạy; chưa loại hết ảnh hưởng thời tiết, các thay đổi mô hình khác hoặc quy ước ngày forecast trong CSV.
+
+#### 20.6.2. Năm liền kề các mốc
+
+Mỗi ô dưới đây ghi **năm trước → năm chứa mốc → năm sau**. Mưa và bốc hơi trong bảng đều so ERA5-Land. Bức xạ là hiệu giá trị lưu trữ của **net ERA5-Land và downward HRES**, không phải bias vật lý giữa hai đại lượng tương đương.
+
+| Biến | Năm mốc | Mean hiệu gộp | W1 trung vị từng ID |
+|---|---:|---|---|
+| Nhiệt độ (°C) | 2006 | 0,684 → 0,538 → 0,459 | 0,668 → 0,545 → 0,491 |
+| Nhiệt độ (°C) | 2010 | 0,447 → 0,395 → 0,271 | 0,439 → 0,420 → 0,366 |
+| Nhiệt độ (°C) | 2016 | 0,175 → 0,100 → 0,151 | 0,356 → 0,335 → 0,385 |
+| Điểm sương (°C) | 2006 | 0,231 → 0,046 → 0,028 | 0,628 → 0,506 → 0,393 |
+| Điểm sương (°C) | 2010 | -0,009 → -0,017 → -0,205 | 0,373 → 0,390 → 0,387 |
+| Điểm sương (°C) | 2016 | -0,208 → -0,347 → -0,272 | 0,374 → 0,413 → 0,351 |
+| Mưa (mm/ngày) | 2006 | -0,278 → -0,331 → -0,123 | 0,570 → 0,568 → 0,466 |
+| Mưa (mm/ngày) | 2010 | -0,060 → 0,033 → 0,032 | 0,440 → 0,359 → 0,321 |
+| Mưa (mm/ngày) | 2016 | -0,168 → -0,245 → -0,033 | 0,343 → 0,397 → 0,324 |
+| Bốc hơi (giá trị mm/ngày lưu trữ) | 2006 | 0,154 → 0,140 → 0,073 | 0,223 → 0,207 → 0,168 |
+| Bốc hơi (giá trị mm/ngày lưu trữ) | 2010 | 0,184 → 0,125 → 0,092 | 0,210 → 0,212 → 0,128 |
+| Bốc hơi (giá trị mm/ngày lưu trữ) | 2016 | -0,063 → 0,008 → -0,057 | 0,157 → 0,112 → 0,149 |
+| Bức xạ (đơn vị lưu trữ) | 2006 | 36,940 → 36,716 → 32,875 | 33,118 → 32,236 → 28,263 |
+| Bức xạ (đơn vị lưu trữ) | 2010 | 37,321 → 38,777 → 34,892 | 31,838 → 33,451 → 30,324 |
+| Bức xạ (đơn vị lưu trữ) | 2016 | 32,014 → 29,752 → 29,763 | 27,479 → 24,551 → 24,520 |
+
+Nguồn: [bảng năm](Tables/A1_P6_HRES_annual_summary.csv), [bảng tháng–năm](Tables/A1_P6_HRES_monthly_summary.csv), [bảng cửa sổ và đối chiếu](Tables/A1_P6_HRES_change_summary.csv).
+
+![Hiệu trung bình và W1 theo năm quanh ba mốc HRES](Figures/A1_P6_HRES_annual_changes.png)
+
+Hình: cột trái là mean HRES−ERA5-Land, cột phải là W1 trung vị từng lưu vực; năm được đặt tại giữa năm. Vạch đứt là ngày nâng cấp đã công bố, không phải ngày đổi bậc được phát hiện từ dữ liệu. Các ô dùng thang và đơn vị riêng.
+
+#### 20.6.3. Đối chiếu trước/sau và kết luận từng mốc
+
+**Mốc 2006.** Điểm sương có dấu hiệu đổi mức theo giai đoạn: mean hiệu năm giảm từ +0,231 xuống +0,046 rồi +0,028 °C; W1 giảm từ 0,628 xuống 0,506 rồi 0,393 °C. Trung vị hiệu sau−trước 90 ngày là **−0,298 °C** và W1 **−0,246 °C**; cửa sổ 365 ngày vẫn cho **−0,147/−0,213 °C**. Cùng cách so 90 ngày ở năm trước và năm sau cho hiệu mean +0,018 và +0,052 °C, nên thay đổi năm 2006 khác hướng với hai đối chiếu đó. Đây là dấu hiệu đổi mức phù hợp thời kỳ nâng cấp, chưa xác định nguyên nhân riêng do lưới.
+
+Nhiệt độ cũng giảm mean và W1 sau giai đoạn này; cửa sổ 365 ngày cho thay đổi **−0,164/−0,163 °C**, nhưng mean trong cửa sổ 90 ngày chỉ đổi **−0,025 °C**. Vì vậy kết luận phù hợp là **độ lệch nhiệt độ thu hẹp dần**, không phải một bước nhảy tức thời rõ ở mọi thước đo. Với mưa, thay đổi 90 ngày là −0,232 mm/ngày về mean và +0,272 về W1, còn 365 ngày chỉ −0,030/+0,009; chưa có đổi bậc kéo dài rõ. Bốc hơi và bức xạ có mùa mạnh, được đọc riêng ở dưới.
+
+**Mốc 2010.** Không thấy một bước nhảy chung rõ ngay ngày 26/01. Nhiệt độ có thay đổi mean/W1 90 ngày **+0,074/+0,027 °C**, còn 365 ngày **−0,057/−0,010 °C**. Điểm sương có thay đổi mean/W1 365 ngày **−0,059/−0,0005 °C**; mean âm hơn rõ ở năm 2011, không phải ngay cả năm 2010. Mưa có mean gần 0 trong 2010–2011 và W1 năm giảm 0,440 → 0,359 → 0,321; tuy nhiên thay đổi mean 90 ngày năm 2010 (+0,204 mm/ngày) gần đối chiếu cùng mùa năm trước (+0,170), còn mean trở lại âm từ 2012. Bằng chứng hỗ trợ **khác biệt phân phối theo thời kỳ**, chưa xác định một mức mới ổn định do đúng ngày nâng lưới.
+
+**Mốc 2016.** Mưa là biến nổi bật về thay đổi ngắn hạn: trung vị hiệu mean/W1 sau−trước 90 ngày là **−0,375/+0,284 mm/ngày**; 402/451 ID có W1 tăng. Hai đối chiếu mean cùng mùa ở năm trước và năm sau chỉ +0,007 và +0,005 mm/ngày. Tuy nhiên hiệu mean gộp theo tháng giảm mạnh vào mùa xuân–hè, thấp nhất **−0,812 mm/ngày trong 06/2016**, rồi trở về gần 0 ở 11/2016; mean năm 2017 là −0,033, so với −0,245 năm 2016. Cửa sổ 365 ngày cũng chỉ còn **−0,092/+0,044**. Vì vậy đây là **đợt hụt mưa HRES so ERA5-Land rõ trong năm 2016**, chưa phải bước nhảy mức trung bình bền vững qua năm sau.
+
+Nhiệt độ 2016 có mean/W1 giảm trong 90 ngày **−0,131/−0,118 °C**, nhưng 365 ngày chỉ **−0,051/−0,003 °C**; đối chiếu cùng mùa năm 2017 còn giảm mạnh hơn (−0,511/−0,276). Điểm sương gần như không đổi mean trong 90 ngày (−0,007 °C), trong khi 365 ngày cho mean −0,115 và W1 +0,078; tháng 12/2016 có mean hiệu −1,176 °C và W1 1,237 °C. Khác biệt theo cửa sổ và tháng này không hỗ trợ một bước nhảy tức thời đồng loạt ở nhiệt độ/điểm sương ngày 08/03.
+
+Dịch ngày mốc −1/+1 ngày giữ hướng các thay đổi mean/W1 90 ngày của nhiệt độ, điểm sương và mưa ở 2006/2016. Điều đó cho thấy kết luận không phụ thuộc riêng việc đặt ranh giới sớm/muộn một ngày; không xác nhận nguyên nhân hoặc quy ước thời gian của nguồn.
+
+**Bốc hơi và bức xạ.** Bốc hơi so ERA5-Land có thay đổi mean 90 ngày +0,335 quanh 2006 và +0,242 quanh 2010, nhưng 365 ngày lại −0,022 và −0,071; quanh 2016, 90 ngày là −0,047 còn 365 ngày +0,057. Dấu/hình thái thay đổi phụ thuộc mùa và cửa sổ, nên **không có đổi bậc kéo dài rõ tại cả ba mốc** trên giá trị lưu trữ. Dấu và thành phần ET vẫn cần được hiểu theo nguồn, không tự đảo dấu hoặc gọi chênh này là sai số bốc hơi thực.
+
+Bức xạ có thay đổi mean 90 ngày rất lớn: +33,000/+25,965/+21,108 đơn vị lưu trữ ở ba mốc; cùng phép đo ở năm liền kề cũng tăng mạnh, thể hiện ảnh hưởng mùa. Thay đổi 365 ngày chỉ −3,255/+0,792/−0,895; mean năm 2016/2017 gần nhau nhưng cặp vẫn khác định nghĩa net/downward. **Không kết luận bước nhảy bias bức xạ vật lý** từ cặp này.
+
+![Hiệu trung bình và W1 theo tháng–năm quanh ba mốc HRES](Figures/A1_P6_HRES_monthly_changes.png)
+
+Hình: mỗi điểm là một tháng–năm thực; các khoảng không tính được để trống, không nối qua nhau. Dao động mùa thấy rõ ở nhiều biến, đặc biệt bức xạ. Tháng chứa mốc trộn ngày trước/sau, nên bảng cửa sổ ngày được dùng để đối chiếu thêm.
+
+#### 20.6.4. Ảnh hưởng tới train 2003–2009 và test 2014–2017
+
+**Train và test có quan hệ HRES–nguồn đối chiếu khác nhau.** Mean hiệu gộp từng kỳ được tính lại từ mean năm, với trọng số số ngày–ID; không lấy trung bình đơn giản các năm hoặc W1 năm:
+
+| Cặp HRES−ERA5-Land | Train | Validation | Test |
+|---|---:|---:|---:|
+| Nhiệt độ, °C | +0,532 | +0,300 | +0,142 |
+| Điểm sương, °C | +0,134 | −0,163 | −0,244 |
+| Mưa, mm/ngày | −0,232 | −0,060 | −0,133 |
+| Bốc hơi, giá trị mm/ngày lưu trữ | +0,118 | +0,102 | −0,033 |
+| Bức xạ, giá trị lưu trữ net/downward | +32,103 | +36,516 | +31,043 |
+
+Mô hình dòng chảy học trên giai đoạn nhiệt độ HRES lệch dương nhiều hơn, điểm sương chủ yếu lệch dương trung bình, rồi gặp test có độ lệch nhiệt độ nhỏ hơn và điểm sương âm. Đây là **bằng chứng lệch quan hệ giữa các nguồn theo thời kỳ**, bên cạnh thay đổi thời tiết và phiên bản HRES; ERA5-Land là nguồn đối chiếu, không phải quan trắc độc lập. Lưới train gồm khoảng 40/25 km, còn test gồm 16/9 km; ảnh hưởng tới đặc trưng địa hình và các biến khí tượng có thể thay đổi đầu vào mà mô hình đã học.
+
+Các số này không xác định mức tăng/giảm NSE do nâng lưới. W1 khí tượng giảm không bảo đảm NSE dòng chảy tăng, vì còn sự kiện, lưu trữ nước, độ biến thiên nhãn và nhiều đầu vào khác. Kết quả phục vụ mô tả lệch miền và diễn giải đánh giá; không dùng thống kê test để fit lại scaler, chọn hiệu chỉnh, lọc ID hoặc chọn checkpoint. Không cần huấn luyện lại A2–A4 để hoàn tất phép khảo sát dữ liệu này.
+
+#### 20.6.5. Bằng chứng lưu trong repo và phiên bản notebook
+
+Cell báo 50.512 hàng năm, 227.304 hàng tháng và 113.652 hàng cửa sổ theo ID. Bản lưu cục bộ gồm ba CSV tổng hợp **112/504/126 hàng**, [JSON kiểm của Kaggle](Tables/A1_P6_HRES_checks.json), [output nguyên văn](Tables/A1_P6_HRES_output.txt) và hai PNG ở trên. [Biên nhận kiểm cục bộ](Tables/A1_P6_HRES_received_verification.json) có **34 phép kiểm đạt** về khóa, số ID/ngày, lịch nhuận, toán học mean, khoảng giá trị và sự nhất quán giữa nhật ký–JSON; giữ nguyên byte bảy tệp nhận được. Các bảng từng ID và CSV khí tượng gốc chưa được đọc lại cục bộ, nên không gọi kiểm bảng tổng hợp là tái tính W1 từ dữ liệu ngày.
+
+Bằng chứng này là output cell 6.5 chạy trên Kaggle, có đối chiếu 6.1 khớp. Bản `.ipynb` trong repo dựa trên A1 Version 2, đã bổ sung tiêu đề và cell code 6.5 ngay sau 6.4; toàn bộ cell/output cũ được giữ nguyên. Cell mới khớp nguồn `.py`, có `execution_count=null` và chưa ghép output vào notebook; kết quả thật được lưu ở các CSV/PNG và nhật ký nêu trên. Số Version Kaggle mới chưa được cung cấp. Khi có bản Save & Run All mới, thay bản notebook cục bộ bằng bản tải về có output đầy đủ.
 
 <a id="sec-21"></a>
 
@@ -4598,6 +4688,7 @@ Số liệu đo lấy từ output Kaggle thật của các cell 1–10.9 và cá
 | 4.3, 4.5 | Đã nhận và đối chiếu trực tiếp sáu CSV 4.3 và tám CSV 4.5 |
 | Phần 5 | Giữ log nguồn giờ 2.5/5.9, output 5.2/5.3/5.8 và các tệp thật đã cung cấp; CSV chi tiết 5.1–5.12 chưa nhận cục bộ, kể cả bảng q_ratio_extremes chưa có output thật |
 | 6.1–6.4 | Bảng kết quả đã cung cấp, bốn hình và output nguyên văn 6.3/6.4; năm CSV mỗi cell chưa nhận cục bộ |
+| 6.5 | Ba CSV tổng hợp năm/tháng/cửa sổ, JSON kiểm, output và hai PNG; đối chiếu 6.1 khớp, kiểm cục bộ 34/34; `.ipynb` đã có cell 6.5, kết quả cell mới giữ ở các tệp nhận riêng |
 | 7.1 | Đã nhận bảng path 120 dòng, vai trò 24 dòng, lịch 48 dòng và kiểm kê trước/sau diễn giải path; các CSV hợp đồng chi tiết khác chưa nhận |
 | 7.2–7.4 | Giữ output nguyên văn 7.2/7.4 và hình cửa sổ; 7.3 được dán trực tiếp trong chat; CSV đếm/cohort/cache chi tiết chưa nhận |
 | 8.1–8.4 | Giữ hình 8.1, hình/output nguyên văn 8.2/8.4 và output nguyên văn 8.3; bảng 8.1 dán trong chat; các CSV chi tiết chưa nhận |

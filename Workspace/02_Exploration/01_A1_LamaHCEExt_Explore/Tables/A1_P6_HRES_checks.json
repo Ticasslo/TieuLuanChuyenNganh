@@ -1,0 +1,19 @@
+{
+  "IDs": 451,
+  "annual_rows": 50512,
+  "monthly_rows": 227304,
+  "window_rows": 113652,
+  "annual_rows_expected": 50512,
+  "W1_scipy_fixture_matched": true,
+  "annual_groups_all_451": true,
+  "annual_complete_all_pairs": true,
+  "computed_on_dataset": true,
+  "causal_upgrade_effect_established": false,
+  "old_part6_1": "matched",
+  "basin_list_sha256": "45c3d648b3868d5bb27ef50b3cff2c23658bd09ace001141380d82ce1ded2feb",
+  "python": "3.13.15",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3",
+  "scipy": "1.16.3",
+  "seconds": 187.3263426159997
+}

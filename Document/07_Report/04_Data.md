@@ -148,6 +148,8 @@ Khảo sát dữ liệu chỉ ra ba yêu cầu cho đánh giá mô hình. Thứ 
 
 Các đặc điểm diện tích, độ cao, tuyết, khí hậu và lớp phủ là cơ sở xây dựng giả thuyết về điều kiện mô hình hoạt động tốt. Kết quả hiện tại xác định được những khác biệt dữ liệu và độ phủ cần kiểm soát; phần liên hệ thuộc tính với chênh lệch giữa các lõi sẽ được thực hiện khi có kết quả so sánh cùng đầu vào. Phạm vi kết luận của chương là tập Extended LamaH-CE đang xét.
 
+**Lệch miền theo thời kỳ.** Đối chiếu HRES–ERA5-Land quanh các mốc nâng lưới 2006/2010/2016 cho thấy quan hệ giữa các nguồn thay đổi: mean hiệu nhiệt độ từ +0,532 °C trong train giảm còn +0,142 °C trong test; điểm sương từ +0,134 chuyển thành −0,244 °C. Điểm sương có dấu hiệu đổi mức rõ hơn quanh 2006, còn các biến không đồng loạt đổi bậc bền vững ở mọi mốc; mưa năm 2016 có một đợt hụt rõ so ERA5-Land rồi hồi lại. Các kết quả là mô tả trên các kỳ khác nhau, chưa tách riêng ảnh hưởng nâng lưới khỏi mùa, thời tiết và những thay đổi hệ thống khác. Do đó, đánh giá các mô hình trên cùng ngày/lưu vực giúp tránh so lẫn các miền đầu vào, còn scaler vẫn chỉ fit train. Chi tiết: [A1 Mục 20.6](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#206-các-mốc-nâng-lưới-ecmwf-hres-kết-quả-cell-65).
+
 ## 4.8. Nguồn số liệu và khả năng đối chiếu
 
 | Nội dung | Tài liệu hoặc kết quả |

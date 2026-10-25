@@ -146,6 +146,8 @@ Thiếu nhãn tập trung ở một số trạm: 324/600/623 không có nhãn tr
 
 **Ngưỡng đánh giá đã được tính riêng cho từng lưu vực trên tham chiếu 1981–2013.** Ba phân vị q30/q80/q98 chia qmax ngày thành bốn mức: thấp, trung bình, cao, rất cao. Ngưỡng lũ 1,5/2/5/10 năm dùng Gumbel L-moments trên đỉnh năm thủy văn 01/10–30/09; các đoạn vượt ngưỡng được tổng hợp thành cụm theo quy tắc USWRC. Có 427 lưu vực với ít nhất 10 năm đỉnh và 24 lưu vực chỉ có 3–9 năm; nhóm mẫu ngắn được báo riêng khi đánh giá sự kiện. Ngưỡng trước test và thống kê chuẩn hóa huấn luyện giữ hai vai trò riêng.
 
+**Kiểm ba mốc nâng lưới ECMWF HRES:** hiệu HRES−ERA5-Land và W1 trên 451 ID cho thấy dấu hiệu đổi mức rõ hơn ở điểm sương quanh 2006, nhiệt độ thu hẹp độ lệch dần; không thấy bước nhảy đồng loạt bền vững ở mọi biến tại cả ba mốc. Mưa HRES hụt so ERA5-Land mạnh trong mùa xuân–hè 2016 nhưng không giữ mức đó sang cả năm 2017. Mean hiệu nhiệt độ giảm từ +0,532 °C ở train xuống +0,142 °C ở test; điểm sương đổi từ +0,134 sang −0,244 °C. Các khác biệt theo thời kỳ là căn cứ mô tả lệch miền đầu vào, không xác định tác động nhân quả của nâng lưới hoặc mức thay đổi NSE. Phương pháp, bảng năm/tháng và giới hạn bức xạ/ET: [A1 Mục 20.6](../../Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md#206-các-mốc-nâng-lưới-ecmwf-hres-kết-quả-cell-65).
+
 A1 cung cấp cơ sở dữ liệu và các hồ sơ chẩn đoán cho A3, bộ nạp và bộ đánh giá.
 
 ### 6.3. Tái lập bằng trọng số tác giả (bước A2, Kaggle 11/10/2026)
