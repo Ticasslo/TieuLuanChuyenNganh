@@ -350,7 +350,7 @@ Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook
 | `02_Exploration/` | Khảo sát dữ liệu (A1), ngưỡng | A1 hoàn thành khảo sát và tính ngưỡng; thuyết minh tại `Workspace/02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md` |
 | `03_Baseline/` | A2 tái lập (`01_A2_LamaHCEExt_Reproduce.py`), A3 mốc so sánh gồm persistence, PNSE, KGE, DLinear (`02_A3_LamaHCEExt_Benchmarks.py`), A4 huấn luyện lại và nhiễu hạt giống (`03_A4_LamaHCEExt_Retrain_Seed111/222/333.py`, so sánh `04_A4_LamaHCEExt_Compare.py`) | A2 tái lập đạt; A3 hoàn thành persistence, sáu A2 và DLinear ba hạt giống; A4 huấn luyện lại đạt, xuất 3 tệp dự báo theo hợp đồng của bộ đánh giá |
 | `04_Setup/` | Cài môi trường, wheel `mamba-ssm`, kiểm thử đơn vị, đo thời gian | Wheel `mamba-ssm` và `causal-conv1d` cho Kaggle T4 dựng xong, đạt bộ test chính thức (`01_0_MambaSSM_Build.py`); mô hình chung, các lõi và kiểm thử đơn vị chưa viết |
-| `05_Training/` | Notebook huấn luyện theo bước B–H | B1: `01_B1_LamaHCEExt_Train_Seed111/222/333` (fork `e794d7c`; Version 1, 1, 2) |
+| `05_Training/` | Notebook huấn luyện theo bước B–H | B1: `01_B1_LamaHCEExt_Train_Seed111/222/333` (fork `e794d7c`; Version 1, 1, 2), so sánh và NPZ `02_B1_LamaHCEExt_Compare` (Version 1) |
 | `06_Evaluation/` | Bộ đánh giá Mục 6 | Đã chấm 14 run A2/DLinear/persistence/A4 trên Kaggle theo giao thức 3 (Version 4), test/S0/hạn một ngày; 129 kiểm thử đạt, khớp A3 trên 4.961 cặp run–ID và ba hợp đồng A4; bảng lũ chính cùng ngày bắt đầu, bảng phụ ±1; phân tích theo lưu vực (Version 2) 18 phép so; mở rộng khi có dự báo validation/S1–S4/nhiều hạn |
 | `07_Demo/` | Demo (mục dự án trong trang web của nhóm) | Chưa viết |
 
@@ -388,7 +388,7 @@ Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu
 | Thứ tự | Tuần dự kiến | Người 1 (dữ liệu, đánh giá, demo D1–D3) | Người 2 (mô hình, huấn luyện, XAI, VPS) | Giờ GPU |
 |---|---|---|---|---|
 | 1 | Xong 24/10/2026 | A1 khảo sát dữ liệu, tệp ngưỡng; A3 mốc so sánh; báo cáo tiến độ; bộ đánh giá chấm A2/DLinear/A4 (14 run), phân tích theo lưu vực | Bước 0 phần cài `mamba-ssm` trên T4; A2; A4 nhiễu hạt giống và đo thời gian | – |
-| 2 | 26/10 – 08/11/2026 | Viết bộ nạp B2 trên mã B1 và cách (b) của bước H, kiểm thử đơn vị phần bộ nạp | B1 (sửa lưu mô hình tốt nhất, Q mm/ngày, `qmax` quá khứ); song song: mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) | B1: 3 lần, khoảng 9 giờ |
+| 2 | 26/10 – 08/11/2026 | Viết bộ nạp B2 trên mã B1 và cách (b) của bước H, kiểm thử đơn vị phần bộ nạp | B1 xong 25/10/2026 (sửa lưu mô hình tốt nhất, Q mm/ngày, `qmax` quá khứ); song song: mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) | B1: 3 lần, đo được 5,2 giờ huấn luyện (cộng 1,9 giờ đánh giá test mọi epoch) |
 | 3 | 09/11 – 22/11/2026 | Đánh giá bước B, gồm kịch bản S0–S4 trên validation cho B* | B2, B3, B*; phối hợp rà soát bộ nạp B2 trước khi huấn luyện B2; gắn mốc `freeze-C` | B2, B3: 9 lần, khoảng 27 giờ |
 | 4 | 23/11 – 13/12/2026 | Đánh giá bước C; demo D1, D2 (Mục 9.6) | C1 tinh chỉnh, C2 chạy chính thức | Tối đa 70 lần, khoảng 210 giờ (khoảng 2,3 tuần GPU) |
 | 5 | 14/12 – 27/12/2026 | Đánh giá bước mở rộng; demo D3 | H, D, E, F, GV theo thứ tự ưu tiên ở Mục 7, 8.3 | Tối đa 42 lần, khoảng 126 giờ (khoảng 1,4 tuần GPU) |
@@ -397,7 +397,7 @@ Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu
 
 Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.
 
-Bước A đã xong (A1–A4) và bộ đánh giá đã chấm 14 run A2/DLinear/persistence/A4. Ưu tiên hiện tại: Người 2 so sánh B1 với A4 (ba lần huấn luyện B1 trên fork `e794d7c` đã xong); Người 1 viết bộ nạp B2 trên mã B1 (B2 sửa tiếp từ B1). Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
+Bước A đã xong (A1–A4) và bộ đánh giá đã chấm 14 run A2/DLinear/persistence/A4. B1 đã xong (25/10/2026): NSE trung vị test trung bình 0,7208 so với A4 0,7016, hơn 3,4 độ lệch chuẩn hạt giống A4 (`Workspace/05_Training/01_B1_LamaHCEExt_Train/01_B1_LamaHCEExt_Train.md`). Ưu tiên hiện tại: Người 1 chấm 3 NPZ B1 bằng bộ đánh giá và viết bộ nạp B2 trên mã B1 (B2 sửa tiếp từ B1); Người 2 làm phần còn lại của bước 0 và phần mô hình B2. Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
 
 | Nội dung học | Nguồn | Học trước bước |
 |---|---|---|

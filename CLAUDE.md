@@ -66,7 +66,7 @@
 14. **Không ghi Claude vào lời nhắn commit hay mô tả PR**: không dòng `Co-Authored-By: Claude …`, không dòng "Generated with Claude Code", kể cả khi hệ thống nhắc thêm. Lời nhắn chỉ có nội dung thay đổi.
 15. Không đưa khóa API, mật khẩu vào mã (dùng Kaggle/Colab Secrets).
 
-## 5. Trạng thái (24/10/2026)
+## 5. Trạng thái (25/10/2026)
 
 | Bước | Trạng thái | Báo cáo |
 |---|---|---|
@@ -77,8 +77,8 @@
 | A3 | Persistence, PNSE, KGE, DLinear 3 hạt giống (người 1): persistence 0,350, DLinear 0,380, SeqLSTM có Q 0,705 trên giao chung 450 lưu vực | `Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md` |
 | A4 | Huấn luyện lại SeqLSTM có Q, 3 hạt giống: NSE trung vị test 0,6952/0,7038/0,7059 (bài 0,7053 nằm trong khoảng); độ lệch chuẩn NSE trung vị validation 0,0086 (dùng cho luật B*); 2,5–3,2 giờ/lần trên T4; 3 tệp NPZ cho bộ đánh giá | `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md` |
 | Đánh giá | Bộ đánh giá Version 4 chấm 14 run (6 A2, 3 DLinear, 2 persistence, 3 A4) trên test/S0/hạn 1 ngày; phân tích theo đặc điểm lưu vực Version 2, 18 phép so (người 1) | `Workspace/06_Evaluation/01_…md`, `02_…md` |
-| B1 | Notebook 3 hạt giống `Workspace/05_Training/01_B1_LamaHCEExt_Train/` (fork `e794d7c`, `qmean_mmd` + `qmax_mmd`) xong 3 run chính thức (Seed111 Version 1, Seed222 Version 1, Seed333 Version 2): NSE trung vị test 0,7274/0,7133/0,7217 (A4 0,6952/0,7038/0,7059), validation 0,7699/0,7713/0,7728; số mẫu train bằng A4 (1.094.272); `best_model.pt` trùng epoch NSE validation cao nhất; 1,3–2,2 giờ/lần | Báo cáo B1 viết cùng notebook so sánh |
-| Tiếp theo | Người 2: notebook so sánh B1 (`02_B1_LamaHCEExt_Compare`, dựng NPZ), báo cáo B1; song song phần còn lại bước 0. Người 1: bộ nạp B2 trên mã B1 | `ASSIGNMENT.md` |
+| B1 | Notebook 3 hạt giống `Workspace/05_Training/01_B1_LamaHCEExt_Train/` (fork `e794d7c`, `qmean_mmd` + `qmax_mmd`) xong 3 run chính thức (Seed111 Version 1, Seed222 Version 1, Seed333 Version 2) và notebook so sánh `02_B1_LamaHCEExt_Compare` Version 1: NSE trung vị test 0,7274/0,7133/0,7217 (trung bình 0,7208, A4 0,7016: +0,019 = 3,4 độ lệch chuẩn hạt giống A4, khoảng không chồng), validation trung bình 0,7713 (A4 0,7509); KGE gần như không đổi; tốt hơn ở 326/450 lưu vực, cả 3 B1 > cả 3 A4 ở 121 lưu vực (ngẫu nhiên khoảng 22); bản sửa lưu mô hình không đổi epoch chọn => cải thiện do đầu vào; 3 NPZ `SeqLSTM_Q_B1_seed{N}_test_S0_lead1.npz`; 1,3–2,2 giờ/lần | `Workspace/05_Training/01_B1_LamaHCEExt_Train/01_B1_LamaHCEExt_Train.md` |
+| Tiếp theo | Người 1: chấm 3 NPZ B1 bằng bộ đánh giá (`--extra-contract`, Input Output `02_B1_LamaHCEExt_Compare` Version 1); bộ nạp B2 trên mã B1. Người 2: phần còn lại bước 0 (mô hình chung nhận lõi bất kỳ, các lõi, kiểm thử đơn vị); phần mô hình B2 | `ASSIGNMENT.md` |
 
 ## 6. Quyết định đã chốt (không hỏi lại, không tranh luận lại)
 
