@@ -910,7 +910,7 @@ h_1=1   h_2=2,8   h_3=2,46   h_4=2,976   h_5=3,3296   h_6=3,4972
 
 #### 4.6.8 Liên hệ cài đặt thực tế
 
-Cài đặt bằng **CUDA kernel chuyên dụng** (`selective_scan_cuda`, `causal_conv1d_cuda` — đúng tên đã ghi trong `Document/01_Plan/01_OverallPlan.md` Mục 8, lý do bắt buộc cần GPU) — tối ưu phần cứng: giữ tính toán trong bộ nhớ nhanh trên chip (SRAM) thay vì đọc/ghi liên tục ra bộ nhớ GPU chậm hơn (HBM) — lý do Mamba chạy nhanh thật trên GPU, không chỉ nhanh trên giấy.
+Cài đặt bằng **CUDA kernel chuyên dụng** (`selective_scan_cuda`, `causal_conv1d_cuda` — lý do bắt buộc cần GPU, `Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md`) — tối ưu phần cứng: giữ tính toán trong bộ nhớ nhanh trên chip (SRAM) thay vì đọc/ghi liên tục ra bộ nhớ GPU chậm hơn (HBM) — lý do Mamba chạy nhanh thật trên GPU, không chỉ nhanh trên giấy.
 
 #### 4.6.9 Kiểm tra lại và nguồn
 

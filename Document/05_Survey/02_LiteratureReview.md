@@ -2,7 +2,7 @@
 
 > Tài liệu trình bày kết quả khảo sát tính hợp lý của đề tài theo hai yêu cầu đánh giá: **(1) yêu cầu riêng cho nhóm nghiên cứu** — đánh giá Mamba có cải thiện đáng kể trong các công trình đã công bố hay không (Mục 1), và tìm ít nhất 5 bài báo trong 5 năm gần đây giải quyết bài toán dự báo lưu lượng theo tiêu chí uy tín: không MDPI, không chỉ là preprint, trích dẫn ≥ 5, ưu tiên Scimago Q1/Q2, ưu tiên Việt Nam → Đông Nam Á → châu Á, **ưu tiên tạp chí/hội nghị ngành CNTT hoặc AI** (có ưu thế về AI) (Mục 2); **(2) yêu cầu chung** — tiểu luận phải ra được demo/phần mềm (Mục 3). Số trích dẫn và hạng Scimago lấy từ Google Scholar và Scimago tại thời điểm tra (08–09/2026).
 >
-> Hướng đề tài hiện tại: bài cơ sở BiasCast (HESS 2026) trên Extended LamaH-CE, so sánh các lõi thời gian (`Document/01_Plan/01_OverallPlan.md`, `Document/01_Plan/03_Pipeline.md`); RiverMamba là tài liệu tham khảo về kiến trúc.
+> Hướng đề tài hiện tại: bài cơ sở BiasCast (HESS 2026) trên Extended LamaH-CE, so sánh các lõi thời gian (`Document/01_Plan/03_Pipeline.md`); RiverMamba là tài liệu tham khảo về kiến trúc.
 
 ---
 

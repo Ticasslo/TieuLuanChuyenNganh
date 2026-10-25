@@ -53,6 +53,23 @@ Cách nói trước hội đồng: đề tài không khẳng định Mamba tốt
 5. **Kiểm thử trước khi huấn luyện:** mọi mô-đun mới có kiểm thử đơn vị (Mục 9.2).
 6. **Kết quả nào cũng là câu trả lời:** báo cáo cả kết quả âm tính.
 
+### 1.5. Tên đề tài
+
+| | Tên | Trạng thái |
+|---|---|---|
+| Tên đăng ký với GVHD, dùng cho tiểu luận | *"Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy"* | Giữ nguyên |
+| Tên khóa luận | — | Chưa chốt |
+
+Tên không có chữ "lũ lụt": đầu ra là lưu lượng Q, không phải vùng ngập hay mực nước. Quy đổi Q sang mực nước cần đường quan hệ mực nước – lưu lượng riêng từng mặt cắt, ngoài phạm vi đề tài; "nguy cơ lũ" chỉ suy ra gián tiếp qua ngưỡng chu kỳ lặp lại trên Q (Mục 6.2).
+
+### 1.6. Hạn chế và đạo đức
+
+- Công cụ nghiên cứu, không thay cảnh báo chính thức; cần người kiểm tra.
+- Mô hình học trên tái phân tích suy giảm khi chạy với dự báo thời tiết thật — BiasCast đo được NSE trung vị 0,58 → 0,33; đề tài dùng dự báo thật ngay từ đầu vào.
+- Dữ liệu chỉ ở Trung Âu (Áo và vùng lân cận); khả năng áp dụng cho Việt Nam chưa được kiểm chứng.
+- Extended LamaH-CE dùng giấy phép CC BY-NC 4.0 (không thương mại); bản 1.0 ghi chưa phải bản sửa cuối. Hai nguồn bên trong cũng chỉ cho dùng phi thương mại: MSWEP (CC BY-NC 4.0, tài liệu MSWEP v3.16 của GloH2O), E-OBS (nghiên cứu và giáo dục phi thương mại, chính sách dữ liệu ECA&D). Đề tài và demo là nghiên cứu, giáo dục phi thương mại; sản phẩm thương mại sau này phải thay nguồn dữ liệu.
+- Trang Zenodo của LamaH-CE ghi số liệu lưu lượng của Cộng hòa Séc không được dùng để dựng hệ thống cảnh báo vận hành (điều kiện của CHMI); demo của đề tài chỉ phát lại kỳ test để minh họa, không phải hệ thống cảnh báo.
+
 ---
 
 ## 2. Tổng quan các giai đoạn
@@ -362,7 +379,7 @@ Mã đặt trong `Workspace/`, mỗi thư mục con một việc; mỗi notebook
 
 ### 9.5. Đầu ra cho đánh giá và demo
 
-Bộ đánh giá chỉ đọc dự báo đã lưu, không gọi mô hình. Demo dùng các tệp này cho bản đồ và đường Q, còn phần chạy mô hình trực tiếp theo Mục 9.6. Mỗi cấu hình chính thức xuất một tệp dự báo kỳ test theo định dạng chung: mã lưu vực, ngày phát hành, hạn (1–7), qmax quan trắc, qmax dự báo (mm/ngày và m³/s), phân vị khi dùng CMAL, mã cấu hình và mã commit thư viện. Kết quả giải thích mô hình (Mục 6.7) lưu riêng, tổng hợp theo lưu vực, để demo hiển thị. Định dạng tệp cụ thể chọn khi viết bộ đánh giá. Trang demo công khai phải ghi nguồn dữ liệu (Extended LamaH-CE, LamaH-CE, BiasCast) kèm giấy phép, ghi rõ đây là phát lại kỳ test để minh họa, không phải cảnh báo chính thức (điều kiện CHMI về số liệu lưu lượng Séc, `01_OverallPlan.md` Mục 9), và không thu phí, không quảng cáo (giấy phép phi thương mại).
+Bộ đánh giá chỉ đọc dự báo đã lưu, không gọi mô hình. Demo dùng các tệp này cho bản đồ và đường Q, còn phần chạy mô hình trực tiếp theo Mục 9.6. Mỗi cấu hình chính thức xuất một tệp dự báo kỳ test theo định dạng chung: mã lưu vực, ngày phát hành, hạn (1–7), qmax quan trắc, qmax dự báo (mm/ngày và m³/s), phân vị khi dùng CMAL, mã cấu hình và mã commit thư viện. Kết quả giải thích mô hình (Mục 6.7) lưu riêng, tổng hợp theo lưu vực, để demo hiển thị. Định dạng tệp cụ thể chọn khi viết bộ đánh giá. Trang demo công khai phải ghi nguồn dữ liệu (Extended LamaH-CE, LamaH-CE, BiasCast) kèm giấy phép, ghi rõ đây là phát lại kỳ test để minh họa, không phải cảnh báo chính thức (điều kiện CHMI về số liệu lưu lượng Séc, Mục 1.6), và không thu phí, không quảng cáo (giấy phép phi thương mại).
 
 ### 9.6. Đưa mô hình vào demo
 
@@ -461,6 +478,8 @@ Hai bản thảo tại `Document/07_Report/` sử dụng số liệu A1/A2/A3 v�
 | So với khung mã nguồn mở của Google (Y20) | Google công bố mã 3/6/2026 (Apache 2.0); cần kiểm có trọng số sẵn không và dữ liệu huấn luyện Caravan có chứa lưu vực LamaH-CE không |
 | Biến thể lai Mamba–Transformer (SST), LOAN, xLSTM | Sau khi có kết quả dạng thuần |
 | Phần mềm ứng dụng | Yêu cầu của khóa luận (mức "có tính ứng dụng" cần hỏi GVHD). Nâng trang demo: tìm kiếm lưu vực theo tên, sông, vị trí; trang từng lưu vực (Q 1–7 ngày, ngưỡng, xác suất vượt ngưỡng); so sánh mô hình và giải thích mô hình theo lưu vực; tài khoản, cảnh báo qua email; API. Tham khảo Google Flood Hub (trang Google Research *Flood Forecasting*, Flood Forecasting API). Dữ liệu Extended LamaH-CE chỉ tới 2017 nên vẫn là phát lại; chạy gần thời gian thực cần nguồn trực tiếp (eHYD, dữ liệu mở ECMWF, ERA5-Land), chưa kiểm giấy phép và cách tải |
+
+Hướng công bố sau khóa luận: SOICT (mời mở rộng sang *Multimedia Tools and Applications* / *Informatica*), chu kỳ 2027 trở đi.
 
 ---
 

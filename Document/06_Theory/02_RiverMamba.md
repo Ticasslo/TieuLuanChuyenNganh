@@ -1,6 +1,6 @@
 # RiverMamba — Ghi chú đọc mã nguồn (tài liệu tham khảo)
 
-> Tài liệu tổng hợp kết quả đọc repo chính thức của RiverMamba (Shams Eddin, Zhang, Kollet, Gall — NeurIPS 2025; DOI proceedings `10.52202/085713-4446`; arXiv 2505.22535; mã nguồn `github.com/HakamShams/RiverMamba_code`, đọc ngày 26/8/2026). Đề tài không chạy hay fine-tune RiverMamba (đề tài dùng dữ liệu theo lưu vực Extended LamaH-CE, xem `Document/01_Plan/01_OverallPlan.md`); tài liệu này dùng để tham khảo kiến trúc, hàm mất mát, quy ước dữ liệu và kinh nghiệm cài đặt `mamba-ssm` trên Colab/Kaggle. Thư mục `docs/` của repo chỉ chứa ảnh và poster, không có tài liệu văn bản bổ sung.
+> Tài liệu tổng hợp kết quả đọc repo chính thức của RiverMamba (Shams Eddin, Zhang, Kollet, Gall — NeurIPS 2025; DOI proceedings `10.52202/085713-4446`; arXiv 2505.22535; mã nguồn `github.com/HakamShams/RiverMamba_code`, đọc ngày 26/8/2026). Đề tài không chạy hay fine-tune RiverMamba (đề tài dùng dữ liệu theo lưu vực Extended LamaH-CE, xem `Document/01_Plan/03_Pipeline.md`); tài liệu này dùng để tham khảo kiến trúc, hàm mất mát, quy ước dữ liệu và kinh nghiệm cài đặt `mamba-ssm` trên Colab/Kaggle. Thư mục `docs/` của repo chỉ chứa ảnh và poster, không có tài liệu văn bản bổ sung.
 
 ---
 

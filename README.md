@@ -6,7 +6,7 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 
 | Thư mục | Nội dung |
 |---|---|
-| `Document/01_Plan/` | Kế hoạch tổng thể (`01_OverallPlan.md`), giới thiệu bài cơ sở BiasCast (`02_BasePaper.md`), pipeline, kiến trúc, phạm vi (`03_Pipeline.md`) |
+| `Document/01_Plan/` | Giới thiệu bài cơ sở BiasCast (`02_BasePaper.md`); tài liệu gốc của đề tài: tên, câu hỏi nghiên cứu, pipeline, kiến trúc, phạm vi (`03_Pipeline.md`) |
 | `Document/02_Meetings/` | Biên bản họp với GVHD và việc cần làm |
 | `Document/03_Data/` | Ghi chú thực thi dữ liệu LamaH-CE và Extended LamaH-CE: tải, kiểm tra, kết quả |
 | `Document/04_Ideas/` | Ý tưởng cho đề tài: căn cứ, chi phí, vị trí trong lộ trình |
@@ -41,7 +41,6 @@ Mã bộ đánh giá hỗ trợ hạn 1–7 với dung sai chính ±⌊hạn/3�
 
 ## Tài liệu báo cáo
 
-- [Báo cáo tiến độ cho GVHD](Document/01_Plan/04_ProgressReport_2026-10-23.md): dữ liệu, tái lập, persistence/DLinear, phân mức và sự kiện, có ví dụ giải thích chỉ số.
 - [Chương 4 — Dữ liệu](Document/07_Report/04_Data.md): nguồn theo năm, đơn vị, độ phủ, cửa sổ và ngưỡng.
 - [Chương 6 — Thí nghiệm và kết quả](Document/07_Report/06_ExperimentsAndResults.md): giao thức, các kết quả đã chạy và diễn giải.
 - [Bộ đánh giá và bằng chứng thực nghiệm](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md): mã, notebook, bảng kết quả và kiểm tra.

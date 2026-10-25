@@ -146,7 +146,7 @@ Thiếu nhãn tập trung ở một số trạm: 324/600/623 không có nhãn tr
 
 **Ngưỡng đánh giá đã được tính riêng cho từng lưu vực trên tham chiếu 1981–2013.** Ba phân vị q30/q80/q98 chia qmax ngày thành bốn mức: thấp, trung bình, cao, rất cao. Ngưỡng lũ 1,5/2/5/10 năm dùng Gumbel L-moments trên đỉnh năm thủy văn 01/10–30/09; các đoạn vượt ngưỡng được tổng hợp thành cụm theo quy tắc USWRC. Có 427 lưu vực với ít nhất 10 năm đỉnh và 24 lưu vực chỉ có 3–9 năm; nhóm mẫu ngắn được báo riêng khi đánh giá sự kiện. Ngưỡng trước test và thống kê chuẩn hóa huấn luyện giữ hai vai trò riêng.
 
-A1 cung cấp cơ sở dữ liệu và các hồ sơ chẩn đoán cho A3, bộ nạp và bộ đánh giá. [Báo cáo tiến độ](../01_Plan/04_ProgressReport_2026-10-23.md) trình bày kết quả A1/A2/A3 và giải thích các chỉ số cho người đọc mới.
+A1 cung cấp cơ sở dữ liệu và các hồ sơ chẩn đoán cho A3, bộ nạp và bộ đánh giá.
 
 ### 6.3. Tái lập bằng trọng số tác giả (bước A2, Kaggle 11/10/2026)
 
