@@ -29,7 +29,7 @@ EDGE = "endArrow=block;endFill=1;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;
 SEQUENCE = [
     ("0", "0. Hạ tầng: fork riêng, mamba-ssm trên T4, kiểm thử đơn vị, đo thời gian"),
     ("A", "A. Tái lập, persistence, PNSE, DLinear, nhiễu 3 hạt giống (6 lần)"),
-    ("B", "B. LSTM cải tiến: Q, masked mean theo nguồn, che dữ liệu (12 lần)"),
+    ("B", "B. LSTM cải tiến, thêm từng thay đổi: B0 nền 30 epoch, B1a đơn vị Q, B1 qmax, B2 masked mean, B3 che dữ liệu (21 lần)"),
     ("C", "C. 5 lõi cùng tham số, tinh chỉnh 8 cấu hình, 3 hạt giống (tối đa 70 lần)"),
     ("C", "H → D → E → F → GV. Dự báo 1–7 ngày, 730 ngày, biến thể, CMAL, kiểm chứng lấy mẫu lũ (42 lần)"),
     ("EV", "Đánh giá: mức, sự kiện lũ, kịch bản vận hành, kiểm định"),
@@ -47,7 +47,7 @@ BANDS = [
         ("Hindcast 364 ngày × 31 biến (ERA5-Land, E-OBS, MSWEP, GLEAM), một khối chung",
          [("B", "B2. Chia nhóm theo nguồn dữ liệu"), ("C", "D. Mở rộng 730 ngày (LSTM, Mamba, S4D)")]),
         ("Q quá khứ: qmean theo m³/s (nhãn mm/ngày), thiếu ngày → mất mẫu",
-         [("B", "B1. Q cùng đơn vị mm/ngày với nhãn, thêm qmax quá khứ; B2: nhóm Q riêng"),
+         [("B", "B1a. Q cùng đơn vị mm/ngày với nhãn; B1: thêm qmax quá khứ; B2: nhóm Q riêng"),
           ("B", "B3. Che dữ liệu khi huấn luyện (0,1/0,12 và 0,05/0,05)")]),
         ("Forecast ngày t: 5 biến ECMWF HRES",
          [("C", "H. Dự báo 1–7 ngày: ngày đầu ECMWF HRES thật, các ngày sau để trống; so với chỉ quá khứ và dự báo hoàn hảo")]),
@@ -72,7 +72,7 @@ BANDS = [
     ("4. Huấn luyện", [
         ("Hàm mất mát NSE*: (ŷ−y)² / (σ lưu vực + 0,1)²", []),
         ("Adam 10⁻³, cosine annealing, ≤30 epoch, dừng sớm theo NSE kiểm định",
-         [("B", "B1. Sửa lưu mô hình tốt nhất; ghi NSE kiểm định và kiểm tra mỗi epoch")]),
+         [("B", "B0. Chạy đủ 30 epoch, không dừng sớm; sửa lưu mô hình tốt nhất; ghi NSE kiểm định và kiểm tra mỗi epoch")]),
         ("1 hạt giống · ẩn 128, lô 256, dropout 0,3",
          [("A", "A4. 3 hạt giống mọi cấu hình, đo nhiễu hạt giống"),
           ("C", "C. Tinh chỉnh 8 cấu hình mỗi lõi: dung lượng × độ sâu × learning rate")]),
