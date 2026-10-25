@@ -1,6 +1,6 @@
 # Kịch bản trình bày tiến độ ngày 25/10/2026 cho hai thành viên
 
-Tài liệu dùng để tập nói và điều khiển màn hình khi báo cáo. Những đoạn trích dẫn là lời có thể đọc trực tiếp; phần **Mở**, **Chỉ vào** và **Chuyển màn hình** là hướng dẫn thao tác, không đọc thành lời. Các số liệu lấy từ kết quả đã kiểm trong repo, cập nhật ngày 24/10/2026. Bản thuyết minh gửi giảng viên là [báo cáo tiến độ](04_ProgressReport_2026-10-23.md).
+Tài liệu dùng để tập nói và điều khiển màn hình khi báo cáo. Những đoạn trích dẫn là lời có thể đọc trực tiếp; phần **Mở**, **Chỉ vào** và **Chuyển màn hình** là hướng dẫn thao tác, không đọc thành lời. Các số liệu lấy từ kết quả đã kiểm trong repo, cập nhật ngày 25/10/2026. Bản thuyết minh gửi giảng viên là [báo cáo tiến độ](04_ProgressReport_2026-10-23.md).
 
 Thông điệp xuyên suốt: **nhóm đã hiểu dữ liệu, tái lập suy luận, tự huấn luyện các mốc và xây dựng bộ đánh giá; LSTM có kỹ năng chuỗi khá tốt nhưng khả năng bắt đúng ngày khởi phát lũ còn hạn chế. Đặc điểm lưu vực có liên hệ với mức cải thiện và các xu hướng chính giữ qua ba seed.** Kết quả hiện có là nền thực nghiệm cho bước cải tiến và so sánh các lõi, chưa phải kết quả chứng minh lợi ích của Mamba.
 
@@ -239,7 +239,11 @@ Nguồn: output cell 9.5–9.7 và [A3, Phần 9](../../Workspace/03_Baseline/02
 
 Nguồn: output cell 10.7, [A3, Phần 10](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#phần-10-so-sánh-các-mô-hình-trên-giao-ngày-chung).
 
-### P1-05. Cell 11.10: chỉ số gắn với chuỗi dự báo thực tế như thế nào?
+### P1-05. Cell 11.10 và 11.12: mô hình sai ở đâu, vì sao cần đánh giá thêm?
+
+**Mục đích của điểm dừng này:** giải thích những gì bảng NSE chưa thể hiện hết. Lưu vực 800 minh họa việc mô hình theo được biến động chung nhưng vẫn hụt đỉnh; 742/758 minh họa việc sai lệch mức nền gặp quan trắc ít biến động có thể làm NSE âm sâu. Đây là cầu nối từ bảng chỉ số sang đánh giá ngày lưu lượng cao và sự kiện lũ, không phải phần giới thiệu thêm một mô hình.
+
+#### A. Cell 11.10 — nhìn trực tiếp sai sót trên chuỗi dự báo
 
 **Mở:** hình ở output **11.10 — Chuỗi dự báo ở 742, 758, 363 và 800**. [Mở hình cục bộ](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/Figures/A3_profile_hydrographs.png).
 
@@ -247,15 +251,132 @@ Nguồn: output cell 10.7, [A3, Phần 10](../../Workspace/03_Baseline/02_A3_Lam
 
 **Lời nói:**
 
-> “Hình này đưa các điểm số trở lại chuỗi dự báo. Trục ngang là thời gian, trục dọc là qmax quy đổi theo diện tích, đơn vị mm/ngày. Đường đen là quan trắc.
+> “Sau khi xem bảng NSE, nhóm kiểm tra trực tiếp chuỗi dự báo để biết mô hình còn sai ở đâu. Trục ngang là thời gian, trục dọc là qmax quy đổi theo diện tích, đơn vị mm/ngày. Đường đen là quan trắc, các đường màu là dự báo.
 >
-> Ở lưu vực 800, có thể thấy các biến động chung mà mô hình theo được, nhưng một số đỉnh quan trắc lớn vẫn bị dự báo hụt. Vì thế, một điểm NSE tổng hợp chưa đủ để kết luận mô hình dự báo tốt những ngày lưu lượng cao.
+> Trước tiên, ở lưu vực 800, các đường dự báo theo được một phần biến động chung nhưng nhiều đỉnh cao của đường đen vẫn bị dự báo thấp hơn. Như vậy, có kỹ năng trên cả chuỗi chưa có nghĩa đã dự báo tốt những ngày lưu lượng cao. Đó là lý do nhóm đánh giá thêm theo mức lưu lượng và theo sự kiện.
 >
-> Ở hai lưu vực 742 và 758, quan trắc có biến thiên nhỏ. Sai lệch mức nền có thể lớn so với độ biến thiên đó, dẫn tới NSE âm rất sâu. Nhóm giữ các lưu vực này để phân tích, thay vì loại khỏi bảng chính.”
+> Tiếp theo, ở 742 và 758, lưu lượng quan trắc ít biến động nhưng nhiều dự báo bị lệch khỏi mức nền đó. Vì NSE so sai số với độ biến thiên quan trắc, sai lệch này có thể làm điểm âm rất sâu. Nhóm giữ các lưu vực này và kiểm nguyên nhân của điểm số.”
 
-**Nếu thầy hỏi sâu:** mở **cell 11.12 — Thành phần sai số chuẩn hóa**; nói:
+**Câu chuyển sang hình tiếp theo:**
 
-> “Nhóm tách sai số bình phương trung bình thành bình phương sai số trung bình và phương sai sai số. Sau chuẩn hóa bằng phương sai quan trắc, tổng hai phần bằng 1 trừ NSE. Đây là cách mô tả sai số, chưa phải giải thích cơ chế vật lý bên trong mô hình.”
+> “Để phân biệt sai lệch mức nền với phần sai số thay đổi theo ngày, nhóm phân rã sai số ở hình tiếp theo.”
+
+#### B. Cell 11.12 — mở hình và xác định các thành phần trước khi diễn giải
+
+**Mở:** output **11.12 — Thành phần sai số chuẩn hóa**, hình `A3_profile_error_components.png`. [Mở hình cục bộ](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/Figures/A3_profile_error_components.png).
+
+**Hình này trả lời:** với mỗi bộ dự báo tại một lưu vực, sai số tổng thể có bao nhiêu giá trị đến từ **lệch trung bình**, và bao nhiêu đến từ **sai số thay đổi quanh mức lệch trung bình đó**?
+
+**Giải thích bố cục theo đúng thứ tự chỉ tay:**
+
+1. Bốn ô là bốn lưu vực: **742 trên trái, 758 trên phải, 363 dưới trái, 800 dưới phải**.
+2. Trục ngang là các run. Mỗi cột là một bộ dự báo tại lưu vực đang xét. Hình A3 này gồm sáu run A2, ba DLinear và hai persistence; **các cột DLinear 111/222/333 không phải ba LSTM A4**.
+3. Mỗi cột chồng hai phần: **cam** ở dưới, **xanh** ở trên.
+4. Trục tung là **sai số bình phương trung bình đã chuẩn hóa bằng phương sai quan trắc**. Đây là tỷ số không có đơn vị, không phải qmax hay mm/ngày.
+5. Đường ngang nét đứt tại **1** là mốc **NSE = 0**. Đọc vị trí đỉnh cột so với đường này.
+
+**Lời nói mở hình:**
+
+> “Mỗi ô vẫn là một lưu vực, nhưng ở đây mỗi mô hình được biểu diễn bằng một cột sai số. Nhóm chia cột thành hai phần để xem mô hình bị lệch mức trung bình nhiều hay sai số thay đổi nhiều theo ngày. Cột thấp hơn nghĩa sai số chuẩn hóa nhỏ hơn.”
+
+#### C. Màu cam: sai lệch mức trung bình
+
+Gọi sai số ngày t là **e(t) = dự báo(t) − quan trắc(t)**. Trung bình sai số cũng bằng trung bình dự báo trừ trung bình quan trắc.
+
+**Phần cam = [trung bình sai số]² / phương sai quan trắc.** Nhãn tiếng Anh là `Squared mean error / obs variance`.
+
+**Cách hiểu:** dự báo có thể thường xuyên cao hơn hoặc thấp hơn mức quan trắc, tạo sai lệch trung bình kéo dài. Bình phương làm phần đóng góp này không âm. Vì đã bình phương, **chỉ nhìn phần cam không biết dự báo lệch cao hay lệch thấp**; cần đối chiếu chuỗi ở cell 11.10 hoặc dấu của `mean_error` trong bảng chẩn đoán.
+
+**Lời nói:**
+
+> “Phần cam đo sai lệch mức trung bình. Ví dụ, nếu dự báo thường xuyên cao hơn quan trắc một lượng gần cố định, trung bình sai số sẽ khác 0 và phần cam tăng. Nếu thường xuyên thấp hơn, phần cam cũng tăng vì sai lệch được bình phương. Muốn biết lệch theo hướng nào thì phải xem lại chuỗi hoặc sai số có dấu.”
+
+Không nói “cam là sai số của xu hướng DLinear”: đây là thành phần sai số đánh giá cho **mọi run**, không phải nhánh trend trong kiến trúc DLinear.
+
+#### D. Màu xanh: sai số thay đổi quanh mức lệch trung bình
+
+**Phần xanh = phương sai của sai số / phương sai quan trắc.** Nhãn tiếng Anh là `Error variance / obs variance`.
+
+**Cách hiểu:** sau khi trừ mức sai lệch trung bình, sai số còn thay đổi nhiều hay ít giữa các ngày. Sai số có thể tăng mạnh ở một số đỉnh, giảm ở ngày khác, hoặc đổi dấu giữa dự báo thừa và thiếu. Phần xanh lớn cho biết có độ phân tán sai số lớn; riêng hình này chưa phân biệt đầy đủ lệch thời điểm, hụt biên độ hay các kiểu sai khác.
+
+**Lời nói:**
+
+> “Phần xanh đo mức thay đổi của sai số quanh mức lệch trung bình. Một mô hình có thể trung bình không lệch nhiều, nhưng hôm thì dự báo thừa, hôm thì thiếu, hoặc sai nhiều ở một số đỉnh. Những sai số đó có thể triệt tiêu khi lấy trung bình, nhưng vẫn xuất hiện trong phần xanh.”
+
+**Điểm dễ nhầm:** màu xanh là phương sai **sai số**, không phải phương sai **dự báo**. Một dự báo hằng vẫn có phần xanh vì quan trắc thay đổi làm sai số thay đổi. Cũng không gọi phần xanh là toàn bộ “nhiễu ngẫu nhiên”: nó có thể chứa sai sót có cấu trúc của mô hình.
+
+#### E. Tổng hai phần và đường mốc 1 liên hệ với NSE thế nào?
+
+Với cùng ngày chấm, dùng phương sai theo ddof=0 như mã A3:
+
+**MSE = [trung bình sai số]² + phương sai sai số.**
+
+Chia hai vế cho phương sai quan trắc dương:
+
+**Tổng giá trị cam + xanh = MSE / phương sai quan trắc = 1 − NSE.**
+
+Do đó, **đỉnh cột là giá trị 1 − NSE**, không phải NSE. Cột càng cao thì NSE càng thấp.
+
+| Giá trị đọc tại đỉnh cột — ví dụ minh họa | NSE tương ứng | Cách diễn giải |
+|---|---:|---|
+| 0 | 1 | Dự báo hoàn hảo trên các ngày chấm |
+| 0,2 | 0,8 | Sai số bình phương nhỏ hơn mốc trung bình quan trắc |
+| 1 | 0 | Sai số bình phương ngang mốc trung bình quan trắc |
+| 5 | −4 | Sai số bình phương lớn hơn mốc đó |
+
+**Lời nói:**
+
+> “Tổng hai phần bằng 1 trừ NSE. Vì vậy đường nét đứt ở mức 1 tương ứng NSE bằng 0. Cột nằm dưới đường này cho NSE dương; cột cao hơn cho NSE âm. Ví dụ đỉnh cột bằng 5 thì NSE bằng 1 trừ 5, tức âm 4.”
+
+**Lưu ý trục:** hình dùng symlog: vùng từ 0 đến 1 là tuyến tính, phía trên 1 được nén theo thang log. Cần đọc các mốc số trên từng ô; không so trực tiếp chiều cao cột giữa hai ô có thang hiển thị khác nhau. Cũng không ước lượng “cam chiếm bao nhiêu phần trăm sai số” bằng tỷ lệ chiều dài hai màu trên vùng log; muốn tỷ lệ phải dùng giá trị số trong bảng.
+
+#### F. Ví dụ số để phân biệt cam và xanh khi tập
+
+Ví dụ sau chỉ giải thích công thức, không phải số liệu của bốn lưu vực. Giả sử phương sai quan trắc bằng 1 trên bốn ngày:
+
+| Sai số của một dự báo qua bốn ngày | Trung bình sai số | Phương sai sai số | Cam | Xanh | Tổng | NSE |
+|---|---:|---:|---:|---:|---:|---:|
+| +2, +2, +2, +2 | 2 | 0 | 4 | 0 | 4 | −3 |
+| +2, −2, +2, −2 | 0 | 4 | 0 | 4 | 4 | −3 |
+
+Hai dự báo có cùng MSE và NSE, nhưng kiểu sai khác nhau: trường hợp đầu luôn lệch cao một lượng cố định; trường hợp sau sai số đổi dấu nên trung bình bằng 0 mà sai số bình phương vẫn lớn. Đây là lý do xem hai màu thay vì chỉ một điểm NSE.
+
+#### G. Đọc bốn ô của chính hình kết quả
+
+| Ô hình | Chỉ vào đâu | Kết luận được phép rút ra |
+|---|---|---|
+| 742 — trên trái | Nhiều cột mô hình cao hơn đường 1; phần cam lớn ở nhiều run; hai persistence nằm dưới 1 | Nhiều run có NSE âm ở lưu vực này; sai lệch trung bình đóng góp lớn ở nhiều run. Không khẳng định mọi run đều cùng kiểu sai: SeqLSTM_noQ có phần sai số biến thiên nổi bật |
+| 758 — trên phải | Phần cam rất lớn ở nhiều run, đặc biệt EncDec; DLinear 111 cũng cao hơn 1; persistence rất thấp | Mức trung bình dự báo lệch so với quan trắc, cùng phương sai quan trắc nhỏ, làm sai số chuẩn hóa lớn. Mô hình phức tạp không bảo đảm hơn persistence ở mọi lưu vực |
+| 363 — dưới trái | Các DLinear hơi cao hơn 1; persistence qmax còn cao hơn; phần xanh chiếm phần lớn giá trị sai số ở nhiều run | DLinear có NSE hơi âm ở đây nhưng vẫn có thể hơn persistence, tức PNSE dương. NSE và PNSE dùng hai mốc khác nhau |
+| 800 — dưới phải | Các cột dưới 1, phần xanh đóng góp lớn hơn phần cam | NSE dương nhưng vẫn còn sai số thay đổi theo ngày. Đối chiếu cell 11.10 thấy những đỉnh bị dự báo hụt; hình phân rã riêng lẻ chưa chứng minh mọi phần xanh đều do hụt đỉnh |
+
+**Ví dụ thật dễ đọc:** tại lưu vực **758, DLinear seed 111**, giá trị cam xấp xỉ **12,516**, xanh **0,048**, tổng **12,564**. Vì tổng bằng 1−NSE nên NSE xấp xỉ **−11,564**. Trường hợp này có đóng góp sai lệch trung bình rất lớn; không cần đọc toàn bộ cột khác để giải thích cơ chế của điểm âm.
+
+Các số làm tròn trên được đối chiếu từ [chỉ số cùng giao ngày](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/Tables/BasinAnalysis_paired_contrasts.csv) và [trung bình/std quan trắc](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/Tables/BasinAnalysis_attributes_and_diagnostics.csv). Trong Output A3, bảng dữ liệu của hình là `A3_figure_error_components.csv`.
+
+#### H. Lời thoại liền mạch khoảng 1–2 phút cho cell 11.12
+
+**Thao tác:** chỉ chú giải hai màu → đường mốc 1 → ô 758/DLinear 111 → ô 800 → chốt mục đích.
+
+> “Hình này giúp nhóm giải thích vì sao các mô hình có điểm NSE như ở bảng trước. Mỗi cột là một bộ dự báo tại một lưu vực, gồm hai phần sai số.
+>
+> Phần cam là bình phương sai lệch trung bình: dự báo thường xuyên cao hơn hoặc thấp hơn mức quan trắc sẽ làm phần này tăng. Phần xanh là độ biến thiên của sai số quanh mức lệch trung bình: có thể trung bình không lệch nhiều nhưng từng ngày vẫn sai lớn.
+>
+> Hai phần đều được chia cho phương sai quan trắc, tổng bằng 1 trừ NSE. Vì thế cột thấp hơn đường nét đứt 1 cho NSE dương, cao hơn cho NSE âm.
+>
+> Chẳng hạn ở lưu vực 758, DLinear seed 111 có tổng khoảng 12,56 nên NSE khoảng âm 11,56; đóng góp lớn nằm ở sai lệch trung bình. Quan trắc ở đây ít biến động nên sai lệch nền trở nên rất lớn so với độ biến thiên của quan trắc.
+>
+> Còn ở lưu vực 800, các cột đều dưới 1, tức NSE dương, nhưng vẫn có phần sai số biến thiên đáng kể. Khi quay lại hình chuỗi, nhóm thấy nhiều đỉnh quan trắc bị dự báo hụt.
+>
+> Như vậy nhóm vừa kiểm các ca NSE âm sâu, vừa nhận ra có NSE dương chưa đủ để kết luận dự báo tốt các đỉnh. Đó là lý do phần đánh giá tiếp theo kiểm riêng mức lưu lượng cao và sự kiện lũ.”
+
+**Nếu chỉ còn 30 giây, dùng bản ngắn:**
+
+> “Cam là sai lệch trung bình, xanh là độ biến thiên của sai số; tổng bằng 1 trừ NSE. Ở 742/758, nhiều dự báo lệch mức nền trên chuỗi ít biến động nên NSE âm sâu. Ở 800, NSE dương nhưng vẫn còn sai số ở các biến động và đỉnh. Vì vậy nhóm cần xem cả chuỗi và đánh giá thêm theo mức, theo sự kiện.”
+
+**Giới hạn cần giữ:** đây là đồng nhất thức mô tả sai số trên các ngày chấm. Nó không tự xác định vì sao mạng học sai, không chứng minh một thuộc tính hay một nguồn dữ liệu là nguyên nhân. Việc 363 được chọn để chẩn đoán sau khi đọc test không làm thay đổi tập ID, cấu hình hoặc chọn checkpoint.
+
+Nguồn công thức và cách vẽ: [mã A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.py), hàm chẩn đoán ở cell 11.3 và phần vẽ ở cell 11.12; [thuyết minh A3, Phần 11](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#phần-11-hồ-sơ-bất-thường-và-trực-quan-hóa-kết-quả).
 
 **Chuyển lời sang Người 2:**
 
@@ -342,7 +463,7 @@ Nguồn: [báo cáo A4, kết quả Phần 2](../../Workspace/03_Baseline/03_A4_
 
 **Nếu được hỏi lỗi lưu best model:**
 
-> “Ở A4, nhóm giữ quy trình gốc để đo mốc nền. Riêng ba lần A4 này, nhóm so trọng số `best_model.pt` với trọng số từng epoch: epoch được lưu trùng epoch có NSE validation cao nhất, nên lỗi không ảnh hưởng kết quả A4. Bản sửa đã đưa vào thư viện của nhóm ở bước B1, kèm kiểm thử tự động; ba lần huấn luyện B1 đang chạy.”
+> “Ở A4, nhóm giữ quy trình gốc để đo mốc nền. Riêng ba lần A4 này, nhóm so trọng số `best_model.pt` với trọng số từng epoch: epoch được lưu trùng epoch có NSE validation cao nhất, nên lỗi không ảnh hưởng kết quả A4. Bản sửa đã đưa vào thư viện của nhóm ở bước B1, kèm kiểm thử tự động; ba lần huấn luyện B1 đã hoàn tất; NSE trung vị test lần lượt là 0,7274; 0,7133; 0,7217, còn bộ đánh giá 14 run dưới đây chưa gồm B1.”
 
 Giải thích lỗi chi tiết ở Q19 (Mục 8).
 
@@ -468,6 +589,16 @@ Nguồn: [bảng mức cộng dồn đã kiểm](../../Workspace/06_Evaluation/0
 ### P1-09. Sự kiện chính: có bắt đúng ngày khởi phát trận không?
 
 **Mở:** `evaluation_output/Evaluation_events_pooled.csv`, các dòng **test/S0/lead 1/T=2/USWRC/cohort=all**, dung sai chính bằng 0. Bảng gọn 14 run ở [Evaluation, Mục 10.3](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#103-sự-kiện-lũ-chu-kỳ-hai-năm).
+
+**Giải thích POD trước khi đọc số:** POD viết đầy đủ là **Probability of Detection**, trong phần này gọi là **tỷ lệ phát hiện được các trận thật**. Nó trả lời: **“Trong tất cả trận thực sự xảy ra và đủ điều kiện chấm, mô hình bắt được bao nhiêu trận?”**
+
+**POD = số trận bắt được / (số trận bắt được + số trận bỏ sót).**
+
+Ví dụ minh họa: có 100 trận thật, mô hình bắt được 20 và bỏ sót 80 thì POD = 20/(20+80) = 0,20 = **20%**. Có thể nói “mô hình bắt được 20 trong 100 trận thật”. Trên cùng tập trận, POD càng cao nghĩa là bỏ sót càng ít. Đây không phải tỷ lệ đúng của mọi ngày và chưa cho biết có bao nhiêu báo động nhầm.
+
+Trong bảng chính của đề tài, “bắt được” còn phải thỏa quy tắc **trận dự báo bắt đầu cùng ngày trận thật**. Vì vậy, khi đọc POD phải đi kèm ngưỡng, cách gộp trận và dung sai thời gian.
+
+**Đọc các cột liên quan:** `hit` = số trận bắt được; `missed` = số trận thật bị bỏ sót; `false_alarm` = số trận dự báo không ghép được với trận thật. **FAR = False Alarm Ratio**, tức tỷ lệ báo nhầm trong số trận được dự báo: **FAR = báo nhầm / (bắt được + báo nhầm)**. POD đo mức bỏ sót, FAR đo mức báo nhầm; cần xem cả hai.
 
 **Chỉ vào:** `hit`, `missed`, `false_alarm`, `POD`, `FAR`.
 
@@ -615,6 +746,8 @@ Nguồn: [hệ số](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBa
 
 **Mở:** `BasinAnalysis_quartile_flood_POD.png`, hàng dưới, cột **Catchment area**. [Mở hình cục bộ](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/Figures/BasinAnalysis_quartile_flood_POD.png).
 
+**Nhắc lại trước khi chỉ hình:** POD là tỷ lệ trận thật được phát hiện theo quy tắc ghép đang dùng; POD 0,2 trên trục tung nghĩa là **20% số trận thật được bắt**, không phải NSE bằng 0,2. Bảng này cộng số trận trong nhóm trước khi chia, không lấy trung bình POD của các lưu vực.
+
 **Chỉ vào:** Q1 và Q4 diện tích; nhắc trục dọc đã đổi thành POD, không còn là ΔNSE.
 
 **Lời nói:**
@@ -673,11 +806,11 @@ Nguồn: [phân tán LSTM](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEEx
 >
 > Khi đánh giá sâu hơn, nhóm thấy kỹ năng cả chuỗi chưa đồng nghĩa bắt tốt ngày khởi phát lũ. Phân tích thuộc tính cho biết mức cải thiện còn thay đổi theo loại lưu vực; các liên hệ chính với độ cao, tuyết và độ khô hạn giữ qua ba seed.
 >
-> Bước tiếp theo là B1, gồm ba thay đổi trên LSTM nền: sửa lưu checkpoint tốt nhất, đưa Q quá khứ về cùng đơn vị mm/ngày với nhãn, và thêm qmax quá khứ làm đầu vào. Bản sửa checkpoint đã có trong thư viện của nhóm kèm kiểm thử; notebook B1 đã chạy thử đủ các phần và đang huấn luyện chính thức ba seed, kết quả sẽ so với ba seed A4. Luồng bộ nạp B2 viết tiếp trên mã B1, tổ chức đầu vào theo nguồn và xử lý nhóm bị thiếu. Sau khi có khung dữ liệu và đánh giá thống nhất, nhóm mới so sánh các lõi LSTM, GRU, Transformer, S4D và Mamba.
+> B1 gồm ba thay đổi trên LSTM nền: sửa lưu checkpoint tốt nhất, đưa Q quá khứ về cùng đơn vị mm/ngày với nhãn, và thêm qmax quá khứ làm đầu vào. Bản sửa checkpoint đã có trong thư viện của nhóm kèm kiểm thử; B1 đã hoàn tất ba seed, có NSE trung vị test 0,7274; 0,7133; 0,7217 theo output chính thức. Bảng 14 run trong buổi trình bày này chưa gồm B1; bước tiếp theo là đưa dự báo B1 qua cùng bộ đánh giá để so với A4. Luồng bộ nạp B2 viết tiếp trên mã B1, tổ chức đầu vào theo nguồn và xử lý nhóm bị thiếu. Sau khi có khung dữ liệu và đánh giá thống nhất, nhóm mới so sánh các lõi LSTM, GRU, Transformer, S4D và Mamba.
 >
 > Các kết quả hôm nay xác lập mốc thực nghiệm và các câu hỏi cần kiểm chứng ở bước cải tiến.”
 
-**Nếu cần phân công câu chốt:** Người 1 bổ sung một câu về việc tích hợp bộ nạp/đánh giá; Người 2 nói về B1 và luồng mô hình. Không nói B1 đã có kết quả (mới đang chạy), không nói B2 đã tích hợp hoặc Mamba đã được so sánh trên dataset này.
+**Nếu cần phân công câu chốt:** Người 1 bổ sung một câu về việc tích hợp bộ nạp/đánh giá; Người 2 nói về B1 và luồng mô hình. Phân biệt kết quả huấn luyện B1 vừa có với bảng đánh giá chung 14 run chưa gồm B1; không nói B2 đã tích hợp hoặc Mamba đã được so sánh trên dataset này.
 
 ## 7. Tờ nhớ thuật ngữ ngay khi đứng trình bày
 
@@ -701,8 +834,8 @@ Nguồn: [phân tán LSTM](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEEx
 | CDF | Tỷ lệ lưu vực có điểm không vượt giá trị trục ngang | CDF không phải đường dự báo theo thời gian |
 | Median | Trung vị: giá trị ở giữa phân phối điểm | Khác mean, ít bị kéo bởi số cực đoan hơn |
 | Recall mức rất cao | Tỷ lệ ngày rất cao thật được nhận diện đúng | Khác tỷ lệ trận lũ bắt được |
-| POD sự kiện | Số trận bắt được / số trận thật đủ điều kiện | Lưu vực không có trận thật có POD không xác định |
-| FAR sự kiện | Số trận báo nhầm / số trận được dự báo | Không phải 1−POD; khác false positive rate dùng mẫu số khác |
+| POD sự kiện — Probability of Detection | Tỷ lệ phát hiện được các trận thật: bắt được / (bắt được + bỏ sót). Ví dụ bắt 20/100 trận thì POD 20% | Phụ thuộc quy tắc ghép; lưu vực không có trận thật có POD không xác định |
+| FAR sự kiện — False Alarm Ratio | Tỷ lệ báo nhầm trong số trận được dự báo: báo nhầm / (bắt được + báo nhầm) | Không phải 1−POD; khác false positive rate dùng mẫu số khác |
 | ΔNSE | NSE mô hình trừ NSE mốc tại cùng lưu vực/ngày | Đơn vị điểm, không phải phần trăm tăng |
 | Spearman ρ | Hệ số liên hệ theo thứ hạng, trong khoảng [−1;1] | Liên hệ không phải đóng góp nhân quả |
 | Q1–Q4 trên hình nhóm | Nhóm thuộc tính từ thấp đến cao | Không phải bốn mức lưu lượng; cũng không phải nhóm NSE |
@@ -834,7 +967,7 @@ Nếu thầy nêu ví dụ chó–mèo: “Phân tích hiện tại cho biết m
 
 **Người trả lời chính: Người 1 về bộ nạp, Người 2 về khung mô hình.**
 
-> “Chưa ạ. B1 đang huấn luyện ba seed; B2 viết tiếp trên mã B1 nên bắt đầu tích hợp sau khi B1 ổn định, rồi hai luồng rà soát chung trước khi huấn luyện B2. Khi khung dùng chung ổn định, nhóm mới so các lõi để tránh thay đồng thời nhiều yếu tố mà không biết lợi ích đến từ đâu.”
+> “Chưa ạ. B1 đã hoàn tất ba seed; B2 có bản kiểm bộ nạp độc lập và cần tích hợp trên mã B1, rồi hai luồng rà soát chung trước khi huấn luyện B2. Khi khung dùng chung ổn định, nhóm mới so các lõi để tránh thay đồng thời nhiều yếu tố mà không biết lợi ích đến từ đâu.”
 
 ### Q19. Lỗi lưu mô hình tốt nhất là gì, sửa thế nào?
 
