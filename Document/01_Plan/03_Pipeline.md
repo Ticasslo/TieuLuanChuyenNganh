@@ -419,7 +419,7 @@ Báo cáo tiểu luận viết tiếng Việt; chữ trong hình và sơ đồ v
 | 1. Mở đầu | Bài toán dự báo qmax, câu hỏi nghiên cứu RQ1–RQ6, đóng góp C1–C6 | Mục 1 |
 | 2. Cơ sở lý thuyết | LSTM, GRU, Transformer, SSM, S4D, Mamba; NSE, KGE, PNSE, chỉ số theo mức và theo sự kiện | `06_Theory/` |
 | 3. Công trình liên quan | BiasCast; các công trình so sánh tính mới (Mục 1.3); khảo sát theo yêu cầu GVHD | `02_BasePaper.md`, `05_Survey/` |
-| 4. Dữ liệu | Liệt kê bộ dữ liệu theo năm phát hành, rồi đoạn thảo luận thống kê từ A1 (khuôn GVHD, biên bản 27/9/2026 Mục 3.1) | [Bản thảo Chương 4](../07_Report/04_Data.md); `03_Data/01_LamaHCE.md` |
+| 4. Dữ liệu | Liệt kê bộ dữ liệu theo năm phát hành, rồi đoạn thảo luận thống kê từ A1 (khuôn GVHD, biên bản 27/9/2026 Mục 3.1); đoạn lý thuyết thủy văn về năm nhóm thuộc tính lưu vực (khí hậu, địa hình, đất, thực vật, địa chất) và vai trò của chúng với dòng chảy, có nguồn, đối chiếu với kết quả phân tích theo lưu vực (biên bản 27/9/2026 Mục 2.1, biên bản 11/10/2026 Mục 2.1) | [Bản thảo Chương 4](../07_Report/04_Data.md); `03_Data/01_LamaHCE.md` |
 | 5. Phương pháp | Khung chung, khối giữ nguyên và khối sửa đổi (sơ đồ), giao thức so sánh cùng tham số | Mục 3–5, `Diagrams/ProjectDiagram.drawio` |
 | 6. Thí nghiệm và kết quả | Bước A, B, C, mở rộng; đánh giá Mục 6; giải thích mô hình | [Bản thảo Chương 6](../07_Report/06_ExperimentsAndResults.md); Mục 6, 7 |
 | 7. Demo | Kiến trúc demo, hai phần phát lại và chạy trực tiếp | Mục 9.5, 9.6 |

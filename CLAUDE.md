@@ -105,10 +105,11 @@
 - Demo là một mục trong trang web nhiều mục của người 2 (giới thiệu, hồ sơ, dự án), chạy 24/7 trên VPS Oracle Cloud Always Free (từ 12/6/2026 hạn mức A1 còn 2 OCPU/12 GB; máy rảnh 7 ngày dưới 20% CPU/mạng/bộ nhớ có thể bị thu hồi — docs.oracle.com). Mức 2 (chọn 10/10/2026): mô hình chạy thật trên CPU, thử "nếu… thì…" với ECMWF HRES ngày t; 4 bước D1 Kaggle GPU → D2 Kaggle CPU (Mamba dùng `mambapy`) → D3 laptop → D4 VPS, bản laptop dự phòng ngày bảo vệ (`03_Pipeline.md` Mục 9.6). Không thuê GPU phục vụ web, không làm giao diện trên Kaggle; công nghệ giao diện, Cloudflare Tunnel, tên miền tra khi có demo chạy thử (Mục 12).
 - XAI: feature attribution qua Captum (Integrated Gradients/SHAP), **không** fine-tune LLM viết báo cáo, thay bằng câu mẫu điền số (23/8/2026). Demiray & Demir (preprint 2025, WaterBench-Iowa) đã làm Mamba + SHAP => cần đóng góp khác biệt.
 
-**Góp ý GVHD** (`Document/02_Meetings/Meeting_2026-09-27.md`)
+**Góp ý GVHD** (`Document/02_Meetings/Meeting_2026-09-27.md`, `Meeting_2026-10-11.md`)
 - Mục dữ liệu: gạch đầu dòng theo năm phát hành + đoạn thảo luận thống kê để biện luận.
 - Kiến trúc tách rõ khối giữ của bài gốc và khối thêm/sửa; không khẳng định điều không kiểm soát được; không dùng LLM.
 - **Đánh giá theo mức lưu lượng** như bài toán phân loại, ưu tiên báo động nhầm hơn bỏ sót lũ (`03_Pipeline.md` Mục 6.2).
 - Theo dõi chỉ số tập test mỗi epoch (đề tài vẫn chọn checkpoint theo validation); khuyến khích viết tiếng Anh.
 - Y7 (lấy mẫu nhiều ngày lũ, bằng chứng trái chiều) đưa vào bước GV; Y8 (đóng băng có chọn lọc theo XAI) chưa đưa vào.
+- Họp 11/10/2026 (`Meeting_2026-10-11.md`): thêm đoạn lý thuyết thuộc tính lưu vực vào Chương 4 (`03_Pipeline.md` Mục 9.8); khởi tạo ưu tiên đặc trưng ghi thành Y22, không đưa vào tiểu luận; vẽ training loss; không chọn seed theo kết quả.
 - Khảo sát bài báo: không MDPI, không chỉ preprint, trích dẫn ≥ 5, ưu tiên Scimago Q1/Q2 và venue CNTT/AI (điểm cộng, không bắt buộc — đính chính 26/9/2026). Tiểu luận **phải có demo**; khóa luận nâng thành phần mềm có tính ứng dụng.
