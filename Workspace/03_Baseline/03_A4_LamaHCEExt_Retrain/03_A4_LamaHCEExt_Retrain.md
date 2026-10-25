@@ -207,7 +207,7 @@ Trọng số mọi epoch, kết quả validation mỗi epoch, kết quả test v
 
 | Số đo ở A4 | Dùng ở |
 |---|---|
-| Độ lệch chuẩn NSE trung vị validation giữa hạt giống: 0,0086 | Luật chọn B* (`03_Pipeline.md` Mục 7): cấu hình kém cấu hình tốt nhất không quá mức này coi như ngang nhau |
+| Độ lệch chuẩn NSE trung vị validation giữa hạt giống: 0,0086 | Mức nhiễu dưới giao thức dừng sớm của tác giả; luật chọn B* dùng độ lệch chuẩn đo lại ở B0 theo giao thức 30 epoch (`03_Pipeline.md` Mục 5.3, 7) |
 | Độ lệch chuẩn NSE trung vị test: 0,0056; khoảng 0,0106 | Đọc chênh lệch NSE trung vị giữa các mô hình ở B, C |
 | Trung vị độ lệch chuẩn NSE theo lưu vực: 0,0207 (0,009–0,034 tùy mức NSE) | Đọc chênh lệch từng lưu vực, phân tích theo lưu vực |
 | Hai lần chạy chỉ khác hạt giống vẫn khác nhau với p Holm < 0,05 | So sánh mô hình phải kèm độ lớn hiệu và nhiều hạt giống, không chỉ p |

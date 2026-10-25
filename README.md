@@ -13,7 +13,7 @@ Tiểu luận chuyên ngành (định hướng khóa luận tốt nghiệp): d�
 | `Document/05_Survey/` | Khảo sát bộ dữ liệu, khảo sát tài liệu, ghi chú đọc từng PDF tham khảo |
 | `Document/06_Theory/` | Lý thuyết LSTM, Transformer, GRU, Mamba; ghi chú đọc mã RiverMamba (tham khảo); ghi chú học BiasCast từng phần; cách đọc hình các chỉ số đánh giá (`08_EvaluationFigures.md`) |
 | `Document/07_Report/` | Bản thảo báo cáo theo chương: Chương 4 Dữ liệu và Chương 6 Thí nghiệm, kết quả từ A1/A2/A3 và đánh giá S0 |
-| `Diagrams/` | Sơ đồ đề tài (`ProjectDiagram.drawio`, sinh bằng `Tools/Diagram_Build.py`): thứ tự thực hiện, kiến trúc chi tiết, thứ tự cắt |
+| `Diagrams/` | Sơ đồ đề tài (`ProjectDiagram.drawio`, sinh bằng `Tools/Diagram_Build.py`): thứ tự thực hiện, kiến trúc chi tiết |
 | `Workspace/` | Mã notebook Kaggle, mỗi thư mục một việc, mỗi notebook một thư mục con cùng tên (`.py`, `.ipynb` có output, báo cáo `.md`, `Figures/`, `Tables/`): `01_Download` (tải dữ liệu), `02_Exploration` (A1), `03_Baseline` (A2–A4 đã có kết quả), `04_Setup` (bước 0: dựng `mamba-ssm` cho Kaggle T4), `05_Training` (huấn luyện từ B0), `06_Evaluation` (bộ đánh giá, bảng và hình S0/hạn một ngày) |
 | `NeuralHydrology/` | Thư viện huấn luyện (submodule, fork `Ticasslo/neuralhydrology`, nhánh `research`) — nơi viết phần đề tài thêm vào thư viện |
 | `Tools/` | Công cụ phụ trợ: chuyển giọng nói buổi họp thành văn bản, sinh sơ đồ đề tài, sinh hình minh họa cho ghi chú lý thuyết (`Theory_Figures.py`) |
