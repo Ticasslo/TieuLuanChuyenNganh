@@ -488,6 +488,7 @@ Hai bản thảo tại `Document/07_Report/` sử dụng số liệu A1/A2/A3 v�
 | Siêu tham số khởi điểm S4D | Wang và cs., WRR 2025, phụ lục S4D-FT |
 | PatchTST, DLinear | Nie và cs. (ICLR 2023); Zhang và cs. (J. Hydrol. 2026) |
 | Trạng thái chạy liên tục thay vì handoff | BiasCast Mục 3.6 |
+| Chạy đủ 30 epoch không dừng sớm; ablation thêm từng thay đổi (B0 → B1a → B1b → B2 → B3) | Lịch cosine T_max 30 trong config tác giả (`02_BasePaper.md` Mục 11); Meyes và cs. (arXiv 1901.08644, 2019); biên bản họp 25/10/2026 (`Meeting_2026-10-25.md` Mục 2.2, 3.3, 3.6) |
 
 ---
 
@@ -516,6 +517,7 @@ Bài ghi "preprint" chưa qua phản biện; chỉ dùng làm công trình liên
 - Saint-Fleur, B. E. và cs. (2026). Chiến lược đồng hóa Q. *HESS* 30, 3497–3527. https://doi.org/10.5194/hess-30-3497-2026
 - Hu, Y. và cs. (2025). Dò khái niệm thủy văn trong trạng thái LSTM. *Environmental Modelling & Software* 192, 106527. https://doi.org/10.1016/j.envsoft.2025.106527
 - Talbot và Davenport (2026). *No Free Lunch? Improving LSTM Flood Predictions with Minimal Loss…* Preprint ESS Open Archive. https://doi.org/10.22541/essoar.177075740.01674581
+- Meyes, R., Lu, M., de Puiseau, C. W., Meisen, T. (2019). *Ablation Studies in Artificial Neural Networks*. arXiv 1901.08644.
 
 **Kiến trúc**
 - Gu, A., Dao, T. (2024). Mamba. *COLM 2024*, arXiv 2312.00752.
