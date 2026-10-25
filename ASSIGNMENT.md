@@ -65,7 +65,7 @@ Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu 
 | Từ | Đến | Thứ bàn giao | Khi nào |
 |---|---|---|---|
 | Người 1 | Người 2 | Tệp ngưỡng, số mẫu hợp lệ, danh sách lưu vực bất thường (A1) | Sau A1 |
-| Người 2 | Người 1 | Thời gian 1 lần huấn luyện (A4): khoảng 9,5 phút/epoch, 2,5–3,2 giờ/lần trên T4 — **đã bàn giao** (`02_Pipeline.md` Mục 8.1) | Sau A4 — cả nhóm gắn ngày cho lịch |
+| Người 2 | Người 1 | Thời gian 1 lần huấn luyện (A4): 9,1–9,5 phút/epoch, 2,5–3,2 giờ/lần trên T4 — **đã bàn giao** (`02_Pipeline.md` Mục 8.1) | Sau A4 — cả nhóm gắn ngày cho lịch |
 | Người 2 | Người 1 | 3 tệp NPZ của A4 (`contracts/SeqLSTM_Q_A4_seed{111,222,333}_test_S0_lead1.npz`, Output notebook `04_A4_LamaHCEExt_Compare` Version 2) — **đã sẵn sàng** | Sau A4 |
 | Người 1 | Người 2 | Bộ nạp B2 đã qua kiểm thử | Trước B2 |
 | Người 2 | Người 1 | Tệp dự báo theo định dạng chung (`02_Pipeline.md` Mục 9.5), kèm mã cấu hình và mã commit thư viện | Sau mỗi bước huấn luyện |

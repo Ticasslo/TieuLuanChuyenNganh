@@ -33,7 +33,7 @@ Tài liệu đi cùng mã của bốn notebook Kaggle: [03_A4_LamaHCEExt_Retrain
 | `03_A4_LamaHCEExt_Retrain_Seed333` | như trên | như trên | Version 2 |
 | `04_A4_LamaHCEExt_Compare` | CPU, Internet On | Output ba notebook trên (đúng các Version ở cột cuối), Output `02_A3_LamaHCEExt_Benchmarks` Version 1 (tài khoản `hunhthanhnhn`), Dataset `lamah-ce-ext` | Version 2 |
 
-Ba tệp huấn luyện giống hệt nhau, chỉ khác dòng `RUN_SEED` ở Phần 1, để mỗi notebook chạy Save & Run All mà không phải sửa dòng nào. Mỗi hạt giống một notebook vì một lần chạy dài 2,7–3,4 giờ kể cả dựng dữ liệu và đánh giá; chạy hai hạt giống song song trên hai GPU của một phiên chậm 1,45 lần do tranh 4 CPU, chạy ba hạt giống nối tiếp trong một phiên có thể vượt giới hạn 12 giờ của Kaggle. Một lần huấn luyện phải nằm trọn trong một phiên: chức năng chạy tiếp (`continue_training`) của thư viện chỉ khôi phục trọng số và optimizer, không khôi phục trạng thái dừng sớm và bộ lập lịch learning rate (`training/basetrainer.py` dòng 180–190, 313–325), nên không tương đương một lần chạy liền.
+Ba tệp huấn luyện giống hệt nhau, chỉ khác dòng `RUN_SEED` ở Phần 1, để mỗi notebook chạy Save & Run All mà không phải sửa dòng nào. Mỗi hạt giống một notebook vì một lần chạy dài 2,7–3,4 giờ kể cả dựng dữ liệu và đánh giá; chạy hai hạt giống song song trên hai GPU của một phiên chậm 1,45 lần do tranh 4 CPU (đo ở phiên chạy thử khi lập kế hoạch, không có trong bản lưu chính thức), chạy ba hạt giống nối tiếp trong một phiên có thể vượt giới hạn 12 giờ của Kaggle. Một lần huấn luyện phải nằm trọn trong một phiên: chức năng chạy tiếp (`continue_training`) của thư viện chỉ khôi phục trọng số và optimizer, không khôi phục trạng thái dừng sớm và bộ lập lịch learning rate (`training/basetrainer.py` dòng 180–190, 313–325), nên không tương đương một lần chạy liền.
 
 Môi trường cả bốn notebook: ảnh Kaggle dựng ngày 22/10/2026, Python 3.13.15, torch 2.11.0+cu128, NumPy 2.1.3, pandas 2.3.3, xarray 2025.12.0, SciPy 1.16.3, matplotlib 3.10.0; thư viện NeuralHydrology cài từ fork `Ticasslo/neuralhydrology` commit `dda45fc` (giống A2).
 
@@ -89,12 +89,12 @@ Số đậm là epoch lưu thành `best_model.pt`; hạt giống 333 đạt cao 
 | Hạng mục | Hạt giống 111 | Hạt giống 222 | Hạt giống 333 |
 |---|---|---|---|
 | Dựng thư mục Q (Phần 3) | 224 giây | 295 giây | 345 giây |
-| Một epoch huấn luyện | khoảng 5,6 phút | khoảng 5,7 phút | khoảng 5,9 phút |
+| Một epoch huấn luyện (trung bình từ epoch 2) | 5,7 phút | 5,7 phút | 5,8 phút |
 | Một lượt validation 451 lưu vực | 4,8 phút lần đầu, sau đó khoảng 3,4 phút | 5,0 phút lần đầu, sau đó khoảng 3,5 phút | 5,1 phút lần đầu, sau đó khoảng 3,6 phút |
 | Huấn luyện tới khi dừng sớm (Phần 5) | 2,50 giờ (16 epoch) | 3,17 giờ (20 epoch) | 3,08 giờ (19 epoch) |
 | Đánh giá test (Phần 6) | 5,2 phút | 5,3 phút | 5,3 phút |
 
-Trung bình một epoch kể cả validation là khoảng 9,5 phút, trong đó validation chiếm khoảng 38%. Nếu chạy đủ 30 epoch (không dừng sớm), một lần huấn luyện mất khoảng 4,7 giờ. Lượt validation đầu tiên chậm hơn vì dựng và đệm dữ liệu validation (`cache_validation_data: true`).
+Một epoch kể cả validation (từ epoch 2) mất trung bình 9,1 / 9,2 / 9,5 phút ở ba hạt giống, trong đó validation chiếm khoảng 38%. A4 dừng sớm ở epoch 16–20 nên không đo được thời gian 30 epoch; ước tính theo 30 × thời gian một epoch đo được, một lần chạy đủ 30 epoch mất khoảng 4,5–4,7 giờ. Lượt validation đầu tiên chậm hơn vì dựng và đệm dữ liệu validation (`cache_validation_data: true`).
 
 <a id="p2"></a>
 ## Phần 1–2 notebook so sánh. Kết quả ba hạt giống và điều kiện đạt
@@ -211,5 +211,5 @@ Trọng số mọi epoch, kết quả validation mỗi epoch, kết quả test v
 | Độ lệch chuẩn NSE trung vị test: 0,0056; khoảng 0,0106 | Đọc chênh lệch NSE trung vị giữa các mô hình ở B, C |
 | Trung vị độ lệch chuẩn NSE theo lưu vực: 0,0207 (0,009–0,034 tùy mức NSE) | Đọc chênh lệch từng lưu vực, phân tích theo lưu vực |
 | Hai lần chạy chỉ khác hạt giống vẫn khác nhau với p Holm < 0,05 | So sánh mô hình phải kèm độ lớn hiệu và nhiều hạt giống, không chỉ p |
-| Một lần huấn luyện 2,5–3,2 giờ (khoảng 9,5 phút/epoch, validation chiếm khoảng 38%), tối đa khoảng 4,7 giờ nếu chạy đủ 30 epoch | Ngân sách và lịch (`02_Pipeline.md` Mục 8.1, 9.7) |
+| Một lần huấn luyện 2,5–3,2 giờ (9,1–9,5 phút/epoch, validation chiếm khoảng 38%), ước tính khoảng 4,5–4,7 giờ nếu chạy đủ 30 epoch (30 × thời gian một epoch, chưa đo) | Ngân sách và lịch (`02_Pipeline.md` Mục 8.1, 9.7) |
 | Ba tệp NPZ của mô hình nền | Bộ đánh giá chấm mô hình nền huấn luyện lại cùng các mốc A3; mốc so sánh cho bước B |

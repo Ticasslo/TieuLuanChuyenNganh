@@ -237,7 +237,7 @@ Có `qmean` (32 biến quá khứ, nhúng quá khứ 528) thì mỗi mô hình t
 
 - Bài chạy ba biến thể Encoder–Decoder ([Bài] dòng 134): (1) cơ bản; (2) thêm `qmean` vào pha quá khứ (Mục 5.6); (3) thêm dự báo lưu trữ vào pha quá khứ (Mục 5.5).
 - Mọi cấu hình Sequential và Encoder–Decoder dùng chung một bộ siêu tham số: 128 chiều ẩn, lô 256, dropout 0,3 ([Cơ sở] Mục 11.3). Bài không nói tối ưu Bayes chạy riêng cho từng kiến trúc hay không.
-- A2 tái lập hai run Encoder–Decoder (nhúng phức tạp): có `qmean` 0,6622, không `qmean` 0,569, khớp bài ([LamaH] Mục 6.3). Run không `qmean` có cảnh báo hệ số tương quan r của KGE không xác định ở ít nhất 1 lưu vực, sẽ xem ở bước A3.
+- A2 tái lập hai run Encoder–Decoder (nhúng phức tạp): có `qmean` 0,6622, không `qmean` 0,5689, khớp bài ([LamaH] Mục 6.3). Run không `qmean` có cảnh báo hệ số tương quan r của KGE không xác định ở ít nhất 1 lưu vực, sẽ xem ở bước A3.
 - Đề tài **không** đưa Encoder–Decoder vào so sánh lõi ở bước C: khung chung của đề tài là Sequential Forecast nhận lõi bất kỳ (`02_Pipeline.md` Mục 4), vì Sequential là mô hình tốt nhất của bài.
 
 **Câu hỏi tự kiểm tra (Mục 5.3):**
@@ -388,7 +388,7 @@ Bài không tách nguyên nhân. Một số lý do hợp lý, đều chưa kiể
 
 #### Chi tiết kỹ thuật (đọc sau, không bắt buộc)
 
-- Từ đây, Bảng F1 cùng các tệp cấu hình cho phép đọc ra quy ước tên run: "Encoder Decoder LSTM" không ghi gì là bản lớp nhúng phức tạp (0,57; A2 tái lập 0,569 cho run `..._Complex_Embedding`), còn "Sequential Forecast LSTM" không ghi gì là bản lớp nhúng đơn giản (0,63; tệp cấu hình trên trỏ `..._Simple_Embedding`). Hai mô hình chính của bài vì thế không cùng loại lớp nhúng.
+- Từ đây, Bảng F1 cùng các tệp cấu hình cho phép đọc ra quy ước tên run: "Encoder Decoder LSTM" không ghi gì là bản lớp nhúng phức tạp (0,57; A2 tái lập 0,5689 cho run `..._Complex_Embedding`), còn "Sequential Forecast LSTM" không ghi gì là bản lớp nhúng đơn giản (0,63; tệp cấu hình trên trỏ `..._Simple_Embedding`). Hai mô hình chính của bài vì thế không cùng loại lớp nhúng.
 - Đề tài không đưa dự báo lưu trữ vào pha quá khứ ở bước B–C. Pha quá khứ của đề tài được làm khác: nhúng theo nguồn và masked mean (bước B2, `02_Pipeline.md`).
 
 **Câu hỏi tự kiểm tra (Mục 5.5):**
@@ -509,7 +509,7 @@ A2 chạy lại trọng số của tác giả cho đúng 6 đường của Hình
 | Run | Mục | Bài (Bảng F1) | A2 tự chạy |
 |---|---|---|---|
 | 𝒟FC | 5.1 | 0,39 | 0,3864 / 0,3867 |
-| Encoder–Decoder không `qmean` (phức tạp) | 5.3 | 0,57 | 0,569 |
+| Encoder–Decoder không `qmean` (phức tạp) | 5.3 | 0,57 | 0,5689 |
 | Sequential không `qmean` (đơn giản) | Phần 4 | 0,63 | 0,6276 |
 | Encoder–Decoder có `qmean` (phức tạp) | 5.6 | 0,66 | 0,6622 |
 | 𝒟RA (đơn giản) | 5.1 | 0,69 | 0,6923 |

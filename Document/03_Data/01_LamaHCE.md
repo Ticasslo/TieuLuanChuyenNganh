@@ -157,7 +157,7 @@ Chạy lại `best_model.pt` của tác giả trên kỳ test 2014–2017 cho s�
 | Sequential Forecast LSTM có Q | 0,7053 | 0,7053 |
 | Sequential Forecast LSTM không Q | 0,6276 | 0,6276 |
 | Encoder–Decoder LSTM có Q | 0,6622 | 0,6622 |
-| Encoder–Decoder LSTM không Q | 0,569 | 0,569 |
+| Encoder–Decoder LSTM không Q | 0,5689 | 0,5689 |
 | 𝒟FC | 0,3864 | 0,3867 |
 | 𝒟RA | 0,6923 | 0,6923 |
 

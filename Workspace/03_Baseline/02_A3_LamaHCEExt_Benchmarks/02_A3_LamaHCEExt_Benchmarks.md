@@ -860,10 +860,10 @@ Môi trường là **PyTorch 2.11.0+cu128, Tesla T4 tại cuda:0**, hai thread C
 | ID có NSE validation hữu hạn | 450 |
 | Cặp obs/sim validation | 652481 ngày–ID |
 | Dự báo validation hữu hạn | 652486 ngày–ID |
-| Thời gian validation | 3,833622 giây |
+| Thời gian validation | 4,049981 giây |
 | Đỉnh bộ nhớ tensor CUDA của cell | 65,12207 MiB |
 | Ma trận X/Y chuẩn bị | 20,108368 MiB |
-| Dự phóng train+validation, 30 epoch × ba seed | 0,556134 giờ, khoảng 33,4 phút |
+| Dự phóng train+validation, 30 epoch × ba seed | 0,616898 giờ, khoảng 37,0 phút |
 
 Năm ngày–ID có sim nhưng thiếu nhãn validation được giữ trong dự báo và không đưa vào chấm. Dự phóng thời gian chưa gồm test mỗi epoch, khởi tạo, checkpoint hoặc xuất tệp; không phải tổng thời gian bảo đảm. NSE 0,413147 chỉ xác nhận mô hình tạm đi qua luồng đánh giá, không phải kết quả seed 111 hoặc lựa chọn siêu tham số.
 
@@ -974,7 +974,7 @@ Epoch 4 tăng khoảng **0,00451** so với epoch 1, nên được lưu làm bes
 | Validation | 0,42470130717371873 | 450 | 652481 | 652486 |
 | Test | 0,38279888678864976 | 450 | 652628 | 652636 |
 
-Có 1094229 mẫu train mỗi epoch. Tổng thời gian train/validation/test các epoch **151,22344370500196 giây**, khoảng 2,52 phút; chưa gồm khởi tạo, checkpoint I/O và export cuối. Runtime là PyTorch 2.11.0+cu128, NumPy 2.1.3, Tesla T4, deterministic=True, TF32 tắt; cùng môi trường đã kiểm ở Phần 8.
+Có 1094229 mẫu train mỗi epoch. Tổng thời gian train/validation/test các epoch **171,80 giây**, khoảng 2,86 phút; chưa gồm khởi tạo, checkpoint I/O và export cuối. Runtime là PyTorch 2.11.0+cu128, NumPy 2.1.3, Tesla T4, deterministic=True, TF32 tắt; cùng môi trường đã kiểm ở Phần 8.
 
 Các hồ sơ test từ checkpoint được chọn:
 
@@ -1023,7 +1023,7 @@ Cải thiện validation epoch 2 so với epoch 1 khoảng 0,00164, đủ cập 
 | Validation | 0,4239968232328928 | 450 | 652481 | 652486 |
 | Test | 0,37806925642069816 | 450 | 652628 | 652636 |
 
-Có 1094229 mẫu train mỗi epoch. Tổng thời gian train/validation/test các epoch **153,4748106060024 giây**, khoảng 2,56 phút, không gồm checkpoint I/O, khởi tạo và export. Runtime tiếp tục PyTorch 2.11.0+cu128, NumPy 2.1.3, Tesla T4, deterministic=True và TF32 tắt.
+Có 1094229 mẫu train mỗi epoch. Tổng thời gian train/validation/test các epoch **163,43 giây**, khoảng 2,72 phút, không gồm checkpoint I/O, khởi tạo và export. Runtime tiếp tục PyTorch 2.11.0+cu128, NumPy 2.1.3, Tesla T4, deterministic=True và TF32 tắt.
 
 Các hồ sơ test từ checkpoint được chọn:
 
@@ -1074,7 +1074,7 @@ Epoch 5 vượt mốc validation epoch 1 hơn 0,005 nên vừa thay best vừa r
 | Validation | 0,42818650160845584 | 450 | 652481 | 652486 |
 | Test | 0,37958829946360906 | 450 | 652628 | 652636 |
 
-Có 1094229 mẫu train mỗi epoch. Tổng thời gian train/validation/test các epoch **256,5135612389977 giây**, khoảng 4,28 phút, không gồm checkpoint I/O, khởi tạo và export. Runtime tiếp tục PyTorch 2.11.0+cu128, NumPy 2.1.3, Tesla T4, deterministic=True, TF32 tắt; config SHA-256 vẫn `0640b77b27ff9799d336220ae01ed3c3bf26d5db0dc92ef4349cf11caad396f4`.
+Có 1094229 mẫu train mỗi epoch. Tổng thời gian train/validation/test các epoch **277,47 giây**, khoảng 4,62 phút, không gồm checkpoint I/O, khởi tạo và export. Runtime tiếp tục PyTorch 2.11.0+cu128, NumPy 2.1.3, Tesla T4, deterministic=True, TF32 tắt; config SHA-256 vẫn `0640b77b27ff9799d336220ae01ed3c3bf26d5db0dc92ef4349cf11caad396f4`.
 
 | ID | Cặp test | NSE test | Số ngày sim raw âm trên toàn lịch test |
 |---|---|---|---|

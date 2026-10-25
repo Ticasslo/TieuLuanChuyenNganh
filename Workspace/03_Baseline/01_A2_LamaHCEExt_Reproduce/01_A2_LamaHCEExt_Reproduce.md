@@ -50,12 +50,12 @@ Thư mục `Experiments/` có 24 run (thư mục có `config.yml`) và `basins_f
 
 **Lý do chọn 6 trên 24 run.** Sáu run được chọn theo bốn tiêu chí:
 
-1. **Lấy từ các run tác giả dùng cho kết luận chính về lưu lượng quá khứ:** mục 3.4 của bài (*The role of integrating past discharge in the training domain*) có Hình 7 gồm sáu đường CDF, khai báo trong tệp cấu hình vẽ hình của mã tác giả (`Inspect_Experiments/config/Role_of_integrating_discharge.yml`): 𝒟FC, 𝒟RA, Sequential Forecast LSTM không Q và có Q (Simple), Encoder–Decoder LSTM không Q và có Q (Complex); sáu run trên đúng là sáu đường đó; các tệp cấu hình hình vẽ khác cũng dùng `Reanalysis_Simple_Embedding` làm 𝒟RA. NSE trung vị của hai bản 𝒟RA trong kết quả tác giả đều làm tròn thành 0,69 (Simple 0,6923, Complex 0,6884), nên bản dùng được xác định qua tệp cấu hình hình vẽ, không qua số trong bài.
+1. **Lấy từ các run tác giả dùng cho kết luận chính về lưu lượng quá khứ:** mục 3.4 của bài (*The role of integrating past discharge in the training domain*) có Hình 7 gồm sáu đường CDF, khai báo trong tệp cấu hình vẽ hình của mã tác giả (`Inspect_Experiments/config/Role_of_integrating_discharge.yml`): 𝒟FC, 𝒟RA, Sequential Forecast LSTM không Q và có Q (Simple), Encoder–Decoder LSTM không Q và có Q (Complex); sáu run trên đúng là sáu đường đó; các tệp cấu hình hình vẽ khác cũng dùng `Reanalysis_Simple_Embedding` làm 𝒟RA. NSE trung vị của hai bản 𝒟RA (Simple, Complex) trong kết quả tác giả đều làm tròn thành 0,69, nên bản dùng được xác định qua tệp cấu hình hình vẽ, không qua số trong bài.
 2. **Bao trùm mọi thành phần cần kiểm:** đủ ba kiến trúc (LSTM thường, Sequential Forecast LSTM, Encoder–Decoder LSTM), có và không có `qmean` (kiểm thư mục Q tự dựng), hai loại lớp nhúng (Simple, Complex), hai nguồn dữ liệu (dự báo ECMWF HRES, tái phân tích). Các run còn lại chỉ lặp lại một tổ hợp đã có: bản lớp nhúng khác của cùng mô hình, biến thể có dự báo lưu trữ trong pha quá khứ (FCRA, cùng thư mục dữ liệu gốc), CrossDomain (LSTM thường 5 biến).
 3. **Là các mốc các bước sau cần:** Sequential Forecast LSTM có Q là mô hình tốt nhất của bài (0,71) và là điểm xuất phát của bước B, C; 𝒟FC và 𝒟RA là mốc dưới, mốc trên; Sequential Forecast LSTM không Q và hai run Encoder–Decoder LSTM (có, không Q) là đối chứng cho vai trò của Q và của kiến trúc. Đề tài không phát triển tiếp hướng học chuyển giao và FCRA.
 4. **Chạy lại trọn được:** bốn run học chuyển giao thiếu tệp (ba run `PreRun` không có `test_metrics.csv`, `TL_AllWeights` không có tệp chuẩn hóa).
 
-Mỗi run đánh giá mất 2–6 phút GPU (Phần 6: 136–311 giây); tái lập thêm khoảng 20 run còn chạy được tốn khoảng 1,5 giờ GPU, không cung cấp kiểm tra mới và không phục vụ các bước sau, nên chỉ làm khi cần chứng minh toàn bộ Bảng F1 tái lập được.
+Mỗi run đánh giá mất 2–6 phút GPU (Phần 6: 147–325 giây); tái lập thêm khoảng 20 run còn chạy được tốn khoảng 1,5 giờ GPU, không cung cấp kiểm tra mới và không phục vụ các bước sau, nên chỉ làm khi cần chứng minh toàn bộ Bảng F1 tái lập được.
 
 Config ghi cứng đường dẫn máy tác giả ở 6 trường: `data_dir` (`/home/ok2907/Documents/Data/LamaH_expanded`; run có Q dùng `LamaH_expanded_q_input`), `run_dir`, `train_dir`, `train_basin_file`, `validation_basin_file`, `test_basin_file`. Tệp khí tượng mức A có 40 biến (ERA5-Land 21, ECMWF HRES 8, E-OBS 8, MSWEP 1, GLEAM 2) và `DOY`, từ 1981 tới 2019; tệp trạm có `qmin`, `qmean`, `qmax` (m³/s), từ 1981 tới 2017.
 
@@ -101,11 +101,11 @@ NSE trung vị test trong kết quả có sẵn của tác giả khớp số tro
 | Sequential Forecast LSTM có Q | 0,7053 | 0,71 (mục 3.4) | 450 | 84.785 |
 | Sequential Forecast LSTM không Q | 0,6276 | 0,63 (mục 3.2) | 451 | 84.769 |
 | Encoder–Decoder LSTM có Q | 0,6622 | 0,66 (mục 3.4) | 450 | 341.436 |
-| Encoder–Decoder LSTM không Q | 0,569 | 0,57 (mục 3.2, 3.4) | 451 | |
+| Encoder–Decoder LSTM không Q | 0,5689 | 0,57 (mục 3.2, 3.4) | 451 | 341.406 |
 | 𝒟FC | 0,3867 | 0,39 (Bảng F1) | 451 | 83.713 |
 | 𝒟RA | 0,6923 | 0,69 (mục 3.4, Bảng F1) | 451 | 84.129 |
 
-Số trong bài lấy từ Bảng F1 (Phụ lục F, trang 5093 của tạp chí, trang 27 của tệp PDF) và phần chữ mục 3.2 (trang 5076) và 3.4 (trang 5078). Trong bản PDF, tên dòng của Bảng F1 in lệch so với hàng số, nên dòng tương ứng của mỗi run được xác định qua cột Min: giá trị Min trùng NSE của lưu vực 758 trong kết quả tác giả (Sequential Forecast LSTM có Q −78,3; không Q −8,71; Encoder–Decoder LSTM có Q −131,42; 𝒟FC −33,29; 𝒟RA −85,12). Encoder–Decoder LSTM không Q khớp 0,57 ở phần chữ mục 3.2 và 3.4 (NSE trung vị lấy từ hình CDF của Phần 7, làm tròn ba chữ số). Hai run có Q chỉ có NSE ở 450 lưu vực.
+Số trong bài lấy từ Bảng F1 (Phụ lục F, trang 5093 của tạp chí, trang 27 của tệp PDF) và phần chữ mục 3.2 (trang 5076) và 3.4 (trang 5078). Trong bản PDF, tên dòng của Bảng F1 in lệch so với hàng số, nên dòng tương ứng của mỗi run được xác định qua cột Min: giá trị Min trùng NSE của lưu vực 758 trong kết quả tác giả (Sequential Forecast LSTM có Q −78,3; không Q −8,71; Encoder–Decoder LSTM có Q −131,42; 𝒟FC −33,29; 𝒟RA −85,12). Encoder–Decoder LSTM không Q khớp 0,57 ở phần chữ mục 3.2 và 3.4. Hai run có Q chỉ có NSE ở 450 lưu vực.
 
 Sáu run được chép sang thư mục làm việc (bỏ kết quả test cũ, trọng số từng epoch và trạng thái optimizer; 0,3–1,4 MB mỗi run), đổi sáu trường đường dẫn, `device` sang GPU và `num_workers` từ 20 xuống 4 (số CPU của Kaggle); không run nào dùng mã hóa lưu vực hay tệp đặc trưng thêm. Cả sáu run dựng lại được mô hình bằng thư viện và nạp `best_model.pt` không lỗi.
 
@@ -116,12 +116,12 @@ Chạy `eval_run` với `best_model.pt` của tác giả (không huấn luyện)
 
 | Run | Thời gian | Lưu vực có NSE | NSE trung vị chạy lại | NSE trung vị tác giả | Chênh |
 |---|---|---|---|---|---|
-| Sequential Forecast LSTM có Q | 288 giây | 450 | 0,7053 | 0,7053 | 0,0000 |
-| Sequential Forecast LSTM không Q | 283 giây | 451 | 0,6276 | 0,6276 | 0,0000 |
-| Encoder–Decoder LSTM có Q | 287 giây | 450 | 0,6622 | 0,6622 | 0,0000 |
-| Encoder–Decoder LSTM không Q | 311 giây | 451 | 0,569 | 0,569 | dưới 0,001 |
-| 𝒟FC | 136 giây | 451 | 0,3864 | 0,3867 | −0,0002 |
-| 𝒟RA | 233 giây | 451 | 0,6923 | 0,6923 | +0,0001 |
+| Sequential Forecast LSTM có Q | 305 giây | 450 | 0,7053 | 0,7053 | 0,0000 |
+| Sequential Forecast LSTM không Q | 303 giây | 451 | 0,6276 | 0,6276 | 0,0000 |
+| Encoder–Decoder LSTM có Q | 325 giây | 450 | 0,6622 | 0,6622 | 0,0000 |
+| Encoder–Decoder LSTM không Q | 311 giây | 451 | 0,5689 | 0,5689 | 0,0000 |
+| 𝒟FC | 147 giây | 451 | 0,3864 | 0,3867 | −0,0002 |
+| 𝒟RA | 262 giây | 451 | 0,6923 | 0,6923 | +0,0001 |
 
 Ở hai run có Q, lưu vực 55 không có giá trị dự báo nào trong kỳ test (thư viện báo mọi giá trị dự báo là NaN), nên chỉ còn 450 lưu vực; kết quả của tác giả cũng có 450 lưu vực. Lưu vực 55 chỉ có `qmean` ở 1025 trên 1825 ngày của kỳ test cộng 364 ngày khởi động, nên cửa sổ 365 ngày của mọi mẫu đều chứa ô `qmean` trống; ở kỳ test mẫu không bị lọc mà vẫn chạy, nhưng đầu vào có ô trống nên dự báo ra NaN.
 

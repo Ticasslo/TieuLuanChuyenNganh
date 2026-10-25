@@ -57,7 +57,7 @@ paths:
 - Wheel `mamba-ssm` lấy từ Output notebook `01_0_MambaSSM_Build`; notebook sau chép cell Phần 9 của notebook đó làm cell cài.
 - **Save & Run All chạy phiên mới**: không thấy tệp tạo ở phiên tương tác => tính thời gian theo chạy lại toàn bộ. Mỗi lần huấn luyện chạy trọn trong 1 phiên (dưới 12 giờ) vì `continue_training` không khôi phục dừng sớm và scheduler.
 - Mỗi notebook cuối cùng ghi `environment.json` (Input, Version nguồn, thư viện, commit NeuralHydrology) và `manifest.csv` (mọi tệp output kèm sha256).
-- Thời gian đo được (A4, T4): khoảng 9,5 phút/epoch SeqLSTM (huấn luyện 5,6–5,9 phút, validation 3,4–3,6 phút), 2,5–3,2 giờ/lần; đánh giá một run 2–6 phút.
+- Thời gian đo được (A4, T4): 9,1–9,5 phút/epoch SeqLSTM tùy hạt giống (huấn luyện 5,6–5,9 phút, validation 3,4–3,6 phút), 2,5–3,2 giờ/lần; đánh giá một run 2–6 phút.
 - **Notebook huấn luyện từ B0 (giao thức 30 epoch, `02_Pipeline.md` Mục 5.1):** config `epochs: 30`, `early_stopping_patience: 30` (không dừng, vẫn lưu `best_model.pt` theo NSE validation); kiểm trong log có đủ 30 epoch và không có dòng "stopped early"; khoảng 6,8 giờ/notebook kể cả chấm test mọi epoch, vẫn dưới 12 giờ.
 
 ## Hợp đồng dữ liệu cho bộ đánh giá
