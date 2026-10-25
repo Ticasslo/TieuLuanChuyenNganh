@@ -236,7 +236,7 @@ Trọng số mọi epoch, kết quả validation mỗi epoch, kết quả test `
 | Fork `e794d7c` (bản sửa lưu mô hình, kiểm thử `test/test_best_model.py`) | Mã nền của B2, B3 và các lõi ở bước C |
 | Thư mục dữ liệu `qmean_mmd`, `qmax_mmd` (Phần 3 notebook huấn luyện) | Bộ nạp B2 dùng lại cùng nhóm Q theo mm/ngày |
 | NSE trung vị validation B1: trung bình 0,7713, độ lệch chuẩn 0,0015 | Đối chiếu với B1b (cùng hai thay đổi, 30 epoch); ứng viên của luật chọn B* là B1b (`03_Pipeline.md` Mục 7) |
-| Ba tệp NPZ test S0 | Bộ đánh giá chấm B1 cùng 14 run đã có (`--extra-contract`) |
+| Ba tệp NPZ test S0 | Lưu trong Output notebook so sánh; không đưa vào bộ đánh giá vì bước B chấm B0, B1a, B1b (`03_Pipeline.md` Mục 7) |
 | Một lần huấn luyện 1,3–2,2 giờ + đánh giá test mọi epoch khoảng 0,5–0,8 giờ; khoảng 9,6 phút/epoch | Ngân sách và lịch (`03_Pipeline.md` Mục 8.1, 9.7): với 30 epoch khoảng 4,8 giờ huấn luyện |
 | Mã notebook huấn luyện 3 hạt giống | Dựng notebook B0, B1a, B1b 30 epoch (`03_Pipeline.md` Mục 7) |
 | Hai lưu vực 742, 758 chi phối trung bình hiệu và Cohen's dz | Khi so mô hình ở B, C, đọc trung vị hiệu và số lưu vực tốt hơn/kém hơn kèm Cohen's dz |
