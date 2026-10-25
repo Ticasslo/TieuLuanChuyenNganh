@@ -1,0 +1,10 @@
+mục,số phần tử,A-A2: khác / lệch lớn nhất,A-B: khác / lệch lớn nhất,A2-B: khác / lệch lớn nhất
+trọng số epoch 1,"84,801",trùng,trùng,trùng
+trọng số epoch 2,"84,801",trùng,trùng,trùng
+loss từng bước,"8,550",trùng,trùng,trùng
+NSE validation epoch 1,451,trùng,trùng,trùng
+KGE validation epoch 1,451,trùng,trùng,trùng
+NSE validation epoch 2,451,trùng,trùng,trùng
+KGE validation epoch 2,451,trùng,trùng,trùng
+NSE test epoch 2,451,trùng,trùng,trùng
+KGE test epoch 2,451,trùng,trùng,trùng

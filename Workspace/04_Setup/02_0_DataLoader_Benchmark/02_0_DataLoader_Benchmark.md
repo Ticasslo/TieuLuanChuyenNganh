@@ -8,8 +8,9 @@ Tài liệu đi cùng [mã Python](02_0_DataLoader_Benchmark.py) của notebook 
 - [2. Khái niệm dùng trong báo cáo](#2)
 - [3. Cài đặt notebook](#3)
 - [4. Các Phần và kết quả](#4)
-- [5. Kết luận cho các bước sau](#5)
-- [6. Nguồn](#6)
+- [5. Kiểm bản sửa thư viện trên GPU](#5)
+- [6. Kết luận cho các bước sau](#6)
+- [7. Nguồn](#7)
 
 <a id="1"></a>
 ## 1. Câu hỏi cần trả lời
@@ -149,21 +150,53 @@ Một lần chạy 30 epoch gồm 5,1 phút chi phí một lần (dựng trainer
 | `pin_memory` + `non_blocking` | 4,05 | 7,11 | 11,16 | 5,67 | 47 phút (12%) | Đạt |
 | Dữ liệu sẵn trên GPU | 2,88 | 1,75 | 4,63 | 2,40 | 243 phút (63%) | Đạt |
 
-Với cách hiện tại, 56% thời gian một epoch là chờ hoặc đọc dữ liệu. Số "validation + test" của cách dữ liệu sẵn trên GPU ngoại suy từ bản thử Phần 8 (chạy mô hình không qua hàm `_evaluate` của thư viện); số đo trên thư viện đã sửa lấy ở notebook kiểm `03_0_GPUData_Check`.
+Với cách hiện tại, 56% thời gian một epoch là chờ hoặc đọc dữ liệu. Số "validation + test" của cách dữ liệu sẵn trên GPU ngoại suy từ bản thử Phần 8 (chạy mô hình không qua hàm `_evaluate` của thư viện); số đo trên thư viện đã sửa ở [Mục 5](#5).
 
 <a id="5"></a>
-## 5. Kết luận cho các bước sau
+## 5. Kiểm bản sửa thư viện trên GPU
 
-- Trả lời GVHD: bộ nạp hiện tại dùng 2 tiến trình phụ khi huấn luyện, nhưng tester dùng 1 tiến trình khi validation. Thời gian chậm không do thiếu tiến trình: Kaggle chỉ có 2 lõi CPU thật, và mỗi lô phải cắt, ghép bằng Python khoảng 55 ms trên CPU. Thêm tiến trình không giúp khi có mô hình (Phần 5–6).
-- Thời gian một lần chạy chính thức theo cách hiện tại khoảng 6,5 giờ (30 epoch, chấm test mỗi epoch), gần ước tính 6,8 giờ ở `02_Pipeline.md` Mục 8.1 (ước tính đó cộng thêm dựng dữ liệu và chấm `best_model.pt`).
-- Cả hai cách đạt luật ≥ 5%. Để dữ liệu sẵn trên GPU bỏ được cả phần chờ khi huấn luyện lẫn phần đọc khi chấm điểm, rút một lần chạy từ khoảng 6,5 giờ xuống khoảng 2,4 giờ, và cho lô trùng từng giá trị với bộ nạp thư viện. Đề tài chọn cách này: thêm vào fork một khóa config `data_on_gpu` (mặc định tắt, nên A2, A4 không đổi), giữ batch 256 và mô hình.
-- Trước khi dùng cho B0, bản sửa thư viện phải qua kiểm thử đơn vị trên CPU và notebook `03_0_GPUData_Check` trên GPU: huấn luyện B1b 2 epoch bằng bộ nạp cũ và mới, so trọng số và chỉ số.
-- Dữ liệu train trên GPU chiếm 211 MB (T4 có 14,6 GB), còn đủ chỗ cho các lõi ở bước C.
+Bản sửa thêm vào fork khóa config `data_on_gpu` (mặc định tắt): dữ liệu của cả kỳ được xếp sẵn trên GPU một lần, mỗi lô lấy bằng chỉ số ngay trên GPU, thứ tự mẫu vẫn rút qua `DataLoader` của PyTorch nên dãy số ngẫu nhiên dùng y như bộ nạp cũ; dùng cho cả huấn luyện, validation và chấm test (`datautils/gpu_loader.py`, `training/basetrainer.py`, `evaluation/tester.py`, fork commit `f229e02`). Trên CPU, 17 kiểm thử (`test/test_gpu_loader.py`, dữ liệu CAMELS-US của thư viện) xác nhận lô trùng từng giá trị với bộ nạp cũ và huấn luyện, đánh giá cho cùng kết quả.
+
+Notebook [`03_0_GPUData_Check`](../03_0_GPUData_Check/03_0_GPUData_Check.ipynb) (Version 1, Save & Run All, GPU T4, Input `lamah-ce-ext`) kiểm trên đúng GPU, dữ liệu và cấu hình của bước B: cấu hình B1b, hạt giống 111, huấn luyện 2 epoch, validation 451 lưu vực mỗi epoch, chấm test epoch 2. Ba run chỉ khác bộ nạp: A (bộ nạp cũ), A2 (bộ nạp cũ lần hai, đo lệch tự nhiên giữa hai lần chạy), B (`data_on_gpu`). Notebook bật chế độ tất định của PyTorch (`CUBLAS_WORKSPACE_CONFIG=:4096:8`, `use_deterministic_algorithms`, `cudnn.deterministic`) để hai lần chạy cùng phép tính cho cùng kết quả; không có cảnh báo phép tính thiếu bản tất định. Luật ghi trước khi chạy: A trùng A2 từng bit thì B phải trùng A từng bit.
+
+| Mục so | Số phần tử | A với A2 | A với B |
+|---|---|---|---|
+| Trọng số epoch 1, epoch 2 | 84.801 mỗi epoch | trùng từng bit | trùng từng bit |
+| Loss từng bước huấn luyện | 8.550 | trùng từng bit | trùng từng bit |
+| NSE, KGE validation epoch 1, 2 | 451 lưu vực | trùng từng bit | trùng từng bit |
+| NSE, KGE test epoch 2 | 451 lưu vực | trùng từng bit | trùng từng bit |
+
+Các tệp loss từng bước, chỉ số validation và test của ba run có cùng sha256 (`manifest.csv` của Output). NSE trung vị test epoch 2 là 0,7139 ở cả ba run.
+
+| Thành phần (phút, chế độ tất định) | Bộ nạp cũ (trung bình A, A2) | `data_on_gpu` (B) | Nhanh hơn |
+|---|---|---|---|
+| Dựng trainer | 2,05 | 1,96 | 4% |
+| Huấn luyện một epoch | 7,26 / 7,34 (epoch 1 / 2) | 3,87 / 3,86 | 47% |
+| Validation lượt đầu (gồm dựng và giữ dataset) | 5,73 | 3,01 | 48% |
+| Validation lượt sau | 4,26 | 1,12 | 74% |
+| Chấm test (gồm dựng dataset) | 5,89 | 3,04 | 48% |
+| Tổng 2 epoch và chấm test | 32,53 | 16,87 | 48% |
+
+![Thời gian từng thành phần của 3 run](../03_0_GPUData_Check/Figures/G0_RunTime.png)
+
+*Hình: thời gian từng thành phần của 3 run B1b 2 epoch ở chế độ tất định; hai run bộ nạp cũ mất khoảng 32,5 phút, run `data_on_gpu` 16,9 phút. Bảng số ở `../03_0_GPUData_Check/Tables/G0_Timing.csv`, so từng bit ở `G0_Compare.csv` cùng thư mục.*
+
+Bộ nhớ GPU: dữ liệu train chiếm thêm 211 MB, đỉnh khi huấn luyện 1,75 GB trên 14,6 GB của T4. Thời gian đo ở chế độ tất định nên tuyệt đối chậm hơn cách chạy thường (huấn luyện A4 5,6–5,9 phút/epoch, notebook đo Phần 6 là 5,63 phút); so sánh hai bộ nạp là so cùng điều kiện.
 
 <a id="6"></a>
-## 6. Nguồn
+## 6. Kết luận cho các bước sau
+
+- Trả lời GVHD: bộ nạp hiện tại dùng 2 tiến trình phụ khi huấn luyện, nhưng tester dùng 1 tiến trình khi validation. Thời gian chậm không do thiếu tiến trình: Kaggle chỉ có 2 lõi CPU thật, và mỗi lô phải cắt, ghép bằng Python khoảng 55 ms trên CPU. Thêm tiến trình không giúp khi có mô hình (Phần 5–6).
+- Thời gian một lần chạy chính thức với bộ nạp cũ khoảng 6,5 giờ (30 epoch, chấm test mỗi epoch).
+- Cả hai cách đạt luật ≥ 5%. Để dữ liệu sẵn trên GPU bỏ được cả phần chờ khi huấn luyện lẫn phần đọc khi chấm điểm, rút một lần chạy từ khoảng 6,5 giờ xuống khoảng 2,4 giờ, và cho lô trùng từng giá trị với bộ nạp thư viện. Đề tài chọn cách này: thêm vào fork một khóa config `data_on_gpu` (mặc định tắt, nên A2, A4 không đổi), giữ batch 256 và mô hình.
+- Bản sửa cho kết quả trùng từng bit với bộ nạp cũ trên dữ liệu thật ([Mục 5](#5)), nên dùng từ B0 (fork `f229e02`, config `data_on_gpu: true`) mà không làm đổi kết quả so với cách chạy cũ. Ước tính một lần chạy chính thức còn khoảng 3,3 giờ (`02_Pipeline.md` Mục 8.1), thay bằng số đo thật ở B0.
+- Dữ liệu train trên GPU chiếm 211 MB (T4 có 14,6 GB), còn đủ chỗ cho các lõi ở bước C.
+
+<a id="7"></a>
+## 7. Nguồn
 
 - Konold và cs. (2026), BiasCast, HESS 30:5067–5096; config tác giả Zenodo 17292895; dữ liệu Zenodo 17119635.
 - Fork `Ticasslo/neuralhydrology` commit `e794d7c`: `training/basetrainer.py` (dòng 103–108 `DataLoader` huấn luyện, 363–421 vòng huấn luyện), `evaluation/tester.py` (dòng 219–232 dataset và `DataLoader` từng lưu vực, 229 giữ dataset validation), `datasetzoo/basedataset.py` (dòng 150–212 `__getitem__`, 839–857 `collate_fn`), `datasetzoo/lamah.py` (dòng 119–131 đọc tệp khí tượng).
 - PyTorch 2.11 documentation: `torch.utils.data` (`num_workers`, `pin_memory`, `persistent_workers`, `prefetch_factor`, tính ngẫu nhiên khi nạp nhiều tiến trình), CUDA semantics (`non_blocking`). https://docs.pytorch.org/docs/2.11/
 - Output notebook Version 1: `environment.json`, `manifest.csv` (14 tệp kèm sha256), log thư viện `S0_neuralhydrology.log`.
+- Fork commit `f229e02`: `datautils/gpu_loader.py`, `test/test_gpu_loader.py`. Output notebook `03_0_GPUData_Check` Version 1: `environment.json`, `manifest.csv` (22 tệp kèm sha256), `G0_Compare.csv`, `G0_Timing.csv`.
