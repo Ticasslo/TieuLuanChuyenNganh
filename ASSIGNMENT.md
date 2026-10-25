@@ -27,7 +27,7 @@
 
 ## 2. Việc theo từng bước
 
-Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên từ 24/10/2026:** Người 1 đã chấm ba NPZ A4 và phân tích thuộc tính qua ba seed; tiếp tục tích hợp bộ nạp B2 (#4) trên mã B1 khi Người 2 xong B1. Người 2 đã xong B1 (#3, 25/10/2026): 3 run chính thức (Version 1/1/2), notebook so sánh `02_B1_LamaHCEExt_Compare` Version 1 với 3 NPZ B1, báo cáo `Workspace/05_Training/01_B1_LamaHCEExt_Train/01_B1_LamaHCEExt_Train.md`; tiếp theo phần còn lại của bước 0 (#1) và phần mô hình B2. Người 1 chấm 3 NPZ B1 bằng bộ đánh giá (`--extra-contract`) trước khi tích hợp B2. Cột "Cần trước" ghi đầu vào của từng việc.
+Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu tiên từ 25/10/2026:** Người 1 đã chấm ba NPZ A4 và phân tích thuộc tính qua ba seed; tiếp tục tích hợp bộ nạp B2 (#4) trên mã B1 (fork `e794d7c`, thư mục Q `qmean_mmd`, `qmax_mmd` ở Phần 3 notebook huấn luyện B1). Người 2 đã xong B1 (#3, 25/10/2026): 3 run chính thức (Version 1/1/2), notebook so sánh `02_B1_LamaHCEExt_Compare` Version 1 với 3 NPZ B1, báo cáo `Workspace/05_Training/01_B1_LamaHCEExt_Train/01_B1_LamaHCEExt_Train.md`; tiếp theo phần còn lại của bước 0 (#1) và phần mô hình B2. Người 1 chấm 3 NPZ B1 bằng bộ đánh giá (`--extra-contract`) trước khi tích hợp B2. Cột "Cần trước" ghi đầu vào của từng việc.
 
 ### Người 1 — dữ liệu, bộ nạp, đánh giá, demo D1–D3
 
@@ -48,7 +48,7 @@ Mã việc trong bảng được giữ cố định để đối chiếu. **Ưu 
 |---|---|---|---|---|
 | 1 | Bước 0 | Cài `mamba-ssm` trên Kaggle T4 (dự phòng `mambapy`) — **xong**; còn: mô hình chung "Sequential Forecast" nhận lõi bất kỳ; các lõi GRU, Transformer, S4D, Mamba; kiểm thử đơn vị Mục 9.2 (nạp trọng số tác giả cho đầu ra trùng, không rò rỉ, đúng trục, số tham số lệch ≤ 1%) | Mã trong fork, wheel ở Output notebook `01_0_MambaSSM_Build` (gắn làm Input) | Fork `research` |
 | 2 | A4 — **xong** | Notebook `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain_Seed111/222/333.py` (mỗi hạt giống một notebook) và `04_A4_LamaHCEExt_Compare.py`: đo thời gian trên T4; huấn luyện lại mô hình tốt nhất của bài với hạt giống 111, 222, 333 | Độ lệch chuẩn giữa hạt giống; thời gian mỗi lần chạy để gắn ngày cho lịch; 3 tệp dự báo NPZ cho bộ đánh giá | Thư mục Q (A2 Phần 4) |
-| 3 | B1–B3, B* | B1: sửa lưu mô hình tốt nhất, Q mm/ngày, qmax quá khứ; B2 phần mô hình (nhúng theo nguồn, masked mean); B3: che dữ liệu hai mức; B*: chọn theo luật ghi sẵn; gắn mốc `freeze-C` | Trọng số, nhật ký, tệp dự báo | A4; bộ nạp B2 của người 1 |
+| 3 | B1–B3, B* | B1 (**xong** 25/10/2026): sửa lưu mô hình tốt nhất, Q mm/ngày, qmax quá khứ; B2 phần mô hình (nhúng theo nguồn, masked mean); B3: che dữ liệu hai mức; B*: chọn theo luật ghi sẵn; gắn mốc `freeze-C` | Trọng số, nhật ký, tệp dự báo | A4; bộ nạp B2 của người 1 |
 | 4 | C | C1 tinh chỉnh 5 lõi × 8 cấu hình; C2 chạy chính thức 3 hạt giống | Tệp dự báo mọi cấu hình chính thức | `freeze-C` |
 | 5 | Mở rộng | H (dự báo 1–7 ngày) → D (730 ngày) → E (biến thể) → F (CMAL) → GV, cắt theo `03_Pipeline.md` Mục 8.3 khi thiếu thời gian | Tệp dự báo | C xong |
 | 6 | G | Integrated Gradients (Captum), dò trạng thái ẩn; xuất kết quả theo lưu vực cho demo | Hình, tệp kết quả XAI | Mô hình chính thức |
