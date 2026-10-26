@@ -10,7 +10,9 @@ Mã dùng **giao thức 3**: dung sai chính ±⌊hạn/3⌋ ngày cho từng h�
 
 ## 1. Đầu vào và cách chạy
 
-Notebook tự đọc **14 run**: sáu A2, ba DLinear, hai persistence và ba LSTM A4. Gắn bốn nguồn Output đã Save Version: A1, A2, A3 và **`04_A4_LamaHCEExt_Compare` Version 2**. Dataset LamaH-CE gốc và ba Output huấn luyện A4 riêng không bắt buộc, vì A3/A4 Compare đã xuất đủ ngữ cảnh và dự báo. Chỉ chạy lại bộ đánh giá, không huấn luyện lại A1–A4.
+Mã trong `.py` và `.ipynb` hiện có đã đồng bộ để chuẩn bị **Version 5**, tự đọc **17 run**: sáu A2, ba DLinear, hai persistence, ba LSTM A4 và ba LSTM B0. Notebook `.ipynb` đã đồng bộ mã và định dạng tại chỗ; trạng thái thực thi/output cũ được xóa. Output phiên tương tác bổ sung B0 đã được kiểm, còn bản Save Version 5 chưa được cung cấp để xác nhận. Các bảng và hình trong repo vẫn là kết quả **Version 4**. Cần chốt bản lưu chính thức trước khi thay bộ bảng/hình theo Version 5.
+
+Gắn năm nguồn Output đã Save Version: A1 Version 3, A2 Version 2, A3 Version 1, **`04_A4_LamaHCEExt_Compare` Version 2**, **`02_B0_LamaHCEExt_Compare` Version 1**. Dataset gốc và các Output huấn luyện riêng không bắt buộc. CPU, Internet không bắt buộc, chạy toàn bộ `.py` trong phiên sạch, sau đó Save & Run All thành Version 5. Không cần huấn luyện lại các mốc.
 
 | Nguồn | Tệp cần dùng |
 |---|---|
@@ -19,14 +21,37 @@ Notebook tự đọc **14 run**: sáu A2, ba DLinear, hai persistence và ba LST
 | A3 | `A3_Q_source_window.npz`, `A3_persistence_predictions.npz`, `A3_all_metrics_per_basin.csv` |
 | DLinear trong A3 | `dlinear/seed_111`, `seed_222`, `seed_333`, mỗi thư mục có `test_predictions.npz` |
 | A4 Compare Version 2 | Toàn thư mục `a4_compare/`, gồm `a4_summary.json`, `environment.json`, `manifest.csv` và ba NPZ `contracts/SeqLSTM_Q_A4_seed{111,222,333}_test_S0_lead1.npz`; các tệp còn lại trong manifest cũng cần được giữ |
+| B0 Compare Version 1 | Toàn thư mục `b0_compare/`, gồm `b0_summary.json`, `environment.json`, `manifest.csv` và ba NPZ `contracts/SeqLSTM_Q_B0_seed{111,222,333}_test_S0_lead1.npz`; giữ đủ mọi tệp được kê trong manifest |
 
-Mặc định tìm nguồn dưới `/kaggle/input`, xuất vào `/kaggle/working/evaluation_output`. A2 được nhận diện bằng `environment.json` trong thư mục có đủ `runs/<sáu run>`, nên không nhầm với `environment.json` của A4. A4 được tìm qua `a4_summary.json`; thiếu hoặc trùng nguồn làm chương trình dừng, không tự bỏ seed hoặc chọn phiên bản. Script có thể chỉ rõ `--a1`, `--a2`, `--a3`, `--a4`; notebook chạy nguyên mã sau khi gắn đủ Input, không cần điền đường dẫn hay tên tài khoản.
+Mặc định tìm nguồn dưới `/kaggle/input`, xuất vào `/kaggle/working/evaluation_output`. A2 được nhận diện bằng `environment.json` trong thư mục có đủ `runs/<sáu run>`, nên không nhầm với `environment.json` của A4. A4 được tìm qua `a4_summary.json`; thiếu hoặc trùng nguồn làm chương trình dừng, không tự bỏ seed hoặc chọn phiên bản. Script có thể chỉ rõ `--a1`, `--a2`, `--a3`, `--a4`, `--b0`; notebook chạy nguyên mã sau khi gắn đủ Input, không cần điền đường dẫn hay tên tài khoản.
 
-Trên Kaggle, dùng CPU và Run All từ đầu sau khi nhập bản mã mới. Phần 8.1 nhận diện nguồn A2; Phần 8.4 đọc/kiểm ba NPZ A4; Phần 10.3 vẽ CDF có chú giải phân biệt các seed; Phần 11.1 điều phối chấm chung. Cần chạy lại các phần định nghĩa phía trước trong phiên sạch để tránh giữ hàm cũ.
+Trên Kaggle, dùng CPU và Run All từ đầu sau khi nhập bản mã mới. Phần 8.1 nhận diện nguồn A2; Phần 8.4 đọc/kiểm ba NPZ A4 và ba NPZ B0; Phần 10.3 vẽ CDF có chú giải phân biệt các seed; Phần 11.1 điều phối chấm chung. Cần chạy lại các phần định nghĩa phía trước trong phiên sạch để tránh giữ hàm cũ.
 
 Kiểm độc lập bằng lệnh `python Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py --self-test` từ thư mục repo. Môi trường cần NumPy, pandas, SciPy, xarray, PyYAML; phần vẽ dùng matplotlib. Kaggle A1/A2/A3 đã có các thư viện này. Bộ đánh giá không thay phiên bản thư viện trong phiên chạy.
 
-Mã `.py` dùng các cell `# %%` và cell Markdown `# %% [markdown]`: tiêu đề phần → đề mục → code đúng chức năng. `.ipynb` trong repo là Version 4 tải từ Kaggle, mã trùng từng dòng với `.py`.
+Mã `.py` dùng các cell `# %%` và cell Markdown `# %% [markdown]`: tiêu đề phần → đề mục → code đúng chức năng. Mã của 17 code cell trong `.ipynb` đã đồng bộ với `.py`; output phiên tương tác bổ sung B0 đã được đối chiếu, bản lưu Save Version 5 đang chờ chạy. Kiểm cục bộ bằng chính mã đọc từ `.ipynb` sau định dạng đạt 144 ca.
+
+Kiểm cục bộ mã chuẩn bị Version 5: **144 kiểm thử đạt**; đường đọc → chấm → xuất bằng dữ liệu giả chạy đủ 17 run, 360 dòng kiểm định và hình CDF. Đây không phải kết quả chấm NPZ B0 thật.
+
+Sau khi chạy Version 5, kiểm `Evaluation_summary.json`: `complete=true`, `B0_contracts_matched=true`, `A4_contracts_matched=true`, `A3_reference_matched=true`, coverage có 17 run ở test/S0/lead1. Có thêm `Evaluation_B0_input_check.csv` và `Evaluation_B0_contract_check.csv`. Các NPZ B0 phải khai báo commit đầy đủ `f229e02bf98cbd979835a4b6cd503d0e3adb8bc3`; ba notebook huấn luyện đều Version 1. `environment.json` của B0 lưu commit theo từ điển `B0`/`A4`, khác trường chuỗi của A4. Ngưỡng B* được kiểm lại bằng std mẫu (`ddof=1`) của ba NSE trung vị validation trong `b0_summary.json`.
+
+Thêm B0 làm họ Holm có tối đa 120 cặp mỗi chỉ số (16 run chính, bỏ persistence qmean phụ), tổng 360 dòng kiểm định. Không thay p Holm của Version 4 trong báo cáo bằng p từ họ mới trước khi có output. Phép đối chiếu A3 vẫn tính riêng trên tập run gốc, tránh đổi mặt nạ tham chiếu.
+
+Đầu vào cần thêm duy nhất so với Version 4 là Output `02_B0_LamaHCEExt_Compare` Version 1; giữ các Input A1/A2/A3/A4 đang dùng. Cập nhật mã trong cùng notebook Kaggle `01_Evaluation_LamaHCEExt`, không tạo notebook V5 riêng.
+
+Khi Save & Run All Version 5 thành công, bản `.ipynb` có output và các kết quả tương ứng thay vào cùng thư mục notebook, `Tables/` và `Figures/`. File `.ipynb` hiện có đã sửa tại chỗ để chạy Save Version, không được ghi nhận như bản Version 5 đã chạy.
+
+### 1.1. Kiểm output phiên tương tác trước Save Version 5
+
+Đã đọc toàn bộ 26 tệp được cung cấp: 22 CSV, 3 JSON và 1 PNG. Có **84 kiểm chéo** về schema, danh tính run, seed/epoch/commit, số ngày, các phép tổng hợp và công thức; tất cả đạt. Sáu chỉ số liên tục và ba chữ ký được đối chiếu với bảng chi tiết; NSE/PNSE được tính lại từ các tổng bình phương, KGE từ r/alpha/beta. Bảng tổng hợp 459 dòng, 360 dòng kiểm định, 30.668 dòng phân mức, hai bảng sự kiện 61.336 dòng và 22.948 điểm CDF khớp dữ liệu chi tiết tương ứng.
+
+Cả ba NPZ B0 có đúng seed 111/222/333, checkpoint epoch 25/15/14, notebook huấn luyện Version 1 và commit `f229e02`. Giao chung giữ **652.628 ngày–lưu vực, 450 ID có ngày hợp lệ**. NSE trung vị B0 lần lượt là **0,707234; 0,703778; 0,705890**. Ngưỡng B* trong summary/protocol cùng bằng **0,007932303438926078**.
+
+Bảng kịch bản rỗng có header vì chỉ có S0. KGE của `EncDec_noQ` không xác định tại ID 742/758 do r không xác định, nên hình có n=448 cho đường đó; các đường NSE/PNSE tương ứng vẫn có n=450. Hai seed 222/333 của B0 khớp A4 ở toàn bộ bảng chỉ số, phù hợp checkpoint giữ nguyên. Hình CDF có đủ ba ô, chú giải ngoài vùng vẽ, giữ đuôi âm và n riêng theo từng chỉ số.
+
+Kiểm hash cục bộ bao phủ 26 tệp output nhận được. Hash của NPZ/pickle nguồn được đối chiếu giữa các bảng manifest và kiểm đầu vào do Kaggle xuất; không tính lại trực tiếp vì các tệp nguồn đó không nằm trong lô output được cung cấp.
+
+Phần định dạng chỉ thay Markdown/mục lục và bỏ dòng yêu cầu gửi lại output; AST tính toán giữ nguyên. File `.py` và 17 code cell của `.ipynb` đồng bộ, schema notebook hợp lệ; 144 kiểm thử từ chính mã notebook sau định dạng đạt.
 
 ## 2. Hợp đồng dữ liệu và phạm vi chấm
 

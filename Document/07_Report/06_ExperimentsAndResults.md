@@ -2,9 +2,9 @@
 
 Các thí nghiệm đã thực hiện xác nhận việc chạy lại trọng số BiasCast, bổ sung mốc persistence và DLinear, đồng thời đánh giá theo mức lưu lượng và sự kiện lũ. Trên cùng giao ngày test, Sequential Forecast LSTM có Q đạt NSE trung vị **0,705259**, DLinear đạt **0,380152 ± 0,002415** giữa ba hạt giống, còn persistence qmax đạt **0,350031**. DLinear cải thiện theo NSE/PNSE nhưng thấp hơn persistence theo KGE; đánh giá theo mức còn cho thấy khả năng nhận diện ngày lưu lượng rất cao thấp hơn Sequential Forecast LSTM.
 
-Ba lần huấn luyện lại Sequential Forecast LSTM ở A4 đạt NSE trung vị **0,695242 / 0,703778 / 0,705890**, tương đối sát mốc trọng số tác giả. Cùng ba DLinear, nhóm đã thực hiện sáu lần huấn luyện mới từ đầu. A4 đo biến thiên của mô hình nền; các kết quả này chưa kiểm chứng lợi ích của kiến trúc cải tiến.
+Ba lần huấn luyện lại Sequential Forecast LSTM ở A4 đạt NSE trung vị **0,695242 / 0,703778 / 0,705890**, tương đối sát mốc trọng số tác giả. Cùng ba DLinear và ba B0 chạy đủ 30 epoch, nhóm đã thực hiện chín lần huấn luyện mới từ đầu. A4 đo biến thiên của mô hình nền; các kết quả này chưa kiểm chứng lợi ích của kiến trúc cải tiến.
 
-Phạm vi thực nghiệm của chương là A2, A3, A4 và bộ đánh giá trên **test 2014–2017, kịch bản S0, hạn một ngày**. **S0** là không che thêm đầu vào theo kịch bản, dù dữ liệu gốc vẫn có thể thiếu; **hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Các kết quả so sánh năm lõi thời gian, kịch bản mất dữ liệu và nhiều hạn sẽ được bổ sung khi các thí nghiệm tương ứng hoàn thành. Dữ liệu, độ phủ và ngưỡng trước test được trình bày tại [Chương 4](04_Data.md).
+Phạm vi thực nghiệm của chương gồm A2, A3, A4 và B0. Bộ đánh giá Version 4 đã chấm A2/A3/A4 trên **test 2014–2017, kịch bản S0, hạn một ngày**. **S0** là không che thêm đầu vào theo kịch bản, dù dữ liệu gốc vẫn có thể thiếu; **hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Các kết quả so sánh năm lõi thời gian, kịch bản mất dữ liệu và nhiều hạn sẽ được bổ sung khi các thí nghiệm tương ứng hoàn thành. Dữ liệu, độ phủ và ngưỡng trước test được trình bày tại [Chương 4](04_Data.md).
 
 ## 6.1. Câu hỏi thực nghiệm và các cấu hình
 
@@ -16,6 +16,7 @@ Các kết quả hiện có trả lời ba câu hỏi: trọng số tác giả c
 | Persistence qmax | Dự báo qmax(t) bằng qmax(t−1) | Mốc quan trắc chính cho PNSE |
 | DLinear A3 | Huấn luyện ba hạt giống với cùng cấu hình từ qmean quá khứ | Mốc tuyến tính bổ sung |
 | LSTM A4 | Huấn luyện mới ba hạt giống theo cấu hình SeqLSTM_Q của tác giả | Kiểm khả năng huấn luyện lại và biến thiên mô hình nền |
+| LSTM B0 | Cùng kiến trúc, chạy đủ 30 epoch, checkpoint tốt nhất theo validation | Mốc bước B và nhiễu hạt giống dùng chọn B* |
 | Đánh giá dùng chung | Đọc các dự báo đã lưu, áp cùng ngày chấm và ngưỡng A1 | So chỉ số liên tục, bốn mức, sự kiện và kiểm định |
 
 Sáu A2 gồm Sequential Forecast LSTM có/không Q, Encoder–Decoder LSTM có/không Q, D_FC và D_RA. Sequential Forecast LSTM duy trì trạng thái khi chuyển từ lịch sử sang bước dự báo; Encoder–Decoder dùng hai mạng cho hai pha. D_FC là mốc theo nguồn dự báo khí tượng; D_RA dùng tái phân tích, kể cả ở ngày đích. Hai mốc này giúp đối chiếu nguồn thông tin. Cấu hình D_RA có thông tin ngày đích được tái dựng sau quan trắc nên cần được phân biệt với điều kiện vận hành.
@@ -174,6 +175,26 @@ A4 dùng cùng cấu hình Sequential Forecast LSTM có Q của tác giả, kh�
 Trung bình ± độ lệch chuẩn mẫu của ba NSE trung vị là **0,701636 ± 0,005638**. Mốc tác giả 0,705259 nằm trong khoảng ba lần chạy. Đây là độ phân tán giữa các lần huấn luyện, không phải khoảng tin cậy hoặc điểm của một tổ hợp dự báo. Cả ba seed được báo cáo, không chọn seed theo test. [Bảng tổng hợp](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_summary.csv).
 
 PNSE trung vị của ba A4 đều dương nhưng trung bình lần lượt **−1,189; −0,508; −0,355**, cho thấy phần đuôi các lưu vực có persistence mạnh vẫn ảnh hưởng lớn. %BiasFHV trung vị là **−15,70%; −11,71%; −11,56%**: dải lưu lượng cao vẫn bị dự báo hụt theo định nghĩa FHV.
+
+### 6.6.2. Mốc B0 dưới giao thức 30 epoch
+
+B0 giữ Sequential Forecast LSTM có `qmean` quá khứ theo m³/s của A4, chạy đủ 30 epoch với hạt giống 111, 222, 333. Fork `f229e02` sửa cách lưu `best_model.pt` và dùng `data_on_gpu`; checkpoint được chọn bằng NSE trung vị validation cao nhất, test chỉ để báo cáo. Cả ba notebook huấn luyện và notebook so sánh B0 đều là Version 1. [Thiết lập và kết quả B0](../../Workspace/05_Training/01_B0_LamaHCEExt_Train/01_B0_LamaHCEExt_Train.md).
+
+| Hạt giống | Epoch được chọn | NSE trung vị validation | NSE trung vị test |
+|---|---:|---:|---:|
+| 111 | 25 | 0,742328 | 0,707234 |
+| 222 | 15 | 0,754138 | 0,703778 |
+| 333 | 14 | 0,757406 | 0,705890 |
+
+Các điểm trong bảng được đọc từ kết quả thư viện, với trung vị bỏ NaN theo thư viện. Danh sách đánh giá giữ 451 ID; test có 450 ID có NSE hợp lệ. Đây chưa phải bảng tính lại trên giao ngày chung của bộ đánh giá Version 5. Nguồn: bảng theo epoch của [seed 111](../../Workspace/05_Training/01_B0_LamaHCEExt_Train/Tables/B0_Curve_Seed111.csv), [seed 222](../../Workspace/05_Training/01_B0_LamaHCEExt_Train/Tables/B0_Curve_Seed222.csv), [seed 333](../../Workspace/05_Training/01_B0_LamaHCEExt_Train/Tables/B0_Curve_Seed333.csv).
+
+Trung bình NSE trung vị test qua ba seed là **0,7056**, độ lệch chuẩn mẫu **0,0017**. Độ lệch chuẩn mẫu của ba NSE trung vị validation là **0,0079**, dùng làm ngưỡng của luật B*: giữ các ứng viên B1b–B3 có S0 validation trong khoảng này so với ứng viên tốt nhất, rồi so NSE trung vị trung bình qua S1–S4. A4 đo biến thiên dưới giao thức dừng sớm nên không thay thế ngưỡng B0 này.
+
+Notebook Compare B0 xác nhận trọng số ở các epoch chung trùng từng bit A4 cùng seed. Seed 222 và 333 giữ checkpoint epoch 15 và 14; seed 111 chuyển từ epoch 11 của A4 sang epoch 25. Báo cáo Compare cho median hiệu NSE test theo lưu vực của seed 111 là **+0,0043**, nhỏ hơn nhiễu giữa seed; median hiệu ghép cặp khác hiệu hai median toàn tập. Phiên tương tác của bộ đánh giá đã chấm ba NPZ B0 cùng các mốc thành 17 run, đạt 144 kiểm giao thức và 84 kiểm chéo trên 26 tệp output, với giao chung 652628 ngày–ID/450 ID có ngày hợp lệ. Chưa nhận bản Save Version 5 chính thức; các bảng so sánh chung trong chương vẫn giữ nguồn Version 4 và sẽ cập nhật đồng bộ khi chốt bản lưu mới. [Phạm vi kiểm output B0](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#11-kiểm-output-phiên-tương-tác-trước-save-version-5). Kết quả ở đây chưa chứng minh lợi ích của thay đổi kiến trúc B2.
+
+![Biến thiên ba seed B0 và ngưỡng validation cho B*](../../Workspace/05_Training/02_B0_LamaHCEExt_Compare/Figures/B0_Summary.png)
+
+*Hình. Kết quả B0 từ notebook Compare Version 1; ngưỡng B* lấy từ validation, còn test dùng báo cáo.*
 
 ## 6.7. Lưu vực có NSE âm lớn
 
@@ -376,6 +397,7 @@ Những kết quả này xác lập một bộ mốc và bộ đánh giá cho **
 | Tái lập từ trọng số tác giả | [LamaH-CE, Mục 6.3](../03_Data/01_LamaHCE.md#63-tái-lập-bằng-trọng-số-tác-giả-bước-a2-kaggle-11102026) |
 | Persistence, huấn luyện DLinear, chẩn đoán | [Thuyết minh A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#report-part-10) |
 | Huấn luyện lại LSTM và kết quả 14 run | [Thiết lập A4](../../Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md), [đánh giá A4 trên giao chung](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle) |
+| B0, 30 epoch và ngưỡng B* | [Huấn luyện và Compare B0](../../Workspace/05_Training/01_B0_LamaHCEExt_Train/01_B0_LamaHCEExt_Train.md), [mã Compare](../../Workspace/05_Training/02_B0_LamaHCEExt_Compare/02_B0_LamaHCEExt_Compare.py) |
 | Giao thức, số liệu bốn mức và sự kiện | [Thuyết minh bộ đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#10-kết-quả-thực-nghiệm-trên-kaggle) |
 | Đặc điểm lưu vực và chênh lệch kỹ năng | [Phân tích theo lưu vực](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#11-kết-quả-thực-nghiệm-và-kiểm-chứng) |
 | Hợp đồng và mã đánh giá | [Nguồn Python](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.py), [notebook Kaggle](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.ipynb) |
