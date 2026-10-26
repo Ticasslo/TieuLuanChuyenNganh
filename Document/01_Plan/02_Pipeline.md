@@ -354,10 +354,10 @@ Cắt từ trên xuống; RQ1–RQ4 giữ nguyên, RQ5 và RQ6 chỉ thu hẹp: 
 
 | Thành viên | Mảng | Việc chính |
 |---|---|---|
-| Người 1 | Dữ liệu và đánh giá | Khảo sát dữ liệu, ngưỡng mức và ngưỡng lũ, bộ nạp (nhóm theo nguồn, sửa bộ lọc, Q, cách b của bước H), bộ đánh giá Mục 6, demo D1–D3 (hàm dự báo, chạy CPU, bản trên laptop) |
-| Người 2 | Mô hình và huấn luyện | Fork thư viện, mô hình chung và các lõi, kiểm thử đơn vị, cài `mamba-ssm`, tệp cấu hình, huấn luyện trên Kaggle, giải thích mô hình, đưa demo lên VPS (D4; VPS và trang web chứa demo do người 2 quản lý) |
+| Người 1 | Dữ liệu, B2–B3, đánh giá | Khảo sát dữ liệu, ngưỡng mức và ngưỡng lũ, bước B2, B3 trọn gói (bộ nạp nhóm theo nguồn, sửa bộ lọc, Q, cách b của bước H; mô hình nhúng theo nguồn, masked mean; huấn luyện, báo cáo), bộ đánh giá Mục 6, demo D1–D3 (hàm dự báo, chạy CPU, bản trên laptop) |
+| Người 2 | Mô hình và huấn luyện | Fork thư viện, mô hình chung và các lõi, kiểm thử đơn vị, cài `mamba-ssm`, tệp cấu hình, huấn luyện B0, B1a, B1b, B*, C và các bước mở rộng trên Kaggle, giải thích mô hình, đưa demo lên VPS (D4; VPS và trang web chứa demo do người 2 quản lý) |
 
-Điểm nối giữa hai mảng: bộ nạp (người 1) phải xong trước bước B2; đầu ra dự báo của người 2 lưu theo một định dạng chung để bộ đánh giá đọc được.
+Ở bước B, mỗi người nhận trọn một bước (mã thư viện, huấn luyện, so sánh, báo cáo): người 1 làm B2, B3; người 2 làm B0, B1a, B1b, B*. Điểm nối: B2 xây trên cấu hình B1b; B* cần kết quả B1b–B3; đầu ra dự báo lưu theo một định dạng chung để bộ đánh giá đọc được.
 
 Việc cụ thể của từng người theo từng bước, điểm bàn giao và quy ước làm việc chung: `ASSIGNMENT.md` ở gốc repo.
 
@@ -406,11 +406,11 @@ Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba
 
 Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu khi điều kiện chuyển bước ở Mục 7 đạt. Lịch tính theo số đo ở B0 (Mục 8.1; giao thức 30 epoch, dữ liệu để sẵn trên GPU): khoảng 2,5 giờ GPU mỗi lần chạy chính thức, 2,0 giờ mỗi lần tinh chỉnh C1, khoảng 90 giờ GPU mỗi tuần với 3 tài khoản. Cột "giờ GPU" chỉ gồm thời gian huấn luyện theo số lần ở Mục 7, chưa gồm thời gian viết mã và đánh giá; lõi khác LSTM có thời gian riêng, đo ở C1, nên lịch từ bước C trở đi được cập nhật sau C1. Tuần tính từ thứ Hai.
 
-| Thứ tự | Tuần dự kiến | Người 1 (dữ liệu, đánh giá, demo D1–D3) | Người 2 (mô hình, huấn luyện, XAI, VPS) | Giờ GPU |
+| Thứ tự | Tuần dự kiến | Người 1 (dữ liệu, B2–B3, đánh giá, demo D1–D3) | Người 2 (mô hình, huấn luyện, XAI, VPS) | Giờ GPU |
 |---|---|---|---|---|
 | 1 | Xong 24/10/2026 | A1 khảo sát dữ liệu, tệp ngưỡng; A3 mốc so sánh; báo cáo tiến độ; bộ đánh giá chấm A2/DLinear/A4 (14 run), phân tích theo lưu vực | Bước 0 phần cài `mamba-ssm` trên T4; A2; A4 nhiễu hạt giống và đo thời gian | – |
-| 2 | 26/10 – 08/11/2026 | Viết bộ nạp B2 (thư mục Q `qmean_mmd`, `qmax_mmd`) và cách (b) của bước H, kiểm thử đơn vị phần bộ nạp | Đo tốc độ bộ nạp, để sẵn dữ liệu trên GPU (bước 0, xong); B0 (xong), B1a, B1b 30 epoch; song song: mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) | B0, B1a, B1b: 9 lần, khoảng 23 giờ (B0 đo thật 7,4 giờ) |
-| 3 | 09/11 – 22/11/2026 | Đánh giá bước B, gồm kịch bản S0–S4 trên validation cho B* | B2, B3, B*; phối hợp rà soát bộ nạp B2 trước khi huấn luyện B2; gắn mốc `freeze-C` | B2, B3: 9 lần, khoảng 23 giờ |
+| 2 | 26/10 – 08/11/2026 | Chấm B0; B2 trọn gói: bộ nạp (nhóm theo nguồn, sửa bộ lọc, cách (b) của bước H) và mô hình (nhúng theo nguồn, masked mean), kiểm thử đơn vị | Đo tốc độ bộ nạp, để sẵn dữ liệu trên GPU (bước 0, xong); B0 (xong), B1a, B1b 30 epoch; song song: mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) | B0, B1a, B1b: 9 lần, khoảng 23 giờ (B0 đo thật 7,4 giờ) |
+| 3 | 09/11 – 22/11/2026 | Huấn luyện B2, B3 (3 hạt giống); đánh giá bước B, gồm kịch bản S0–S4 trên validation cho B* | Hoàn tất mô hình chung và các lõi; B* khi B1b–B3 đã chấm; gắn mốc `freeze-C` | B2, B3: 9 lần, khoảng 23 giờ |
 | 4 | 23/11 – 13/12/2026 | Đánh giá bước C; demo D1, D2 (Mục 9.6) | C1 tinh chỉnh, C2 chạy chính thức | Tối đa 70 lần, khoảng 155 giờ với LSTM (40 × 2,0 + 30 × 2,5; khoảng 1,7 tuần GPU) |
 | 5 | 14/12 – 27/12/2026 | Đánh giá bước mở rộng; demo D3 | H, D, E, F, GV theo thứ tự ưu tiên ở Mục 7, 8.3 | Tối đa 42 lần, khoảng 105 giờ (khoảng 1,2 tuần GPU) |
 | 6 | 28/12/2026 – 10/01/2027 | Hoàn thiện đánh giá, khối demo D3 bàn giao | Giải thích mô hình (Mục 6.7); demo D4 trên VPS | – |
@@ -418,7 +418,7 @@ Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu
 
 Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.
 
-Bước A đã xong (A1–A4) và bộ đánh giá đã chấm 14 run A2/DLinear/persistence/A4. Sau buổi họp 25/10/2026, giao thức huấn luyện đổi sang chạy đủ 30 epoch (Mục 5.1) và thêm B0, B1a, B1b (Mục 7). Ưu tiên hiện tại: Người 1 viết bộ nạp B2 (cột `qmean_mmd`, `qmax_mmd`; B2 sửa tiếp từ B1b); Người 2 đã chạy B0 (ngưỡng B* 0,0079), chạy tiếp B1a, B1b theo giao thức 30 epoch, làm phần còn lại của bước 0 và phần mô hình B2; Người 1 chấm NPZ B0 (`02_B0_LamaHCEExt_Compare` Version 1), B1a, B1b khi có. Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
+Bước A đã xong (A1–A4) và bộ đánh giá đã chấm 14 run A2/DLinear/persistence/A4. Sau buổi họp 25/10/2026, giao thức huấn luyện đổi sang chạy đủ 30 epoch (Mục 5.1) và thêm B0, B1a, B1b (Mục 7). Ưu tiên hiện tại: Người 1 chấm NPZ B0 (`02_B0_LamaHCEExt_Compare` Version 1), làm trọn B2 rồi B3 (bộ nạp, mô hình, huấn luyện, báo cáo; B2 xây trên cấu hình B1b), chấm B1a, B1b khi có; Người 2 đã chạy B0 (ngưỡng B* 0,0079), chạy tiếp B1a, B1b theo giao thức 30 epoch và làm phần còn lại của bước 0 (mô hình chung, các lõi, kiểm thử đơn vị), rồi B*, `freeze-C`. Thứ tự ưu tiên này giữ nguyên thiết kế thí nghiệm và điều kiện chuyển bước ở Mục 7.
 
 | Nội dung học | Nguồn | Học trước bước |
 |---|---|---|
