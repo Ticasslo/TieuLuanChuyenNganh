@@ -189,7 +189,7 @@ Bộ nhớ GPU: dữ liệu train chiếm thêm 211 MB, đỉnh khi huấn luy�
 - Trả lời GVHD: bộ nạp hiện tại dùng 2 tiến trình phụ khi huấn luyện, nhưng tester dùng 1 tiến trình khi validation. Thời gian chậm không do thiếu tiến trình: Kaggle chỉ có 2 lõi CPU thật, và mỗi lô phải cắt, ghép bằng Python khoảng 55 ms trên CPU. Thêm tiến trình không giúp khi có mô hình (Phần 5–6).
 - Thời gian một lần chạy chính thức với bộ nạp cũ khoảng 6,5 giờ (30 epoch, chấm test mỗi epoch).
 - Cả hai cách đạt luật ≥ 5%. Để dữ liệu sẵn trên GPU bỏ được cả phần chờ khi huấn luyện lẫn phần đọc khi chấm điểm, rút một lần chạy từ khoảng 6,5 giờ xuống khoảng 2,4 giờ, và cho lô trùng từng giá trị với bộ nạp thư viện. Đề tài chọn cách này: thêm vào fork một khóa config `data_on_gpu` (mặc định tắt, nên A2, A4 không đổi), giữ batch 256 và mô hình.
-- Bản sửa cho kết quả trùng từng bit với bộ nạp cũ trên dữ liệu thật ([Mục 5](#5)), nên dùng từ B0 (fork `f229e02`, config `data_on_gpu: true`) mà không làm đổi kết quả so với cách chạy cũ. Ước tính một lần chạy chính thức còn khoảng 3,3 giờ (`02_Pipeline.md` Mục 8.1), thay bằng số đo thật ở B0.
+- Bản sửa cho kết quả trùng từng bit với bộ nạp cũ trên dữ liệu thật ([Mục 5](#5)), nên dùng từ B0 (fork `f229e02`, config `data_on_gpu: true`) mà không làm đổi kết quả so với cách chạy cũ. B0 đo được một notebook 30 epoch kể cả chấm test mọi epoch mất 2,36–2,58 giờ (`Workspace/05_Training/01_B0_LamaHCEExt_Train/01_B0_LamaHCEExt_Train.md`).
 - Dữ liệu train trên GPU chiếm 211 MB (T4 có 14,6 GB), còn đủ chỗ cho các lõi ở bước C.
 
 <a id="7"></a>

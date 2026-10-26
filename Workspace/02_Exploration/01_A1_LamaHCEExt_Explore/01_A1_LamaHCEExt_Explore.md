@@ -6,7 +6,7 @@ Tài liệu thuyết minh bước A1: cấu trúc và độ phủ dữ liệu, t
 
 **Cách đọc bằng chứng.** Bảng ghi “đã đo” dựa vào output thật trên Kaggle với input hiện tại. Giải thích từ bài/tài liệu được gắn nguồn tương ứng. Câu có “giả thuyết”, “chưa xác nhận” hoặc “nếu” không phải kết luận đo được. Các ví dụ tự đặt được ghi rõ là minh họa; các ca trạm có ID/ngày cụ thể được lấy từ output đã kiểm.
 
-Khảo sát chạy Kaggle CPU với input `lamah-ce-ext`; bản chính thức là Version 2 của notebook `01_A1_LamaHCEExt_Explore` (Save & Run All, tệp `.ipynb` có output cạnh tệp này), đọc dữ liệu gốc và lưu bảng/hình vào `WORK_DIR`; không sửa input. LAMAH_DIR chỉ tới `LamaH_extended`, EXP_DIR chỉ tới `Experiments`. Cell 2.5 tự chuẩn bị Q giờ khi thiếu; bật Internet cho lần cần tải từ Zenodo. Đường dẫn trên máy khác có thể đổi qua LAMAH_ROOT. Phần 1 đã kiểm môi trường Python 3.13.15, NumPy 2.1.3, pandas 2.3.3, matplotlib 3.10.0, geopandas 1.1.4, shapely 2.1.2, pyogrio 0.13.0, scipy 1.16.3, torch 2.11.0+cpu và xarray 2025.12.0; đây là môi trường đã chạy, không phải yêu cầu mọi máy phải có đúng các phiên bản này.
+Khảo sát chạy Kaggle CPU với input `lamah-ce-ext`; bản chính thức là Version 3 của notebook `01_A1_LamaHCEExt_Explore` (Save & Run All 60,6 phút, 73/73 cell code, tệp `.ipynb` có output cạnh tệp này), đọc dữ liệu gốc và lưu bảng/hình vào `WORK_DIR`; không sửa input. LAMAH_DIR chỉ tới `LamaH_extended`, EXP_DIR chỉ tới `Experiments`. Cell 2.5 tự chuẩn bị Q giờ khi thiếu; bật Internet cho lần cần tải từ Zenodo. Đường dẫn trên máy khác có thể đổi qua LAMAH_ROOT. Phần 1 đã kiểm môi trường Python 3.13.15, NumPy 2.1.3, pandas 2.3.3, matplotlib 3.10.0, geopandas 1.1.4, shapely 2.1.2, pyogrio 0.13.0, scipy 1.16.3, torch 2.11.0+cpu và xarray 2025.12.0; đây là môi trường đã chạy, không phải yêu cầu mọi máy phải có đúng các phiên bản này.
 
 ## Mục lục
 
@@ -3137,7 +3137,7 @@ Phần 7 kiểm ô đầu vào theo từng pha và cửa sổ cùng điều ki�
 | 26/01/2010 | T799, khoảng 25 km → T1279, khoảng 16 km | Đầu validation 2010–2013 | [ECMWF, Horizontal resolution increase](https://www.ecmwf.int/en/about/media-centre/news/2010/horizontal-resolution-increase) |
 | 08/03/2016 | Khoảng 16 km → 9 km, chu kỳ 41r2 | Bên trong test 2014–2017 | [ECMWF, New model cycle brings higher resolution](https://www.ecmwf.int/en/newsletter/147/meteorology/new-model-cycle-brings-higher-resolution) |
 
-Cell 6.5 đã chạy trên **451 ID**, mất **187,3 giây**. Cả bảy cặp đều đủ ngày trong từng năm 2002–2017; năm cặp cũ khớp mean năm và số cặp của 6.1. Ngoài nhiệt độ, điểm sương và bức xạ, cell bổ sung `ECMWF_tp`–`ERA5L_prec`, `ECMWF_e`–`ERA5L_total_et`; giữ HRES–MSWEP và HRES–GLEAM làm đối chiếu phụ. Mọi giá trị hữu hạn khác −999, kể cả số âm, được giữ nguyên.
+Cell 6.5 đã chạy trên **451 ID**, mất **168,0 giây** ở Version 3. Cả bảy cặp đều đủ ngày trong từng năm 2002–2017; năm cặp cũ khớp mean năm và số cặp của 6.1. Ngoài nhiệt độ, điểm sương và bức xạ, cell bổ sung `ECMWF_tp`–`ERA5L_prec`, `ECMWF_e`–`ERA5L_total_et`; giữ HRES–MSWEP và HRES–GLEAM làm đối chiếu phụ. Mọi giá trị hữu hạn khác −999, kể cả số âm, được giữ nguyên.
 
 Mean hiệu là **HRES trừ nguồn đối chiếu**, gộp trên cùng ngày–ID. W1 trong các bảng tổng hợp là **trung vị W1 tính riêng từng lưu vực**, không phải W1 của phân phối gộp và không được cộng/trung bình W1 tháng thành W1 năm. Mean và W1 đo hai mặt khác nhau: mức trung bình có thể gần nhau trong khi phân phối vẫn khác.
 
@@ -3213,7 +3213,7 @@ Các số này không xác định mức tăng/giảm NSE do nâng lưới. W1 k
 
 Cell báo 50.512 hàng năm, 227.304 hàng tháng và 113.652 hàng cửa sổ theo ID. Bản lưu cục bộ gồm ba CSV tổng hợp **112/504/126 hàng**, [JSON kiểm của Kaggle](Tables/A1_P6_HRES_checks.json), [output nguyên văn](Tables/A1_P6_HRES_output.txt) và hai PNG ở trên. [Biên nhận kiểm cục bộ](Tables/A1_P6_HRES_received_verification.json) có **34 phép kiểm đạt** về khóa, số ID/ngày, lịch nhuận, toán học mean, khoảng giá trị và sự nhất quán giữa nhật ký–JSON; giữ nguyên byte bảy tệp nhận được. Các bảng từng ID và CSV khí tượng gốc chưa được đọc lại cục bộ, nên không gọi kiểm bảng tổng hợp là tái tính W1 từ dữ liệu ngày.
 
-Bằng chứng này là output cell 6.5 chạy trên Kaggle, có đối chiếu 6.1 khớp. Bản `.ipynb` trong repo dựa trên A1 Version 2, đã bổ sung tiêu đề và cell code 6.5 ngay sau 6.4; toàn bộ cell/output cũ được giữ nguyên. Cell mới khớp nguồn `.py`, có `execution_count=null` và chưa ghép output vào notebook; kết quả thật được lưu ở các CSV/PNG và nhật ký nêu trên. Số Version Kaggle mới chưa được cung cấp. Khi có bản Save & Run All mới, thay bản notebook cục bộ bằng bản tải về có output đầy đủ.
+Bằng chứng này là output cell 6.5 của Version 3, có đối chiếu 6.1 khớp. Tệp `.ipynb` trong repo là bản Save & Run All Version 3, có output đầy đủ của mọi cell kể cả 6.5; JSON kiểm của Version 3 trùng [JSON kiểm](Tables/A1_P6_HRES_checks.json) ở mọi khóa trừ thời gian chạy, và các giá trị hiển thị trong bảng output 6.5 khớp ba CSV tổng hợp. Các cell khác cho output trùng Version 2, trừ dòng tiến độ giải nén của cell 2.5.
 
 <a id="sec-21"></a>
 
@@ -4688,7 +4688,7 @@ Số liệu đo lấy từ output Kaggle thật của các cell 1–10.9 và cá
 | 4.3, 4.5 | Đã nhận và đối chiếu trực tiếp sáu CSV 4.3 và tám CSV 4.5 |
 | Phần 5 | Giữ log nguồn giờ 2.5/5.9, output 5.2/5.3/5.8 và các tệp thật đã cung cấp; CSV chi tiết 5.1–5.12 chưa nhận cục bộ, kể cả bảng q_ratio_extremes chưa có output thật |
 | 6.1–6.4 | Bảng kết quả đã cung cấp, bốn hình và output nguyên văn 6.3/6.4; năm CSV mỗi cell chưa nhận cục bộ |
-| 6.5 | Ba CSV tổng hợp năm/tháng/cửa sổ, JSON kiểm, output và hai PNG; đối chiếu 6.1 khớp, kiểm cục bộ 34/34; `.ipynb` đã có cell 6.5, kết quả cell mới giữ ở các tệp nhận riêng |
+| 6.5 | Ba CSV tổng hợp năm/tháng/cửa sổ, JSON kiểm, output và hai PNG; đối chiếu 6.1 khớp, kiểm cục bộ 34/34; `.ipynb` Version 3 có output cell 6.5 |
 | 7.1 | Đã nhận bảng path 120 dòng, vai trò 24 dòng, lịch 48 dòng và kiểm kê trước/sau diễn giải path; các CSV hợp đồng chi tiết khác chưa nhận |
 | 7.2–7.4 | Giữ output nguyên văn 7.2/7.4 và hình cửa sổ; 7.3 được dán trực tiếp trong chat; CSV đếm/cohort/cache chi tiết chưa nhận |
 | 8.1–8.4 | Giữ hình 8.1, hình/output nguyên văn 8.2/8.4 và output nguyên văn 8.3; bảng 8.1 dán trong chat; các CSV chi tiết chưa nhận |

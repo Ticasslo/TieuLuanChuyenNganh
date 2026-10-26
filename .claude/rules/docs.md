@@ -54,7 +54,7 @@ paths:
 | `06_Theory/02_RiverMamba.md` | Tham khảo: đọc mã RiverMamba (cấu hình, loss, dữ liệu, cài `mamba-ssm` trên Colab). Không chạy |
 | `06_Theory/03_BiasCast1_Overview.md` … `07_BiasCast5_Experiments.md` | Học BiasCast từng phần: 1 tổng quan (trạm, lưu vực, đơn vị, nguồn dữ liệu, lệch miền); 2 chỉ số (NSE, trung vị/CDF, 𝒟FC, 𝒟RA, KGE, persistence, PNSE, Wilcoxon); 3 dữ liệu phía lưu lượng, bốn mức, chu kỳ lặp lại; 4 mô hình (tensor, nhúng, LSTM, NSE*, huấn luyện, dừng sớm, tham số); 5 thí nghiệm (baseline, Cross-Domain, Encoder–Decoder, ECMWF HRES pha quá khứ, `qmean`, 6 run A2). Phần sau mỗi phần một tệp |
 | `06_Theory/08_EvaluationFigures.md` | Đọc 10 hình chỉ số đánh giá trên dữ liệu giả lập (hình `Metrics_*.svg`, Phần 6 của `Tools/Theory_Figures.py`), ba tầng chỉ số, câu hỏi ôn |
-| `07_Report/` | Bản thảo các chương báo cáo (`04_Data.md`, `06_ExperimentsAndResults.md` của người 1) |
+| `07_Report/` | Bản thảo các chương báo cáo (`04_Data.md`, `06_ExperimentsAndResults.md` của người 1); tệp đánh số theo số chương trong dàn ý `02_Pipeline.md` Mục 9.8 (không theo thứ tự tạo), chương chưa viết thì chưa có tệp |
 
 - Thay đổi phạm vi hay quyết định => sửa cả `01_BasePaper.md`, `02_Pipeline.md` và sơ đồ. Không dùng `#N` trong hai tệp này.
 - Quyết định kỹ thuật ổn định ghi ở tệp kế hoạch; chi tiết thực thi theo bước, bộ dữ liệu ghi ở báo cáo cạnh notebook hoặc `03_Data/`; phát hiện làm đổi hiểu biết tầng kế hoạch => sửa cả hai nơi.

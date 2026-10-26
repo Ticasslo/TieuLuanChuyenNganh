@@ -54,7 +54,7 @@ Cấu hình lấy nguyên từ `config.yml` của tác giả (run `Sequential_Fo
 Hai điểm của mã tác giả được **giữ nguyên** ở A4; điểm đầu sửa từ B0 (fork `e794d7c`):
 
 - **Lưu mô hình tốt nhất:** `best_model.pt` được ghi mỗi khi NSE validation vượt mốc tốt nhất mà bộ dừng sớm ghi nhận, còn bộ dừng sớm chỉ nâng mốc khi tăng quá 0,005 (`basetrainer.py` dòng 286–289, 336–344; `early_stopping.py` dòng 59–65). Vì vậy `best_model.pt` có thể kém epoch tốt nhất thật tới 0,005. Ở cả ba hạt giống của A4, epoch chứa trong `best_model.pt` (xác định bằng cách so từng tensor với `model_epochXXX.pt`) trùng epoch có NSE validation cao nhất, nên lỗi này không ảnh hưởng tới kết quả A4.
-- **Không bật chế độ tất định:** thư viện đặt hạt giống cho `random`, `numpy`, `torch` nhưng không bật `cudnn.deterministic` (`basetrainer.py` dòng 419–427); LSTM trên cuDNN có thể không tất định (tài liệu `torch.nn.LSTM`). Các bước B, C chạy cùng mã này, nên nhiễu đo ở A4 phải gồm cả phần không tất định của GPU.
+- **Không bật chế độ tất định:** thư viện đặt hạt giống cho `random`, `numpy`, `torch` nhưng không bật `cudnn.deterministic` (`basetrainer.py` dòng 419–427); LSTM trên cuDNN có thể không tất định (tài liệu `torch.nn.LSTM`). Các bước B, C chạy cùng cách. B0 chạy lại cùng ba hạt giống trên thư viện và bộ nạp khác (`f229e02`, `data_on_gpu`): trọng số mọi epoch chung trùng từng bit A4, nên với LSTM này trên T4 nhiễu giữa các lần chạy chỉ do hạt giống ([báo cáo B0](../../05_Training/01_B0_LamaHCEExt_Train/01_B0_LamaHCEExt_Train.md#p3)).
 
 Tác giả huấn luyện ở commit `91af6a0` của thư viện; commit này không có trong fork công khai `conestone/neuralhydrology` (chỉ có `f00cf47` và `9d94908`), và Zenodo không có nhật ký huấn luyện, nên không so được đường NSE validation theo epoch hay thời gian chạy với tác giả.
 
@@ -118,7 +118,7 @@ Mỗi mô hình có 451 lưu vực, 450 lưu vực có NSE (lưu vực 55 trốn
 
 **Điều kiện đạt** (đặt trước khi chạy): NSE trung vị test của tác giả nằm trong [nhỏ nhất, lớn nhất] của ba hạt giống, hoặc cách trung bình không quá 2 độ lệch chuẩn. Điều kiện dùng khoảng của chính ba hạt giống vì bài chỉ có một lần chạy, không có khoảng tin cậy của tác giả; với ba mẫu, độ lệch chuẩn ước lượng còn thô nên ghi kèm cả khoảng [nhỏ nhất, lớn nhất]. Kết quả: 0,7053 nằm trong [0,6952; 0,7059], z = (0,7053 − 0,7016) / 0,0056 = +0,65 => **đạt**. KGE trung vị của tác giả (0,7671) cũng nằm trong khoảng của ba hạt giống [0,7581; 0,7910].
 
-Hạt giống 111 trùng hạt giống của tác giả nhưng cho NSE test 0,6952, không phải 0,7053: cùng hạt giống không cho cùng mô hình vì thư viện tác giả dùng (commit `91af6a0`) khác thư viện của đề tài (`dda45fc`), phần cứng khác (tác giả dùng RTX 4090) và phép tính trên GPU không tất định.
+Hạt giống 111 trùng hạt giống của tác giả nhưng cho NSE test 0,6952, không phải 0,7053: cùng hạt giống không cho cùng mô hình vì thư viện tác giả dùng (commit `91af6a0`) khác thư viện của đề tài (`dda45fc`), phần cứng khác (tác giả dùng RTX 4090, đề tài dùng T4; trang *Reproducibility* của PyTorch ghi kết quả không bảo đảm trùng giữa các phiên bản, nền tảng, CPU và GPU). Trên cùng T4, cùng hạt giống cho trọng số trùng từng bit (B0, [báo cáo B0](../../05_Training/01_B0_LamaHCEExt_Train/01_B0_LamaHCEExt_Train.md#p3)).
 
 <a id="p3"></a>
 ## Phần 3. Nhiễu hạt giống theo lưu vực
