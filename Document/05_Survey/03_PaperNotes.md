@@ -45,6 +45,7 @@
 | `Sheng2026_AISE_ResBiMambaPlus.pdf` | Mamba hai chiều + attention không gian – thời gian + ResNet, lưu lượng giờ sông Columbia | Quét hai chiều trong cửa sổ quá khứ; tới 48 giờ; chỉ dùng dữ liệu, chưa có ràng buộc vật lý | Căn cứ biến thể Mamba hai chiều ở bước E |
 | `Wang2025_WRR_S4D-FT.pdf` | S4D-FT so với LSTM và SAC-SMA, 531 lưu vực CAMELS | S4D-FT hơn LSTM ở lưu vực tuyết và dòng chảy gián đoạn, kém ở lưu vực lũ nhanh, lưu lượng lớn — nhân chập toàn cục thiên về động lực chậm | Giả thuyết cho Y3 và đánh giá theo mức: SSM có thể yếu ở đỉnh lũ nhanh |
 | `Wang2025_WRR_S4D-FT_Supplement.pdf` | Phụ lục S4D-FT | Siêu tham số: d_model 128, d_state 128, 6 lớp, dropout 0,12, min_dt 0,01, max_dt 0,1, 50 epoch, batch 128, lr 4e-4, lr riêng cho tham số SSM 4e-5; thứ tự tinh chỉnh: dung lượng → rời rạc hóa → tối ưu | Điểm xuất phát cấu hình S4D ở bước C |
+| `Wang2025_arXiv_HydroDiffusion.pdf` (bản arXiv 2512.12183 của *HydroDiffusion*, Water Resources Research, đăng 6/10/2026, DOI `10.1029/2025WR043158`) | Mô hình khuếch tán xác suất với lõi SSM S4D-FT, khử nhiễu cả quỹ đạo 7 ngày một lần; 531 lưu vực CAMELS; dự báo vận hành bằng dự báo tái lập GEFSv12; không dùng Q quan trắc làm đầu vào | Lõi SSM nhỉnh hơn lõi LSTM (NSE ngày 0 trung vị 0,75 so với 0,73); công trình gần nhất về SSM trong dự báo có dự báo thời tiết thật | `02_Pipeline.md` Mục 1.3 |
 | `Zhang2026_JHydrol_TemporalInductiveBiases.pdf` | So LSTM, Transformer, PatchTST, Mamba, DLinear dự báo theo giờ, 516 lưu vực CAMELS | Có Q quá khứ: DLinear tốt nhất ở 1 giờ, PatchTST tốt nhất khi tầm xa hơn; không có Q hoặc lưu vực ẩm, tuyết: LSTM và Mamba ổn định hơn; Mamba gần nhưng hơi kém LSTM | Bằng chứng không mặc định Mamba thắng; DLinear là mốc đơn giản đáng thêm (Y13) |
 
 ## 4. Công trình trích dẫn BiasCast (`Related/`)
@@ -103,11 +104,10 @@ Chi tiết căn cứ, chi phí, vị trí trong pipeline: `Document/04_Ideas/01_
 
 ## 8. Đánh giá danh mục PDF
 
-44 tệp đều có vai trò: căn cứ cho pipeline, lý thuyết, khảo sát theo yêu cầu GVHD hoặc hướng khóa luận. Không có bài nào cần bỏ.
+45 tệp đều có vai trò: căn cứ cho pipeline, lý thuyết, khảo sát theo yêu cầu GVHD hoặc hướng khóa luận. Không có bài nào cần bỏ.
 
 ## 9. Công trình liên quan chưa có PDF
 
 | Công trình | Nội dung | Rút ra | Áp dụng |
 |---|---|---|---|
-| *HydroDiffusion*, Water Resources Research, đăng 6/10/2026, DOI `10.1029/2025WR043158` (ghi chú đọc từ bản arXiv 2512.12183) | Mô hình khuếch tán xác suất với lõi SSM S4D-FT, khử nhiễu cả quỹ đạo 7 ngày một lần; 531 lưu vực CAMELS; dự báo vận hành bằng dự báo tái lập GEFSv12; không dùng Q quan trắc làm đầu vào | Lõi SSM nhỉnh hơn lõi LSTM (NSE ngày 0 trung vị 0,75 so với 0,73); công trình gần nhất về SSM trong dự báo có dự báo thời tiết thật | `02_Pipeline.md` Mục 1.3 |
 | Saint-Fleur và cs., HESS 30:3497–3527 (2026), DOI `10.5194/hess-30-3497-2026` | Ba chiến lược đồng hóa Q (đưa Q quan trắc, thêm dự báo của mô hình nền, hậu xử lý sai số) cho dự báo 1–7 ngày; CAMELS-US, CAMELS-FR; dự báo hoàn hảo và dự báo tổ hợp ECMWF | Với LSTM, Q quan trắc giúp chủ yếu ở lưu vực LSTM vốn kém; tổ hợp của LSTM bị thiếu độ phân tán | `02_Pipeline.md` Mục 1.3; đối chiếu khi phân tích lợi ích của Q theo lưu vực (Mục 6.4) |
