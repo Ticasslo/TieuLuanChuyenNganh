@@ -108,7 +108,7 @@ Mốc: mô hình LSTM tác giả trên config này, 84.785 tham số (mốc chí
 | Mamba | 4 | 49 | 96 | 84.509 | −0,326% |
 | Mamba | 6 | 38 | 77 | 84.387 | −0,469% |
 
-Dòng đậm là cấu hình chính dùng ở Phần 6. Mọi 13 cấu hình đều lệch dưới 1%; các số lớp khác dành cho tinh chỉnh C1 (`02_Pipeline.md` Mục 5.2).
+Dòng đậm là cấu hình chính dùng ở Phần 6. Mọi 13 cấu hình đều lệch dưới 1%. Tinh chỉnh C1 dùng LSTM, GRU, Transformer 1 và 2 lớp, S4D, Mamba 2 và 4 khối (`02_Pipeline.md` Mục 5.2); Transformer 4 lớp, S4D và Mamba 6 khối không dùng.
 
 ### Phần 6. Huấn luyện ngắn trên dữ liệu thật
 
