@@ -1,6 +1,6 @@
 # Bước 0 — Mô hình chung nhận 5 lõi và kiểm trên GPU
 
-Tài liệu đi cùng [mã Python](04_0_Cores_Check.py) của notebook Kaggle `04_0_Cores_Check`. Bước C so 5 lõi thời gian (LSTM, GRU, Transformer, S4D, Mamba) trong cùng một mô hình Sequential Forecast, cùng số tham số (`02_Pipeline.md` Mục 4.1, 4.2, 5). Phần mã thư viện của việc này nằm ở fork `Ticasslo/neuralhydrology`, nhánh `core-models`, commit `fed53dc`; kiểm thử CPU chạy ở máy. Notebook kiểm phần chỉ chạy được trên GPU và dữ liệu thật.
+Tài liệu đi cùng [mã Python](04_0_Cores_Check.py) của notebook Kaggle `04_0_Cores_Check`. Bước C so 5 lõi thời gian (LSTM, GRU, Transformer, S4D, Mamba) trong cùng một mô hình Sequential Forecast, cùng số tham số (`02_Pipeline.md` Mục 4.1, 4.2, 5). Phần mã thư viện của việc này nằm ở fork `Ticasslo/neuralhydrology`, commit `fed53dc` (nhánh `core-models`, nay cũng là đầu nhánh `research`); kiểm thử CPU chạy ở máy. Notebook kiểm phần chỉ chạy được trên GPU và dữ liệu thật.
 
 ## Mục lục
 
@@ -146,7 +146,7 @@ Lưu `cores_summary.json` (số liệu chính của mọi Phần, [Tables/cores_
 ## 6. Nguồn
 
 - Konold và cs. (2026), BiasCast, HESS 30:5067–5096; config và trọng số tác giả Zenodo 17292895; dữ liệu Zenodo 17119635.
-- Fork `Ticasslo/neuralhydrology` commit `fed53dc`: `modelzoo/sequential_forecast.py` (dòng 13–79), `modelzoo/sf_cores.py` (dòng 63–101 `RNNCore`, 104–142 `TransformerCore`, 145–175 `ResidualCore`, 178–256 `S4DBlock`, 264–293 `mamba_expand`, `mamba_block_parameters`, 338– `match_parameters`), `training/__init__.py` (dòng 14–53 `get_optimizer`), `test/test_sequential_forecast.py`.
+- Fork `Ticasslo/neuralhydrology` commit `fed53dc`: `modelzoo/sequential_forecast.py` (dòng 13–79), `modelzoo/sf_cores.py` (dòng 63–101 `RNNCore`, 104–142 `TransformerCore`, 145–175 `ResidualCore`, 178–256 `S4DBlock`, 264–293 `mamba_expand`, `mamba_block_parameters`, 338– `match_parameters`), `training/__init__.py` (dòng 14–55 `get_optimizer`), `test/test_sequential_forecast.py`.
 - Gu, Gupta, Goel, Ré (2022), On the Parameterization and Initialization of Diagonal State Space Models, NeurIPS 2022; mã `github.com/state-spaces/s4`, `models/s4/s4d.py` và `example.py` (Apache-2.0).
 - Gu & Dao (2023), Mamba: Linear-Time Sequence Modeling with Selective State Spaces, arXiv 2312.00752; `mamba_ssm` 2.3.2.post1, `mamba_ssm/modules/mamba_simple.py` (`d_inner = int(expand * d_model)`).
 - Vaswani và cs. (2017), Attention Is All You Need, NeurIPS 2017 (tầng truyền thẳng 4 × `d_model`); PyTorch 2.11 `nn.TransformerEncoderLayer` (`norm_first`).

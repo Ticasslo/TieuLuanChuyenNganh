@@ -51,7 +51,7 @@ Lưu ý khi tra cứu: "Jamba" trùng tên tạp chí *Jàmbá*; "Hyena" trùng 
 
 **Vì sao dùng Mamba, không phải Transformer?**
 1. Đầu vào là chuỗi dài; Mamba xử lý tuyến tính theo độ dài chuỗi, Transformer bậc hai.
-2. Mamba còn rất mới cho bài toán dự báo lưu lượng (Mục 1.4). Transformer đã được thử ở lưu vực Mekong và thua LSTM (bài #2, Mục 2.1) — Mamba với cơ chế nén trạng thái tuyến tính là một hướng khác để kiểm chứng.
+2. Mamba còn rất mới cho bài toán dự báo lưu lượng (Mục 1.4). Transformer đã được thử ở lưu vực Mekong và thua LSTM (bài Mekong, IEEE Access 2023, Mục 2.1) — Mamba với cơ chế nén trạng thái tuyến tính là một hướng khác để kiểm chứng.
 
 **Nếu có công trình Transformer tương đương thì sao?** Đó là tiến bộ khoa học bình thường, không phủ nhận giá trị kết quả so sánh tại thời điểm thực hiện.
 
@@ -89,10 +89,10 @@ Tiêu chí: không MDPI, không chỉ preprint, trích dẫn ≥ 5, ưu tiên Sc
 | 6 | Forecasting Floods Using Deep Learning Models: A Longitudinal Case Study of Chenab River, Pakistan | IEEE Access (Q1) | 2024 | 9 | Sông Chenab, Pakistan (trạm cụ thể chưa xác nhận do trang chặn truy cập) | LSTM (R² 0,91, r 0,96), ML-GMDH (R² 0,88). Tác giả: Aatif, Fahiem, Tahir | [10.1109/ACCESS.2024.3445586](https://doi.org/10.1109/ACCESS.2024.3445586) |
 
 **Nhận xét.** 6 bài đạt yêu cầu tối thiểu 5 bài, đúng thứ tự ưu tiên vùng (2 Việt Nam, 1 Đông Nam Á, 3 châu Á); 5 bài IEEE Access và 1 bài ESWA, đều thuộc ngành CNTT/AI. Các thuật toán đã được thử: LSTM, GRU, CNN, FFNN, BiLSTM, Transformer, GPR, SVM, ML-GMDH — chưa bài nào dùng Mamba/SSM.
-- **Bài #1 (sông Hồng):** mô hình phức tạp hơn (Stacked LSTM 3 lớp, BiLSTM) không vượt LSTM/GRU 1 lớp; với đỉnh lũ 23/7/2014 (6.740 m³/s), LSTM sai 3,0% còn GRU 5,7% dù GRU có NSE tổng thể nhỉnh hơn ở dự báo 2 ngày — NSE cao không đồng nghĩa dự báo đúng đỉnh lũ.
-- **Bài #2 (Mekong):** Transformer thua LSTM ở cả ngắn hạn và dài hạn; bài không giải thích cơ chế.
-- **Bài #3 (Johor):** wavelet-ANN RMSE 119,25 so với ANN 126,88; CNN ổn định hơn nhưng quá khớp ở thành phần tần số thấp. Không so Transformer/Mamba; có giá trị tham khảo cho phần đánh giá bất định.
-- **Bài #4 (Dương Tử):** Transformer tùy biến thắng ARIMA, TCN, LSTM và Transformer thường; năm lũ 1998/2016 R² > 0,95. Đối chiếu với bài #2 cho thấy cách tùy biến kiến trúc theo bài toán quyết định kết quả hơn là bản thân kiến trúc gốc.
+- **Bài sông Hồng (IEEE Access 2021):** mô hình phức tạp hơn (Stacked LSTM 3 lớp, BiLSTM) không vượt LSTM/GRU 1 lớp; với đỉnh lũ 23/7/2014 (6.740 m³/s), LSTM sai 3,0% còn GRU 5,7% dù GRU có NSE tổng thể nhỉnh hơn ở dự báo 2 ngày — NSE cao không đồng nghĩa dự báo đúng đỉnh lũ.
+- **Bài Mekong (IEEE Access 2023):** Transformer thua LSTM ở cả ngắn hạn và dài hạn; bài không giải thích cơ chế.
+- **Bài sông Johor (IEEE Access 2024):** wavelet-ANN RMSE 119,25 so với ANN 126,88; CNN ổn định hơn nhưng quá khớp ở thành phần tần số thấp. Không so Transformer/Mamba; có giá trị tham khảo cho phần đánh giá bất định.
+- **Bài Dương Tử (IEEE Access 2022):** Transformer tùy biến thắng ARIMA, TCN, LSTM và Transformer thường; năm lũ 1998/2016 R² > 0,95. Đối chiếu với bài Mekong cho thấy cách tùy biến kiến trúc theo bài toán quyết định kết quả hơn là bản thân kiến trúc gốc.
 
 ### 2.2. Dự báo mực nước (tham khảo)
 
@@ -119,8 +119,8 @@ Yêu cầu: *"Phải ra được phần mềm/demo. Trường hợp là demo th�
 
 - Đạt yêu cầu khảo sát (6 bài, đúng thứ tự ưu tiên vùng, đều thuộc ngành CNTT/AI); chưa bài nào dùng Mamba/SSM, cho thấy tính mới của hướng Mamba.
 - Mamba không có bằng chứng vượt trội tuyệt đối so với Transformer; đề tài lập luận theo hiệu quả tính toán, tính mới và so sánh có kiểm soát.
-- Bài #2 và #4 cho thấy kết quả phụ thuộc cách tùy biến kiến trúc theo bài toán — cơ sở để thiết kế thí nghiệm so sánh công bằng giữa các kiến trúc.
-- Bài #1 cho thấy cần đánh giá riêng đỉnh lũ, không chỉ dựa vào NSE tổng thể — phù hợp với đánh giá theo mức lưu lượng và theo sự kiện lũ (`Document/01_Plan/02_Pipeline.md` Mục 6.2).
+- Bài Mekong và bài Dương Tử cho thấy kết quả phụ thuộc cách tùy biến kiến trúc theo bài toán — cơ sở để thiết kế thí nghiệm so sánh công bằng giữa các kiến trúc.
+- Bài sông Hồng cho thấy cần đánh giá riêng đỉnh lũ, không chỉ dựa vào NSE tổng thể — phù hợp với đánh giá theo mức lưu lượng và theo sự kiện lũ (`Document/01_Plan/02_Pipeline.md` Mục 6.2).
 
 ---
 

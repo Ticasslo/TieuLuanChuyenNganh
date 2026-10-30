@@ -610,4 +610,4 @@ missing = sorted(expected - set(MANIFEST["tệp"]))
 if missing:
     raise RuntimeError(f"Phần 6 CHƯA đạt: thiếu {missing}")
 print(f"=> Xong A4 ({'ĐẠT' if A4_PASS else 'KHÔNG ĐẠT'} điều kiện). Tải 2 hình A4_Seeds.png, A4_BasinNoise.png về "
-      "Workspace/03_Baseline/04_A4_LamaHCEExt_Compare/Figures/; Output này (Save Version) gắn làm Input cho bộ đánh giá.")
+      "Workspace/03_Baseline/Figures/; Output này (Save Version) gắn làm Input cho bộ đánh giá.")

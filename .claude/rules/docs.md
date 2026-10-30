@@ -35,7 +35,7 @@ paths:
 
 - Tên tệp, thư mục tiếng Anh; trong `Document/` đánh số `01_`, `02_`… theo thứ tự đọc, tệp mới đánh số tiếp; biên bản họp `Meeting_<ngày>.md`; PDF `AuthorYear_Venue_Topic.pdf`.
 - Tên tệp `.md` trần (VD `02_Pipeline.md` Mục 6.2) là tệp trong `Document/`; `PaperResearch/...` tính từ gốc repo.
-- Chú thích trong các notebook đã chạy chính thức (A1, A2, A4, bước 0: `.py` và `.ipynb`) còn ghi tên cũ `02_BasePaper.md`, `03_Pipeline.md`; nay là `01_BasePaper.md`, `02_Pipeline.md` (đổi 25/10/2026). Không sửa các tệp chính thức đó.
+- Chú thích trong các notebook đã chạy chính thức (A1, A2, A4, bước 0: `.py` và `.ipynb`) còn ghi tên cũ `02_BasePaper.md`, `03_Pipeline.md`; nay là `01_BasePaper.md`, `02_Pipeline.md` (đổi 25/10/2026). Không sửa các tệp chính thức đó. Tương tự, 3 notebook B1b chạy chính thức với tên `05_B1b_LamaHCEExt_Train_Seed*` rồi đổi thành `04_B1b_…` (29/10/2026, Kaggle đổi URL, Output giữ nguyên); chú thích trong `.py`, `.ipynb` của chúng còn ghi tên cũ, không sửa. Chú thích đầu tệp huấn luyện B1a, B1b còn ghi tên notebook so sánh dự kiến ban đầu (`04_B1a_LamaHCEExt_Compare`, `06_B1b_LamaHCEExt_Compare`); notebook so sánh thực tế là `05_B1_LamaHCEExt_Compare` (gộp B0, B1a, B1b).
 - **Hỏi người dùng trước khi tạo tệp `.md` mới** (trừ báo cáo cạnh notebook đã có trong kế hoạch).
 
 ## Vai trò từng tệp
