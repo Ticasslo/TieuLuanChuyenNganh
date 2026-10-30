@@ -16,7 +16,7 @@ paths:
 - `PaperResearch/PaperResearchPDF/` chỉ giữ PDF cần cho đề tài, tên `AuthorYear_Venue_Topic.pdf`:
   - `BasePaper/`: BiasCast PDF, bản chữ `Konold2026_HESS_BiasCast_FullText.md`, `PeerReview/` (thư trả lời phản biện và biên tập).
   - `Evidence/`: căn cứ cho pipeline — Kratzert 2019 (NSE*), Kratzert 2024, Nearing 2022, Nearing 2024, Klotz 2022 (CMAL), Gauch 2025, Martel 2025, Baste 2025, Yang 2025, Yilmaz 2008, Klingler 2021 (bài dữ liệu LamaH-CE), Liu 2024 (giới hạn Transformer).
-  - `MambaSSM/`: Mamba gốc, S4D gốc, RiverMamba, ResBi-Mamba Plus, S4D-FT, S4D/S5D, PatchTST, Zhang 2026 (so sánh LSTM/PatchTST/Mamba).
+  - `MambaSSM/`: Mamba gốc, S4D gốc, RiverMamba, ResBi-Mamba Plus, S4D-FT, HydroDiffusion (bản arXiv), S4D/S5D, PatchTST, Zhang 2026 (so sánh LSTM/PatchTST/Mamba).
   - `Survey/`: bài của `02_LiteratureReview.md` (`MambaTimeSeries/` Mục 1.1, `StreamflowAsia/` Mục 2.1).
   - `Related/`: công trình trích dẫn BiasCast (AIFL, MF²LSTM — `01_BasePaper.md` Mục 12).
   - `Thesis/`: hướng khóa luận (Kirschstein & Sun, Mosaffa, Wang FloodGNNs — đồ thị trên LamaH; MF-LSTM — dữ liệu giờ).

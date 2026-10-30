@@ -1,0 +1,255 @@
+{
+  "phan2_pytest": {
+    "minutes": 13.9,
+    "returncode": 0,
+    "passed": 205,
+    "failed": 0,
+    "sequential_forecast_tests": 43
+  },
+  "phan3_lstm_vs_author": {
+    "test_nse_median": {
+      "ref": 0.7052593641455123,
+      "sf_lstm": 0.7052593641455123
+    },
+    "author_nse_median": 0.7052839398384094,
+    "basins_bit_equal": 451,
+    "basins": 451,
+    "max_abs_diff": 0.0,
+    "eval_minutes": {
+      "ref": 2.3,
+      "sf_lstm": 2.2
+    },
+    "q_dir_minutes": 4.1
+  },
+  "phan4_mamba": {
+    "causal_max_before_k": 0.0,
+    "axis_max_diff": 1.1920928955078125e-06,
+    "param_formula_ok": true,
+    "mambapy_rel_err": [
+      1.685964008402152e-07,
+      1.8057995987419417e-07
+    ],
+    "mambapy_cpu_seconds": 0.056131601333618164
+  },
+  "phan5_target_parameters": 84785,
+  "phan5_match": [
+    {
+      "lõi": "lstm",
+      "số lớp": 1,
+      "chính": "x",
+      "hidden_size": 128,
+      "kích thước trong": "-",
+      "số tham số": 84785,
+      "lệch %": 0.0,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "lstm",
+      "số lớp": 2,
+      "chính": "",
+      "hidden_size": 77,
+      "kích thước trong": "-",
+      "số tham số": 84026,
+      "lệch %": -0.8952055198443121,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "gru",
+      "số lớp": 1,
+      "chính": "x",
+      "hidden_size": 150,
+      "kích thước trong": "-",
+      "số tham số": 84663,
+      "lệch %": -0.1438933773662794,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "gru",
+      "số lớp": 2,
+      "chính": "",
+      "hidden_size": 90,
+      "kích thước trong": "-",
+      "số tham số": 84423,
+      "lệch %": -0.42696231644748484,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "transformer",
+      "số lớp": 1,
+      "chính": "",
+      "hidden_size": 80,
+      "kích thước trong": 335,
+      "số tham số": 84848,
+      "lệch %": 0.07430559650881642,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "transformer",
+      "số lớp": 2,
+      "chính": "x",
+      "hidden_size": 56,
+      "kích thước trong": 243,
+      "số tham số": 84743,
+      "lệch %": -0.04953706433921094,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "transformer",
+      "số lớp": 4,
+      "chính": "",
+      "hidden_size": 40,
+      "kích thước trong": 168,
+      "số tham số": 84625,
+      "lệch %": -0.18871262605413694,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "s4d",
+      "số lớp": 2,
+      "chính": "x",
+      "hidden_size": 111,
+      "kích thước trong": "-",
+      "số tham số": 84741,
+      "lệch %": -0.05189597216488766,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "s4d",
+      "số lớp": 4,
+      "chính": "",
+      "hidden_size": 72,
+      "kích thước trong": "-",
+      "số tham số": 84369,
+      "lệch %": -0.490652827740756,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "s4d",
+      "số lớp": 6,
+      "chính": "",
+      "hidden_size": 55,
+      "kích thước trong": "-",
+      "số tham số": 84213,
+      "lệch %": -0.6746476381435396,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "mamba",
+      "số lớp": 2,
+      "chính": "x",
+      "hidden_size": 72,
+      "kích thước trong": 143,
+      "số tham số": 84959,
+      "lệch %": 0.20522498083387392,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "mamba",
+      "số lớp": 4,
+      "chính": "",
+      "hidden_size": 49,
+      "kích thước trong": 96,
+      "số tham số": 84509,
+      "lệch %": -0.3255292799433862,
+      "khớp": "ĐẠT"
+    },
+    {
+      "lõi": "mamba",
+      "số lớp": 6,
+      "chính": "",
+      "hidden_size": 38,
+      "kích thước trong": 77,
+      "số tham số": 84387,
+      "lệch %": -0.46942265730966565,
+      "khớp": "ĐẠT"
+    }
+  ],
+  "phan6_dataset_minutes": 1.7,
+  "phan6_short_training": [
+    {
+      "lõi": "SeqLSTM thư viện",
+      "số lớp": 1,
+      "hidden_size": 128,
+      "kích thước trong": "-",
+      "số tham số": 84785,
+      "ms/bước huấn luyện": 37.98883358637492,
+      "phút/epoch (ước tính)": 2.7067043930292134,
+      "ms/lô dự báo": 15.805330276489258,
+      "GPU đỉnh (GB)": 1.584986686706543,
+      "loss 20 bước đầu": 0.07513942252844572,
+      "loss 20 bước cuối": 0.031167565425857902,
+      "lặp lại trùng bit": "-"
+    },
+    {
+      "lõi": "lstm",
+      "số lớp": 1,
+      "hidden_size": 128,
+      "kích thước trong": "-",
+      "số tham số": 84785,
+      "ms/bước huấn luyện": 40.08143742879232,
+      "phút/epoch (ước tính)": 2.8558024168014526,
+      "ms/lô dự báo": 16.171135902404785,
+      "GPU đỉnh (GB)": 1.596125602722168,
+      "loss 20 bước đầu": 0.07513942252844572,
+      "loss 20 bước cuối": 0.031167565425857902,
+      "lặp lại trùng bit": "có"
+    },
+    {
+      "lõi": "gru",
+      "số lớp": 1,
+      "hidden_size": 150,
+      "kích thước trong": "-",
+      "số tham số": 84663,
+      "ms/bước huấn luyện": 68.52210760116577,
+      "phút/epoch (ước tính)": 4.882200166583061,
+      "ms/lô dự báo": 38.57989311218262,
+      "GPU đỉnh (GB)": 1.609109878540039,
+      "loss 20 bước đầu": 0.056008650828152894,
+      "loss 20 bước cuối": 0.03346636779606342,
+      "lặp lại trùng bit": "có"
+    },
+    {
+      "lõi": "transformer",
+      "số lớp": 2,
+      "hidden_size": 56,
+      "kích thước trong": 243,
+      "số tham số": 84743,
+      "ms/bước huấn luyện": 105.60575723648071,
+      "phút/epoch (ước tính)": 7.524410203099251,
+      "ms/lô dự báo": 65.43178081512451,
+      "GPU đỉnh (GB)": 0.979027271270752,
+      "loss 20 bước đầu": 0.15552364122122525,
+      "loss 20 bước cuối": 0.028826053813099863,
+      "lặp lại trùng bit": "không (lệch 2.6e-03)"
+    },
+    {
+      "lõi": "s4d",
+      "số lớp": 2,
+      "hidden_size": 111,
+      "kích thước trong": "-",
+      "số tham số": 84741,
+      "ms/bước huấn luyện": 114.54994413587782,
+      "phút/epoch (ước tính)": 8.161683519681295,
+      "ms/lô dự báo": 51.23635768890381,
+      "GPU đỉnh (GB)": 1.407701015472412,
+      "loss 20 bước đầu": 0.11457349900156259,
+      "loss 20 bước cuối": 0.03514769123867154,
+      "lặp lại trùng bit": "có"
+    },
+    {
+      "lõi": "mamba",
+      "số lớp": 2,
+      "hidden_size": 72,
+      "kích thước trong": 143,
+      "số tham số": 84959,
+      "ms/bước huấn luyện": 121.42649624082777,
+      "phút/epoch (ước tính)": 8.65163785715898,
+      "ms/lô dự báo": 40.57980537414551,
+      "GPU đỉnh (GB)": 1.1748991012573242,
+      "loss 20 bước đầu": 0.17489128559827805,
+      "loss 20 bước cuối": 0.02731177960522473,
+      "lặp lại trùng bit": "không (lệch 1.7e-06)"
+    }
+  ],
+  "phan6_lstm_vs_library_max_diff": 0.0
+}
