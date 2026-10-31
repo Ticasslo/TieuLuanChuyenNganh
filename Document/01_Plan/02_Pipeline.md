@@ -509,7 +509,8 @@ Hướng công bố sau khóa luận: SOICT (mời mở rộng sang *Multimedia 
 | Gumbel L-moments | Hosking, JRSS B 52:105–124 (1990); AIFL (Taccari và cs., J. Hydrol. 678, 2026) |
 | Đoạn đường duy trì lưu lượng | Yilmaz, Gupta, Wagener, WRR 44 (2008) |
 | Wilcoxon signed-rank + Cohen's d | Kratzert và cs. (2019, 2024); Gauch và cs. (2025); Nearing và cs. (2024) |
-| Siêu tham số khởi điểm S4D | Wang và cs., WRR 2025, phụ lục S4D-FT |
+| Siêu tham số ngoài lưới của các lõi (dropout trong khối, learning rate tham số SSM của S4D) | Mặc định mã tham chiếu: PyTorch `nn.TransformerEncoderLayer`; `state-spaces/s4` `example.py` (S4D); `state-spaces/mamba` (Mamba, không dropout); số lớp SSM thủy văn: Wang và cs., WRR 2025, phụ lục S4D-FT; Jing và cs. (2026) |
+| Chạy một lần huấn luyện qua hai phiên Kaggle | Giới hạn 12 giờ một phiên (kaggle.com/docs/notebooks); khôi phục trạng thái bộ sinh số ngẫu nhiên sau khi dựng mô hình, dữ liệu (PyTorch issue 201119, Hugging Face Transformers issue 39215); kiểm trùng từng bit ở `05_0_C_Configs_Check.md` Mục 4 |
 | PatchTST, DLinear | Nie và cs. (ICLR 2023); Zhang và cs. (J. Hydrol. 2026) |
 | Trạng thái chạy liên tục thay vì handoff | BiasCast Mục 3.6 |
 | Chạy đủ 30 epoch không dừng sớm; ablation thêm từng thay đổi (B0 → B1a → B1b → B2 → B3) | Lịch cosine T_max 30 trong config tác giả (`01_BasePaper.md` Mục 11); Meyes và cs. (arXiv 1901.08644, 2019); biên bản họp 25/10/2026 (`Meeting_2026-10-25.md` Mục 2.2, 3.3, 3.6) |
