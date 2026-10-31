@@ -1,6 +1,6 @@
 # Bước 0 — Mô hình chung nhận 5 lõi và kiểm trên GPU
 
-Tài liệu đi cùng [mã Python](04_0_Cores_Check.py) của notebook Kaggle `04_0_Cores_Check`. Bước C so 5 lõi thời gian (LSTM, GRU, Transformer, S4D, Mamba) trong cùng một mô hình Sequential Forecast, cùng số tham số (`02_Pipeline.md` Mục 4.1, 4.2, 5). Phần mã thư viện của việc này nằm ở fork `Ticasslo/neuralhydrology`, commit `fed53dc` (nhánh `core-models`, nay cũng là đầu nhánh `research`); kiểm thử CPU chạy ở máy. Notebook kiểm phần chỉ chạy được trên GPU và dữ liệu thật.
+Tài liệu đi cùng [mã Python](04_0_Cores_Check.py) của notebook Kaggle `04_0_Cores_Check`. Bước C so 5 lõi thời gian (LSTM, GRU, Transformer, S4D, Mamba) trong cùng một mô hình Sequential Forecast, cùng số tham số (`02_Pipeline.md` Mục 4.1, 4.2, 5). Phần mã thư viện của việc này nằm ở fork `Ticasslo/neuralhydrology`, commit `fed53dc` (nhánh `core-models`, đã gộp vào `research`); kiểm thử CPU chạy ở máy. Notebook kiểm phần chỉ chạy được trên GPU và dữ liệu thật.
 
 ## Mục lục
 

@@ -26,7 +26,7 @@ Tài liệu đi cùng [mã Python](05_0_C_Configs_Check.py) của notebook Kaggl
 | Accelerator | GPU T4 x2 (dùng GPU 0) | Đúng GPU huấn luyện; `mamba_ssm` cần sm_75 trở lên |
 | Internet | On | Cài fork từ GitHub |
 | Input | Kaggle Dataset `hunhngcthng/lamah-ce-ext`; Output notebook `01_0_MambaSSM_Build` Version 1 | Dữ liệu, config tác giả; wheel `mamba-ssm`, `causal-conv1d` dựng cho T4 |
-| Thư viện | Fork `Ticasslo/neuralhydrology` commit `fed53dc` (nhánh `research`) | Bản có mô hình chung 5 lõi |
+| Thư viện | Fork `Ticasslo/neuralhydrology` commit `fed53dc` (đầu nhánh `research` lúc chạy) | Bản có mô hình chung 5 lõi |
 | Cấu hình nền | B1b hạt giống 111 (`qmean_mmd`, `qmax_mmd` quá khứ; 84.801 tham số) | Đại diện cho B* (chọn trong B1b–B3, chưa có); khác biệt về lớp nhúng giữa các ứng viên B* ảnh hưởng ít tới thời gian, nên số giờ ở đây là ước tính |
 
 <a id="3"></a>
@@ -143,7 +143,7 @@ Kiểm:
 - Kiểm thử `test/test_resume.py` (5 kiểm thử, CPU, dữ liệu kiểm thử CAMELS-US của thư viện, mô hình chung lõi LSTM và Transformer có dropout, lịch cosine, dừng sớm): chạy liền 4 epoch so với 2 epoch rồi chạy tiếp 2 epoch trùng từng bit ở trọng số mọi epoch, optimizer, `best_model.pt`, NSE validation và trạng thái epoch 4. Chạy trên Kaggle cùng bộ kiểm thử liên quan: 75 đạt, 24 bỏ qua, 0 hỏng.
 - Phép thử tạm trên Kaggle T4 (31/10/2026, không lưu thành notebook chính thức): config B1b, `data_on_gpu`, 451 lưu vực, 300 bước mỗi epoch, mỗi lần chạy một tiến trình `nh_run` riêng như hai phiên. Lõi LSTM (`lstm_L1_x1`) chạy liền 2 epoch và chạy 1 epoch rồi chạy tiếp 1 epoch trùng từng bit (trọng số, optimizer, `best_model.pt`, NSE từng lưu vực; NSE trung vị 0,479982 cả hai). Lõi Mamba (`mamba_L2_x1`) lệch trọng số 9,5e-07, NSE từng lưu vực 1,4e-06, NSE trung vị trùng tới 6 chữ số (0,519638); cùng cỡ phần không tất định của Mamba trên GPU khi chạy hai lần liền cùng hạt giống (1,7e-06, `Workspace/04_Setup/04_0_Cores_Check/04_0_Cores_Check.md` Phần 6). Cả hai chạy tiếp trong cùng thư mục và dừng đúng ở epoch 2.
 
-Kết quả: một lần huấn luyện chia làm hai phiên cho cùng kết quả với chạy liền một phiên (LSTM trùng từng bit; Mamba trong mức không tất định vốn có). Nhánh gộp vào `research` trước mốc `freeze-C` (`02_Pipeline.md` Mục 9.1).
+Kết quả: một lần huấn luyện chia làm hai phiên cho cùng kết quả với chạy liền một phiên (LSTM trùng từng bit; Mamba trong mức không tất định vốn có). Nhánh đã gộp vào `research`, nên từ `5844037` nhánh `research` có phần chạy tiếp (`02_Pipeline.md` Mục 9.1).
 
 <a id="5"></a>
 ## 5. Kết luận cho bước C
