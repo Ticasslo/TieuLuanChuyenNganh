@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "Tools" / "C_Notebook_Template.py"
 OUT_DIRS = {"C1": ROOT / "Workspace" / "05_Training" / "06_C1_LamaHCEExt_Tune",
             "C2": ROOT / "Workspace" / "05_Training" / "08_C2_Train"}
-PREFIX = {"C1": "06_C1_LamaHCEExt_Tune", "C2": "08_C2_Train"}
+PREFIX = {"C1": "06_C1_LamaHCEExt_Tune", "C2": "08_C2_Train"}  # số NN đặt lại sau B2, B3 (thứ tự chạy trong 05_Training)
 MAX_NAME = 50                                # tên notebook Kaggle tối đa 50 ký tự
 CORE_DEPTHS = {"lstm": (1, 2), "gru": (1, 2), "transformer": (1, 2), "s4d": (2, 4), "mamba": (2, 4)}
 LEVELS = (1, 3)
