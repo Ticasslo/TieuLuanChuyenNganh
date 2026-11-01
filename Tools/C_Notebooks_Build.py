@@ -2,8 +2,9 @@
 # CẤU HÌNH ở Phần 1 (NOTEBOOK, STEP, CORE, DEPTH, LEVEL, LR, RUN_SEED). Lưới C1: Document/01_Plan/02_Pipeline.md Mục 5.2.
 # Chạy (từ gốc repo):
 #   python Tools/C_Notebooks_Build.py c1 [--out THƯ_MỤC]
-#       39 notebook C1 (5 lõi x 2 độ sâu x 2 mức x 2 learning rate, bỏ lstm_L1_x1_lr1e-3 = B* hạt giống 111) và notebook
-#       phiên 2 (_Cont) cho các cấu hình vượt 12 giờ, mặc định vào Workspace/05_Training/10_C1_Tune/.
+#       39 notebook C1 (5 lõi x 2 độ sâu x 2 mức x 2 learning rate, bỏ lstm_L1_x1_lr1e-3 = B* hạt giống 111; vòng 1
+#       tới epoch 15) và 39 notebook phiên 2 (_Cont, vòng 2 tới epoch 30, chỉ chạy cho cấu hình được giữ ở
+#       11_C1_LamaHCEExt_Compare), mặc định vào Workspace/05_Training/10_C1_Tune/.
 #   python Tools/C_Notebooks_Build.py c2 mamba_L4_x1_lr1e-3 [...] [--cont mamba_L4_x3_lr1e-3 ...] [--out THƯ_MỤC]
 #       3 hạt giống (111, 222, 333) cho mỗi cấu hình C2, _Cont cho cấu hình ghi ở --cont, mặc định vào
 #       Workspace/05_Training/12_C2_Train/. Tên C2 bỏ "LamaHCEExt" để vừa 50 ký tự (giới hạn tên notebook Kaggle).
@@ -32,10 +33,6 @@ LEVELS = (1, 3)
 LRS = {"lr1e-3": 1e-3, "lr5e-4": 5e-4}
 C2_SEEDS = (111, 222, 333)
 B_STAR = "lstm_L1_x1_lr1e-3"                 # cấu hình LSTM chuẩn của C1 = B* hạt giống 111, không chạy lại
-# Cấu hình cần notebook phiên 2 (_Cont): ước tính một lần C1 trên config B* >= 9 giờ (TEST T4 1/11/2026, 200 bước có che,
-# data_on_gpu), so với khoảng 10,5 giờ huấn luyện mỗi phiên của khuôn (SESSION_LIMIT_H trừ cài đặt và RESERVE_H), chừa
-# khoảng 15% cho sai số đo; vượt 12 giờ: 4 cấu hình đầu (14,6-15,6 giờ); 9,5-11,8 giờ: 3 cấu hình sau
-C1_LONG = ("lstm_L2_x3", "gru_L2_x3", "s4d_L4_x3", "mamba_L4_x3", "mamba_L2_x3", "s4d_L2_x3", "transformer_L2_x3")
 CONF_RE = re.compile(r"^(lstm|gru|transformer|s4d|mamba)_L(\d)_x([13])_(lr1e-3|lr5e-4)$")
 BLOCK_START = "# ---- CẤU HÌNH (Tools/C_Notebooks_Build.py ghi lại khối này) ----\n"
 BLOCK_END = "# ---- HẾT CẤU HÌNH ----\n"
@@ -118,7 +115,7 @@ def main(argv=None):
         if args.configs or args.cont is not None:
             ap.error("c1 không nhận danh sách cấu hình (sinh đủ lưới)")
         confs = c1_configs()
-        cont = [c for c in confs if c.rsplit("_", 1)[0] in C1_LONG]
+        cont = confs                                             # C1 vòng 2: cấu hình nào cũng có thể được giữ
         seeds = (111,)
     else:
         if not args.configs:

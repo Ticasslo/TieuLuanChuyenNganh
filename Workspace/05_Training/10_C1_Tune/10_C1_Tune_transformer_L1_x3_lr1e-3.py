@@ -1,16 +1,18 @@
 # =============================================================================
 # Bước C - Huấn luyện một cấu hình của mô hình chung Sequential Forecast (lõi LSTM, GRU, Transformer, S4D hoặc Mamba)
 # trên Extended LamaH-CE, 30 epoch, Kaggle T4. Cùng một khuôn cho tinh chỉnh C1 (1 hạt giống, chỉ validation) và chạy
-# chính thức C2 (3 hạt giống, thêm chấm test mọi epoch).
+# chính thức C2 (3 hạt giống, thêm chấm test mọi epoch). C1 loại sớm hai vòng (02_Pipeline.md Mục 5.2): notebook phiên 1
+# dừng ở epoch 15 (lịch cosine vẫn T_max 30), notebook _Cont của cấu hình được giữ chạy tiếp epoch 16-30.
 # Bài: Konold và cs., HESS 30:5067-5096 (2026). Dữ liệu Zenodo 17119635 (CC BY-NC 4.0), config tác giả Zenodo 17292895
 #      - đã lưu thành Kaggle Dataset "lamah-ce-ext".
 # Kế hoạch: Document/01_Plan/02_Pipeline.md Mục 5.1 (giao thức 30 epoch), 5.2 (lưới C1, siêu tham số ngoài lưới),
 # 7 (dòng C1, C2), 9.1 (cài thư viện theo commit). Thời gian từng cấu hình:
 # Workspace/04_Setup/05_0_C_Configs_Check/05_0_C_Configs_Check.md.
 # Tệp sinh từ Tools/C_Notebook_Template.py bằng Tools/C_Notebooks_Build.py: các tệp chỉ khác khối CẤU HÌNH ở Phần 1.
-# Tên notebook Kaggle trùng tên tệp. Cấu hình nào không xong trong một phiên (Phần 5 dừng trước giới hạn 12 giờ)
-# chạy tiếp ở notebook phiên 2 cùng tên thêm đuôi "_Cont" (cùng mã, khối CẤU HÌNH chỉ khác tên notebook; thêm Input =
-# Output notebook phiên 1; tài khoản khác chạy được khi notebook phiên 1 đã chia sẻ).
+# Tên notebook Kaggle trùng tên tệp. Notebook phiên 2 cùng tên thêm đuôi "_Cont" (cùng mã, khối CẤU HÌNH chỉ khác tên
+# notebook; thêm Input = Output notebook phiên 1; tài khoản khác chạy được khi notebook phiên 1 đã chia sẻ) chạy tiếp:
+# C1 - vòng 2 của cấu hình được giữ ở 11_C1_LamaHCEExt_Compare; C2 - cấu hình không xong trong một phiên (Phần 5 dừng
+# trước giới hạn 12 giờ).
 # Cài đặt: Accelerator = GPU T4 x2 (dùng GPU 0), Internet = On, Persistence = Files only,
 # Environment = Pin to original environment, Add Input => lamah-ce-ext, Output notebook 01_0_MambaSSM_Build
 # (Version 1, wheel mamba-ssm, causal-conv1d) và Output notebook 08_B3_LamaHCEExt_Train_P10S12_Seed111 (Version 1, B*:
@@ -21,7 +23,8 @@
 #   Phần 2 - Tìm dữ liệu, danh sách lưu vực, config tác giả của run SeqLSTM có Q
 #   Phần 3 - Dựng thư mục dữ liệu có cột qmean_mmd, qmax_mmd
 #   Phần 4 - Config B* cho cấu hình của khối CẤU HÌNH, khớp tham số
-#   Phần 5 - Huấn luyện (30 epoch, validation mỗi epoch), dừng gọn trước giới hạn phiên; phiên 2 chạy tiếp
+#   Phần 5 - Huấn luyện (C1 vòng 1 tới epoch 15, còn lại tới 30; validation mỗi epoch), dừng gọn trước giới hạn
+#            phiên; phiên 2 chạy tiếp
 #   Phần 6 - Kiểm best_model.pt, validation theo epoch; C2: chấm test mọi epoch và best_model.pt
 #   Phần 7 - Hình đường học theo epoch và loss theo bước
 #   Phần 8 - Tóm tắt, môi trường, danh mục tệp, dọn thư mục dữ liệu tạm, trạng thái run
@@ -73,6 +76,9 @@ WORK_DIR = Path("/kaggle/working") if IS_KAGGLE else Path("c_work")
 OUT_DIR = WORK_DIR / "c_output"          # bảng, hình, tóm tắt, môi trường, log tiến trình huấn luyện
 WHEEL_ROOTS = [Path("/kaggle/input"), WORK_DIR / "wheels"]
 SESSION_LIMIT_H = 11.0                   # giới hạn phiên Kaggle 12 giờ (kaggle.com/docs/notebooks), chừa 1 giờ lưu Output
+EPOCHS_FULL = 30                         # giao thức 30 epoch, lịch cosine T_max 30 (Pipeline Mục 5.1)
+C1_CUT = 15                              # C1 vòng 1 dừng ở epoch này (Pipeline Mục 5.2: xếp hạng ở epoch 15 trùng epoch 30
+                                         # trên 18 lần chạy B0-B3, Spearman 0,99)
 CORE_DEPTHS = {"lstm": (1, 2), "gru": (1, 2), "transformer": (1, 2), "s4d": (2, 4), "mamba": (2, 4)}
 WORK_DIR.mkdir(parents=True, exist_ok=True)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -94,6 +100,10 @@ conf_errors = [msg for ok, msg in [
 if conf_errors:
     raise ValueError("Khối CẤU HÌNH sai: " + "; ".join(conf_errors))
 EXP_NAME = f"{STEP}_{conf_name}_{lr_tag}_seed{RUN_SEED}"   # tên run (experiment_name), thư mục run bắt đầu bằng tên này
+# Khóa epochs ghi trong config.yml của run (C1 dừng ở vòng 1) và epoch cuối phiên này huấn luyện tới (C1 _Cont chạy tiếp
+# tới EPOCHS_FULL bằng config phụ ở Phần 5)
+CFG_EPOCHS = C1_CUT if STEP == "C1" else EPOCHS_FULL
+N_EPOCHS = C1_CUT if STEP == "C1" and SESSION == 1 else EPOCHS_FULL
 
 
 def installed_versions(libs):
@@ -171,9 +181,9 @@ def mamba_install():
 
 
 show("Cấu hình chạy", pd.DataFrame({"Mục": ["notebook", "bước", "lõi", "độ sâu", "mức dung lượng", "learning rate",
-                                             "hạt giống", "tên run", "phiên", "giới hạn phiên (giờ)"],
+                                             "hạt giống", "tên run", "phiên", "huấn luyện tới epoch", "giới hạn phiên (giờ)"],
                                      "Giá trị": [NOTEBOOK, STEP, CORE, DEPTH, f"x{LEVEL}", LR, RUN_SEED, EXP_NAME,
-                                                 SESSION, SESSION_LIMIT_H]}).astype(str))
+                                                 SESSION, f"{N_EPOCHS} / {EPOCHS_FULL}", SESSION_LIMIT_H]}).astype(str))
 
 # Cài fork theo commit (không editable: thư viện nằm trong site-packages như các notebook trước)
 before = installed_versions(CHECK_LIBS)
@@ -584,7 +594,8 @@ print("=> Đạt. Chạy Phần 4.")
 # (kiểm sha256 theo manifest.csv); chỉ được lệch khóa đường dẫn, thiết bị, hạt giống, tên run. (3) Mốc = số tham số lõi
 # LSTM 1 lớp của mô hình chung trên config B*, phải bằng SequentialForecastLSTM của B* (84.865, B3 Phần 4). (4) Thêm khóa
 # mô hình chung cho CORE, DEPTH, LR (siêu tham số ngoài lưới theo Pipeline Mục 5.2), kích thước từ match_parameters cho
-# LEVEL x mốc, đếm bằng mô hình thật; ghi config cuối, nạp lại bằng Config, so từng khóa với B*.
+# LEVEL x mốc, đếm bằng mô hình thật; C1 đặt epochs = C1_CUT (vòng 1; lịch cosine giữ T_max 30 của B*, nên 15 epoch đầu
+# như nửa đầu lần chạy 30 epoch); ghi config cuối, nạp lại bằng Config, so từng khóa với B*.
 # Cùng config B* và cùng thư mục Q (Phần 3 trùng B3 Phần 3) => cùng tập mẫu huấn luyện của B* (1.112.307 mẫu).
 # Cần chạy Phần 1-3 trước trong phiên.
 import copy
@@ -714,7 +725,7 @@ cfg_c = copy.deepcopy(cfg_bstar)
 update = model_update(CORE, DEPTH, LR)
 cfg_c.update_config(update)
 size = sf_cores.match_parameters(cfg_c, LEVEL * TARGET, tolerance=PARAM_TOL)
-cfg_c.update_config({**size, "experiment_name": EXP_NAME})
+cfg_c.update_config({**size, "experiment_name": EXP_NAME, "epochs": CFG_EPOCHS})
 CFG_PATH = CFG_DIR / f"{EXP_NAME}.yml"
 if CFG_PATH.exists():
     raise RuntimeError(f"Đã có config {CFG_PATH} - dùng phiên mới để tránh ghi đè run.")
@@ -724,7 +735,7 @@ N_PARAMS = sf_cores.count_parameters(get_model(copy.deepcopy(cfg_run)))
 inner = next((size[k] for k in INNER_KEYS if k in size), None)
 dev = (N_PARAMS - LEVEL * TARGET) / (LEVEL * TARGET)
 shutil.copy2(CFG_PATH, OUT_DIR / "config.yml")
-run_diff = config_diff(cfg_bstar_saved, cfg_run, KEYS_RUNTIME + KEYS_MODEL)
+run_diff = config_diff(cfg_bstar_saved, cfg_run, KEYS_RUNTIME + KEYS_MODEL + (["epochs"] if STEP == "C1" else []))
 
 bstar_rows = [
     {"kiểm": "notebook / bước / mức che / hạt giống",
@@ -760,7 +771,11 @@ cfg_rows = [
      "giá trị": f"{cfg_run.epochs} / {cfg_run.early_stopping_patience} / {cfg_run.data_on_gpu} / {cfg_run.seed} / "
                 f"{cfg_run.experiment_name}",
      "đạt": [cfg_run.epochs, cfg_run.early_stopping_patience, cfg_run.data_on_gpu, cfg_run.seed,
-             cfg_run.experiment_name] == [30, PATIENCE, True, RUN_SEED, EXP_NAME]},
+             cfg_run.experiment_name] == [CFG_EPOCHS, PATIENCE, True, RUN_SEED, EXP_NAME]},
+    {"kiểm": "lịch learning rate (T_max phải là số epoch của giao thức, không theo khóa epochs)",
+     "giá trị": f"{cfg_run.lr_scheduler.get('type')} / T_max {cfg_run.lr_scheduler.get('T_max')}",
+     "đạt": str(cfg_run.lr_scheduler.get("type")).lower() == "cosineannealinglr"
+            and cfg_run.lr_scheduler.get("T_max") == EPOCHS_FULL},
     {"kiểm": "số biến mỗi nguồn quá khứ / ngày t (mong đợi [21, 7, 1, 2, 2] / [5])",
      "giá trị": f"{list(map(len, hind))} / {list(map(len, fc))}",
      "đạt": list(map(len, hind)) == [21, 7, 1, 2, 2] and list(map(len, fc)) == [5]},
@@ -782,20 +797,23 @@ if not ok:
 print("=> Đạt. Chạy Phần 5.")
 
 
-# %% Phần 5 - Huấn luyện (30 epoch, validation mỗi epoch), dừng gọn trước giới hạn phiên; phiên 2 chạy tiếp
+# %% Phần 5 - Huấn luyện (C1 vòng 1 tới epoch 15, còn lại tới 30; validation mỗi epoch), dừng gọn trước giới hạn
+# phiên; phiên 2 chạy tiếp
 # Như B1b Phần 5: thư viện chạy thành tiến trình riêng trên GPU 0, in tiến trình và GPU mỗi 5 phút, bảng theo epoch đọc
 # từ log. Thêm: max_training_hours = SESSION_LIMIT_H trừ thời gian phiên đã dùng ở Phần 1-4 và phần chừa cho Phần 6-8.
 # Thư viện tính giờ từ lúc dựng trainer (basetrainer.py dòng 60, gồm dựng dataset) và sau mỗi epoch dừng nếu thời gian
 # đã chạy + epoch dài nhất vượt mức, log "Training paused at epoch N" (dòng 328-335 ở 5844037); mỗi epoch ghi
 # training_state_epochNNN.pt.
-# Phiên 1: ghi max_training_hours vào config, "nh_run train".
+# Phiên 1: ghi max_training_hours vào config, "nh_run train" (C1 dừng ở epoch C1_CUT theo khóa epochs của Phần 4).
 # Phiên 2 (notebook _Cont, Input = Output notebook phiên 1): tìm đúng một thư mục c_runs/<tên run>_* trong Input, kiểm
-# summary.json phiên 1 ("cần phiên 2", cùng tên run, cùng số tham số), sha256 theo manifest.csv phiên 1, config của run
-# trùng config Phần 4 ở các khóa mô hình và dữ liệu; chép run về đúng đường dẫn cũ (config.yml của run ghi đường dẫn
-# tuyệt đối) rồi "nh_run continue_training" với resume_training_state: true và max_training_hours mới - thư viện chạy
-# tiếp trong thư mục run tới epoch `epochs`, khôi phục scheduler, dừng sớm, RNG (basetrainer.py dòng 340-430).
+# summary.json phiên 1 (C2 "cần phiên 2"; C1 "xong vòng 1" hoặc "cần phiên 2", cùng tên run, cùng số tham số), sha256
+# theo manifest.csv phiên 1, config của run trùng config Phần 4 ở các khóa mô hình và dữ liệu; chép run về đúng đường dẫn
+# cũ (config.yml của run ghi đường dẫn tuyệt đối) rồi "nh_run continue_training" với config phụ resume_training_state:
+# true, epochs: EPOCHS_FULL và max_training_hours mới - thư viện chạy tiếp trong thư mục run tới epoch `epochs` của config
+# phụ (basetrainer.py dòng 249), khôi phục scheduler, dừng sớm, RNG (dòng 340-430); test/test_resume.py kiểm đúng cách này
+# (chạy 2 epoch rồi tiếp tới 4 với T_max 4 trùng từng bit chạy liền 4 epoch).
 # Kiểm: mã thoát 0, đúng một thư mục run, số model_epoch*.pt = thư mục validation = training_state = số epoch NSE trong
-# log (cả hai phiên) = epoch cuối E, không dừng sớm, có best_model.pt; E < epochs thì phiên này phải có dòng "Training
+# log (cả hai phiên) = epoch cuối E, không dừng sớm, có best_model.pt; E < N_EPOCHS thì phiên này phải có dòng "Training
 # paused". Epoch ghi best_model.pt sau cùng phải là epoch NSE trung vị validation cao nhất (bản sửa e794d7c) - cảnh báo.
 # Cần chạy Phần 1-4 trước trong phiên.
 import re
@@ -855,13 +873,14 @@ if SESSION == 2:
     bad_sha = [r["tệp"] for _, r in prev_man.iterrows() if sha256(prev_root / r["tệp"]) != r["sha256"]]
     prev_cfg = Config(prev_run / "config.yml")
     cfg_diff = [k for k in SAME_KEYS if getattr(prev_cfg, k) != getattr(Config(CFG_PATH), k)]
+    prev_ok_status = ("xong vòng 1", "cần phiên 2") if STEP == "C1" else ("cần phiên 2",)
     prev_rows = [
         ("Run phiên 1 trong Input", prev_run.relative_to("/kaggle/input").as_posix(), "đúng 1 thư mục", True),
         ("Trạng thái phiên 1 / tên run / số tham số",
          f"{PREV_SUMMARY['status']} / {PREV_SUMMARY['experiment_name']} / {PREV_SUMMARY['n_params']:,}",
-         f"cần phiên 2 / {EXP_NAME} / {N_PARAMS:,}",
-         [PREV_SUMMARY["status"], PREV_SUMMARY["experiment_name"], PREV_SUMMARY["n_params"]]
-         == ["cần phiên 2", EXP_NAME, N_PARAMS]),
+         f"{' hoặc '.join(prev_ok_status)} / {EXP_NAME} / {N_PARAMS:,}",
+         PREV_SUMMARY["status"] in prev_ok_status
+         and [PREV_SUMMARY["experiment_name"], PREV_SUMMARY["n_params"]] == [EXP_NAME, N_PARAMS]),
         ("Tệp manifest.csv phiên 1 khớp sha256", f"{len(prev_man) - len(bad_sha)} / {len(prev_man)}", "đủ", not bad_sha),
         ("Config run phiên 1 khác config Phần 4 ở các khóa", cfg_diff or "không", "không", not cfg_diff),
         ("Commit thư viện phiên 1", PREV_SUMMARY["library_commit"][:7], NH_COMMIT[:7],
@@ -886,12 +905,12 @@ if SESSION == 1:
     cmd_args = ["train", "--config-file", str(CFG_PATH)]
 else:
     resume_cfg = CFG_DIR / f"{EXP_NAME}_resume.yml"         # khóa đè lên config.yml của run (nh_run.py continue_run)
-    resume_cfg.write_text(f"resume_training_state: true\nmax_training_hours: {MAX_TRAIN_H}\n", encoding="utf-8")
+    resume_cfg.write_text(f"resume_training_state: true\nepochs: {N_EPOCHS}\nmax_training_hours: {MAX_TRAIN_H}\n",
+                          encoding="utf-8")
     shutil.copy2(resume_cfg, OUT_DIR / resume_cfg.name)
     cmd_args = ["continue_training", "--run-dir", str(RUNS_DIR / prev_run.name), "--config-file", str(resume_cfg)]
 cfg_run = Config(CFG_PATH)
-N_EPOCHS = cfg_run.epochs
-assert cfg_run.experiment_name == EXP_NAME
+assert cfg_run.experiment_name == EXP_NAME and cfg_run.epochs == CFG_EPOCHS
 
 env = dict(os.environ, CUDA_VISIBLE_DEVICES="0", PYTHONUNBUFFERED="1")
 
@@ -927,7 +946,8 @@ def run_logged(cmd):
 
 gpu_samples = []                                           # (giờ từ lúc bắt đầu, MiB, %)
 # C2: phiên 1 đã huấn luyện đủ epoch nhưng chưa chấm hết test => phiên 2 không huấn luyện, chỉ chấm test ở Phần 6
-SKIP_TRAIN = SESSION == 2 and PREV_SUMMARY["train_done"]
+# (C1 phiên 1 xong vòng 1 có train_done nhưng mới tới C1_CUT => vẫn huấn luyện tiếp)
+SKIP_TRAIN = SESSION == 2 and PREV_SUMMARY["epochs_trained"] == N_EPOCHS
 t0_train = time.time()
 if SKIP_TRAIN:
     STDOUT_LOG.write_text("")
@@ -1009,7 +1029,7 @@ n_val = int(TRAIN_LOG[nse_col].notna().sum()) if has_val else 0
 has_best = bool(RUN_DIR and (RUN_DIR / "best_model.pt").exists())
 checks = [("Mã thoát của tiến trình", RETURN_CODE, "0", RETURN_CODE == 0),
           ("Số thư mục run", len(runs), "1", len(runs) == 1),
-          ("Epoch cuối E / số epoch của config", f"{LAST_EPOCH} / {N_EPOCHS}",
+          ("Epoch cuối E / epoch cần tới ở phiên này", f"{LAST_EPOCH} / {N_EPOCHS}",
            ">= 1" if SESSION == 1 else f"{'=' if SKIP_TRAIN else '>'} {PREV_SUMMARY['epochs_trained']} (phiên 1)",
            LAST_EPOCH >= 1 if SESSION == 1 else (LAST_EPOCH == PREV_SUMMARY["epochs_trained"] if SKIP_TRAIN
                                                   else LAST_EPOCH > PREV_SUMMARY["epochs_trained"])),
@@ -1027,7 +1047,8 @@ N_HARD = 7                                                 # 7 dòng đầu thi�
 show("Kiểm", pd.DataFrame([{"mục": a, "giá trị": str(b), "cần": str(c), "đạt": "ĐẠT" if d else "KHÔNG",
                             "thiếu thì": "dừng" if i < N_HARD else "cảnh báo"} for i, (a, b, c, d) in enumerate(checks)]))
 print(f"Thư mục run: {RUN_DIR}")
-print(f"Trạng thái huấn luyện: xong {N_EPOCHS} epoch" if TRAIN_DONE else
+print(f"Trạng thái huấn luyện: xong {N_EPOCHS} epoch" + (f" (C1 vòng 1; vòng 2 tới epoch {EPOCHS_FULL} nếu được giữ)"
+                                                          if N_EPOCHS < EPOCHS_FULL else "") if TRAIN_DONE else
       f"Trạng thái huấn luyện: tạm dừng sau epoch {LAST_EPOCH}, chạy tiếp ở notebook {BASE_NOTEBOOK}_Cont"
       if SESSION == 1 else f"Trạng thái huấn luyện: CHƯA xong sau phiên 2 (epoch {LAST_EPOCH}) - báo lại để xử lý")
 if not all(c[3] for c in checks[:N_HARD]):
@@ -1287,7 +1308,7 @@ for ax in axes.flat:
     ax.grid(alpha=0.3)
     ax.legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1))
 fig.suptitle(f"{STEP} Sequential Forecast, {CORE_LABEL[CORE]} core, {DEPTH} {DEPTH_UNIT[CORE]}s, {N_PARAMS:,} parameters "
-             f"(x{LEVEL}), lr {LR:g}, seed {RUN_SEED}: learning curves ({n_epochs} of {cfg_saved.epochs} epochs)")
+             f"(x{LEVEL}), lr {LR:g}, seed {RUN_SEED}: learning curves ({n_epochs} of {EPOCHS_FULL} epochs)")
 fig.tight_layout()
 fig_path = FIG_DIR / f"{STEP}_Curve_{EXP_NAME}.png"
 fig.savefig(fig_path, dpi=150, bbox_inches="tight")
@@ -1301,7 +1322,7 @@ if best is not None:
         best_txt += f", NSE test {vn(best['NSE trung vị test'])}"
     best_txt += ")"
 caption(f"đường học của lõi {CORE_LABEL[CORE]} {DEPTH} {'lớp' if DEPTH_UNIT[CORE] == 'layer' else 'khối'}, "
-        f"{n_params_vn} tham số, learning rate {str(LR).replace(".", ",")}, hạt giống {RUN_SEED}, {n_epochs} / {cfg_saved.epochs} epoch. "
+        f"{n_params_vn} tham số, learning rate {str(LR).replace(".", ",")}, hạt giống {RUN_SEED}, {n_epochs} / {EPOCHS_FULL} epoch. "
         f"(a) loss NSE* trung bình mỗi epoch của kỳ huấn luyện và kỳ validation; loss huấn luyện giảm trong khi loss "
         f"validation tăng là dấu hiệu quá khớp. (b), (c) NSE và KGE trung vị {len(basins)} lưu vực của kỳ validation "
         f"(dùng để chọn mô hình)" + (" và kỳ test (chỉ để theo dõi)" if DO_TEST else "")
@@ -1320,7 +1341,8 @@ print("=> Đạt. Chạy Phần 8." if len(steps) else "=> CHƯA có loss theo b
 #                  tensorboard, output.log;
 #   c_output/     - config.yml, log, bảng epoch, đường học, loss theo bước, bộ nhớ GPU, hình (Phần 5-7), summary.json,
 #                  environment.json, manifest.csv.
-# Trạng thái: C1 "xong" khi đủ epoch; C2 "xong" khi đủ epoch và đã chấm test mọi epoch + best_model.pt; còn lại "cần
+# Trạng thái: C1 "xong vòng 1" khi tới epoch C1_CUT (vòng 2 = notebook <tên>_Cont nếu 11_C1_LamaHCEExt_Compare giữ
+# cấu hình), "xong" khi đủ 30 epoch; C2 "xong" khi đủ 30 epoch và đã chấm test mọi epoch + best_model.pt; còn lại "cần
 # phiên 2" (notebook <tên>_Cont). Như B1b: không xuất NPZ ở đây, notebook so sánh dựng NPZ từ test/best_model/test_results.p.
 # Xóa thư mục dữ liệu dựng ở Phần 3 (1,53 GB, dựng lại được).
 # Cần chạy Phần 1-7 trước trong phiên.
@@ -1338,12 +1360,14 @@ def lib_version(lib):
 
 
 # (1) Tóm tắt và trạng thái
-STATUS = "xong" if TRAIN_DONE and (TEST_DONE or not DO_TEST) else "cần phiên 2"
+STATUS = ("xong" if LAST_EPOCH == EPOCHS_FULL else "xong vòng 1") if TRAIN_DONE and (TEST_DONE or not DO_TEST) \
+    else "cần phiên 2"
 val_best = CURVE.set_index("epoch").loc[SAVED_EPOCH, "NSE trung vị validation (tệp)"] if SAVED_EPOCH else None
 SUMMARY = {"notebook": NOTEBOOK, "session": SESSION, "status": STATUS, "step": STEP, "core": CORE, "depth": DEPTH,
            "level": LEVEL, "learning_rate": LR, "seed": RUN_SEED, "experiment_name": EXP_NAME, "run_dir": RUN_DIR.name,
            "hidden_size": cfg_saved.hidden_size, "inner_size": inner, "n_params": N_PARAMS, "target_params": TARGET,
-           "epochs": cfg_saved.epochs, "epochs_trained": LAST_EPOCH, "train_done": TRAIN_DONE,
+           "epochs": EPOCHS_FULL, "epochs_config": cfg_saved.epochs, "c1_cut": C1_CUT if STEP == "C1" else None,
+           "epochs_target_session": N_EPOCHS, "epochs_trained": LAST_EPOCH, "train_done": TRAIN_DONE,
            "test_every_epoch": DO_TEST, "epochs_tested": int(CURVE["NSE trung vị test"].notna().sum()) if DO_TEST else 0,
            "test_done": TEST_DONE, "saved_epoch": SAVED_EPOCH, "true_best_epoch": TRUE_BEST,
            "val_nse_median_best_model": float(val_best) if val_best is not None else None,
@@ -1368,7 +1392,9 @@ env = {"notebook": NOTEBOOK, "session": SESSION, "experiment_name": EXP_NAME,
        "platform": platform.platform(), "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
        "neuralhydrology_commit": nh_commit, "neuralhydrology_commit_expected": NH_COMMIT,
        "config_sha256": sha256(RUN_DIR / "config.yml"),
-       "protocol": {"epochs": cfg_saved.epochs, "early_stopping_patience": cfg_saved.early_stopping_patience,
+       "protocol": {"epochs": EPOCHS_FULL, "epochs_config": cfg_saved.epochs,
+                    "c1_cut": C1_CUT if STEP == "C1" else None, "T_max": cfg_saved.lr_scheduler.get("T_max"),
+                    "early_stopping_patience": cfg_saved.early_stopping_patience,
                     "data_on_gpu": cfg_saved.data_on_gpu, "num_workers": cfg_saved.num_workers,
                     "max_training_hours": MAX_TRAIN_H, "test_every_epoch": DO_TEST, "deterministic": False},
        "libs": {lib: lib_version(lib) for lib in ENV_LIBS}, "summary": SUMMARY, "q_inputs": Q_USE,
@@ -1414,13 +1440,17 @@ if missing:
     print("Thiếu:", missing)
 show("Trạng thái run", pd.DataFrame([
     ("Trạng thái", STATUS),
-    ("Epoch đã huấn luyện", f"{LAST_EPOCH} / {cfg_saved.epochs}"),
-    ("Epoch đã chấm test", f"{SUMMARY['epochs_tested']} / {cfg_saved.epochs}" + (", best_model.pt: có" if TEST_DONE else "")
+    ("Epoch đã huấn luyện", f"{LAST_EPOCH} / {EPOCHS_FULL}"),
+    ("Epoch đã chấm test", f"{SUMMARY['epochs_tested']} / {EPOCHS_FULL}" + (", best_model.pt: có" if TEST_DONE else "")
      if DO_TEST else "- (C1 không chấm test)"),
     ("best_model.pt", f"epoch {SAVED_EPOCH}, NSE trung vị validation {val_best:.4f}" if val_best is not None else "-"),
     ("Thời gian phiên", f"{SUMMARY['session_hours']:.2f} giờ"),
-    ("Việc tiếp", "không" if STATUS == "xong" else f"chạy {BASE_NOTEBOOK}_Cont (Input = Output bản này)"
+    ("Việc tiếp", "không" if STATUS == "xong" else
+     f"chờ chọn vòng 1 ở 11_C1_LamaHCEExt_Compare; được giữ thì chạy {BASE_NOTEBOOK}_Cont (Input = Output bản này)"
+     if STATUS == "xong vòng 1" else f"chạy {BASE_NOTEBOOK}_Cont (Input = Output bản này)"
      if SESSION == 1 else "CHƯA xong sau phiên 2 - báo lại để xử lý")], columns=["mục", "giá trị"]))
-print(("=> Đạt. Xong notebook." if STATUS == "xong" else f"=> Đạt phiên 1. Cần phiên 2: {BASE_NOTEBOOK}_Cont."
-       if SESSION == 1 else "=> CHƯA xong sau phiên 2 - gửi output này.")
+print(("=> Đạt. Xong notebook." if STATUS == "xong" else
+       f"=> Đạt vòng 1 (epoch {LAST_EPOCH}). Chờ chọn ở 11_C1_LamaHCEExt_Compare." if STATUS == "xong vòng 1" else
+       f"=> Đạt phiên 1. Cần phiên 2: {BASE_NOTEBOOK}_Cont." if SESSION == 1 else
+       "=> CHƯA xong sau phiên 2 - gửi output này.")
       if all(c[3] for c in checks) else "=> CHƯA đạt (dòng KHÔNG ở trên): gửi output này.")
