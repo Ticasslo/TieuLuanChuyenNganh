@@ -1,0 +1,4 @@
+hạt giống,tệp,MB,selected_epoch,clip_to_zero,dự báo âm trước chặn,ngày-lưu vực có sim,lỗi hợp đồng,max |ΔNSE| so với thư viện,NaN NSE trùng thư viện,mặt nạ obs trùng A3,giá trị obs khớp A3 trong sai số float32,max |obs run - obs A3|,NSE trung vị obs run (đối chiếu thư viện),NSE trung vị từ NPZ (obs A3),đạt
+111,SeqLSTM_Q_B2_seed111_test_S0_lead1.npz,10.022519,13,True,1789,658911,-,3.573607791906852e-07,True,True,True,1.1280656664780508e-05,0.719445196402699,0.7194451814261777,True
+222,SeqLSTM_Q_B2_seed222_test_S0_lead1.npz,10.017597,12,True,2021,658911,-,1.818635508854527e-07,True,True,True,1.1280656664780508e-05,0.7201443604467853,0.7201443560022511,True
+333,SeqLSTM_Q_B2_seed333_test_S0_lead1.npz,10.025624,7,True,1681,658911,-,7.215532900062271e-07,True,True,True,1.1280656664780508e-05,0.7219677349082508,0.7219677339268875,True

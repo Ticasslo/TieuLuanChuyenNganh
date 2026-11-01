@@ -1,0 +1,76 @@
+{
+  "complete": true,
+  "step": "B3",
+  "scope": "test_S0_lead1_two_mask_levels_three_seeds_each",
+  "library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+  "B2_source": {
+    "notebook": "07_B2_LamaHCEExt_Compare",
+    "version": 1,
+    "summary_sha256": "b8c4ac9a3f3ef68c33711f4af8e575f7620c706e7f64fedb03c34b630a47973c",
+    "environment_sha256": "65d8821e7a1d3977f43441df262296ff803d621c4cc10ea7ffd115d1150a0cc6"
+  },
+  "bstar_threshold_val_nse_sd": 0.007932303438926078,
+  "mask_levels": {
+    "P10S12": {
+      "nan_step_probability": 0.1,
+      "nan_sequence_probability": 0.12,
+      "training_versions_expected": {
+        "111": 1,
+        "222": 1,
+        "333": 1
+      },
+      "saved_epoch": {
+        "111": 23,
+        "222": 19,
+        "333": 14
+      },
+      "seed_val_nse_median": {
+        "111": 0.7611958683132041,
+        "222": 0.770566659673621,
+        "333": 0.7689517721765483
+      },
+      "seed_test_nse_median": {
+        "111": 0.7199659664989382,
+        "222": 0.713896797923252,
+        "333": 0.7177057497431798
+      },
+      "contracts": {
+        "111": "contracts/SeqLSTM_Q_B3_P10S12_seed111_test_S0_lead1.npz",
+        "222": "contracts/SeqLSTM_Q_B3_P10S12_seed222_test_S0_lead1.npz",
+        "333": "contracts/SeqLSTM_Q_B3_P10S12_seed333_test_S0_lead1.npz"
+      }
+    },
+    "P05S05": {
+      "nan_step_probability": 0.05,
+      "nan_sequence_probability": 0.05,
+      "training_versions_expected": {
+        "111": 1,
+        "222": 1,
+        "333": 1
+      },
+      "saved_epoch": {
+        "111": 14,
+        "222": 11,
+        "333": 9
+      },
+      "seed_val_nse_median": {
+        "111": 0.763899968743629,
+        "222": 0.7773569837745095,
+        "333": 0.7702995529319252
+      },
+      "seed_test_nse_median": {
+        "111": 0.7186211761539676,
+        "222": 0.7192883733740609,
+        "333": 0.7116591500995824
+      },
+      "contracts": {
+        "111": "contracts/SeqLSTM_Q_B3_P05S05_seed111_test_S0_lead1.npz",
+        "222": "contracts/SeqLSTM_Q_B3_P05S05_seed222_test_S0_lead1.npz",
+        "333": "contracts/SeqLSTM_Q_B3_P05S05_seed333_test_S0_lead1.npz"
+      }
+    }
+  },
+  "Bstar_selected": false,
+  "operational_scenarios_run": false,
+  "multi_lead_run": false
+}

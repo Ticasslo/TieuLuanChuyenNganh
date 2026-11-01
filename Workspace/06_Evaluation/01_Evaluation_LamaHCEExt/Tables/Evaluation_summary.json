@@ -7,7 +7,7 @@
     "1": 0
   },
   "supplementary_event_tolerance_days": 1,
-  "fixture_checks": 129,
+  "fixture_checks": 205,
   "A3_reference_matched": true,
   "A4_contracts_matched": true,
   "A4_runs": [
@@ -15,13 +15,62 @@
     "SeqLSTM_Q_A4_seed222",
     "SeqLSTM_Q_A4_seed333"
   ],
+  "B3_contracts_matched": true,
+  "B3_runs": [
+    "SeqLSTM_Q_B3_P10S12_seed111",
+    "SeqLSTM_Q_B3_P10S12_seed222",
+    "SeqLSTM_Q_B3_P10S12_seed333",
+    "SeqLSTM_Q_B3_P05S05_seed111",
+    "SeqLSTM_Q_B3_P05S05_seed222",
+    "SeqLSTM_Q_B3_P05S05_seed333"
+  ],
+  "B3_runs_by_mask": {
+    "P10S12": [
+      "SeqLSTM_Q_B3_P10S12_seed111",
+      "SeqLSTM_Q_B3_P10S12_seed222",
+      "SeqLSTM_Q_B3_P10S12_seed333"
+    ],
+    "P05S05": [
+      "SeqLSTM_Q_B3_P05S05_seed111",
+      "SeqLSTM_Q_B3_P05S05_seed222",
+      "SeqLSTM_Q_B3_P05S05_seed333"
+    ]
+  },
+  "B3_compare_version_expected": 1,
+  "B2_contracts_matched": true,
+  "B2_runs": [
+    "SeqLSTM_Q_B2_seed111",
+    "SeqLSTM_Q_B2_seed222",
+    "SeqLSTM_Q_B2_seed333"
+  ],
+  "B2_compare_version_expected": 1,
+  "B1_contracts_matched": true,
+  "B1a_runs": [
+    "SeqLSTM_Q_B1a_seed111",
+    "SeqLSTM_Q_B1a_seed222",
+    "SeqLSTM_Q_B1a_seed333"
+  ],
+  "B1b_runs": [
+    "SeqLSTM_Q_B1b_seed111",
+    "SeqLSTM_Q_B1b_seed222",
+    "SeqLSTM_Q_B1b_seed333"
+  ],
+  "B1_compare_version_expected": 1,
+  "B0_contracts_matched": true,
+  "B0_runs": [
+    "SeqLSTM_Q_B0_seed111",
+    "SeqLSTM_Q_B0_seed222",
+    "SeqLSTM_Q_B0_seed333"
+  ],
+  "B0_compare_version_expected": 1,
+  "B0_bstar_threshold_val_nse_sd": 0.007932303438926078,
   "A4_compare_version_expected": 2,
   "coverage": [
     {
       "period": "test",
       "scenario": "S0",
       "lead": 1,
-      "runs": 14,
+      "runs": 32,
       "common_day_IDs": 652628,
       "IDs_with_days": 450
     }

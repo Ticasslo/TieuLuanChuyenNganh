@@ -1,13 +1,13 @@
 # %% [markdown]
 # # Bộ đánh giá dự báo lưu lượng - Extended LamaH-CE
 #
-# Notebook đọc dự báo đã lưu, kiểm đầu vào và tính cùng một giao thức cho các mốc A2, DLinear, persistence, LSTM A4 và LSTM B0. Bộ đánh giá không huấn luyện mô hình.
+# Notebook đọc dự báo đã lưu, kiểm đầu vào và tính cùng một giao thức cho các mốc A2, DLinear, persistence, LSTM A4, B0, B1a, B1b, B2 và hai mức B3. Bộ đánh giá không huấn luyện mô hình.
 #
-# **Phạm vi lần chấm:** test 2014–2017, kịch bản S0, hạn một ngày; 17 run, giữ danh sách 451 lưu vực. S0 không che thêm dữ liệu; các giá trị thiếu gốc vẫn được giữ. Các phép so chính dùng chung mặt nạ ngày–lưu vực có quan trắc, persistence và dự báo hữu hạn.
+# **Phạm vi lần chấm:** test 2014–2017, kịch bản S0, hạn một ngày; 32 run, giữ danh sách 451 lưu vực. S0 không che thêm dữ liệu; các giá trị thiếu gốc vẫn được giữ. Các phép so chính dùng chung mặt nạ ngày–lưu vực có quan trắc, persistence và dự báo hữu hạn.
 #
 # ## Cài đặt và đầu vào
 #
-# Dùng CPU. Giữ các Input đã gắn và bổ sung Output B0 Compare Version 1. Không cần ba Output huấn luyện B0 riêng hoặc dataset gốc.
+# Dùng CPU. Giữ các Input đã gắn và bổ sung Output `09_B3_LamaHCEExt_Compare` Version 1. Không cần các Output huấn luyện riêng hoặc dataset gốc.
 #
 # | Output notebook | Version | Vai trò |
 # |---|---:|---|
@@ -16,6 +16,9 @@
 # | `02_A3_LamaHCEExt_Benchmarks` | 1 | Quan trắc chuẩn, persistence và ba seed DLinear |
 # | `04_A4_LamaHCEExt_Compare` | 2 | Ba seed A4 và manifest |
 # | `02_B0_LamaHCEExt_Compare` | 1 | Ba seed B0 và manifest |
+# | `05_B1_LamaHCEExt_Compare` | 1 | Ba seed B1a, ba seed B1b và manifest |
+# | `07_B2_LamaHCEExt_Compare` | 1 | Ba seed B2, audit nguồn, manifest và NPZ |
+# | `09_B3_LamaHCEExt_Compare` | 1 | Hai mức che B3, mỗi mức ba seed, sáu NPZ |
 #
 # Mã tự tìm tệp trong `/kaggle/input`, kiểm manifest/sha256 và dừng khi thiếu, trùng nguồn hoặc sai hợp đồng. Các bảng CSV, metadata JSON và hình được lưu trực tiếp vào `/kaggle/working/evaluation_output`.
 #
@@ -28,7 +31,7 @@
 # 5. [Trích đoạn vượt ngưỡng và gộp USWRC](#evaluation-part-5)
 # 6. [Ghép sự kiện một–một](#evaluation-part-6)
 # 7. [So sánh mô hình và kịch bản](#evaluation-part-7)
-# 8. [Đọc và kiểm Output A1/A2/A3/A4/B0](#evaluation-part-8)
+# 8. [Đọc và kiểm Output A1/A2/A3/A4/B0/B1/B2/B3](#evaluation-part-8)
 # 9. [Kiểm thử độc lập](#evaluation-part-9)
 # 10. [Chấm thực nghiệm và xuất kết quả](#evaluation-part-10)
 # 11. [Chạy toàn bộ và kết luận](#evaluation-part-11)
@@ -77,6 +80,18 @@ B0_SEEDS = (111, 222, 333)
 B0_SEED_VERSIONS = {111: 1, 222: 1, 333: 1}
 B0_COMPARE_VERSION = 1
 B0_LIBRARY_COMMIT = "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3"
+B1_STEPS = ("B1a", "B1b")
+B1_SEEDS = (111, 222, 333)
+B1_SEED_VERSIONS = {111: 1, 222: 1, 333: 1}
+B1_COMPARE_VERSION = 1
+B1_LIBRARY_COMMIT = "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3"
+B2_SEEDS = (111, 222, 333)
+B2_COMPARE_VERSION = 1
+B2_LIBRARY_COMMIT = "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f"
+B3_SEEDS = (111, 222, 333)
+B3_COMPARE_VERSION = 1
+B3_LIBRARY_COMMIT = B2_LIBRARY_COMMIT
+B3_MASKS = {"P10S12": (.1, .12), "P05S05": (.05, .05)}
 RETURN_PERIODS = (1.5, 2.0, 5.0, 10.0)
 LOG_FLOOR_MM_DAY = 1e-6
 TEST_START, TEST_END = "2014-01-01", "2017-12-31"
@@ -598,7 +613,7 @@ def scenario_changes(forecasts):
 # %% [markdown]
 # <a id="evaluation-part-8"></a>
 #
-# ## Phần 8 — Đọc Output A1/A2/A3/A4/B0
+# ## Phần 8 — Đọc Output A1/A2/A3/A4/B0/B1
 
 # %% [markdown]
 # ### 8.1. Chọn nguồn duy nhất và ghi SHA-256
@@ -790,23 +805,26 @@ def read_contract(path):
     return result.validate()
 
 # %% [markdown]
-# ### 8.4. Ba seed A4 và ba seed B0 từ Output Compare
+# ### 8.4. Hai mươi mốt NPZ LSTM A4/B0/B1a/B1b/B2/B3 từ Output Compare
 #
-# Hai nguồn có hợp đồng riêng: A4 dùng Compare Version 2 và commit `dda45fc`; B0 dùng Compare Version 1 và commit `f229e02`. Cả ba notebook huấn luyện B0 đều Version 1.
+# A4/B0 có schema riêng; B1 Compare chứa chung sáu NPZ và summary nested B0/B1a/B1b. Hai nguồn nền: A4 dùng Compare Version 2 và commit `dda45fc`; B0 dùng Compare Version 1 và commit `f229e02`. Cả ba notebook huấn luyện B0 đều Version 1.
 #
-# Kiểm đủ ba seed, manifest, sha256, epoch được chọn và ngữ cảnh A3 trước khi chấm. Ngưỡng B* phải bằng độ lệch chuẩn mẫu của ba NSE trung vị validation B0; không tính ngưỡng từ test.
+# Mỗi bước kiểm đủ ba seed, manifest, sha256, epoch được chọn và ngữ cảnh A3 trước khi chấm. Ngưỡng B* phải bằng độ lệch chuẩn mẫu của ba NSE trung vị validation B0; không tính ngưỡng từ test.
+# B3 Compare Version 1 gồm P10S12 và P05S05, mỗi mức ba seed; thư viện cùng commit B2, nguồn B2 Compare Version 1 và A3 Version 1 phải khớp hash.
 
-# %% Phần 8.4 - Kiểm và đọc ba NPZ A4, ba NPZ B0
+# %% Phần 8.4 - Kiểm hai mươi mốt NPZ A4/B0/B1a/B1b/B2/B3
 # Thiếu tệp, trùng nguồn, sai hash hoặc khác ngữ cảnh => dừng; không tự bỏ seed.
 def read_compare(compare_root, context, context_paths, step):
-    if step not in ("A4", "B0"):
-        raise ValueError("Compare chỉ hỗ trợ A4 hoặc B0")
-    seeds = A4_SEEDS if step == "A4" else B0_SEEDS
-    seed_versions = A4_SEED_VERSIONS if step == "A4" else B0_SEED_VERSIONS
-    compare_version = A4_COMPARE_VERSION if step == "A4" else B0_COMPARE_VERSION
-    commit = A4_LIBRARY_COMMIT if step == "A4" else B0_LIBRARY_COMMIT
-    notebook = "04_A4_LamaHCEExt_Compare" if step == "A4" else "02_B0_LamaHCEExt_Compare"
-    summary_name = f"{step.lower()}_summary.json"
+    if step not in ("A4", "B0", *B1_STEPS):
+        raise ValueError("Compare chỉ hỗ trợ A4, B0, B1a hoặc B1b")
+    is_b1 = step in B1_STEPS
+    seeds = B1_SEEDS if is_b1 else (A4_SEEDS if step == "A4" else B0_SEEDS)
+    seed_versions = B1_SEED_VERSIONS if is_b1 else (A4_SEED_VERSIONS if step == "A4" else B0_SEED_VERSIONS)
+    compare_version = B1_COMPARE_VERSION if is_b1 else (A4_COMPARE_VERSION if step == "A4" else B0_COMPARE_VERSION)
+    commit = B1_LIBRARY_COMMIT if is_b1 else (A4_LIBRARY_COMMIT if step == "A4" else B0_LIBRARY_COMMIT)
+    notebook = "05_B1_LamaHCEExt_Compare" if is_b1 else (
+        "04_A4_LamaHCEExt_Compare" if step == "A4" else "02_B0_LamaHCEExt_Compare")
+    summary_name = "b1_summary.json" if is_b1 else f"{step.lower()}_summary.json"
     root = unique_file(compare_root, summary_name).parent
     summary_path = root / summary_name
     environment_path = root / "environment.json"
@@ -839,19 +857,37 @@ def read_compare(compare_root, context, context_paths, step):
     if not required.issubset(files):
         raise ValueError(f"Manifest {step} thiếu các tệp bắt buộc: {sorted(required - set(files))}")
     contract_files = {p.relative_to(root).as_posix() for p in (root / "contracts").glob("*.npz")}
-    if contract_files != {name for name in required if name.endswith(".npz")}:
-        raise ValueError(f"{step} Compare phải có đúng ba NPZ seed 111/222/333 ở contracts")
+    expected_contracts = ({f"contracts/SeqLSTM_Q_{st}_seed{seed}_test_S0_lead1.npz"
+                           for st in B1_STEPS for seed in B1_SEEDS} if is_b1 else
+                          {name for name in required if name.endswith(".npz")})
+    if contract_files != expected_contracts or not expected_contracts.issubset(files):
+        raise ValueError(f"{step} Compare phải có đúng {'sáu B1a/B1b' if is_b1 else 'ba'} NPZ seed 111/222/333 ở contracts/manifest")
     summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
     environment = json.loads(environment_path.read_text(encoding="utf-8-sig"))
-    if (environment.get("notebook") != notebook
-            or (environment.get("neuralhydrology_commit_of_runs") if step == "A4"
-                else environment.get("neuralhydrology_commit_of_runs", {}).get("B0")) != commit):
+    source_commit = environment.get("neuralhydrology_commit_of_runs")
+    if step == "B0":
+        source_commit = source_commit.get("B0") if isinstance(source_commit, dict) else None
+    if environment.get("notebook") != notebook or source_commit != commit:
         raise ValueError(f"Sai notebook nguồn hoặc commit thư viện {step}")
     seed_keys = {str(seed) for seed in seeds}
+    if is_b1:
+        expected_keys = {f"{st}_{seed}" for st in B1_STEPS for seed in B1_SEEDS}
+        if not isinstance(summary.get("contracts"), dict) or set(summary["contracts"]) != expected_keys:
+            raise ValueError("B1 summary cần đúng sáu hợp đồng B1a/B1b")
+        for key in ("saved_epoch", "seed_test_nse_median", "seed_val_nse_median"):
+            if (not isinstance(summary.get(key), dict) or set(summary[key]) != {"B0", *B1_STEPS}
+                    or any(not isinstance(values, dict) or set(values) != seed_keys for values in summary[key].values())):
+                raise ValueError(f"B1 summary sai cấu trúc B0/B1a/B1b tại {key}")
+        original_summary = summary
+        summary = dict(contracts={str(seed): original_summary["contracts"][f"{step}_{seed}"] for seed in seeds},
+                       saved_epoch=original_summary["saved_epoch"][step],
+                       seed_test_nse_median=original_summary["seed_test_nse_median"][step],
+                       seed_val_nse_median=original_summary["seed_val_nse_median"]["B0"],
+                       bstar_threshold_val_nse_sd=original_summary.get("bstar_threshold_val_nse_sd"))
     for key in ("contracts", "saved_epoch", "seed_test_nse_median"):
         if not isinstance(summary.get(key), dict) or set(summary[key]) != seed_keys:
             raise ValueError(f"{step} summary thiếu hoặc thừa seed ở {key}")
-    if step == "B0":
+    if step == "B0" or is_b1:
         values = summary.get("seed_val_nse_median", {})
         if not isinstance(values, dict) or set(values) != seed_keys:
             raise ValueError("B0 summary thiếu hoặc thừa seed validation")
@@ -879,7 +915,10 @@ def read_compare(compare_root, context, context_paths, step):
         relative = f"contracts/SeqLSTM_Q_{step}_seed{seed}_test_S0_lead1.npz"
         if not str(summary["contracts"][key]).endswith("/" + relative):
             raise ValueError(f"{step} summary không trỏ đúng tệp seed {seed}")
-        source_version = environment.get("inputs", {}).get("seeds", {}).get(key, {}).get("version")
+        source = environment.get("inputs", {}).get(step if is_b1 else "seeds", {}).get(key, {})
+        source_version = source.get("version")
+        if is_b1 and source.get("notebook") != f"{'03' if step == 'B1a' else '04'}_{step}_LamaHCEExt_Train_Seed{seed}":
+            raise ValueError(f"{step} seed {seed}: tên notebook huấn luyện không khớp bàn giao")
         if type(source_version) is not int or source_version != seed_versions[seed]:
             raise ValueError(f"{step} seed {seed}: Version nguồn không khớp bản bàn giao")
         forecast = read_contract(files[relative])
@@ -896,8 +935,11 @@ def read_compare(compare_root, context, context_paths, step):
         check_same_context(reference, forecast)
         forecast.metadata = dict(meta, source=str(files[relative]), source_file_sha256=sha256(files[relative]),
                                  compare_version_expected=compare_version, training_notebook_version=source_version)
-        if step == "B0":
+        if step == "B0" or is_b1:
             forecast.metadata["bstar_threshold_val_nse_sd"] = summary["bstar_threshold_val_nse_sd"]
+            forecast.metadata["reference_B0_seed_val_nse_median"] = summary["seed_val_nse_median"]
+            forecast.metadata["reference_B0_saved_epoch"] = (
+                original_summary["saved_epoch"]["B0"] if is_b1 else summary["saved_epoch"])
         forecasts.append(forecast)
         contract_rows.append(dict(run=forecast.name, seed=seed, selected_epoch=selected_epoch,
                                   training_notebook_version=source_version,
@@ -919,6 +961,367 @@ def read_a4(a4_root, context, context_paths):
 
 def read_b0(b0_root, context, context_paths):
     return read_compare(b0_root, context, context_paths, "B0")
+
+
+def read_b1(b1_root, context, context_paths, step):
+    if step not in B1_STEPS:
+        raise ValueError("B1 chỉ gồm B1a và B1b")
+    return read_compare(b1_root, context, context_paths, step)
+
+
+def read_b2(b2_root, context, context_paths, b0_forecasts, b1_root):
+    # B2 có manifest file/bytes/sha256, nguồn A3 viết hoa và đường dẫn NPZ tương đối.
+    root = unique_file(b2_root, "b2_summary.json").parent
+    manifest_path = root / "manifest.csv"
+    manifest = pd.read_csv(manifest_path, dtype=str, keep_default_na=False)
+    if (not {"file", "bytes", "sha256"}.issubset(manifest.columns) or manifest.empty
+            or manifest["file"].duplicated().any()):
+        raise ValueError("Manifest B2 thiếu cột, rỗng hoặc trùng đường dẫn")
+    files, input_rows = {}, []
+    for row in manifest.to_dict("records"):
+        relative = row["file"]
+        path = root / relative
+        if (not relative or "\\" in relative or Path(relative).is_absolute()
+                or ".." in Path(relative).parts or not path.resolve().is_relative_to(root.resolve())):
+            raise ValueError(f"Đường dẫn manifest B2 ra ngoài nguồn: {relative}")
+        if (not re.fullmatch(r"[0-9a-f]{64}", row["sha256"]) or not path.is_file()
+                or str(path.stat().st_size) != row["bytes"] or sha256(path) != row["sha256"]):
+            raise ValueError(f"B2 không khớp kích thước/SHA-256: {relative}")
+        files[relative] = path
+        input_rows.append(dict(kind="B2_export", file=relative, path=str(path),
+                               expected_sha256=row["sha256"], observed_sha256=row["sha256"], passed=True))
+    contracts = {f"contracts/SeqLSTM_Q_B2_seed{s}_test_S0_lead1.npz" for s in B2_SEEDS}
+    required = contracts | {"b2_summary.json", "environment.json", "B2_seed_table.csv", "B2_seed_stats.csv",
+                            "B2_contract_check.csv", "B2_input_sources.csv", "B2_B1b_reported_summary.csv", "B2_Seeds.png"}
+    actual_contracts = {p.relative_to(root).as_posix() for p in (root / "contracts").glob("*.npz")}
+    if not required.issubset(files) or actual_contracts != contracts:
+        raise ValueError("B2 Compare thiếu tệp bắt buộc hoặc không có đúng ba NPZ seed 111/222/333")
+    summary = json.loads(files["b2_summary.json"].read_text(encoding="utf-8-sig"))
+    environment = json.loads(files["environment.json"].read_text(encoding="utf-8-sig"))
+    if (summary.get("complete") is not True or summary.get("step") != "B2"
+            or summary.get("scope") != "test_S0_lead1_three_seeds"
+            or summary.get("library_commit") != B2_LIBRARY_COMMIT
+            or environment.get("notebook") != "07_B2_LamaHCEExt_Compare"
+            or environment.get("library_commit_of_runs") != B2_LIBRARY_COMMIT
+            or summary.get("Bstar_selected") is not False or summary.get("operational_scenarios_run") is not False):
+        raise ValueError("B2 summary/environment sai danh tính, commit hoặc phạm vi test/S0/hạn1")
+    seed_keys = {str(s) for s in B2_SEEDS}
+    for key in ("contracts", "saved_epoch", "seed_val_nse_median", "seed_test_nse_median", "training_versions_expected"):
+        if not isinstance(summary.get(key), dict) or set(summary[key]) != seed_keys:
+            raise ValueError(f"B2 summary thiếu hoặc thừa seed: {key}")
+    source_a3 = environment.get("inputs", {}).get("A3", {})
+    by_name = {p.name: p for p in context_paths}
+    if source_a3.get("version") != 1:
+        raise ValueError("B2 cần A3 Version 1")
+    for name in ("A3_persistence_predictions.npz", "A3_Q_source_window.npz"):
+        digest = sha256(by_name[name])
+        # Compare B2 Version 1 ghi trực tiếp {tên_tệp: chuỗi_sha256}.
+        expected = source_a3.get("files", {}).get(name)
+        if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected) or expected != digest:
+            raise ValueError(f"B2 dùng nguồn A3 khác Input hiện tại: {name}")
+        input_rows.append(dict(kind="A3_context_used_by_B2", file=name, path=str(by_name[name]),
+                               expected_sha256=digest, observed_sha256=digest, passed=True))
+    b1_summary_path = unique_file(b1_root, "b1_summary.json")
+    b1_environment_path = b1_summary_path.parent / "environment.json"
+    expected_b1 = dict(notebook="05_B1_LamaHCEExt_Compare", version=B1_COMPARE_VERSION,
+                       summary_sha256=sha256(b1_summary_path), environment_sha256=sha256(b1_environment_path))
+    if summary.get("B1b_source") != expected_b1 or environment.get("inputs", {}).get("B1_Compare") != expected_b1:
+        raise ValueError("B2 dùng B1 Compare khác Input hiện tại")
+    for path in (b1_summary_path, b1_environment_path):
+        digest = sha256(path)
+        input_rows.append(dict(kind="B1_context_used_by_B2", file=path.name, path=str(path),
+                               expected_sha256=digest, observed_sha256=digest, passed=True))
+    b1_summary = json.loads(b1_summary_path.read_text(encoding="utf-8-sig"))
+    val = np.array([summary["seed_val_nse_median"][str(s)] for s in B2_SEEDS], dtype=float)
+    native_test = np.array([summary["seed_test_nse_median"][str(s)] for s in B2_SEEDS], dtype=float)
+    reference_val = np.mean(list(b1_summary["seed_val_nse_median"]["B1b"].values()))
+    threshold = b0_forecasts[0].metadata["bstar_threshold_val_nse_sd"]
+    delta = summary.get("B1b_validation_comparison", {})
+    expected_delta = dict(B1b_validation_NSE_mean=reference_val, B2_validation_NSE_mean=float(val.mean()),
+                          validation_NSE_mean_difference=float(val.mean() - reference_val), B0_Bstar_threshold=threshold)
+    if (not np.isfinite(val).all() or not np.isfinite(native_test).all()
+            or any(not np.isclose(delta.get(k, np.nan), v, atol=1e-12, rtol=1e-9) for k, v in expected_delta.items())
+            or delta.get("Bstar_selected") is not False or delta.get("common_mask_evaluation_completed") is not False
+            or not np.isclose(summary.get("seed_test_nse_mean", np.nan), native_test.mean(), atol=1e-12)
+            or not np.isclose(summary.get("seed_test_nse_sd", np.nan), native_test.std(ddof=1), atol=1e-12)):
+        raise ValueError("B2 tham chiếu validation B1b, ngưỡng B0 hoặc thống kê seed không khớp")
+    tables = {}
+    for name, seed_column in (("B2_seed_table.csv", "seed"), ("B2_input_sources.csv", "seed"),
+                               ("B2_contract_check.csv", "hạt giống")):
+        table = pd.read_csv(files[name], keep_default_na=False).set_index(seed_column)
+        if table.index.has_duplicates or set(table.index) != set(B2_SEEDS):
+            raise ValueError(f"B2 thiếu/thừa/trùng seed trong {name}")
+        tables[name] = table
+    reference = Forecast("A3_context", sim=context["persistence"], raw=context["persistence"], **context).validate()
+    forecasts, contract_rows = [], []
+    for seed in B2_SEEDS:
+        key = str(seed)
+        relative = f"contracts/SeqLSTM_Q_B2_seed{seed}_test_S0_lead1.npz"
+        source = environment.get("inputs", {}).get("B2", {}).get(key, {})
+        actual_notebook = f"06_B2_LamaHCEExt_Train_Seed{seed}"
+        embedded = source.get("notebook_in_environment")
+        if (summary["contracts"][key] != relative or type(summary["training_versions_expected"][key]) is not int
+                or summary["training_versions_expected"][key] != 1 or type(source.get("version_expected")) is not int
+                or source.get("version_expected") != 1
+                or source.get("notebook") != actual_notebook
+                or embedded not in (actual_notebook, f"07_B2_LamaHCEExt_Train_Seed{seed}")
+                or not re.fullmatch(r"[0-9a-f]{64}", str(source.get("environment_sha256")))):
+            raise ValueError(f"B2 seed {seed}: sai đường dẫn NPZ hoặc nguồn Train Version 1")
+        forecast = read_contract(files[relative])
+        meta = forecast.metadata
+        epoch = meta.get("selected_epoch")
+        if (forecast.name != f"SeqLSTM_Q_B2_seed{seed}" or type(forecast.seed) is not int or forecast.seed != seed
+                or forecast.group != ("test", "S0", 1) or meta.get("forecast_horizon") != 1
+                or meta.get("clip_to_zero") is not True or meta.get("library_commit") != B2_LIBRARY_COMMIT
+                or not re.fullmatch(r"[0-9a-f]{64}", str(meta.get("config_sha256")))
+                or type(epoch) is not int or not 1 <= epoch <= 30 or epoch != summary["saved_epoch"][key]
+                or meta.get("training_notebook_metadata") != embedded):
+            raise ValueError(f"B2 seed {seed}: sai run/epoch/commit/config/clip hoặc tên nhúng")
+        check_same_context(reference, forecast)
+        seed_row = tables["B2_seed_table.csv"].loc[seed]
+        source_row = tables["B2_input_sources.csv"].loc[seed]
+        audit = tables["B2_contract_check.csv"].loc[seed]
+        flags = ("clip_to_zero", "NaN NSE trùng thư viện", "mặt nạ obs trùng A3",
+                 "giá trị obs khớp A3 trong sai số float32", "đạt")
+        # Audit của Compare dùng giao obs/sim, độc lập với sự có mặt của persistence.
+        # Giao chung cho sáu chỉ số vẫn được áp riêng trong evaluate_group.
+        nse = np.array([metrics(forecast.obs[:, j], forecast.sim[:, j])["NSE"]
+                        for j in range(len(forecast.ids))])
+        audit_nse = float(np.nanmedian(nse))
+        reported_nse = float(audit["NSE trung vị từ NPZ (obs A3)"])
+        checks = [
+            ("seed_table.selected_epoch", seed_row.selected_epoch, epoch, int(seed_row.selected_epoch)==epoch),
+            ("seed_table.validation_NSE", seed_row.validation_NSE_median, val[B2_SEEDS.index(seed)],
+             np.isclose(seed_row.validation_NSE_median, val[B2_SEEDS.index(seed)], atol=1e-12)),
+            ("seed_table.test_NSE", seed_row.test_NSE_median, native_test[B2_SEEDS.index(seed)],
+             np.isclose(seed_row.test_NSE_median, native_test[B2_SEEDS.index(seed)], atol=1e-12)),
+            ("source.notebook", source_row.notebook, actual_notebook, source_row.notebook==actual_notebook),
+            ("source.embedded_notebook", source_row.notebook_in_environment, embedded, source_row.notebook_in_environment==embedded),
+            ("source.version", source_row.version, 1, source_row.version==1),
+            ("source.environment_sha256", source_row.environment_sha256, source["environment_sha256"],
+             source_row.environment_sha256==source["environment_sha256"]),
+            ("audit.contract_errors", audit["lỗi hợp đồng"], "-", audit["lỗi hợp đồng"]=="-"),
+            ("audit.selected_epoch", audit.selected_epoch, epoch, int(audit.selected_epoch)==epoch),
+            ("audit.filename", audit["tệp"], Path(relative).name, audit["tệp"]==Path(relative).name),
+            ("audit.finite_predictions", audit["ngày-lưu vực có sim"], int(np.isfinite(forecast.sim).sum()),
+             int(audit["ngày-lưu vực có sim"])==int(np.isfinite(forecast.sim).sum())),
+            ("audit.raw_negative_predictions", audit["dự báo âm trước chặn"], int((forecast.raw<0).sum()),
+             int(audit["dự báo âm trước chặn"])==int((forecast.raw<0).sum())),
+            ("audit.max_library_NSE_difference", audit["max |ΔNSE| so với thư viện"], "0..1e-5",
+             0<=float(audit["max |ΔNSE| so với thư viện"])<=1e-5),
+            ("audit.NSE_median_obs_sim", audit_nse, reported_nse,
+             np.isclose(audit_nse, reported_nse, atol=1e-9, rtol=1e-9))]
+        checks.extend((f"audit.{k}", audit[k], True, str(audit[k])=="True") for k in flags)
+        failed = [f"{name}: nhận {actual!s}, cần {expected!s}" for name,actual,expected,passed in checks if not passed]
+        if failed:
+            raise ValueError(f"B2 seed {seed}: bảng seed/nguồn/audit khác NPZ hoặc summary:\n"+"\n".join(failed))
+        forecast.metadata = dict(meta, source=str(files[relative]), source_file_sha256=sha256(files[relative]),
+            compare_version_expected=B2_COMPARE_VERSION, training_notebook_version=1,
+            training_notebook=actual_notebook, embedded_training_notebook=embedded,
+            bstar_threshold_val_nse_sd=threshold)
+        forecasts.append(forecast)
+        contract_rows.append(dict(run=forecast.name, seed=seed, selected_epoch=epoch, training_notebook_version=1,
+            training_notebook=actual_notebook, embedded_training_notebook=embedded,
+            compare_version_expected=B2_COMPARE_VERSION, IDs=len(forecast.ids), target_days=len(forecast.dates),
+            finite_prediction_day_IDs=int(np.isfinite(forecast.sim).sum()),
+            paired_obs_prediction_day_IDs=int((np.isfinite(forecast.obs) & np.isfinite(forecast.sim)).sum()),
+            sim_raw_negative_day_IDs=int((forecast.raw < 0).sum()), library_commit=B2_LIBRARY_COMMIT,
+            config_sha256=meta["config_sha256"], canonical_context_matches=True, manifest_sha256_matches=True))
+        contract_rows[-1].update(NSE_audit_mask="finite_obs_and_sim", NSE_audit_median=audit_nse,
+            NSE_audit_reported_median=reported_nse, NSE_audit_abs_difference=abs(audit_nse-reported_nse))
+    return forecasts, [manifest_path, *files.values(), b1_summary_path, b1_environment_path], pd.DataFrame(input_rows), pd.DataFrame(contract_rows)
+
+
+def read_b3(b3_root, context, context_paths, b0_forecasts, b2_root):
+    # Đọc đúng artifact Compare B3 Version 1; audit NSE dùng obs/sim, không phụ thuộc persistence.
+    root = unique_file(b3_root, "b3_summary.json").parent
+    manifest_path = root / "manifest.csv"
+    manifest = pd.read_csv(manifest_path, dtype=str, keep_default_na=False)
+    if (not {"file", "bytes", "sha256"}.issubset(manifest.columns) or manifest.empty
+            or manifest["file"].duplicated().any()):
+        raise ValueError("Manifest B3 thiếu cột, rỗng hoặc trùng đường dẫn")
+    files, input_rows = {}, []
+    for row in manifest.to_dict("records"):
+        relative = row["file"]
+        path = root / relative
+        if (not relative or "\\" in relative or Path(relative).is_absolute()
+                or ".." in Path(relative).parts or not path.resolve().is_relative_to(root.resolve())):
+            raise ValueError(f"Đường dẫn manifest B3 ra ngoài nguồn: {relative}")
+        if (not re.fullmatch(r"[0-9a-f]{64}", row["sha256"]) or not path.is_file()
+                or str(path.stat().st_size) != row["bytes"] or sha256(path) != row["sha256"]):
+            raise ValueError(f"B3 không khớp kích thước/SHA-256: {relative}")
+        files[relative] = path
+        input_rows.append(dict(kind="B3_export", file=relative, path=str(path),
+                               expected_sha256=row["sha256"], observed_sha256=row["sha256"], passed=True))
+    contracts = {f"contracts/SeqLSTM_Q_B3_{level}_seed{s}_test_S0_lead1.npz"
+                 for level in B3_MASKS for s in B3_SEEDS}
+    required = contracts | {"b3_summary.json", "environment.json", "B3_seed_table.csv", "B3_seed_stats.csv",
+                            "B3_contract_check.csv", "B3_input_sources.csv", "B3_B2_reported_summary.csv", "B3_Seeds.png"}
+    actual_contracts = {p.relative_to(root).as_posix() for p in root.rglob("*.npz")}
+    if not required.issubset(files) or actual_contracts != contracts:
+        raise ValueError("B3 Compare cần đúng sáu NPZ: hai mức P10S12/P05S05, seed 111/222/333")
+    summary = json.loads(files["b3_summary.json"].read_text(encoding="utf-8-sig"))
+    environment = json.loads(files["environment.json"].read_text(encoding="utf-8-sig"))
+    if (summary.get("complete") is not True or summary.get("step") != "B3"
+            or summary.get("scope") != "test_S0_lead1_two_mask_levels_three_seeds_each"
+            or summary.get("library_commit") != B3_LIBRARY_COMMIT
+            or environment.get("notebook") != "09_B3_LamaHCEExt_Compare"
+            or environment.get("library_commit_of_runs") != B3_LIBRARY_COMMIT
+            or summary.get("Bstar_selected") is not False or environment.get("Bstar_selected") is not False
+            or summary.get("operational_scenarios_run") is not False or summary.get("multi_lead_run") is not False):
+        raise ValueError("B3 summary/environment sai danh tính, commit hoặc phạm vi test/S0/hạn1")
+    if set(summary.get("mask_levels", {})) != set(B3_MASKS):
+        raise ValueError("B3 thiếu hoặc thừa mức che trong summary")
+    source_a3 = environment.get("inputs", {}).get("A3", {})
+    by_name = {p.name: p for p in context_paths}
+    if type(source_a3.get("version")) is not int or source_a3["version"] != 1:
+        raise ValueError("B3 cần A3 Version 1")
+    for name in ("A3_persistence_predictions.npz", "A3_Q_source_window.npz"):
+        digest = sha256(by_name[name])
+        expected = source_a3.get("files", {}).get(name)
+        if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected) or expected != digest:
+            raise ValueError(f"B3 dùng nguồn A3 khác Input hiện tại: {name}")
+        input_rows.append(dict(kind="A3_context_used_by_B3", file=name, path=str(by_name[name]),
+                               expected_sha256=digest, observed_sha256=digest, passed=True))
+    b2_summary_path = unique_file(b2_root, "b2_summary.json")
+    b2_environment_path = b2_summary_path.parent / "environment.json"
+    identity = dict(notebook="07_B2_LamaHCEExt_Compare", version=B2_COMPARE_VERSION,
+                    summary_sha256=sha256(b2_summary_path), environment_sha256=sha256(b2_environment_path))
+    source_b2 = summary.get("B2_source", {})
+    if (type(source_b2.get("version")) is not int or source_b2 != identity
+            or environment.get("inputs", {}).get("B2_Compare") != identity):
+        raise ValueError("B3 dùng B2 Compare khác Input hiện tại")
+    for path in (b2_summary_path, b2_environment_path):
+        digest = sha256(path)
+        input_rows.append(dict(kind="B2_context_used_by_B3", file=path.name, path=str(path),
+                               expected_sha256=digest, observed_sha256=digest, passed=True))
+    b2_summary = json.loads(b2_summary_path.read_text(encoding="utf-8-sig"))
+    b2_environment = json.loads(b2_environment_path.read_text(encoding="utf-8-sig"))
+    reference_val = float(np.mean(list(b2_summary["seed_val_nse_median"].values())))
+    threshold = b0_forecasts[0].metadata["bstar_threshold_val_nse_sd"]
+    if not np.isclose(summary.get("bstar_threshold_val_nse_sd", np.nan), threshold, atol=1e-12, rtol=1e-9):
+        raise ValueError("B3 ngưỡng B0 khác Input hiện tại")
+    tables = {}
+    expected_keys = set(itertools.product(B3_MASKS, B3_SEEDS))
+    for name, seed_column in (("B3_seed_table.csv", "seed"), ("B3_input_sources.csv", "seed"),
+                               ("B3_contract_check.csv", "hạt giống")):
+        table = pd.read_csv(files[name], keep_default_na=False).set_index(["mask_level", seed_column])
+        if table.index.has_duplicates or set(table.index) != expected_keys:
+            raise ValueError(f"B3 thiếu/thừa/trùng mức che và seed trong {name}")
+        tables[name] = table
+    stats = pd.read_csv(files["B3_seed_stats.csv"]).set_index(["mask_level", "metric"])
+    columns = ("validation_NSE_median", "test_NSE_median", "test_KGE_median", "train_hours")
+    if stats.index.has_duplicates or set(stats.index) != set(itertools.product(B3_MASKS, columns)):
+        raise ValueError("B3 seed stats thiếu/thừa/trùng mức che và chỉ số")
+    deltas = pd.read_csv(files["B3_B2_reported_summary.csv"], keep_default_na=False).set_index("comparison")
+    if deltas.index.has_duplicates or set(deltas.index) != {f"B3 {level} - B2" for level in B3_MASKS}:
+        raise ValueError("B3 bảng validation delta thiếu/thừa/trùng mức che")
+    reference = Forecast("A3_context", sim=context["persistence"], raw=context["persistence"], **context).validate()
+    forecasts, contract_rows = [], []
+    for level, (p_step, p_sequence) in B3_MASKS.items():
+        member = summary["mask_levels"][level]
+        if (member.get("nan_step_probability") != p_step or member.get("nan_sequence_probability") != p_sequence):
+            raise ValueError(f"B3 {level}: sai hai xác suất che")
+        for key in ("contracts", "saved_epoch", "seed_val_nse_median", "seed_test_nse_median", "training_versions_expected"):
+            if not isinstance(member.get(key), dict) or set(member[key]) != {str(s) for s in B3_SEEDS}:
+                raise ValueError(f"B3 {level}: summary thiếu/thừa seed ở {key}")
+        val = np.array([member["seed_val_nse_median"][str(s)] for s in B3_SEEDS], dtype=float)
+        native_test = np.array([member["seed_test_nse_median"][str(s)] for s in B3_SEEDS], dtype=float)
+        if not np.isfinite(val).all() or not np.isfinite(native_test).all():
+            raise ValueError(f"B3 {level}: NSE summary không hữu hạn")
+        expected_delta = dict(B2_validation_NSE_mean=reference_val, B3_validation_NSE_mean=float(val.mean()),
+                              validation_NSE_mean_difference=float(val.mean()-reference_val), B0_Bstar_threshold=threshold)
+        delta = deltas.loc[f"B3 {level} - B2"]
+        if (any(not np.isclose(delta.get(k, np.nan), v, atol=1e-12, rtol=1e-9) for k,v in expected_delta.items())
+                or str(delta.Bstar_selected) != "False" or str(delta.common_mask_evaluation_completed) != "False"):
+            raise ValueError(f"B3 {level}: validation delta hoặc cờ lựa chọn không khớp")
+        for column in columns:
+            values = tables["B3_seed_table.csv"].loc[level, column].to_numpy(dtype=float)
+            row = stats.loc[(level, column)]
+            if (not np.isfinite(values).all() or not np.isclose(row["mean"], values.mean(), atol=1e-12, rtol=1e-9)
+                    or not np.isclose(row["std"], values.std(ddof=1), atol=1e-12, rtol=1e-9)):
+                raise ValueError(f"B3 {level}: mean/SD không khớp {column}")
+        for i, seed in enumerate(B3_SEEDS):
+            key = str(seed)
+            relative = f"contracts/SeqLSTM_Q_B3_{level}_seed{seed}_test_S0_lead1.npz"
+            source = environment.get("inputs", {}).get("B3", {}).get(level, {}).get(key, {})
+            notebook = f"08_B3_LamaHCEExt_Train_{level}_Seed{seed}"
+            if (member["contracts"][key] != relative or type(member["training_versions_expected"][key]) is not int
+                    or member["training_versions_expected"][key] != 1 or type(source.get("version_expected")) is not int
+                    or source.get("version_expected") != 1 or source.get("notebook") != notebook
+                    or not re.fullmatch(r"[0-9a-f]{64}", str(source.get("environment_sha256")))):
+                raise ValueError(f"B3 {level} seed {seed}: sai nguồn Train Version 1 hoặc đường dẫn NPZ")
+            forecast = read_contract(files[relative])
+            meta = forecast.metadata
+            epoch = meta.get("selected_epoch")
+            if (forecast.name != f"SeqLSTM_Q_B3_{level}_seed{seed}" or type(forecast.seed) is not int or forecast.seed != seed
+                    or forecast.group != ("test", "S0", 1) or meta.get("forecast_horizon") != 1
+                    or meta.get("step") != "B3" or meta.get("mask_level") != level
+                    or meta.get("nan_step_probability") != p_step or meta.get("nan_sequence_probability") != p_sequence
+                    or meta.get("clip_to_zero") is not True or meta.get("library_commit") != B3_LIBRARY_COMMIT
+                    or not re.fullmatch(r"[0-9a-f]{64}", str(meta.get("config_sha256")))
+                    or type(epoch) is not int or not 1 <= epoch <= 30
+                    or type(member["saved_epoch"][key]) is not int or epoch != member["saved_epoch"][key]
+                    or meta.get("training_notebook_metadata") != notebook):
+                raise ValueError(f"B3 {level} seed {seed}: sai metadata run/mức che/epoch/commit/config/clip")
+            check_same_context(reference, forecast)
+            seed_row = tables["B3_seed_table.csv"].loc[(level, seed)]
+            source_row = tables["B3_input_sources.csv"].loc[(level, seed)]
+            audit = tables["B3_contract_check.csv"].loc[(level, seed)]
+            b2_source_hash = b2_environment["inputs"]["B2"][key]["environment_sha256"]
+            nse = np.array([metrics(forecast.obs[:, j], forecast.sim[:, j])["NSE"] for j in range(len(forecast.ids))])
+            audit_nse = float(np.nanmedian(nse))
+            reported_nse = float(audit["NSE trung vị từ NPZ (obs A3)"])
+            checks = [
+                ("seed.epoch", int(seed_row.selected_epoch)==epoch),
+                ("seed.validation_NSE", np.isclose(seed_row.validation_NSE_median,val[i],atol=1e-12,rtol=1e-9)),
+                ("seed.test_NSE", np.isclose(seed_row.test_NSE_median,native_test[i],atol=1e-12,rtol=1e-9)),
+                ("seed.mask", seed_row.nan_step_probability==p_step and seed_row.nan_sequence_probability==p_sequence),
+                ("source.notebook", source_row.notebook==notebook),
+                ("source.version", source_row.version_expected==1),
+                ("source.environment_SHA256", source_row.environment_sha256==source["environment_sha256"]),
+                ("source.B2_environment_SHA256", source_row.B2_environment_sha256==b2_source_hash),
+                ("audit.epoch", int(audit.selected_epoch)==epoch),
+                ("audit.filename", audit["tệp"]==Path(relative).name),
+                ("audit.contract_errors", audit["lỗi hợp đồng"]=="-"),
+                ("audit.finite_predictions", int(audit["ngày-lưu vực có sim"])==int(np.isfinite(forecast.sim).sum())),
+                ("audit.raw_negative_predictions", int(audit["dự báo âm trước chặn"])==int((forecast.raw<0).sum())),
+                ("audit.library_NSE", 0<=float(audit["max |ΔNSE| so với thư viện"])<=1e-5),
+                ("audit.NSE_median_obs_sim", np.isclose(audit_nse,reported_nse,atol=1e-9,rtol=1e-9))]
+            flags = ("clip_to_zero", "NaN NSE trùng thư viện", "mặt nạ obs trùng A3",
+                     "giá trị obs khớp A3 trong sai số float32", "đạt")
+            checks.extend((f"audit.{k}",str(audit[k])=="True") for k in flags)
+            failed = [name for name,passed in checks if not passed]
+            if failed:
+                raise ValueError(f"B3 {level} seed {seed}: bảng khác summary/NPZ: {failed}; "
+                                 f"NSE obs/sim tính lại={audit_nse}, bảng={reported_nse}")
+            forecast.metadata = dict(meta, source=str(files[relative]), source_file_sha256=sha256(files[relative]),
+                compare_version_expected=B3_COMPARE_VERSION, training_notebook_version=1,
+                training_notebook=notebook, bstar_threshold_val_nse_sd=threshold)
+            forecasts.append(forecast)
+            contract_rows.append(dict(run=forecast.name, mask_level=level, seed=seed, selected_epoch=epoch,
+                nan_step_probability=p_step, nan_sequence_probability=p_sequence, training_notebook_version=1,
+                training_notebook=notebook, compare_version_expected=B3_COMPARE_VERSION,
+                IDs=len(forecast.ids), target_days=len(forecast.dates),
+                finite_prediction_day_IDs=int(np.isfinite(forecast.sim).sum()),
+                paired_obs_prediction_day_IDs=int((np.isfinite(forecast.obs)&np.isfinite(forecast.sim)).sum()),
+                sim_raw_negative_day_IDs=int((forecast.raw<0).sum()), library_commit=B3_LIBRARY_COMMIT,
+                config_sha256=meta["config_sha256"], canonical_context_matches=True, manifest_sha256_matches=True,
+                NSE_audit_mask="finite_obs_and_sim", NSE_audit_median=audit_nse,
+                NSE_audit_reported_median=reported_nse, NSE_audit_abs_difference=abs(audit_nse-reported_nse)))
+    return forecasts, [manifest_path,*files.values(),b2_summary_path,b2_environment_path], pd.DataFrame(input_rows), pd.DataFrame(contract_rows)
+
+
+def check_b1_b0_reference(b0_forecasts, b1_forecasts):
+    reference, received = b0_forecasts[0].metadata, b1_forecasts[0].metadata
+    keys = [str(seed) for seed in B0_SEEDS]
+    if (not np.isclose(received["bstar_threshold_val_nse_sd"], reference["bstar_threshold_val_nse_sd"],
+                       atol=1e-12, rtol=1e-9)
+            or received["reference_B0_saved_epoch"] != reference["reference_B0_saved_epoch"]
+            or not np.allclose([received["reference_B0_seed_val_nse_median"][key] for key in keys],
+                               [reference["reference_B0_seed_val_nse_median"][key] for key in keys],
+                               atol=1e-12, rtol=1e-9)):
+        raise ValueError("B1 Compare dùng ngưỡng/seed validation/epoch B0 khác Output B0 Compare hiện tại")
 
 
 def show_table(title, table):
@@ -1188,6 +1591,346 @@ def self_test():
             rejects(f"{step}_missing_seed_rejected", lambda: read_compare(compare, context, context_paths, step))
             summary["contracts"]["333"] = missing
             seal_compare()
+        # B1 Compare thực chứa sáu NPZ, metadata/env và summary nested theo bước.
+        compare = root / "b1"
+        (compare / "contracts").mkdir(parents=True)
+        summary = dict(contracts={}, saved_epoch={}, seed_test_nse_median={}, seed_val_nse_median={})
+        for st in ("B0", *B1_STEPS):
+            summary["saved_epoch"][st] = {str(seed): 25 for seed in B1_SEEDS}
+            summary["seed_test_nse_median"][st] = {str(seed): 1. for seed in B1_SEEDS}
+            summary["seed_val_nse_median"][st] = {"111": .74, "222": .75, "333": .76}
+        summary["bstar_threshold_val_nse_sd"] = float(np.std([.74, .75, .76], ddof=1))
+        env = dict(notebook="05_B1_LamaHCEExt_Compare", neuralhydrology_commit_of_runs=B1_LIBRARY_COMMIT,
+                   inputs={st: {str(seed): dict(notebook=f"{'03' if st == 'B1a' else '04'}_{st}_LamaHCEExt_Train_Seed{seed}",
+                                                version=1) for seed in B1_SEEDS} for st in B1_STEPS})
+        env["inputs"]["a3"] = dict(version=1, files={p.name: {"sha256": sha256(p)} for p in context_paths})
+        for st, seed in itertools.product(B1_STEPS, B1_SEEDS):
+            name = f"SeqLSTM_Q_{st}_seed{seed}"
+            relative = f"contracts/{name}_test_S0_lead1.npz"
+            meta = dict(run=name, period="test", scenario="S0", lead=1, forecast_horizon=1, seed=seed,
+                        unit="mm/day_area_gov", config_sha256="a" * 64, library_commit=B1_LIBRARY_COMMIT,
+                        clip_to_zero=True, selected_epoch=25)
+            np.savez_compressed(compare / relative, **payload, metadata_json=json.dumps(meta))
+            summary["contracts"][f"{st}_{seed}"] = f"b1_compare/{relative}"
+
+        def seal_b1():
+            (compare / "b1_summary.json").write_text(json.dumps(summary), encoding="utf-8")
+            (compare / "environment.json").write_text(json.dumps(env), encoding="utf-8")
+            pd.DataFrame([{"tệp": p.relative_to(compare).as_posix(), "sha256": sha256(p)}
+                          for p in sorted(compare.rglob("*")) if p.is_file() and p.name != "manifest.csv"]).to_csv(
+                              compare / "manifest.csv", index=False)
+
+        seal_b1()
+        for st in B1_STEPS:
+            found, _, checked_inputs, checked_contracts = read_b1(compare, context, context_paths, st)
+            compare_models.extend(found)
+            check(f"{st}_shared_Compare_three_seeds_manifest_and_context", len(found) == 3
+                  and checked_inputs.passed.all() and checked_contracts.canonical_context_matches.all())
+        env["inputs"]["B1a"]["222"]["version"] = 2
+        seal_b1()
+        rejects("B1_wrong_training_version_rejected", lambda: read_b1(compare, context, context_paths, "B1a"))
+        env["inputs"]["B1a"]["222"]["version"] = 1
+        env["inputs"]["B1a"]["222"]["notebook"] = "04_B1b_LamaHCEExt_Train_Seed222"
+        seal_b1()
+        rejects("B1_wrong_training_notebook_rejected", lambda: read_b1(compare, context, context_paths, "B1a"))
+        env["inputs"]["B1a"]["222"]["notebook"] = "03_B1a_LamaHCEExt_Train_Seed222"
+        env["neuralhydrology_commit_of_runs"] = A4_LIBRARY_COMMIT
+        seal_b1()
+        rejects("B1_wrong_library_commit_rejected", lambda: read_b1(compare, context, context_paths, "B1b"))
+        env["neuralhydrology_commit_of_runs"] = B1_LIBRARY_COMMIT
+        env["inputs"]["a3"]["files"][context_paths[0].name]["sha256"] = "b" * 64
+        seal_b1()
+        rejects("B1_different_A3_context_rejected", lambda: read_b1(compare, context, context_paths, "B1b"))
+        env["inputs"]["a3"]["files"][context_paths[0].name]["sha256"] = sha256(context_paths[0])
+        summary["saved_epoch"]["B1b"]["333"] = 24
+        seal_b1()
+        rejects("B1_selected_epoch_mismatch_rejected", lambda: read_b1(compare, context, context_paths, "B1b"))
+        summary["saved_epoch"]["B1b"]["333"] = 25
+        summary["bstar_threshold_val_nse_sd"] = .5
+        seal_b1()
+        rejects("B1_wrong_B0_validation_std_rejected", lambda: read_b1(compare, context, context_paths, "B1a"))
+        summary["bstar_threshold_val_nse_sd"] = float(np.std([.74, .75, .76], ddof=1))
+        value = summary["contracts"].pop("B1b_333")
+        seal_b1()
+        rejects("B1_missing_shared_summary_contract_rejected", lambda: read_b1(compare, context, context_paths, "B1a"))
+        summary["contracts"]["B1b_333"] = value
+        extra = compare / "contracts/extra.npz"
+        extra.write_bytes(b"not_a_contract")
+        seal_b1()
+        rejects("B1_extra_contract_rejected", lambda: read_b1(compare, context, context_paths, "B1b"))
+        extra.unlink()
+        seal_b1()
+        manifest = pd.read_csv(compare / "manifest.csv")
+        manifest.loc[~manifest["tệp"].str.contains("B1b_seed333")].to_csv(compare / "manifest.csv", index=False)
+        rejects("B1_missing_other_step_manifest_contract_rejected", lambda: read_b1(compare, context, context_paths, "B1a"))
+        seal_b1()
+        (compare / "b1_summary.json").write_text("{}", encoding="utf-8")
+        rejects("B1_manifest_tampering_rejected", lambda: read_b1(compare, context, context_paths, "B1b"))
+        seal_b1()
+        b0_reference = [f for f in compare_models if "_B0_" in f.name]
+        b1_reference = [f for f in compare_models if "_B1b_" in f.name]
+        check_b1_b0_reference(b0_reference, b1_reference)
+        check("B1_B0_reference_consistent_across_Compare", True)
+        for field, wrong in (
+                ("bstar_threshold_val_nse_sd", .5),
+                ("reference_B0_seed_val_nse_median", {"111": .76, "222": .75, "333": .74}),
+                ("reference_B0_saved_epoch", {"111": 24, "222": 25, "333": 25})):
+            changed = replace(b1_reference[0], metadata=dict(b1_reference[0].metadata, **{field: wrong}))
+            rejects(f"B1_B0_cross_Compare_{field}_mismatch_rejected",
+                    lambda: check_b1_b0_reference(b0_reference, [changed]))
+        # B2 dùng đúng schema Compare Version 1, cả tên nhúng trước/sau đổi số.
+        b2 = root / "b2"
+        (b2 / "contracts").mkdir(parents=True)
+        b1_identity = dict(notebook="05_B1_LamaHCEExt_Compare", version=1,
+            summary_sha256=sha256(compare / "b1_summary.json"), environment_sha256=sha256(compare / "environment.json"))
+        b2_val = {"111": .742, "222": .752, "333": .762}
+        b2_delta = dict(comparison="B2 - B1b", B1b_validation_NSE_mean=.75, B2_validation_NSE_mean=.752,
+            validation_NSE_mean_difference=.002, B0_Bstar_threshold=summary["bstar_threshold_val_nse_sd"],
+            common_mask_evaluation_completed=False, Bstar_selected=False)
+        b2_summary = dict(complete=True, step="B2", scope="test_S0_lead1_three_seeds", library_commit=B2_LIBRARY_COMMIT,
+            training_versions_expected={str(s): 1 for s in B2_SEEDS}, contracts={},
+            saved_epoch={str(s): 25 for s in B2_SEEDS}, seed_val_nse_median=b2_val,
+            seed_test_nse_median={str(s): 1. for s in B2_SEEDS}, seed_test_nse_mean=1., seed_test_nse_sd=0.,
+            B1b_source=b1_identity, B1b_validation_comparison=b2_delta, Bstar_selected=False, operational_scenarios_run=False)
+        b2_env = dict(notebook="07_B2_LamaHCEExt_Compare", library_commit_of_runs=B2_LIBRARY_COMMIT,
+            inputs={"B2": {}, "B1_Compare": b1_identity,
+                    "A3": dict(version=1, files={p.name: sha256(p) for p in context_paths})}, Bstar_selected=False)
+        b2_seeds, b2_sources, b2_audits = [], [], []
+        for seed in B2_SEEDS:
+            notebook = f"06_B2_LamaHCEExt_Train_Seed{seed}"
+            embedded = notebook if seed == 111 else f"07_B2_LamaHCEExt_Train_Seed{seed}"
+            source_hash = str(seed)[0] * 64
+            relative = f"contracts/SeqLSTM_Q_B2_seed{seed}_test_S0_lead1.npz"
+            b2_summary["contracts"][str(seed)] = relative
+            b2_env["inputs"]["B2"][str(seed)] = dict(notebook=notebook, version_expected=1,
+                notebook_in_environment=embedded, environment_sha256=source_hash)
+            b2_meta = dict(run=f"SeqLSTM_Q_B2_seed{seed}", period="test", scenario="S0", lead=1,
+                forecast_horizon=1, seed=seed, unit="mm/day_area_gov", config_sha256="a"*64,
+                library_commit=B2_LIBRARY_COMMIT, clip_to_zero=True, selected_epoch=25,
+                training_notebook_metadata=embedded)
+            b2_payload = dict(payload)
+            if seed == 222:
+                # B2 vẫn dự báo ngày có obs nhưng persistence thiếu (Q hôm trước thiếu).
+                changed_sim = context["obs"].copy()
+                gap = np.isfinite(context["obs"]) & ~np.isfinite(context["persistence"])
+                changed_sim[gap] += .2
+                b2_payload.update(sim_raw_mm_day=changed_sim, sim_mm_day=changed_sim)
+            fixture_nse = []
+            for j in range(len(ids)):
+                valid = np.isfinite(context["obs"][:, j]) & np.isfinite(b2_payload["sim_mm_day"][:, j])
+                observed = context["obs"][valid, j]
+                predicted = b2_payload["sim_mm_day"][valid, j]
+                fixture_nse.append(1 - np.sum((predicted - observed)**2) / np.sum((observed - observed.mean())**2))
+            native_median = float(np.nanmedian(fixture_nse))
+            b2_summary["seed_test_nse_median"][str(seed)] = native_median
+            np.savez_compressed(b2 / relative, **b2_payload, metadata_json=json.dumps(b2_meta))
+            b2_seeds.append(dict(seed=seed, selected_epoch=25, validation_NSE_median=b2_val[str(seed)],
+                test_NSE_median=native_median, test_KGE_median=1., train_hours=.1))
+            b2_sources.append(dict(seed=seed, notebook=notebook, version=1, notebook_in_environment=embedded,
+                metadata_name_matches_source=notebook==embedded, environment_sha256=source_hash))
+            b2_audits.append({"hạt giống": seed, "tệp": Path(relative).name, "selected_epoch": 25,
+                "clip_to_zero": True, "dự báo âm trước chặn": 0,
+                "ngày-lưu vực có sim": int(np.isfinite(context["obs"]).sum()), "lỗi hợp đồng": "-",
+                "max |ΔNSE| so với thư viện": 0., "NaN NSE trùng thư viện": True, "mặt nạ obs trùng A3": True,
+                "giá trị obs khớp A3 trong sai số float32": True, "đạt": True,
+                "NSE trung vị từ NPZ (obs A3)": native_median})
+        test_values = list(b2_summary["seed_test_nse_median"].values())
+        b2_summary["seed_test_nse_mean"] = float(np.mean(test_values))
+        b2_summary["seed_test_nse_sd"] = float(np.std(test_values, ddof=1))
+
+        def seal_b2():
+            (b2 / "b2_summary.json").write_text(json.dumps(b2_summary), encoding="utf-8")
+            (b2 / "environment.json").write_text(json.dumps(b2_env), encoding="utf-8")
+            table = pd.DataFrame(b2_seeds)
+            table.to_csv(b2 / "B2_seed_table.csv", index=False)
+            table.drop(columns=["seed", "selected_epoch"]).agg(["mean", "std"]).T.reset_index(names="metric").to_csv(
+                b2 / "B2_seed_stats.csv", index=False)
+            pd.DataFrame(b2_sources).to_csv(b2 / "B2_input_sources.csv", index=False)
+            pd.DataFrame(b2_audits).to_csv(b2 / "B2_contract_check.csv", index=False)
+            pd.DataFrame([b2_delta]).to_csv(b2 / "B2_B1b_reported_summary.csv", index=False)
+            (b2 / "B2_Seeds.png").write_bytes(b"synthetic_image_placeholder_not_experimental_output")
+            pd.DataFrame([dict(file=p.relative_to(b2).as_posix(), bytes=p.stat().st_size, sha256=sha256(p))
+                          for p in sorted(b2.rglob("*")) if p.is_file() and p.name != "manifest.csv"]).to_csv(
+                              b2 / "manifest.csv", index=False)
+
+        seal_b2()
+        b2_models, _, b2_inputs, b2_contracts = read_b2(b2, context, context_paths, b0_reference, compare)
+        check("B2_three_seeds_manifest_and_context", len(b2_models)==3 and b2_inputs.passed.all()
+              and b2_contracts.canonical_context_matches.all())
+        check("B2_preserves_actual_and_embedded_notebook_names", b2_contracts.iloc[1].training_notebook.startswith("06_")
+              and b2_contracts.iloc[1].embedded_training_notebook.startswith("07_"))
+        masked_member = next(f for f in b2_models if f.seed==222)
+        with_persistence = np.nanmedian([metrics(masked_member.obs[:, j], masked_member.sim[:, j],
+            masked_member.persistence[:, j])["NSE"] for j in range(len(ids))])
+        checked_222 = b2_contracts.set_index("seed").loc[222]
+        check("B2_NSE_audit_keeps_obs_sim_days_with_missing_persistence",
+              np.isclose(checked_222.NSE_audit_median, b2_summary["seed_test_nse_median"]["222"], atol=1e-12)
+              and not np.isclose(checked_222.NSE_audit_median, with_persistence, atol=1e-9, rtol=1e-9))
+        for label, owner, key, wrong in (
+            ("training_version", b2_env["inputs"]["B2"]["222"], "version_expected", 2),
+            ("boolean_training_version", b2_env["inputs"]["B2"]["222"], "version_expected", True),
+            ("library_commit", b2_env, "library_commit_of_runs", B1_LIBRARY_COMMIT),
+            ("A3_context", b2_env["inputs"]["A3"]["files"], context_paths[0].name, "b"*64),
+            ("A3_hash_type", b2_env["inputs"]["A3"]["files"], context_paths[0].name, {"sha256": sha256(context_paths[0])}),
+            ("B1_source_hash", b2_summary["B1b_source"], "summary_sha256", "b"*64),
+            ("B0_threshold", b2_delta, "B0_Bstar_threshold", .5),
+            ("selected_epoch", b2_summary["saved_epoch"], "333", 24),
+            ("embedded_name", b2_env["inputs"]["B2"]["333"], "notebook_in_environment", "unknown"),
+            ("audit_NSE", b2_audits[0], "NSE trung vị từ NPZ (obs A3)", .5)):
+            previous = owner[key]
+            owner[key] = wrong
+            seal_b2()
+            rejects(f"B2_wrong_{label}_rejected", lambda: read_b2(b2, context, context_paths, b0_reference, compare))
+            if label == "audit_NSE":
+                try:
+                    read_b2(b2, context, context_paths, b0_reference, compare)
+                except ValueError as error:
+                    check("B2_audit_failure_reports_field_and_values", "audit.NSE_median_obs_sim" in str(error)
+                          and "nhận" in str(error) and "cần" in str(error))
+            owner[key] = previous
+        value = b2_summary["contracts"].pop("333")
+        seal_b2()
+        rejects("B2_missing_seed_rejected", lambda: read_b2(b2, context, context_paths, b0_reference, compare))
+        b2_summary["contracts"]["333"] = value
+        extra = b2 / "contracts/extra.npz"
+        extra.write_bytes(b"not_a_contract")
+        seal_b2()
+        rejects("B2_extra_NPZ_rejected", lambda: read_b2(b2, context, context_paths, b0_reference, compare))
+        extra.unlink()
+        seal_b2()
+        (b2 / "b2_summary.json").write_text("{}", encoding="utf-8")
+        rejects("B2_manifest_tampering_rejected", lambda: read_b2(b2, context, context_paths, b0_reference, compare))
+        seal_b2()
+        # B3: hai mức, ba seed; cùng schema của 09_B3 Compare Version 1.
+        b3 = root / "b3"
+        (b3 / "contracts").mkdir(parents=True)
+        b2_identity = dict(notebook="07_B2_LamaHCEExt_Compare", version=1,
+            summary_sha256=sha256(b2 / "b2_summary.json"), environment_sha256=sha256(b2 / "environment.json"))
+        b3_summary = dict(complete=True, step="B3", scope="test_S0_lead1_two_mask_levels_three_seeds_each",
+            library_commit=B3_LIBRARY_COMMIT, B2_source=b2_identity, mask_levels={},
+            bstar_threshold_val_nse_sd=summary["bstar_threshold_val_nse_sd"],
+            Bstar_selected=False, operational_scenarios_run=False, multi_lead_run=False)
+        b3_env = dict(notebook="09_B3_LamaHCEExt_Compare", library_commit_of_runs=B3_LIBRARY_COMMIT,
+            inputs={"B3": {}, "B2_Compare": b2_identity, "A3": {"version": 1,
+                    "files": {p.name: sha256(p) for p in context_paths}}}, Bstar_selected=False)
+        b3_seed_rows, b3_sources, b3_audits, b3_deltas = [], [], [], []
+        for level, (p_step, p_sequence) in B3_MASKS.items():
+            block = dict(nan_step_probability=p_step, nan_sequence_probability=p_sequence,
+                training_versions_expected={}, saved_epoch={}, seed_val_nse_median={}, seed_test_nse_median={}, contracts={})
+            b3_summary["mask_levels"][level] = block
+            b3_env["inputs"]["B3"][level] = {}
+            for j, seed in enumerate(B3_SEEDS):
+                key = str(seed)
+                notebook = f"08_B3_LamaHCEExt_Train_{level}_Seed{seed}"
+                relative = f"contracts/SeqLSTM_Q_B3_{level}_seed{seed}_test_S0_lead1.npz"
+                with np.load(b2 / f"contracts/SeqLSTM_Q_B2_seed{seed}_test_S0_lead1.npz", allow_pickle=False) as data:
+                    b3_payload = {k: np.array(data[k]) for k in data.files if k != "metadata_json"}
+                raw = b3_payload["sim_raw_mm_day"].copy() + (j+1) * .003
+                sim = np.maximum(raw, 0)
+                b3_payload.update(sim_raw_mm_day=raw, sim_mm_day=sim)
+                native_nse = float(np.nanmedian([metrics(context["obs"][:, k], sim[:, k])["NSE"] for k in range(len(ids))]))
+                epoch = (23,19,14)[j] if level == "P10S12" else (14,11,9)[j]
+                meta = dict(run=f"SeqLSTM_Q_B3_{level}_seed{seed}", period="test", scenario="S0", lead=1,
+                    forecast_horizon=1, seed=seed, unit="mm/day_area_gov", config_sha256="c"*64,
+                    library_commit=B3_LIBRARY_COMMIT, clip_to_zero=True, selected_epoch=epoch, step="B3", mask_level=level,
+                    nan_step_probability=p_step, nan_sequence_probability=p_sequence, training_notebook_metadata=notebook)
+                np.savez_compressed(b3 / relative, **b3_payload, metadata_json=json.dumps(meta))
+                own_hash = ("d" if level=="P10S12" else "e") * 64
+                b3_env["inputs"]["B3"][level][key] = dict(notebook=notebook, version_expected=1, environment_sha256=own_hash)
+                block["training_versions_expected"][key] = 1
+                block["saved_epoch"][key] = epoch
+                block["seed_val_nse_median"][key] = .745+j*.005
+                block["seed_test_nse_median"][key] = native_nse
+                block["contracts"][key] = relative
+                b3_seed_rows.append(dict(mask_level=level, seed=seed, selected_epoch=epoch, nan_step_probability=p_step,
+                    nan_sequence_probability=p_sequence, validation_NSE_median=block["seed_val_nse_median"][key],
+                    test_NSE_median=native_nse, test_KGE_median=.8+j*.005, train_hours=.1+j*.01))
+                b3_sources.append(dict(mask_level=level, seed=seed, notebook=notebook, version_expected=1,
+                    environment_sha256=own_hash, B2_environment_sha256=b2_env["inputs"]["B2"][key]["environment_sha256"]))
+                b3_audits.append({"mask_level": level, "hạt giống": seed, "tệp": Path(relative).name,
+                    "selected_epoch": epoch, "clip_to_zero": True, "dự báo âm trước chặn": int((raw<0).sum()),
+                    "ngày-lưu vực có sim": int(np.isfinite(sim).sum()), "lỗi hợp đồng": "-",
+                    "max |ΔNSE| so với thư viện": 0., "NaN NSE trùng thư viện": True, "mặt nạ obs trùng A3": True,
+                    "giá trị obs khớp A3 trong sai số float32": True, "đạt": True,
+                    "NSE trung vị obs run (đối chiếu thư viện)": native_nse,
+                    "NSE trung vị từ NPZ (obs A3)": native_nse})
+            value = float(np.mean(list(block["seed_val_nse_median"].values())))
+            reference_value = float(np.mean(list(b2_summary["seed_val_nse_median"].values())))
+            b3_deltas.append(dict(comparison=f"B3 {level} - B2", B2_validation_NSE_mean=reference_value,
+                B3_validation_NSE_mean=value, validation_NSE_mean_difference=value-reference_value,
+                B0_Bstar_threshold=summary["bstar_threshold_val_nse_sd"],
+                common_mask_evaluation_completed=False, Bstar_selected=False))
+
+        def seal_b3():
+            (b3 / "b3_summary.json").write_text(json.dumps(b3_summary), encoding="utf-8")
+            (b3 / "environment.json").write_text(json.dumps(b3_env), encoding="utf-8")
+            seed_table = pd.DataFrame(b3_seed_rows)
+            seed_table.to_csv(b3 / "B3_seed_table.csv", index=False)
+            stats_table = seed_table.melt(id_vars=["mask_level","seed"],
+                value_vars=["validation_NSE_median","test_NSE_median","test_KGE_median","train_hours"], var_name="metric")
+            stats_table.groupby(["mask_level","metric"],sort=False)["value"].agg(["mean","std"]).reset_index().to_csv(
+                b3 / "B3_seed_stats.csv", index=False)
+            pd.DataFrame(b3_sources).to_csv(b3 / "B3_input_sources.csv", index=False)
+            pd.DataFrame(b3_audits).to_csv(b3 / "B3_contract_check.csv", index=False)
+            pd.DataFrame(b3_deltas).to_csv(b3 / "B3_B2_reported_summary.csv", index=False)
+            (b3 / "B3_Seeds.png").write_bytes(b"synthetic_plot_placeholder_not_experimental_output")
+            pd.DataFrame([dict(file=p.relative_to(b3).as_posix(),bytes=p.stat().st_size,sha256=sha256(p))
+                          for p in sorted(b3.rglob("*")) if p.is_file() and p.name!="manifest.csv"]).to_csv(b3 / "manifest.csv",index=False)
+
+        seal_b3()
+        b3_models, _, b3_inputs, b3_contracts = read_b3(b3, context, context_paths, b0_reference, b2)
+        check("B3_six_contracts_two_levels_three_seeds", len(b3_models)==6 and b3_inputs.passed.all()
+              and b3_contracts.canonical_context_matches.all())
+        check("B3_audit_obs_sim_without_persistence", b3_contracts.NSE_audit_abs_difference.le(1e-12).all()
+              and b3_contracts.loc[b3_contracts.seed.eq(222),"NSE_audit_median"].lt(1.).all())
+        for label, target, key, wrong in (
+            ("wrong_mask", b3_summary["mask_levels"]["P10S12"], "nan_step_probability", .2),
+            ("wrong_version", b3_summary["mask_levels"]["P05S05"]["training_versions_expected"], "111", 2),
+            ("boolean_version", b3_env["inputs"]["B3"]["P10S12"]["111"], "version_expected", True),
+            ("wrong_A3_hash", b3_env["inputs"]["A3"]["files"], "A3_persistence_predictions.npz", "0"*64),
+            ("wrong_B2_hash", b3_summary["B2_source"], "summary_sha256", "0"*64),
+            ("wrong_B0_threshold", b3_summary, "bstar_threshold_val_nse_sd", .5),
+            ("wrong_source_B2_environment", b3_sources[0], "B2_environment_sha256", "0"*64),
+            ("wrong_source_notebook", b3_sources[0], "notebook", "unknown"),
+            ("wrong_seed_mask", b3_seed_rows[0], "nan_sequence_probability", .5),
+            ("wrong_negative_count", b3_audits[0], "dự báo âm trước chặn", 123),
+            ("wrong_audit_NSE", b3_audits[1], "NSE trung vị từ NPZ (obs A3)", .5),
+            ("failed_audit", b3_audits[0], "đạt", False),
+            ("wrong_delta", b3_deltas[0], "validation_NSE_mean_difference", .1),
+            ("premature_Bstar", b3_summary, "Bstar_selected", True)):
+            previous = target[key]
+            target[key] = wrong
+            seal_b3()
+            rejects(f"B3_{label}_rejected", lambda: read_b3(b3, context, context_paths, b0_reference, b2))
+            target[key] = previous
+        seal_b3()
+        special = b3 / b3_summary["mask_levels"]["P10S12"]["contracts"]["111"]
+        original = special.read_bytes()
+        with np.load(special,allow_pickle=False) as data:
+            b3_payload = {k:np.array(data[k]) for k in data.files if k!="metadata_json"}
+            original_meta = json.loads(str(data["metadata_json"].item()))
+        for key, wrong in (("mask_level","P05S05"),("nan_sequence_probability",.05),("selected_epoch",True),
+                           ("library_commit","f229e02"),("training_notebook_metadata","unknown")):
+            changed = dict(original_meta,**{key:wrong})
+            np.savez_compressed(special,**b3_payload,metadata_json=json.dumps(changed))
+            seal_b3()
+            rejects(f"B3_contract_{key}_rejected",lambda:read_b3(b3,context,context_paths,b0_reference,b2))
+        special.write_bytes(original)
+        extra = b3 / "contracts/extra.npz"
+        extra.write_bytes(b"invalid")
+        seal_b3()
+        rejects("B3_extra_contract_rejected",lambda:read_b3(b3,context,context_paths,b0_reference,b2))
+        extra.unlink()
+        seal_b3()
+        special.unlink()
+        seal_b3()
+        rejects("B3_missing_contract_rejected",lambda:read_b3(b3,context,context_paths,b0_reference,b2))
+        special.write_bytes(original)
+        seal_b3()
+        (b3 / "b3_summary.json").write_text("{}",encoding="utf-8")
+        rejects("B3_manifest_tampering_rejected",lambda:read_b3(b3,context,context_paths,b0_reference,b2))
+        seal_b3()
+
         level_table = pd.DataFrame(dict(basin_id=ids, reference_start="1981-01-01", reference_end="2013-12-31",
                                        q30_mm_day=[.8, 1.5], q80_mm_day=[1.2, 2.3], q98_mm_day=[1.35, 2.7]))
         level_table.to_csv(a1 / "A1_P10_qmax_level_thresholds.csv", index=False)
@@ -1255,11 +1998,23 @@ def self_test():
                     raw=context["persistence"] * .8, **context).validate()]
         expanded_tables, expanded_mask = evaluate_group(expanded, levels, floods)
         expanded_pairs = pairwise_tests(expanded_tables["metrics"])
-        check("A4_B0_scored_together_17_runs", len(expanded) == 17
-              and expanded_tables["metrics"].run.nunique() == 17
+        check("A4_B0_B1_scored_together_23_runs", len(expanded) == 23
+              and expanded_tables["metrics"].run.nunique() == 23
               and np.array_equal(expanded_mask, shared))
-        check("A4_B0_Holm_120_pairs_per_metric", set(expanded_pairs.planned_family_size) == {120}
-              and len(expanded_pairs) == 360)
+        check("A4_B0_B1_Holm_231_pairs_per_metric", set(expanded_pairs.planned_family_size) == {231}
+              and len(expanded_pairs) == 693)
+        b2_tables, b2_mask = evaluate_group(expanded + b2_models, levels, floods)
+        b2_pairs = pairwise_tests(b2_tables["metrics"])
+        check("A4_B0_B1_B2_scored_together_26_runs", b2_tables["metrics"].run.nunique()==26
+              and np.array_equal(b2_mask, shared))
+        check("A4_B0_B1_B2_Holm_300_pairs_per_metric", set(b2_pairs.planned_family_size)=={300} and len(b2_pairs)==900)
+
+        b3_tables, b3_mask = evaluate_group(expanded + b2_models + b3_models, levels, floods)
+        b3_pairs = pairwise_tests(b3_tables["metrics"])
+        check("A4_B0_B1_B2_B3_scored_together_32_runs", b3_tables["metrics"].run.nunique()==32
+              and np.array_equal(b3_mask,b2_mask))
+        check("A4_B0_B1_B2_B3_Holm_465_pairs_per_metric", set(b3_pairs.planned_family_size)=={465}
+              and len(b3_pairs)==1395)
 
         for lead in range(1, 8):
             contract_path = root / f"lead{lead}.npz"
@@ -1462,7 +2217,7 @@ def draw_figures(table, output):
     import matplotlib.pyplot as plt
     rows = []
     for group, part in table.loc[table.scope.eq("common_source_all")].groupby(["period", "scenario", "lead"], sort=False):
-        fig, axes = plt.subplots(1, 3, figsize=(16, 5))
+        fig, axes = plt.subplots(1, 3, figsize=(16, max(5, .16*part.run.nunique()+.5)))
         styles = {"SeqLSTM_Q": ("#0072B2", "-"), "SeqLSTM_noQ": ("#56B4E9", "--"),
                   "EncDec_Q": ("#009E73", "-"), "EncDec_noQ": ("#E69F00", "--"),
                   "D_FC": ("#9467BD", "-"), "D_RA": ("#CC79A7", "-"),
@@ -1470,6 +2225,11 @@ def draw_figures(table, output):
         for seed, linestyle in zip(A4_SEEDS, ("--", "-.", ":")):
             styles[f"SeqLSTM_Q_A4_seed{seed}"] = ("#0072B2", linestyle)
             styles[f"SeqLSTM_Q_B0_seed{seed}"] = ("#8C564B", linestyle)
+            styles[f"SeqLSTM_Q_B1a_seed{seed}"] = ("#009E73", linestyle)
+            styles[f"SeqLSTM_Q_B1b_seed{seed}"] = ("#CC79A7", linestyle)
+            styles[f"SeqLSTM_Q_B2_seed{seed}"] = ("#6F4E7C", linestyle)
+            styles[f"SeqLSTM_Q_B3_P10S12_seed{seed}"] = ("#A50F15", linestyle)
+            styles[f"SeqLSTM_Q_B3_P05S05_seed{seed}"] = ("#008B8B", linestyle)
             styles[f"DLinear_seed_{seed}"] = ("#D55E00", linestyle)
         for panel, (ax, metric) in enumerate(zip(axes, ("NSE", "PNSE", "KGE"))):
             for run, data in part.groupby("run", sort=False):
@@ -1477,7 +2237,9 @@ def draw_figures(table, output):
                 if len(finite):
                     y = np.arange(1, len(finite) + 1) / len(finite)
                     color, linestyle = styles.get(run, (None, "-"))
-                    label = run.replace("SeqLSTM_Q_A4_seed", "SeqLSTM_Q A4 ").replace("SeqLSTM_Q_B0_seed", "SeqLSTM_Q B0 ")
+                    label = run.replace("SeqLSTM_Q_A4_seed", "SeqLSTM_Q A4 ").replace("SeqLSTM_Q_B0_seed", "SeqLSTM_Q B0 ").replace("SeqLSTM_Q_B1a_seed", "SeqLSTM_Q B1a ").replace("SeqLSTM_Q_B1b_seed", "SeqLSTM_Q B1b ").replace("SeqLSTM_Q_B2_seed", "SeqLSTM_Q B2 ")
+                    if run.startswith("SeqLSTM_Q_B3_"):
+                        label = run.replace("SeqLSTM_Q_B3_", "SeqLSTM_Q B3 ").replace("_seed", " ")
                     ax.step(finite, y, where="post", color=color, linestyle=linestyle,
                             label=f"{label} (n={len(finite)})")
                     rows.extend(dict(period=group[0], scenario=group[1], lead=group[2], run=run, metric=metric,
@@ -1504,20 +2266,20 @@ def draw_figures(table, output):
 # %% [markdown]
 # ### 11.1. Kiểm đầu vào, chấm và lưu kết quả
 #
-# Chạy toàn bộ notebook từ đầu trong phiên sạch. Luồng thực thi kiểm các ví dụ số, đọc năm nguồn Output, chấm dự báo, đối chiếu A3 và xuất bảng/hình.
+# Chạy toàn bộ notebook từ đầu trong phiên sạch. Luồng thực thi kiểm các ví dụ số, đọc bảy nguồn Output, chấm dự báo, đối chiếu A3 và xuất bảng/hình.
 #
-# Kết luận cuối ghi trạng thái hoàn thành, số run, giao ngày chấm, kết quả kiểm A4/B0 và phạm vi kịch bản/hạn đã chạy. `complete=true` chỉ được ghi khi toàn bộ bước kiểm và chấm đã thành công. Các bảng `scenario_changes` có thể rỗng khi chỉ có S0.
+# Kết luận cuối ghi trạng thái hoàn thành, số run, giao ngày chấm, kết quả kiểm A4/B0/B1/B2/B3 và phạm vi kịch bản/hạn đã chạy. `complete=true` chỉ được ghi khi toàn bộ bước kiểm và chấm đã thành công. Các bảng `scenario_changes` có thể rỗng khi chỉ có S0.
 #
 # Sau khi chạy thành công, lưu bằng Save & Run All trong chính notebook này. Kết quả test dùng báo cáo; lựa chọn checkpoint và ngưỡng B* dựa trên validation.
 
 # %% Phần 11.1 - Điều phối và lưu kết quả trực tiếp
 # Mọi dữ liệu giả chỉ ở self_test; trạng thái thực nghiệm chỉ đặt sau khi đọc/chấm thành công.
 def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra_contracts=(), *,
-        a4_root=None, b0_root=None, expected_ids=451):
+        a4_root=None, b0_root=None, b1_root=None, b2_root=None, b3_root=None, expected_ids=451):
     output = Path(output_root)
     output.mkdir(parents=True, exist_ok=True)
     (output / "Evaluation_summary.json").write_text(
-        json.dumps(dict(complete=False, status="incomplete", expected_A4_seeds=list(A4_SEEDS), expected_B0_seeds=list(B0_SEEDS)), indent=2),
+        json.dumps(dict(complete=False, status="incomplete", expected_A4_seeds=list(A4_SEEDS), expected_B0_seeds=list(B0_SEEDS), expected_B1_steps=list(B1_STEPS), expected_B2_seeds=list(B2_SEEDS), expected_B3_masks=list(B3_MASKS)), indent=2),
         encoding="utf-8")
     checks = self_test()
     checks.to_csv(output / "Evaluation_checks.csv", index=False, encoding="utf-8-sig")
@@ -1526,11 +2288,14 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     a1_root = Path(a1_root) if a1_root else unique_file(input_root, "A1_P10_qmax_level_thresholds.csv").parent
     a4_root = unique_file(a4_root or input_root, "a4_summary.json").parent
     b0_root = unique_file(b0_root or input_root, "b0_summary.json").parent
+    b1_root = unique_file(b1_root or input_root, "b1_summary.json").parent
+    b2_root = unique_file(b2_root or input_root, "b2_summary.json").parent
+    b3_root = unique_file(b3_root or input_root, "b3_summary.json").parent
     context, paths = read_context(a3_root)
     context_paths = list(paths)
     if len(context["ids"]) != expected_ids:
         raise ValueError(f"Danh sách có {len(context['ids'])} ID, kỳ vọng {expected_ids}")
-    print("Phần 1–2: kiểm thử đạt; nguồn A1/A2/A3/A4/B0 Compare:", a1_root, a2_root, a3_root, a4_root, b0_root, sep="\n")
+    print("Phần 1–2: kiểm thử đạt; nguồn A1/A2/A3/A4/B0/B1/B2/B3 Compare:", a1_root, a2_root, a3_root, a4_root, b0_root, b1_root, b2_root, b3_root, sep="\n")
     levels, floods, threshold_paths = read_thresholds(a1_root, context["ids"])
     paths.extend(threshold_paths)
     forecasts, read_paths = read_a2(a2_root, context)
@@ -1558,6 +2323,33 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     show_table("Phần 8.4 - Ba hợp đồng LSTM B0", b0_contract_check[[
         "run", "seed", "selected_epoch", "training_notebook_version", "IDs", "target_days",
         "finite_prediction_day_IDs", "canonical_context_matches"]])
+    b1_forecasts, b1_checks = {}, {}
+    for step in B1_STEPS:
+        members, read_paths, input_check, contract_check = read_b1(b1_root, context, context_paths, step)
+        check_b1_b0_reference(b0_forecasts, members)
+        b1_forecasts[step], b1_checks[step] = members, (input_check, contract_check)
+        forecasts.extend(members)
+        paths.extend(read_paths)
+        show_table(f"Phần 8.4 - Manifest {step} và nguồn A3", input_check[["kind", "file", "passed"]])
+        show_table(f"Phần 8.4 - Ba hợp đồng LSTM {step}", contract_check[[
+            "run", "seed", "selected_epoch", "training_notebook_version", "IDs", "target_days",
+            "finite_prediction_day_IDs", "canonical_context_matches"]])
+    b2_forecasts, read_paths, b2_input_check, b2_contract_check = read_b2(
+        b2_root, context, context_paths, b0_forecasts, b1_root)
+    forecasts.extend(b2_forecasts)
+    paths.extend(read_paths)
+    show_table("Phần 8.4 - Manifest B2 và nguồn A3/B1", b2_input_check[["kind", "file", "passed"]])
+    show_table("Phần 8.4 - Ba hợp đồng LSTM B2", b2_contract_check[[
+        "run", "seed", "selected_epoch", "training_notebook_version", "IDs", "target_days",
+        "finite_prediction_day_IDs", "paired_obs_prediction_day_IDs", "NSE_audit_abs_difference", "canonical_context_matches"]])
+    b3_forecasts, read_paths, b3_input_check, b3_contract_check = read_b3(
+        b3_root, context, context_paths, b0_forecasts, b2_root)
+    forecasts.extend(b3_forecasts)
+    paths.extend(read_paths)
+    show_table("Phần 8.4 - Manifest B3 và nguồn A3/B2", b3_input_check[["kind", "file", "passed"]])
+    show_table("Phần 8.4 - Sáu hợp đồng LSTM B3", b3_contract_check[[
+        "run", "mask_level", "seed", "selected_epoch", "training_notebook_version", "IDs", "target_days",
+        "finite_prediction_day_IDs", "paired_obs_prediction_day_IDs", "NSE_audit_abs_difference", "canonical_context_matches"]])
     for path in extra_contracts:
         forecast = read_contract(path)
         if forecast.ids != context["ids"]:
@@ -1602,8 +2394,15 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     results["A4_contract_check"] = a4_contract_check
     results["B0_input_check"] = b0_input_check
     results["B0_contract_check"] = b0_contract_check
+    results["B2_input_check"] = b2_input_check
+    results["B2_contract_check"] = b2_contract_check
+    results["B3_input_check"] = b3_input_check
+    results["B3_contract_check"] = b3_contract_check
+    for step, (input_check, contract_check) in b1_checks.items():
+        results[f"{step}_input_check"] = input_check
+        results[f"{step}_contract_check"] = contract_check
     reference_table = results["metrics"]
-    if a4_forecasts or b0_forecasts or extra_contracts:
+    if a4_forecasts or b0_forecasts or b1_forecasts or b2_forecasts or b3_forecasts or extra_contracts:
         shared = common_mask(a3_only)
         reference_table = pd.DataFrame([
             dict(run=f.name, period="test", scenario="S0", lead=1, scope="common_source_all", basin_id=identifier,
@@ -1643,6 +2442,12 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
                     censored_events="excluded_from_scores_and_counted_separately",
                     holm_family="all_unordered_run_pairs_excluding_qmean_aux_per_metric_period_scenario_lead",
                     holm_family_size="finite_p_values_only_NaN_excluded_planned_size_reported_separately",
+                    B1_compare_version_expected=B1_COMPARE_VERSION,
+                    B1_input_verification="manifest_SHA256_same_A3_context_and_B0_validation_seed_std",
+                    B3_compare_version_expected=B3_COMPARE_VERSION,
+                    B3_input_verification="manifest_bytes_SHA256_same_A3_B2_Compare_B0_threshold_masks_and_obs_sim_NSE_audit",
+                    B2_compare_version_expected=B2_COMPARE_VERSION,
+                    B2_input_verification="manifest_bytes_SHA256_same_A3_B1_Compare_B0_threshold_and_contract_audit",
                     B0_compare_version_expected=B0_COMPARE_VERSION,
                     B0_bstar_threshold_val_nse_sd=b0_forecasts[0].metadata["bstar_threshold_val_nse_sd"],
                     B0_input_verification="manifest_SHA256_same_A3_context_and_validation_seed_std",
@@ -1663,6 +2468,17 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
                    fixture_checks=int(len(checks)), A3_reference_matched=True,
                    A4_contracts_matched=bool(a4_contract_check.canonical_context_matches.all()),
                    A4_runs=[f.name for f in a4_forecasts],
+                   B3_contracts_matched=bool(b3_contract_check.canonical_context_matches.all()),
+                   B3_runs=[f.name for f in b3_forecasts],
+                   B3_runs_by_mask={level:[f.name for f in b3_forecasts if f.metadata["mask_level"]==level] for level in B3_MASKS},
+                   B3_compare_version_expected=B3_COMPARE_VERSION,
+                   B2_contracts_matched=bool(b2_contract_check.canonical_context_matches.all()),
+                   B2_runs=[f.name for f in b2_forecasts],
+                   B2_compare_version_expected=B2_COMPARE_VERSION,
+                   B1_contracts_matched=all(bool(c.canonical_context_matches.all()) for _, c in b1_checks.values()),
+                   B1a_runs=[f.name for f in b1_forecasts["B1a"]],
+                   B1b_runs=[f.name for f in b1_forecasts["B1b"]],
+                   B1_compare_version_expected=B1_COMPARE_VERSION,
                    B0_contracts_matched=bool(b0_contract_check.canonical_context_matches.all()),
                    B0_runs=[f.name for f in b0_forecasts],
                    B0_compare_version_expected=B0_COMPARE_VERSION,
@@ -1690,12 +2506,16 @@ def main():
     parser.add_argument("--a3")
     parser.add_argument("--a4")
     parser.add_argument("--b0")
+    parser.add_argument("--b1")
+    parser.add_argument("--b2")
+    parser.add_argument("--b3")
     parser.add_argument("--extra-contract", action="append", default=[])
     args = parser.parse_args([] if "ipykernel" in sys.modules else None)
     if args.self_test:
         print(self_test().to_string(index=False))
     else:
-        run(args.input, args.output, args.a1, args.a2, args.a3, args.extra_contract, a4_root=args.a4, b0_root=args.b0)
+        run(args.input, args.output, args.a1, args.a2, args.a3, args.extra_contract, a4_root=args.a4,
+            b0_root=args.b0, b1_root=args.b1, b2_root=args.b2, b3_root=args.b3)
 
 
 if __name__ == "__main__":

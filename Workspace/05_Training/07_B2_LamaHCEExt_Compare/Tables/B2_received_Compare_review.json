@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-31",
+  "scope": "received_5_CSV_1_JSON_1_PNG_and_pasted_Compare_log",
+  "checks_passed": 48,
+  "checks": [
+    "B2_B1b_reported_summary.csv_size_and_printed_SHA_prefix",
+    "B2_contract_check.csv_size_and_printed_SHA_prefix",
+    "B2_input_sources.csv_size_and_printed_SHA_prefix",
+    "B2_seed_stats.csv_size_and_printed_SHA_prefix",
+    "B2_seed_table.csv_size_and_printed_SHA_prefix",
+    "b2_summary.json_size_and_printed_SHA_prefix",
+    "B2_Seeds.png_size_and_printed_SHA_prefix",
+    "summary_scope_commit",
+    "three_seed_rows",
+    "seed_111_epoch",
+    "seed_111_summary_scores",
+    "seed_111_training_version",
+    "seed_222_epoch",
+    "seed_222_summary_scores",
+    "seed_222_training_version",
+    "seed_333_epoch",
+    "seed_333_summary_scores",
+    "seed_333_training_version",
+    "stats_validation_NSE_median",
+    "stats_test_NSE_median",
+    "stats_test_KGE_median",
+    "stats_train_hours",
+    "summary_test_mean_sd",
+    "three_contract_rows",
+    "contract_111_flags",
+    "contract_111_identity_coverage",
+    "contract_111_native_NSE_recalculation",
+    "contract_111_negative_count",
+    "contract_222_flags",
+    "contract_222_identity_coverage",
+    "contract_222_native_NSE_recalculation",
+    "contract_222_negative_count",
+    "contract_333_flags",
+    "contract_333_identity_coverage",
+    "contract_333_native_NSE_recalculation",
+    "contract_333_negative_count",
+    "source_111_known_rename",
+    "source_111_environment_hash_matches_training_log",
+    "source_222_known_rename",
+    "source_222_environment_hash_matches_training_log",
+    "source_333_known_rename",
+    "source_333_environment_hash_matches_training_log",
+    "delta_B1b_validation_NSE_mean",
+    "delta_B2_validation_NSE_mean",
+    "delta_validation_NSE_mean_difference",
+    "delta_B0_Bstar_threshold",
+    "validation_delta",
+    "no_Bstar_or_common_mask_claim"
+  ],
+  "source_files": {
+    "B2_B1b_reported_summary.csv": {
+      "bytes": 258,
+      "sha256": "1e6d5357702b260ea3cbdd38b98791196964d138d73c88731c804045c502f1fa",
+      "printed_sha256_prefix": "1e6d5357702b"
+    },
+    "B2_contract_check.csv": {
+      "bytes": 906,
+      "sha256": "40c2c4da2dcb01ca627330efd1a7091bb69a7381acaa1612fb26193267f87540",
+      "printed_sha256_prefix": "40c2c4da2dcb"
+    },
+    "B2_input_sources.csv": {
+      "bytes": 511,
+      "sha256": "59053cd2c6038c7b09b4570765531ca3e40e520a60ef990ff7888d46cac91d89",
+      "printed_sha256_prefix": "59053cd2c603"
+    },
+    "B2_seed_stats.csv": {
+      "bytes": 240,
+      "sha256": "04b5fa6876c79f9d6d59975ef90b8316b3b090c3b23d3907298be241759b8d7c",
+      "printed_sha256_prefix": "04b5fa6876c7"
+    },
+    "B2_seed_table.csv": {
+      "bytes": 334,
+      "sha256": "f1c433a23ec0279804a1724917acc9bbef1ec6f68c44bf65fbcd8860150fbeb9",
+      "printed_sha256_prefix": "f1c433a23ec0"
+    },
+    "b2_summary.json": {
+      "bytes": 1521,
+      "sha256": "b8c4ac9a3f3ef68c33711f4af8e575f7620c706e7f64fedb03c34b630a47973c",
+      "printed_sha256_prefix": "b8c4ac9a3f3e"
+    },
+    "B2_Seeds.png": {
+      "bytes": 148511,
+      "sha256": "c9aad494059c0aa1a056bdc0e8ad58b29702515e7b3eef6b631d5f444dfb0509",
+      "printed_sha256_prefix": "c9aad494059c"
+    }
+  },
+  "original_NPZ_environment_manifest_received_locally": false,
+  "Compare_Save_Version_confirmed": 1,
+  "figure_review": "Readable axes/legend; validation checkpoints 13/12/7 agree with training; no test-based selection",
+  "native_and_canonical_obs_scores_reported_separately": true,
+  "metadata_name_matches_source_false_explained_by_known_07_to_06_rename": true,
+  "common_daily_mask_evaluation_completed": false,
+  "Bstar_selected": false,
+  "Compare_notebook": "07_B2_LamaHCEExt_Compare",
+  "Compare_Save_Version_confirmation_source": "user_message_2026-10-31"
+}

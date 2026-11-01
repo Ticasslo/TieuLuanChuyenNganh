@@ -1,0 +1,82 @@
+{
+  "scope": "CPU_regression_of_integrated_B2_B3_generic_core_helper_and_research_resume",
+  "date": "2026-11-01",
+  "library_commit": "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1",
+  "research_base": "5844037",
+  "B2_B3_saved_experiment_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+  "python": "3.12.6",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "libraries": {
+    "torch": "2.9.1+cpu",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "xarray": "2026.9.0",
+    "scipy": "1.16.3"
+  },
+  "pytest": {
+    "collected": 102,
+    "selected": 98,
+    "passed": 97,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1,
+    "deselected": 4,
+    "seconds": 65.169,
+    "test_counts_by_module": {
+      "test.test_b2_source_inputs": 14,
+      "test.test_b2_c_builder": 15,
+      "test.test_b3_masking": 8,
+      "test.test_sequential_forecast": 43,
+      "test.test_resume": 5,
+      "test.test_gpu_loader": 9,
+      "test.test_best_model": 4
+    },
+    "skip": "CUDA unavailable on local CPU",
+    "deselection": "Four DataLoader num_workers=2 cases hung on this Windows runner; no pass claimed; num_workers=0 cases included.",
+    "filter": "not (test_training_batches and 2-) and not (test_training_and_evaluation_identical and 2-)",
+    "log_post_exit_warning": "pyreadline3 Console destructor WinError; pytest and runner exit code 0"
+  },
+  "C_builder_new_checks": 15,
+  "B3_masking_checks": 8,
+  "generic_forecast_checks": 43,
+  "resume_checks": 5,
+  "T4_evidence_scope": {
+    "commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+    "received_setup_output_passed": {
+      "source_and_core_checks": 57,
+      "long_training_checks": 4
+    },
+    "new_C_helper_tested_on_CUDA": false,
+    "Mamba_actual_forward_tested_locally": false
+  },
+  "API": {
+    "models": [
+      "sequential_forecast_lstm",
+      "sequential_forecast"
+    ],
+    "preserve_masking_default": false,
+    "B3_for_C_requires": "configure_lamah_b2(cfg, preserve_masking=True)",
+    "protocol": "one-day forecast, sequence length 365, 30 epochs; B* selection remains separate"
+  },
+  "changed_source_sha256_lf": {
+    "neuralhydrology/datautils/source_groups.py": "2cecdf5721b6f492cfb090c0578baacb128ee1dee936441fed8718b7771c82c0",
+    "test/test_b2_c_builder.py": "eac246264aa1ba01b33a33edae59eec21c2c50af29804bcf2238d2c44c5a4cc0",
+    "test/test_b3_masking.py": "3073e65c5625ca8e63807310add86df033f3b9b8ac957917d19ec5523da5338a"
+  },
+  "evidence_files": {
+    "B2_C_integration_pytest.xml": {
+      "bytes": 11646,
+      "sha256": "d81df6a87f4c331da233841b773400f32bf0c3a2ea25eae6ce7d1831fae0857f"
+    },
+    "B2_C_integration_pytest.log": {
+      "bytes": 523,
+      "sha256": "ce20ce7d3e8c2a1efcea56c90f0c93af7aead7dc4efa9f5fff0dd8051b75c96b"
+    },
+    "B_publication_source_checks.json": {
+      "bytes": 2410,
+      "sha256": "892003ed085fa7e649b5339c4d6a7e404a91e8ebc8e81ba0f90a6071f24f2fe7"
+    }
+  },
+  "passed_for_documented_CPU_scope": true,
+  "Bstar_selected": false
+}

@@ -1,0 +1,649 @@
+[
+  {
+    "run": "SeqLSTM_Q",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "415e417818bd6c97d51d9787793c4c919bf960e35c3abd33a52df8eac2e7b5af",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/SeqLSTM_Q/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "SeqLSTM_noQ",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "645bf04a9edfa17d8eae68064ab5abff6a65d63bf2b609c3786b170ce1938d16",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/SeqLSTM_noQ/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "EncDec_Q",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "9762066afaaa7260dd9cb65759c1725a9b765de06974638cc9802a9071d74693",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/EncDec_Q/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "EncDec_noQ",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "1636a5cc0dcb73793cd59b80106671f6fa1c7d3dd2044885c2d92fe4b5a9b346",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/EncDec_noQ/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "D_FC",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "bcd348c2aa94cb12be2a9fdfe84955761c9d9b35c3a085f2cdcc927383728b72",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/D_FC/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "D_RA",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "config_sha256": "37fa1e8912443a7c928c7ce0465f3aae30aa99629bb0b7c9539525116f514565",
+      "source": "/kaggle/input/notebooks/hunhngcthng/01-a2-lamahceext-reproduce/a2_output/runs/D_RA/test_results.p",
+      "clip_to_zero": true
+    }
+  },
+  {
+    "run": "DLinear_seed_111",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 111,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/02-a3-lamahceext-benchmarks/a3_output/dlinear/seed_111/test_predictions.npz",
+      "config_sha256": "0640b77b27ff9799d336220ae01ed3c3bf26d5db0dc92ef4349cf11caad396f4",
+      "selected_epoch": 4
+    }
+  },
+  {
+    "run": "DLinear_seed_222",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 222,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/02-a3-lamahceext-benchmarks/a3_output/dlinear/seed_222/test_predictions.npz",
+      "config_sha256": "0640b77b27ff9799d336220ae01ed3c3bf26d5db0dc92ef4349cf11caad396f4",
+      "selected_epoch": 2
+    }
+  },
+  {
+    "run": "DLinear_seed_333",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 333,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/02-a3-lamahceext-benchmarks/a3_output/dlinear/seed_333/test_predictions.npz",
+      "config_sha256": "0640b77b27ff9799d336220ae01ed3c3bf26d5db0dc92ef4349cf11caad396f4",
+      "selected_epoch": 5
+    }
+  },
+  {
+    "run": "Persistence_qmax",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {}
+  },
+  {
+    "run": "Persistence_qmean_aux",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": null,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {}
+  },
+  {
+    "run": "SeqLSTM_Q_A4_seed111",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 111,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_A4_seed111",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 111,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "4080c8f1a2609331645f9745975222881d6d1dae088befc9a4daebd9bab11704",
+      "library_commit": "dda45fcf19ee7ffd481b9d192778539df46fb074",
+      "clip_to_zero": true,
+      "selected_epoch": 11,
+      "source": "/kaggle/input/notebooks/hunhngcthng/04-a4-lamahceext-compare/a4_compare/contracts/SeqLSTM_Q_A4_seed111_test_S0_lead1.npz",
+      "source_file_sha256": "55845fc937ab2d096b5c034a4951e0b50fc8a4e603661292db951628256f76bf",
+      "compare_version_expected": 2,
+      "training_notebook_version": 1
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_A4_seed222",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 222,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_A4_seed222",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 222,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "8b7be948fccc2ad4e88819130b805b67758f410aa4753b51429d941d27bb449b",
+      "library_commit": "dda45fcf19ee7ffd481b9d192778539df46fb074",
+      "clip_to_zero": true,
+      "selected_epoch": 15,
+      "source": "/kaggle/input/notebooks/hunhngcthng/04-a4-lamahceext-compare/a4_compare/contracts/SeqLSTM_Q_A4_seed222_test_S0_lead1.npz",
+      "source_file_sha256": "14afaea08355c70fe4ae5cb79125d098124e46b2f7dbc7f945b270ffa6936377",
+      "compare_version_expected": 2,
+      "training_notebook_version": 2
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_A4_seed333",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 333,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_A4_seed333",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 333,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "b580f025e13bd8510ce036703df29e34de2f6434a9798d7dc6a3434bc0d88334",
+      "library_commit": "dda45fcf19ee7ffd481b9d192778539df46fb074",
+      "clip_to_zero": true,
+      "selected_epoch": 14,
+      "source": "/kaggle/input/notebooks/hunhngcthng/04-a4-lamahceext-compare/a4_compare/contracts/SeqLSTM_Q_A4_seed333_test_S0_lead1.npz",
+      "source_file_sha256": "cc88ecf033786d8e205e89720a60f00ae574d082f4124d2f4538730388703ae1",
+      "compare_version_expected": 2,
+      "training_notebook_version": 2
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B0_seed111",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 111,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B0_seed111",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 111,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "1e807e76e1cc1b0ef0400105af20624abfca053464a254f322c0c99cef08c165",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 25,
+      "source": "/kaggle/input/notebooks/hunhngcthng/02-b0-lamahceext-compare/b0_compare/contracts/SeqLSTM_Q_B0_seed111_test_S0_lead1.npz",
+      "source_file_sha256": "95384690ed4187d1af5df61987562f923065de08f6532ed62aa85d844b31b997",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B0_seed222",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 222,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B0_seed222",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 222,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "f8e0cf9cd8f09db0d2298bbdc6c6de034c5834b7341f083481bc921857617c20",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 15,
+      "source": "/kaggle/input/notebooks/hunhngcthng/02-b0-lamahceext-compare/b0_compare/contracts/SeqLSTM_Q_B0_seed222_test_S0_lead1.npz",
+      "source_file_sha256": "888534c43bc9a35133053def06b66ad2ebd7b17f249aab5f837f77515b372a72",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B0_seed333",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 333,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B0_seed333",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 333,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "734223e3df1cf29b9109cceeb2a906a9c169ead71eea0520e49fd0cf0ed23626",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 14,
+      "source": "/kaggle/input/notebooks/hunhngcthng/02-b0-lamahceext-compare/b0_compare/contracts/SeqLSTM_Q_B0_seed333_test_S0_lead1.npz",
+      "source_file_sha256": "ffd811bb34ee0137d8076b63db190f77e921a9426b8fa50108585b046508c6c7",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B1a_seed111",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 111,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B1a_seed111",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 111,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "b8c9a04ae22dd0afe1b4730afe613d1a10ccf6eea8dd749beeaf6f6fde76497e",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 20,
+      "source": "/kaggle/input/notebooks/hunhngcthng/05-b1-lamahceext-compare/b1_compare/contracts/SeqLSTM_Q_B1a_seed111_test_S0_lead1.npz",
+      "source_file_sha256": "c75368d84b7f89859388d75930f1df6466e6369b9b53d8e182273993edb763f3",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B1a_seed222",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 222,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B1a_seed222",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 222,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "f879e1635bdf47aba3d876ad6e59e374883fb2dd6e5fe88af56b2b9831de427b",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 4,
+      "source": "/kaggle/input/notebooks/hunhngcthng/05-b1-lamahceext-compare/b1_compare/contracts/SeqLSTM_Q_B1a_seed222_test_S0_lead1.npz",
+      "source_file_sha256": "c43f6846278051bff67dadea614b20f5789e7c138c0b9772ce7d5690afa41c78",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B1a_seed333",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 333,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B1a_seed333",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 333,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "8084c4ed62a5c2bd301fe1bd7865cc1c8a700eea14aaabc9ffdd76b41d043f87",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 10,
+      "source": "/kaggle/input/notebooks/hunhngcthng/05-b1-lamahceext-compare/b1_compare/contracts/SeqLSTM_Q_B1a_seed333_test_S0_lead1.npz",
+      "source_file_sha256": "43ba1d8caaca8af2339aa9831e3247ad4db83107f9344ad6a3425ef800bc30cf",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B1b_seed111",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 111,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B1b_seed111",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 111,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "c43f79d1fae6c334702e9b9cbbd60285dabdabdd55e784f320b9c410d958953a",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 11,
+      "source": "/kaggle/input/notebooks/hunhngcthng/05-b1-lamahceext-compare/b1_compare/contracts/SeqLSTM_Q_B1b_seed111_test_S0_lead1.npz",
+      "source_file_sha256": "546375e974692c6d029e21f777b04e0521a7ff02b6c3be1228c5e6f1493f3cbf",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B1b_seed222",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 222,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B1b_seed222",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 222,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "35952e1d0005ba41d07d055fbc92117f4a46c43e5089db1239103b038f1eeccc",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 8,
+      "source": "/kaggle/input/notebooks/hunhngcthng/05-b1-lamahceext-compare/b1_compare/contracts/SeqLSTM_Q_B1b_seed222_test_S0_lead1.npz",
+      "source_file_sha256": "a2f663023cecad9e74e90a5cd2b9f395d705ac1af66f7d4872f3c94bcbae68c9",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B1b_seed333",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 333,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B1b_seed333",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 333,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "4d26019a4ce666ecd805bbb4b91f1b5b9cc51eb069ffc3ddc0233902a4d25ad2",
+      "library_commit": "f229e02bf98cbd979835a4b6cd503d0e3adb8bc3",
+      "clip_to_zero": true,
+      "selected_epoch": 19,
+      "source": "/kaggle/input/notebooks/hunhngcthng/05-b1-lamahceext-compare/b1_compare/contracts/SeqLSTM_Q_B1b_seed333_test_S0_lead1.npz",
+      "source_file_sha256": "cc7df2548a2ca3e1448220a9d48e882c4d916314512360bc8ad5c9630f804714",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "bstar_threshold_val_nse_sd": 0.007932303438926078,
+      "reference_B0_seed_val_nse_median": {
+        "111": 0.7423278079818358,
+        "222": 0.7541379934116129,
+        "333": 0.757406447100777
+      },
+      "reference_B0_saved_epoch": {
+        "111": 25,
+        "222": 15,
+        "333": 14
+      }
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B2_seed111",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 111,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B2_seed111",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 111,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "634ad792fdf1745b35085475311416554209086b5b1dba6d8457f3cbc828b40d",
+      "library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+      "clip_to_zero": true,
+      "selected_epoch": 13,
+      "training_notebook_metadata": "07_B2_LamaHCEExt_Train_Seed111",
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/07-b2-lamahceext-compare/b2_compare/contracts/SeqLSTM_Q_B2_seed111_test_S0_lead1.npz",
+      "source_file_sha256": "9f1842fd992004f8612f1888fe46158abf05b66fe2ae6a300b59da4a7f497fa6",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "training_notebook": "06_B2_LamaHCEExt_Train_Seed111",
+      "embedded_training_notebook": "07_B2_LamaHCEExt_Train_Seed111",
+      "bstar_threshold_val_nse_sd": 0.007932303438926078
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B2_seed222",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 222,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B2_seed222",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 222,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "e69ebc53f92102a8716cdf20f7e7fa26eba046b0b8d8e7b61c166b14c11c34c3",
+      "library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+      "clip_to_zero": true,
+      "selected_epoch": 12,
+      "training_notebook_metadata": "07_B2_LamaHCEExt_Train_Seed222",
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/07-b2-lamahceext-compare/b2_compare/contracts/SeqLSTM_Q_B2_seed222_test_S0_lead1.npz",
+      "source_file_sha256": "55fb99ecef8e4392811d35c07d490ba295dbe687148f6c4134acc308bbb9cbb3",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "training_notebook": "06_B2_LamaHCEExt_Train_Seed222",
+      "embedded_training_notebook": "07_B2_LamaHCEExt_Train_Seed222",
+      "bstar_threshold_val_nse_sd": 0.007932303438926078
+    }
+  },
+  {
+    "run": "SeqLSTM_Q_B2_seed333",
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "seed": 333,
+    "IDs": 451,
+    "days": 1461,
+    "source_metadata": {
+      "run": "SeqLSTM_Q_B2_seed333",
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "forecast_horizon": 1,
+      "seed": 333,
+      "unit": "mm/day_area_gov",
+      "config_sha256": "0ae509c3c282d100ec374996feac37894161f18afac10cf7139afa7d685faa20",
+      "library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+      "clip_to_zero": true,
+      "selected_epoch": 7,
+      "training_notebook_metadata": "07_B2_LamaHCEExt_Train_Seed333",
+      "source": "/kaggle/input/notebooks/hunhthanhnhn/07-b2-lamahceext-compare/b2_compare/contracts/SeqLSTM_Q_B2_seed333_test_S0_lead1.npz",
+      "source_file_sha256": "c73c46432badd4f583aebcad779b9d0a2e25405efc4c07ab18f953e16fe72512",
+      "compare_version_expected": 1,
+      "training_notebook_version": 1,
+      "training_notebook": "06_B2_LamaHCEExt_Train_Seed333",
+      "embedded_training_notebook": "07_B2_LamaHCEExt_Train_Seed333",
+      "bstar_threshold_val_nse_sd": 0.007932303438926078
+    }
+  }
+]

@@ -1,0 +1,4 @@
+seed,selected_epoch,validation_NSE_median,test_NSE_median,test_KGE_median,test_NSE_IDs,epochs,train_process_hours_rounded,source,kaggle_notebook,kaggle_version_confirmed_by_user
+111,13,0.76573,0.71945,0.79501,451,30,2.06,received_console_log_rounded_5_decimal_scores,06_B2_LamaHCEExt_Train_Seed111,1
+222,12,0.77377,0.72014,0.79221,451,30,1.99,received_console_log_rounded_5_decimal_scores,06_B2_LamaHCEExt_Train_Seed222,1
+333,7,0.77189,0.72197,0.77534,451,30,2.13,received_console_log_rounded_5_decimal_scores,06_B2_LamaHCEExt_Train_Seed333,1

@@ -1,0 +1,165 @@
+Tệp output
+file	bytes	sha256
+B_validation_S0_gate.csv	438	7f5ba98e5a33
+B_validation_S0_reproduction.csv	851669	bb945fa5bcb2
+B_validation_Scenarios.png	149171	7b242448d4c6
+B_validation_basin_NSE.csv	4663916	5e09b951ab44
+B_validation_changes.csv	17041	724b9c775f96
+B_validation_common_mask.npz	8601	45a15aa5bc17
+B_validation_context.npz	8695176	94bbb8f0787e
+B_validation_contract_check.csv	13220	15b2eb886899
+B_validation_coverage.csv	98	c07d9692fa39
+B_validation_family_scores.csv	2000	0829af418219
+B_validation_input_manifest.csv	275080	cde33d944788
+B_validation_robustness_by_seed.csv	394	a1e7e8bb67eb
+B_validation_seed_stats.csv	3917	9ce079be653b
+B_validation_seed_table.csv	10765	726a43d1af3d
+B_validation_sources.csv	3649	af9a5a57146e
+B_validation_timing.csv	346	86fca105dbce
+b_validation_summary.json	1156	3175ae462784
+configs/B1b_seed111.yml	3728	ba2f1adc2e9e
+configs/B1b_seed222.yml	3728	e7618e390161
+configs/B1b_seed333.yml	3728	b043af7938f4
+configs/B2_seed111.yml	3359	24d69cf9c1c6
+configs/B2_seed222.yml	3359	49b4f7792b33
+configs/B2_seed333.yml	3359	6b94a84cc7ba
+configs/B3_P05S05_seed111.yml	3968	9aa281e0cce3
+configs/B3_P05S05_seed222.yml	3968	13a56bfac2a5
+configs/B3_P05S05_seed333.yml	3968	02c5328a8a48
+configs/B3_P10S12_seed111.yml	3968	57d995e31da4
+configs/B3_P10S12_seed222.yml	3968	eba6b674d541
+configs/B3_P10S12_seed333.yml	3968	91ed82653d5c
+contracts/SeqLSTM_Q_B1b_seed111_validation_S0_lead1.npz	14160051	239db39fbc11
+contracts/SeqLSTM_Q_B1b_seed111_validation_S1_Q1_lead1.npz	14159659	4206ead53b8f
+contracts/SeqLSTM_Q_B1b_seed111_validation_S1_Q3_lead1.npz	14161724	ffe9774d46e6
+contracts/SeqLSTM_Q_B1b_seed111_validation_S1_Q7_lead1.npz	14163109	417191a5f243
+contracts/SeqLSTM_Q_B1b_seed111_validation_S2_lead1.npz	14181240	7a3b97b28fe4
+contracts/SeqLSTM_Q_B1b_seed111_validation_S3_lead1.npz	14162174	b45c0a156b06
+contracts/SeqLSTM_Q_B1b_seed111_validation_S4_lead1.npz	14162781	37a93f58fa2e
+contracts/SeqLSTM_Q_B1b_seed222_validation_S0_lead1.npz	14156891	8725ff9bd274
+contracts/SeqLSTM_Q_B1b_seed222_validation_S1_Q1_lead1.npz	14156387	8e73024f81ac
+contracts/SeqLSTM_Q_B1b_seed222_validation_S1_Q3_lead1.npz	14157773	f724455f01d4
+contracts/SeqLSTM_Q_B1b_seed222_validation_S1_Q7_lead1.npz	14160431	71300eee90cc
+contracts/SeqLSTM_Q_B1b_seed222_validation_S2_lead1.npz	14179085	5034845275bd
+contracts/SeqLSTM_Q_B1b_seed222_validation_S3_lead1.npz	14157483	cb1855ca61ab
+contracts/SeqLSTM_Q_B1b_seed222_validation_S4_lead1.npz	14157655	4c577152a58a
+contracts/SeqLSTM_Q_B1b_seed333_validation_S0_lead1.npz	14157946	63d1101cb739
+contracts/SeqLSTM_Q_B1b_seed333_validation_S1_Q1_lead1.npz	14156631	35aed0d9582e
+contracts/SeqLSTM_Q_B1b_seed333_validation_S1_Q3_lead1.npz	14159175	6f800f939208
+contracts/SeqLSTM_Q_B1b_seed333_validation_S1_Q7_lead1.npz	14159869	1013f1d348d9
+contracts/SeqLSTM_Q_B1b_seed333_validation_S2_lead1.npz	14178352	1de08bf04e4c
+contracts/SeqLSTM_Q_B1b_seed333_validation_S3_lead1.npz	14158420	f356ee1126e9
+contracts/SeqLSTM_Q_B1b_seed333_validation_S4_lead1.npz	14157723	e31c7d0a2db9
+contracts/SeqLSTM_Q_B2_seed111_validation_S0_lead1.npz	14183472	5126de022dff
+contracts/SeqLSTM_Q_B2_seed111_validation_S1_Q1_lead1.npz	14032142	b784a04d96bf
+contracts/SeqLSTM_Q_B2_seed111_validation_S1_Q3_lead1.npz	13996460	c73c73e92625
+contracts/SeqLSTM_Q_B2_seed111_validation_S1_Q7_lead1.npz	13952597	e70066ed87b1
+contracts/SeqLSTM_Q_B2_seed111_validation_S2_lead1.npz	13775279	67d95d7f3f0f
+contracts/SeqLSTM_Q_B2_seed111_validation_S3_lead1.npz	13802048	8fb0f39e421f
+contracts/SeqLSTM_Q_B2_seed111_validation_S4_lead1.npz	14131175	e158158391c1
+contracts/SeqLSTM_Q_B2_seed222_validation_S0_lead1.npz	14178484	52d8652bec7d
+contracts/SeqLSTM_Q_B2_seed222_validation_S1_Q1_lead1.npz	14038307	07889583a3f2
+contracts/SeqLSTM_Q_B2_seed222_validation_S1_Q3_lead1.npz	14002882	97f66a5ed0ea
+contracts/SeqLSTM_Q_B2_seed222_validation_S1_Q7_lead1.npz	13945857	68516793a62e
+contracts/SeqLSTM_Q_B2_seed222_validation_S2_lead1.npz	13758040	e33af31ab3b7
+contracts/SeqLSTM_Q_B2_seed222_validation_S3_lead1.npz	13898694	7b04f9b76e42
+contracts/SeqLSTM_Q_B2_seed222_validation_S4_lead1.npz	14115613	3abd16a6f0e4
+contracts/SeqLSTM_Q_B2_seed333_validation_S0_lead1.npz	14179491	c0036d83772f
+contracts/SeqLSTM_Q_B2_seed333_validation_S1_Q1_lead1.npz	14057192	b2931dbbb7e5
+contracts/SeqLSTM_Q_B2_seed333_validation_S1_Q3_lead1.npz	13991873	3c91d2bb3612
+contracts/SeqLSTM_Q_B2_seed333_validation_S1_Q7_lead1.npz	13953728	cd6c3b0c6ae7
+contracts/SeqLSTM_Q_B2_seed333_validation_S2_lead1.npz	13774800	cf5ac0452a56
+contracts/SeqLSTM_Q_B2_seed333_validation_S3_lead1.npz	13883559	4017dc08b031
+contracts/SeqLSTM_Q_B2_seed333_validation_S4_lead1.npz	14145020	7ac10f8afc6b
+contracts/SeqLSTM_Q_B3_P05S05_seed111_validation_S0_lead1.npz	14161303	3e3b491c9262
+contracts/SeqLSTM_Q_B3_P05S05_seed111_validation_S1_Q1_lead1.npz	14160065	3f94244ce04b
+contracts/SeqLSTM_Q_B3_P05S05_seed111_validation_S1_Q3_lead1.npz	14150622	e82c5f110eaf
+contracts/SeqLSTM_Q_B3_P05S05_seed111_validation_S1_Q7_lead1.npz	14146771	bbd2916c9343
+contracts/SeqLSTM_Q_B3_P05S05_seed111_validation_S2_lead1.npz	14155495	bd0ece88edfd
+contracts/SeqLSTM_Q_B3_P05S05_seed111_validation_S3_lead1.npz	14173895	218f00809fe8
+contracts/SeqLSTM_Q_B3_P05S05_seed111_validation_S4_lead1.npz	14169497	f9c106dcd088
+contracts/SeqLSTM_Q_B3_P05S05_seed222_validation_S0_lead1.npz	14171990	861c20c58e10
+contracts/SeqLSTM_Q_B3_P05S05_seed222_validation_S1_Q1_lead1.npz	14166759	f7f308ade0ee
+contracts/SeqLSTM_Q_B3_P05S05_seed222_validation_S1_Q3_lead1.npz	14151927	4cd572c154b3
+contracts/SeqLSTM_Q_B3_P05S05_seed222_validation_S1_Q7_lead1.npz	14145503	c1d50bb714f1
+contracts/SeqLSTM_Q_B3_P05S05_seed222_validation_S2_lead1.npz	14153108	e5e6b856e765
+contracts/SeqLSTM_Q_B3_P05S05_seed222_validation_S3_lead1.npz	14179207	6b283c842ca6
+contracts/SeqLSTM_Q_B3_P05S05_seed222_validation_S4_lead1.npz	14176184	9a3b4428f387
+contracts/SeqLSTM_Q_B3_P05S05_seed333_validation_S0_lead1.npz	14175750	ddad4a0a611b
+contracts/SeqLSTM_Q_B3_P05S05_seed333_validation_S1_Q1_lead1.npz	14168106	5de997aee1a6
+contracts/SeqLSTM_Q_B3_P05S05_seed333_validation_S1_Q3_lead1.npz	14148161	93273b07126f
+contracts/SeqLSTM_Q_B3_P05S05_seed333_validation_S1_Q7_lead1.npz	14132647	c3adef8d6b80
+contracts/SeqLSTM_Q_B3_P05S05_seed333_validation_S2_lead1.npz	14154673	7c5793b9c2b6
+contracts/SeqLSTM_Q_B3_P05S05_seed333_validation_S3_lead1.npz	14184490	8dbb485bcdc7
+contracts/SeqLSTM_Q_B3_P05S05_seed333_validation_S4_lead1.npz	14176284	4ef88f1e9fba
+contracts/SeqLSTM_Q_B3_P10S12_seed111_validation_S0_lead1.npz	14171560	b1f4c4480c29
+contracts/SeqLSTM_Q_B3_P10S12_seed111_validation_S1_Q1_lead1.npz	14167905	c32c2280be70
+contracts/SeqLSTM_Q_B3_P10S12_seed111_validation_S1_Q3_lead1.npz	14158194	edaf43fbc35a
+contracts/SeqLSTM_Q_B3_P10S12_seed111_validation_S1_Q7_lead1.npz	14150630	c84a905db139
+contracts/SeqLSTM_Q_B3_P10S12_seed111_validation_S2_lead1.npz	14162365	f6ea4677402e
+contracts/SeqLSTM_Q_B3_P10S12_seed111_validation_S3_lead1.npz	14180945	51d079abdd23
+contracts/SeqLSTM_Q_B3_P10S12_seed111_validation_S4_lead1.npz	14176390	cecda15eb85c
+contracts/SeqLSTM_Q_B3_P10S12_seed222_validation_S0_lead1.npz	14170447	948479ff49b4
+contracts/SeqLSTM_Q_B3_P10S12_seed222_validation_S1_Q1_lead1.npz	14166964	b75b5181f99c
+contracts/SeqLSTM_Q_B3_P10S12_seed222_validation_S1_Q3_lead1.npz	14159972	579f2dc9709d
+contracts/SeqLSTM_Q_B3_P10S12_seed222_validation_S1_Q7_lead1.npz	14152058	69ee9fef6aaf
+contracts/SeqLSTM_Q_B3_P10S12_seed222_validation_S2_lead1.npz	14160343	ccff091b5315
+contracts/SeqLSTM_Q_B3_P10S12_seed222_validation_S3_lead1.npz	14179815	1b699da66cdc
+contracts/SeqLSTM_Q_B3_P10S12_seed222_validation_S4_lead1.npz	14176075	ef9a8fe67434
+contracts/SeqLSTM_Q_B3_P10S12_seed333_validation_S0_lead1.npz	14171833	6eafba78d417
+contracts/SeqLSTM_Q_B3_P10S12_seed333_validation_S1_Q1_lead1.npz	14167680	5983e401dc43
+contracts/SeqLSTM_Q_B3_P10S12_seed333_validation_S1_Q3_lead1.npz	14161420	461dd143f7a5
+contracts/SeqLSTM_Q_B3_P10S12_seed333_validation_S1_Q7_lead1.npz	14152364	7737ff027402
+contracts/SeqLSTM_Q_B3_P10S12_seed333_validation_S2_lead1.npz	14162113	b3f3a7248856
+contracts/SeqLSTM_Q_B3_P10S12_seed333_validation_S3_lead1.npz	14177388	8bf4c65df71b
+contracts/SeqLSTM_Q_B3_P10S12_seed333_validation_S4_lead1.npz	14171551	c07095e2dd7e
+environment.json	2215	6897d0feea17
+{
+  "complete": true,
+  "notebook": "03_B_LamaHCEExt_Validation",
+  "period": "validation",
+  "first_date": "2010-01-01",
+  "last_date": "2013-12-31",
+  "steps": [
+    "B1b",
+    "B2",
+    "B3_P10S12",
+    "B3_P05S05"
+  ],
+  "seeds": [
+    111,
+    222,
+    333
+  ],
+  "scenarios": [
+    "S0",
+    "S1_Q1",
+    "S1_Q3",
+    "S1_Q7",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "contracts": 84,
+  "S0_basin_checks": 5412,
+  "common_day_IDs": 652489,
+  "IDs_with_days": 450,
+  "B0_bstar_threshold": 0.007932303438926078,
+  "imputation_B1b": "masked_cells_only_LOCFin_visible_window_then_train_month_day_then_train_feature_mean",
+  "original_missing_outside_scenario_preserved": true,
+  "normalization_refit": false,
+  "train_climatology_period": [
+    "2003-01-01",
+    "2009-12-31"
+  ],
+  "family_aggregation": "mean_S1_Q1_Q3_Q7_then_equal_mean_S1_S2_S3_S4",
+  "selection_status": "handoff_only_Bstar_owner_must_review_policy_and_apply_predeclared_rule",
+  "Bstar_selected": false,
+  "test_predictions_read": false,
+  "optimizer_steps": 0,
+  "inference_library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+  "source_versions": 1,
+  "training_rerun": false
+}
+Hoàn thành suy luận validation. Save Version; gửi b_validation_summary.json và các CSV B_validation_*.
+Giữ toàn bộ b_validation/contracts, context, common_mask và manifest trong Output để chấm/kiểm độc lập.

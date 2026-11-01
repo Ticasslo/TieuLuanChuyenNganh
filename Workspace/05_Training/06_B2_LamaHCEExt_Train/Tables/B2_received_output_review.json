@@ -1,0 +1,75 @@
+{
+  "scope": "received_text_logs_reviewed_not_original_JSON_CSV_NPZ_hash_audit",
+  "B1a_B1b_handoff_received": true,
+  "B1_source_project_commit": "de17718",
+  "Setup_source_file": "01_B2_LamaHCEExt_DataLoader output.txt",
+  "Setup_source_sha256": "38dc97a99d4afa865b442facf73032f10988bac5591583f3330559c2e1cac443",
+  "Setup_independent_checks": {
+    "passed": 48,
+    "run": 48,
+    "raw_IDs": 451,
+    "probe_IDs": 10,
+    "A1_comparisons": 18,
+    "CUDA_optional_probe": "passed",
+    "official_optimizer_steps": 0
+  },
+  "T4": {
+    "complete": true,
+    "library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+    "device": "Tesla T4",
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "cuda": "12.8",
+    "results": {
+      "b2_and_cores": {
+        "tests": 57,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "four_training_cuda": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "long_training_fixture_device": "cuda:0",
+    "fixture_config_restored": true,
+    "official_B2_training_started": false,
+    "research_merged": false
+  },
+  "library_checks_passed": true,
+  "ready_to_start_B2_training_notebook_preflight": true,
+  "Evaluation_source": "user_message",
+  "Evaluation": {
+    "complete": true,
+    "fixture_checks": 160,
+    "B0_contracts_matched": true,
+    "B1_contracts_matched": true,
+    "A3_reference_matched": true,
+    "A4_contracts_matched": true,
+    "period": "test",
+    "scenario": "S0",
+    "lead": 1,
+    "runs": 23,
+    "retained_IDs": 451,
+    "common_day_IDs": 652628,
+    "IDs_with_days": 450,
+    "B0_B1a_B1b_contracts": 9,
+    "B0_bstar_threshold_val_nse_sd": 0.007932303438926078
+  },
+  "original_exports_received": false,
+  "saved_versions_confirmed": false,
+  "research_merge_confirmed": false,
+  "official_B2_training_started": false,
+  "readiness_reporting_checks": [
+    "independent_True_T4_True_ready_True_manifests_match",
+    "independent_True_T4_False_ready_False_manifests_match",
+    "independent_False_T4_True_ready_False_manifests_match",
+    "reject_library_commit",
+    "reject_fixture_config_restored",
+    "reject_device",
+    "reject_skipped_test"
+  ]
+}

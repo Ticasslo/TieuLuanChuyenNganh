@@ -1,0 +1,18 @@
+{
+  "scope": "synthetic_2_ID_fixture_not_official_B2_evaluation",
+  "fixture_checks_passed": 179,
+  "end_to_end_runs": 26,
+  "paired_test_rows": 900,
+  "planned_Holm_pairs_per_metric": 300,
+  "B2_audits_passed": true,
+  "A3_reference_matched": true,
+  "source_sha256": "ac7c9701a910b9b65a0d4de3b64d922c8cac4ff2d1af05ff95ef93e93bb01a57",
+  "actual_Compare_Part5_producer_consumer_checks_passed": 2,
+  "Compare_source_sha256": "3c344ea7b1c5f68d285f99d1091c004e3d800003f7b0e124917ca0b60d8fc4f9",
+  "B2_obs_sim_audit_with_missing_persistence_passed": true,
+  "shared_scoring_mask_unchanged_passed": true,
+  "date": "2026-10-31",
+  "B2_A3_hash_schema": "filename_to_sha256_string",
+  "B2_NSE_audit_mask": "finite_obs_and_sim",
+  "CDF_26_run_legend_layout_reviewed_on_synthetic_fixture": true
+}

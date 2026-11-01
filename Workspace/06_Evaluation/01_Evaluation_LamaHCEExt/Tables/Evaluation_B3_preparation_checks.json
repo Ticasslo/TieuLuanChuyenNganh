@@ -1,0 +1,25 @@
+{
+  "scope": "synthetic_2_ID_fixture_not_official_B3_evaluation",
+  "fixture_checks_passed": 205,
+  "all_179_previous_V7_fixture_checks_retained": true,
+  "end_to_end_runs": 32,
+  "paired_test_rows": 1395,
+  "planned_Holm_pairs_per_metric": 465,
+  "B3_audits_passed": true,
+  "A3_reference_matched": true,
+  "source_sha256": "ceb601ee28c415eecea5417b95753be2ea64a008d2e87777727433c810c6403f",
+  "actual_Compare_Part5_producer_consumer_checks_passed": 2,
+  "Compare_source_sha256": "2d83d1c7cac4eaeddabc7509703bf7856aef5c3f779db92f2242d31c46d881a2",
+  "B3_obs_sim_audit_with_missing_persistence_passed": true,
+  "unchanged_existing_functions": 38,
+  "changed_existing_functions": [
+    "draw_figures",
+    "main",
+    "run",
+    "self_test"
+  ],
+  "scoring_protocol_functions_unchanged": true,
+  "date": "2026-11-01",
+  "B3_compare_version_expected": 1,
+  "CDF_32_run_legend_visually_reviewed_on_fixture": true
+}

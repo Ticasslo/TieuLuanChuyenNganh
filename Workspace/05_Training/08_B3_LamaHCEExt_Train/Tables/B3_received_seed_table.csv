@@ -1,0 +1,7 @@
+mask_level,seed,selected_epoch,validation_NSE_median,test_NSE_median,test_KGE_median,test_NSE_IDs,epochs,train_process_hours_rounded,peak_GPU_MiB_sampled,kaggle_notebook,kaggle_version_confirmed_by_user,source
+P10S12,111,23,0.7612,0.71997,0.75492,451,30,2.21,3081,08_B3_LamaHCEExt_Train_P10S12_Seed111,1,received_console_log_rounded_5_decimal_scores
+P10S12,222,19,0.77057,0.7139,0.76744,451,30,2.23,3081,08_B3_LamaHCEExt_Train_P10S12_Seed222,1,received_console_log_rounded_5_decimal_scores
+P10S12,333,14,0.76895,0.71771,0.78167,451,30,2.17,3081,08_B3_LamaHCEExt_Train_P10S12_Seed333,1,received_console_log_rounded_5_decimal_scores
+P05S05,111,14,0.7639,0.71862,0.76632,451,30,2.26,3081,08_B3_LamaHCEExt_Train_P05S05_Seed111,1,received_console_log_rounded_5_decimal_scores
+P05S05,222,11,0.77736,0.71929,0.773,451,30,2.11,3081,08_B3_LamaHCEExt_Train_P05S05_Seed222,1,received_console_log_rounded_5_decimal_scores
+P05S05,333,9,0.7703,0.71166,0.78574,451,30,2.22,3081,08_B3_LamaHCEExt_Train_P05S05_Seed333,1,received_console_log_rounded_5_decimal_scores

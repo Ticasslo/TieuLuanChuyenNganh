@@ -1,0 +1,276 @@
+{
+  "scope": "supplemental_Validation_V1_full_manifest_and_pasted_environment_verification",
+  "passed": true,
+  "status": "required_scientific_outputs_and_environment_verified_timing_difference_accepted",
+  "date": "2026-11-01",
+  "saved_version": 1,
+  "checks_passed": 28,
+  "checks_run": 29,
+  "checks": [
+    {
+      "check": "manifest_columns",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "114_unique_manifest_records",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "all_manifest_paths_digests_and_lengths_valid",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "all_114_manifest_paths_match_original_printout",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "only_timing_differs_from_previous_printed_manifest",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_timing.csv",
+      "passed": false,
+      "required": false,
+      "classification": "accepted_difference_between_executions"
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_sources.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_seed_table.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_seed_stats.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_robustness_by_seed.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_input_manifest.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_family_scores.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_coverage.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_context.npz",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_contract_check.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_common_mask.npz",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_basin_NSE.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_changes.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_S0_reproduction.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_S0_gate.csv",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_b_validation_summary.json",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_SHA256_and_bytes_B_validation_Scenarios.png",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "16_scientific_outputs_match_and_only_timing_needs_replacement",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "full_84_contract_name_grid",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "12_runtime_config_name_grid",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "environment_protocol_equals_saved_summary",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "environment_pins_equal_source_pins",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "environment_commit_matches_summary",
+      "passed": true,
+      "required": true
+    },
+    {
+      "check": "pasted_environment_exact_original_bytes_and_full_SHA256",
+      "passed": true,
+      "required": true
+    }
+  ],
+  "discrepancies": [
+    {
+      "file": "B_validation_timing.csv",
+      "received_bytes": 346,
+      "received_sha256": "86fca105dbce7f97112fd74eeb5248419427b11e28d86126f21e35f4f17fd9cd",
+      "saved_manifest_bytes": 367,
+      "saved_manifest_sha256": "0333685ad263984a936e7c0911697e2a8076564cebf7a63aa8023b851c858f26",
+      "accepted_by_user": true,
+      "classification": "run_specific_timing"
+    }
+  ],
+  "previous_printout_differences": [
+    {
+      "file": "B_validation_timing.csv",
+      "printed_bytes": 346,
+      "manifest_bytes": 367,
+      "printed_sha256_prefix": "86fca105dbce",
+      "manifest_sha256": "0333685ad263984a936e7c0911697e2a8076564cebf7a63aa8023b851c858f26"
+    }
+  ],
+  "manifest_records": 114,
+  "contracts_listed": 84,
+  "configs_listed": 12,
+  "manifest_received_as": "pasted_CSV_contents; original manifest file byte fingerprint unavailable",
+  "manifest_received_path": "C:\\Users\\Huỳnh Thanh Nhân\\.codex\\attachments\\e6a76c25-9b11-48ce-b8b4-6e6a2da7c5fd\\Văn bản đã dán.txt",
+  "manifest_retained_path": "Tables/manifest.csv",
+  "manifest_retained_sha256": "fda5f9115e3987e51d5cf8b335b529856564b920609d3e446cdb2dc64d51ee2f",
+  "environment_received_as": "pasted_JSON; serialization verified byte-identical to manifest fingerprint",
+  "environment_retained_path": "Tables/environment.json",
+  "environment_bytes": 2215,
+  "environment_sha256": "6897d0feea1716df363d64cc54ea57ae229c98ca3092c345e09ca49679d5a1c1",
+  "environment": {
+    "notebook": "03_B_LamaHCEExt_Validation",
+    "python": "3.13.15",
+    "neuralhydrology_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+    "libs": {
+      "numpy": "2.1.3",
+      "pandas": "2.3.3",
+      "xarray": "2025.12.0",
+      "torch": "2.11.0+cu128",
+      "scipy": "1.16.3",
+      "numba": "0.61.2",
+      "ruamel.yaml": "0.19.1"
+    },
+    "gpu": "Tesla T4",
+    "compare_pins": {
+      "B1": [
+        "b1_summary.json",
+        "8290a961e2b65d4d97426b6b0c9ca7172df0f311593a169e43984ae38321adf8",
+        "8ee3102ee1fbcacacebf94afc5b04801a9d2c6ab59b1c38d699a58b2e6d3d2bb"
+      ],
+      "B2": [
+        "b2_summary.json",
+        "b8c4ac9a3f3ef68c33711f4af8e575f7620c706e7f64fedb03c34b630a47973c",
+        "65d8821e7a1d3977f43441df262296ff803d621c4cc10ea7ffd115d1150a0cc6"
+      ],
+      "B3": [
+        "b3_summary.json",
+        "5905009431072896bf2c0d04be5a739f6de1cb2ce63fb9cf0d66930a5796ced1",
+        "6b1353ac18b5ee37d8b4ad3ea8371705dfff1e92ac94507ce107201981a20a43"
+      ]
+    },
+    "protocol": {
+      "complete": true,
+      "notebook": "03_B_LamaHCEExt_Validation",
+      "period": "validation",
+      "first_date": "2010-01-01",
+      "last_date": "2013-12-31",
+      "steps": [
+        "B1b",
+        "B2",
+        "B3_P10S12",
+        "B3_P05S05"
+      ],
+      "seeds": [
+        111,
+        222,
+        333
+      ],
+      "scenarios": [
+        "S0",
+        "S1_Q1",
+        "S1_Q3",
+        "S1_Q7",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "contracts": 84,
+      "S0_basin_checks": 5412,
+      "common_day_IDs": 652489,
+      "IDs_with_days": 450,
+      "B0_bstar_threshold": 0.007932303438926078,
+      "imputation_B1b": "masked_cells_only_LOCFin_visible_window_then_train_month_day_then_train_feature_mean",
+      "original_missing_outside_scenario_preserved": true,
+      "normalization_refit": false,
+      "train_climatology_period": [
+        "2003-01-01",
+        "2009-12-31"
+      ],
+      "family_aggregation": "mean_S1_Q1_Q3_Q7_then_equal_mean_S1_S2_S3_S4",
+      "selection_status": "handoff_only_Bstar_owner_must_review_policy_and_apply_predeclared_rule",
+      "Bstar_selected": false,
+      "test_predictions_read": false,
+      "optimizer_steps": 0,
+      "inference_library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+      "source_versions": 1,
+      "training_rerun": false
+    }
+  },
+  "original_17_received_files_full_SHA256_and_sizes_verified": false,
+  "received_scientific_files_verified_against_full_manifest": 16,
+  "earlier_timing_archived_at": "Archive/TimingBeforeManifest/B_validation_timing.csv",
+  "prediction_NPZ_and_runtime_config_bytes_rehashed_locally": false,
+  "Bstar_selected": false,
+  "required_checks_passed": true,
+  "run_specific_timing_difference_accepted_by_user": true,
+  "timing_difference_reason": "Two different executions, confirmed by user; timing fingerprint is not a scientific result acceptance criterion.",
+  "additional_files_requested": false
+}

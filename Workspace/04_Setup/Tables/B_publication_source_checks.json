@@ -1,0 +1,76 @@
+{
+  "parsed_python_files": 16,
+  "notebook_pairs": [
+    {
+      "file": "Workspace\\04_Setup\\01_B2_LamaHCEExt_DataLoader.py",
+      "code_cells": 32,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\06_B2_LamaHCEExt_Train\\06_B2_LamaHCEExt_Train_Seed111.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\06_B2_LamaHCEExt_Train\\06_B2_LamaHCEExt_Train_Seed222.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\06_B2_LamaHCEExt_Train\\06_B2_LamaHCEExt_Train_Seed333.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\07_B2_LamaHCEExt_Compare\\07_B2_LamaHCEExt_Compare.py",
+      "code_cells": 5,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\08_B3_LamaHCEExt_Train\\08_B3_LamaHCEExt_Train_P05S05_Seed111.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\08_B3_LamaHCEExt_Train\\08_B3_LamaHCEExt_Train_P05S05_Seed222.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\08_B3_LamaHCEExt_Train\\08_B3_LamaHCEExt_Train_P05S05_Seed333.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\08_B3_LamaHCEExt_Train\\08_B3_LamaHCEExt_Train_P10S12_Seed111.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\08_B3_LamaHCEExt_Train\\08_B3_LamaHCEExt_Train_P10S12_Seed222.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\08_B3_LamaHCEExt_Train\\08_B3_LamaHCEExt_Train_P10S12_Seed333.py",
+      "code_cells": 8,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\05_Training\\09_B3_LamaHCEExt_Compare\\09_B3_LamaHCEExt_Compare.py",
+      "code_cells": 5,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\06_Evaluation\\01_Evaluation_LamaHCEExt\\01_Evaluation_LamaHCEExt.py",
+      "code_cells": 17,
+      "AST_matched": true
+    },
+    {
+      "file": "Workspace\\06_Evaluation\\03_B_LamaHCEExt_Validation\\03_B_LamaHCEExt_Validation.py",
+      "code_cells": 8,
+      "AST_matched": true
+    }
+  ],
+  "passed": true
+}

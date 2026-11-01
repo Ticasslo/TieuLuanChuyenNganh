@@ -1,0 +1,1425 @@
+{
+  "scope": "received_validation_V1_17_files_and_3_pasted_logs_cross_file_numeric_audit",
+  "date": "2026-11-01",
+  "saved_version": 1,
+  "saved_version_confirmed_by_user": 1,
+  "passed": true,
+  "checks_passed": 242,
+  "checks": [
+    {
+      "check": "printed_manifest_contains_114_outputs",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_timing.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_sources.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_seed_table.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_seed_stats.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_robustness_by_seed.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_input_manifest.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_family_scores.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_coverage.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_context.npz",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_contract_check.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_common_mask.npz",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_basin_NSE.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_changes.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_S0_reproduction.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_S0_gate.csv",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_b_validation_summary.json",
+      "passed": true
+    },
+    {
+      "check": "received_hash_and_bytes_match_printed_manifest_B_validation_Scenarios.png",
+      "passed": true
+    },
+    {
+      "check": "84_contracts_and_12_configs_in_printed_manifest",
+      "passed": true
+    },
+    {
+      "check": "summary_complete_validation_only",
+      "passed": true
+    },
+    {
+      "check": "normalization_and_climatology_protocol",
+      "passed": true
+    },
+    {
+      "check": "four_steps_three_seeds_seven_variants",
+      "passed": true
+    },
+    {
+      "check": "canonical_dates_1461_and_451_unique_IDs",
+      "passed": true
+    },
+    {
+      "check": "context_shapes_and_finite_nonnegative_units",
+      "passed": true
+    },
+    {
+      "check": "positive_area_451",
+      "passed": true
+    },
+    {
+      "check": "persistence_is_previous_calendar_observation",
+      "passed": true
+    },
+    {
+      "check": "mask_context_alignment",
+      "passed": true
+    },
+    {
+      "check": "mask_has_only_observation_and_persistence_pairs",
+      "passed": true
+    },
+    {
+      "check": "actual_coverage_matches_summary",
+      "passed": true
+    },
+    {
+      "check": "coverage_CSV_exact",
+      "passed": true
+    },
+    {
+      "check": "labels_and_persistence_counts",
+      "passed": true
+    },
+    {
+      "check": "12_unique_sources",
+      "passed": true
+    },
+    {
+      "check": "B1b_selected_epochs_and_versions",
+      "passed": true
+    },
+    {
+      "check": "B2_selected_epochs_and_versions",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12_selected_epochs_and_versions",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05_selected_epochs_and_versions",
+      "passed": true
+    },
+    {
+      "check": "same_original_scaler_all_12_runs",
+      "passed": true
+    },
+    {
+      "check": "12_distinct_checkpoint_fingerprints",
+      "passed": true
+    },
+    {
+      "check": "B2111_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B2222_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B2333_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222_environment_matches_prior_Compare",
+      "passed": true
+    },
+    {
+      "check": "B1b111_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B1b222_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B1b333_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B2111_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B2222_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B2333_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333_config_and_epoch_match_Evaluation_V8",
+      "passed": true
+    },
+    {
+      "check": "1346_unique_input_fingerprints",
+      "passed": true
+    },
+    {
+      "check": "451_raw_forcing_and_gauge_sources_match_context_IDs",
+      "passed": true
+    },
+    {
+      "check": "b1_summary.json_matches_pinned_Compare",
+      "passed": true
+    },
+    {
+      "check": "b1_summary.json_environment_matches_pin",
+      "passed": true
+    },
+    {
+      "check": "b2_summary.json_matches_pinned_Compare",
+      "passed": true
+    },
+    {
+      "check": "b2_summary.json_environment_matches_pin",
+      "passed": true
+    },
+    {
+      "check": "b3_summary.json_matches_pinned_Compare",
+      "passed": true
+    },
+    {
+      "check": "b3_summary.json_environment_matches_pin",
+      "passed": true
+    },
+    {
+      "check": "B1b111_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b111_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b111_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b111_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b111_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B1b222_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b222_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b222_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b222_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b222_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B1b333_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b333_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b333_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b333_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B1b333_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B2111_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2111_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2111_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2111_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2111_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B2222_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2222_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2222_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2222_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2222_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B2333_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2333_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2333_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2333_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B2333_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333_environment_in_input_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333_config_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333_scaler_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333_checkpoint_sha256_in_manifest",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333_30_validation_metrics_and_selected_state",
+      "passed": true
+    },
+    {
+      "check": "5412_unique_S0_reproductions",
+      "passed": true
+    },
+    {
+      "check": "all_S0_reproduction_flags_true",
+      "passed": true
+    },
+    {
+      "check": "native_NSE_within_fixed_absolute_tolerance",
+      "passed": true
+    },
+    {
+      "check": "S0_observation_prediction_dtypes_recorded",
+      "passed": true
+    },
+    {
+      "check": "all_5412_audit_scalers_match_source",
+      "passed": true
+    },
+    {
+      "check": "source_medians_reconcile_all_ID_audits",
+      "passed": true
+    },
+    {
+      "check": "84_unique_contract_audits",
+      "passed": true
+    },
+    {
+      "check": "B1b111S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b111S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b111S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b111S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b111S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b111S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b111S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b222S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b222S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b222S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b222S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b222S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b222S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b222S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b333S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b333S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b333S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b333S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b333S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b333S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B1b333S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2111S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2111S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2111S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2111S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2111S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2111S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2111S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2222S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2222S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2222S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2222S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2222S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2222S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2222S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2333S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2333S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2333S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2333S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2333S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2333S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B2333S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05111S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05222S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P05S05333S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12111S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12222S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333S0_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333S1_Q1_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333S1_Q3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333S1_Q7_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333S2_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333S3_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "B3_P10S12333S4_filename_and_checkpoint",
+      "passed": true
+    },
+    {
+      "check": "all_raw_negative_counts_bounded",
+      "passed": true
+    },
+    {
+      "check": "all_B2_B3_predictions_full_calendar",
+      "passed": true
+    },
+    {
+      "check": "contract_finiteness_stable_across_seeds",
+      "passed": true
+    },
+    {
+      "check": "75768_unique_basin_rows_complete_grid",
+      "passed": true
+    },
+    {
+      "check": "day_counts_valid_and_NSE_not_infinite",
+      "passed": true
+    },
+    {
+      "check": "all_84_per_ID_common_counts_reconcile_actual_mask",
+      "passed": true
+    },
+    {
+      "check": "native_counts_are_superset_of_common",
+      "passed": true
+    },
+    {
+      "check": "all_84_common_NSE_eligibility_450",
+      "passed": true
+    },
+    {
+      "check": "168_seed_table_rows_recomputed_from_ID_scores",
+      "passed": true
+    },
+    {
+      "check": "all_native_counts_bounded_by_finite_predictions",
+      "passed": true
+    },
+    {
+      "check": "56_mean_and_sample_SD_rows_recomputed",
+      "passed": true
+    },
+    {
+      "check": "all_168_scenario_deltas_recomputed",
+      "passed": true
+    },
+    {
+      "check": "60_family_scores_recomputed",
+      "passed": true
+    },
+    {
+      "check": "12_robustness_scores_family_balanced",
+      "passed": true
+    },
+    {
+      "check": "S0_gate_mean_SD_gap_recomputed",
+      "passed": true
+    },
+    {
+      "check": "all_four_candidates_pass_predeclared_S0_gate",
+      "passed": true
+    },
+    {
+      "check": "12_positive_timing_rows",
+      "passed": true
+    },
+    {
+      "check": "all_12_runs_completed_451_IDs_in_log",
+      "passed": true
+    },
+    {
+      "check": "84_contract_audit_rows_in_pasted_log",
+      "passed": true
+    },
+    {
+      "check": "all_printed_contract_rows_match_received_CSV",
+      "passed": true
+    },
+    {
+      "check": "same_robustness_leader_for_all_three_seeds",
+      "passed": true
+    },
+    {
+      "check": "reported_leader_also_highest_in_each_stress_variant",
+      "passed": true
+    },
+    {
+      "check": "leader_not_dependent_on_counting_S1_three_times",
+      "passed": true
+    },
+    {
+      "check": "S0_eligibility_unchanged_if_using_common_scope",
+      "passed": true
+    }
+  ],
+  "files": [
+    {
+      "file": "B_validation_timing.csv",
+      "bytes": 346,
+      "sha256": "86fca105dbce7f97112fd74eeb5248419427b11e28d86126f21e35f4f17fd9cd",
+      "matches_full_saved_manifest": false
+    },
+    {
+      "file": "B_validation_sources.csv",
+      "bytes": 3649,
+      "sha256": "af9a5a57146e7f7b300113c83f54093bcfaa0aeff4b34316309fcc4ed930825c",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_seed_table.csv",
+      "bytes": 10765,
+      "sha256": "726a43d1af3dca40b705268b567e20b7ca5d5be1a9c5e2284291aa81f9954387",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_seed_stats.csv",
+      "bytes": 3917,
+      "sha256": "9ce079be653b715b8397814dc2d0b43b602daf7ff3ff34fc6be863f42079d91e",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_robustness_by_seed.csv",
+      "bytes": 394,
+      "sha256": "a1e7e8bb67eb84eab61d3c25bfaa646896300d668df1761e40faaea4d5e2dbcb",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_input_manifest.csv",
+      "bytes": 275080,
+      "sha256": "cde33d944788d8e91a01840942d3a5897e520ec7bf9c45e660697fcc766eb96a",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_family_scores.csv",
+      "bytes": 2000,
+      "sha256": "0829af418219d99a0dc2e7b67d5e989e8c72b2d6247df34da5109193d292b564",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_coverage.csv",
+      "bytes": 98,
+      "sha256": "c07d9692fa39705da9f58509d6945267fc60c45ed4ef947491c1005b69446ce3",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_context.npz",
+      "bytes": 8695176,
+      "sha256": "94bbb8f0787ecd39b9e72ecd2b8b9487e7897879cc9e616acbb39ab9267bcbf9",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_contract_check.csv",
+      "bytes": 13220,
+      "sha256": "15b2eb88689932cca2d995317bb499af13ac5e88e64931f4348680ab68e97215",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_common_mask.npz",
+      "bytes": 8601,
+      "sha256": "45a15aa5bc171bebfe25e7abeefadfbb7c352d41995b668d5af9035539616736",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_basin_NSE.csv",
+      "bytes": 4663916,
+      "sha256": "5e09b951ab44e14d2671060fed0df7dfced107536c143f9d3ab4c9840e66410a",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_changes.csv",
+      "bytes": 17041,
+      "sha256": "724b9c775f96b1c527e0e021ac8a2e818f76918a55364404c0a263a7b77fad0a",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_S0_reproduction.csv",
+      "bytes": 851669,
+      "sha256": "bb945fa5bcb2daf28aae0ccea1c38a9151324f95b053d64063a946b6b5d97989",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_S0_gate.csv",
+      "bytes": 438,
+      "sha256": "7f5ba98e5a33928af33d2d2daf7f9d85cf54d3af26028ee3a149b17d641fc8f8",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "b_validation_summary.json",
+      "bytes": 1156,
+      "sha256": "3175ae462784cc6e65b178e5343331a8a2b5b5e52b98e7635cdff82a1aa9c67f",
+      "matches_full_saved_manifest": true
+    },
+    {
+      "file": "B_validation_Scenarios.png",
+      "bytes": 149171,
+      "sha256": "7b242448d4c6e1518af6ae6511836f722ba1e82c2478b91fb5a7cda576009beb",
+      "matches_full_saved_manifest": true
+    }
+  ],
+  "logs": [
+    {
+      "file": "C:\\Users\\Huỳnh Thanh Nhân\\.codex\\attachments\\978699b9-d83e-4230-b520-398b74517d3e\\Văn bản đã dán.txt",
+      "bytes": 7756,
+      "sha256": "9a9e01f58983fa401b6ca3fec04bd0922db494df426d5cf8943d99a31a7c3a9a"
+    },
+    {
+      "file": "C:\\Users\\Huỳnh Thanh Nhân\\.codex\\attachments\\6ea890d8-8fa2-4709-9fed-feec1e8ffff0\\Văn bản đã dán.txt",
+      "bytes": 13394,
+      "sha256": "a1576a704123fb87123ed475db2bf70a84d93b19478c7032a7cddb2e2b20ad62"
+    },
+    {
+      "file": "C:\\Users\\Huỳnh Thanh Nhân\\.codex\\attachments\\65d8edac-8e2f-4271-96d4-bc0de643440d\\Văn bản đã dán.txt",
+      "bytes": 9842,
+      "sha256": "01d458d305cb657da0a971c4f1f5f8407bef89269c545dd5f5aca058e14993e6"
+    }
+  ],
+  "summary": {
+    "complete": true,
+    "notebook": "03_B_LamaHCEExt_Validation",
+    "period": "validation",
+    "first_date": "2010-01-01",
+    "last_date": "2013-12-31",
+    "steps": [
+      "B1b",
+      "B2",
+      "B3_P10S12",
+      "B3_P05S05"
+    ],
+    "seeds": [
+      111,
+      222,
+      333
+    ],
+    "scenarios": [
+      "S0",
+      "S1_Q1",
+      "S1_Q3",
+      "S1_Q7",
+      "S2",
+      "S3",
+      "S4"
+    ],
+    "contracts": 84,
+    "S0_basin_checks": 5412,
+    "common_day_IDs": 652489,
+    "IDs_with_days": 450,
+    "B0_bstar_threshold": 0.007932303438926078,
+    "imputation_B1b": "masked_cells_only_LOCFin_visible_window_then_train_month_day_then_train_feature_mean",
+    "original_missing_outside_scenario_preserved": true,
+    "normalization_refit": false,
+    "train_climatology_period": [
+      "2003-01-01",
+      "2009-12-31"
+    ],
+    "family_aggregation": "mean_S1_Q1_Q3_Q7_then_equal_mean_S1_S2_S3_S4",
+    "selection_status": "handoff_only_Bstar_owner_must_review_policy_and_apply_predeclared_rule",
+    "Bstar_selected": false,
+    "test_predictions_read": false,
+    "optimizer_steps": 0,
+    "inference_library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+    "source_versions": 1,
+    "training_rerun": false
+  },
+  "ranking": [
+    {
+      "step": "B3_P10S12",
+      "native_S0_mean": 0.7669047667211245,
+      "native_S0_SD": 0.005009551494996128,
+      "robustness_mean": 0.7022971442729854,
+      "robustness_SD": 0.00566861242883298,
+      "S0_gap": 0.0076391100611041,
+      "S0_eligible": true
+    },
+    {
+      "step": "B3_P05S05",
+      "native_S0_mean": 0.7705188351500212,
+      "native_S0_SD": 0.006731186886702522,
+      "robustness_mean": 0.669414964067771,
+      "robustness_SD": 0.011143408625412484,
+      "S0_gap": 0.0040250416322075,
+      "S0_eligible": true
+    },
+    {
+      "step": "B1b",
+      "native_S0_mean": 0.7745438767822287,
+      "native_S0_SD": 0.0041070977510426964,
+      "robustness_mean": 0.5266787525190648,
+      "robustness_SD": 0.010111812544555213,
+      "S0_gap": 0.0,
+      "S0_eligible": true
+    },
+    {
+      "step": "B2",
+      "native_S0_mean": 0.7704652146674231,
+      "native_S0_SD": 0.0042051893518435315,
+      "robustness_mean": 0.2350132468358674,
+      "robustness_SD": 0.026689607785080758,
+      "S0_gap": 0.0040786621148055,
+      "S0_eligible": true
+    }
+  ],
+  "scenario_mean_SD": [
+    {
+      "step": "B1b",
+      "scenario": "S0",
+      "mean": 0.774543877861562,
+      "std": 0.004107091873073
+    },
+    {
+      "step": "B1b",
+      "scenario": "S1_Q1",
+      "mean": 0.6290495950585879,
+      "std": 0.007794497219943
+    },
+    {
+      "step": "B1b",
+      "scenario": "S1_Q3",
+      "mean": 0.450090529385426,
+      "std": 0.0179262763488455
+    },
+    {
+      "step": "B1b",
+      "scenario": "S1_Q7",
+      "mean": 0.3217495555096246,
+      "std": 0.0123279420001098
+    },
+    {
+      "step": "B1b",
+      "scenario": "S2",
+      "mean": 0.268787755942502,
+      "std": 0.0324532342980454
+    },
+    {
+      "step": "B1b",
+      "scenario": "S3",
+      "mean": 0.7512381812106129,
+      "std": 0.0031005965303167
+    },
+    {
+      "step": "B1b",
+      "scenario": "S4",
+      "mean": 0.6197258462719316,
+      "std": 0.0050048648424096
+    },
+    {
+      "step": "B2",
+      "scenario": "S0",
+      "mean": 0.770783235345911,
+      "std": 0.0042548885780729
+    },
+    {
+      "step": "B2",
+      "scenario": "S1_Q1",
+      "mean": 0.304056452221532,
+      "std": 0.0464515722860912
+    },
+    {
+      "step": "B2",
+      "scenario": "S1_Q3",
+      "mean": 0.2041698704210316,
+      "std": 0.0175967766929312
+    },
+    {
+      "step": "B2",
+      "scenario": "S1_Q7",
+      "mean": 0.1536201389067558,
+      "std": 0.0270801827194927
+    },
+    {
+      "step": "B2",
+      "scenario": "S2",
+      "mean": -0.0365574297376531,
+      "std": 0.0098320736990293
+    },
+    {
+      "step": "B2",
+      "scenario": "S3",
+      "mean": 0.4236957973837867,
+      "std": 0.0488060660587971
+    },
+    {
+      "step": "B2",
+      "scenario": "S4",
+      "mean": 0.3322991325142295,
+      "std": 0.0303951119166134
+    },
+    {
+      "step": "B3_P05S05",
+      "scenario": "S0",
+      "mean": 0.7699338041744951,
+      "std": 0.0056283128906353
+    },
+    {
+      "step": "B3_P05S05",
+      "scenario": "S1_Q1",
+      "mean": 0.7011595913621921,
+      "std": 0.0038186431098543
+    },
+    {
+      "step": "B3_P05S05",
+      "scenario": "S1_Q3",
+      "mean": 0.6466640875021438,
+      "std": 0.0219562565180705
+    },
+    {
+      "step": "B3_P05S05",
+      "scenario": "S1_Q7",
+      "mean": 0.6056906039615637,
+      "std": 0.0434160975078502
+    },
+    {
+      "step": "B3_P05S05",
+      "scenario": "S2",
+      "mean": 0.5917552790617161,
+      "std": 0.0170347087905906
+    },
+    {
+      "step": "B3_P05S05",
+      "scenario": "S3",
+      "mean": 0.757535062787932,
+      "std": 0.0123109114242396
+    },
+    {
+      "step": "B3_P05S05",
+      "scenario": "S4",
+      "mean": 0.6771980868128026,
+      "std": 0.0049054756901497
+    },
+    {
+      "step": "B3_P10S12",
+      "scenario": "S0",
+      "mean": 0.7667755433854766,
+      "std": 0.0048865638512799
+    },
+    {
+      "step": "B3_P10S12",
+      "scenario": "S1_Q1",
+      "mean": 0.7177293433381015,
+      "std": 0.0039281778667691
+    },
+    {
+      "step": "B3_P10S12",
+      "scenario": "S1_Q3",
+      "mean": 0.6843676838074111,
+      "std": 0.0004432475895071
+    },
+    {
+      "step": "B3_P10S12",
+      "scenario": "S1_Q7",
+      "mean": 0.6535258694925246,
+      "std": 0.0070246434435552
+    },
+    {
+      "step": "B3_P10S12",
+      "scenario": "S2",
+      "mean": 0.6430457449290811,
+      "std": 0.0110435060084852
+    },
+    {
+      "step": "B3_P10S12",
+      "scenario": "S3",
+      "mean": 0.7686115312362936,
+      "std": 0.0062574542351275
+    },
+    {
+      "step": "B3_P10S12",
+      "scenario": "S4",
+      "mean": 0.7123236687138883,
+      "std": 0.0043073168258782
+    }
+  ],
+  "common_IDs_without_days": [
+    55
+  ],
+  "source_S0_max_abs_difference": 0.0,
+  "independent_float64_vs_native_max_abs_difference": 2.0826767499482202e-07,
+  "native_S0_canonical_vs_library_median_max_difference": 2.9073591201189686e-08,
+  "candidate_with_highest_predeclared_robustness": "B3_P10S12",
+  "Bstar_selected": false,
+  "selection_owner": "Huynh Ngoc Thang",
+  "figure_review": "All four series and SD bars readable; seven scenario variants, external legend, negative B2 S2 retained.",
+  "limitations": [
+    "84 original prediction NPZs, 12 runtime config files and executed ipynb were not attached locally.",
+    "The saved Kaggle notebook validated raw predictions and source files; this review reconciles supplied per-ID scores, masks, context and aggregates.",
+    "Full output manifest fingerprints match all 16 supplied scientific result files; pasted environment JSON exactly matches its original byte length and SHA256.",
+    "The originally received timing CSV belongs to a different execution, confirmed by the user; its fingerprint difference is accepted and the file is archived separately.",
+    "The full manifest is retained as supplied CSV contents; its own original file fingerprint was not separately provided.",
+    "Formal Bstar decision and freeze-C remain with the assigned owner under the recorded imputation and family weighting protocol."
+  ],
+  "output_files_retained_in_repo": [
+    "Archive/TimingBeforeManifest/B_validation_timing.csv",
+    "Tables/B_validation_sources.csv",
+    "Tables/B_validation_seed_table.csv",
+    "Tables/B_validation_seed_stats.csv",
+    "Tables/B_validation_robustness_by_seed.csv",
+    "Tables/B_validation_input_manifest.csv",
+    "Tables/B_validation_family_scores.csv",
+    "Tables/B_validation_coverage.csv",
+    "Tables/B_validation_contract_check.csv",
+    "Tables/B_validation_common_mask.npz",
+    "Tables/B_validation_changes.csv",
+    "Tables/B_validation_S0_reproduction.csv",
+    "Tables/B_validation_S0_gate.csv",
+    "Tables/b_validation_summary.json",
+    "Figures/B_validation_Scenarios.png"
+  ],
+  "received_logs_retained_in_repo": [
+    "Tables/B_validation_received_progress.txt",
+    "Tables/B_validation_received_contracts.txt",
+    "Tables/B_validation_received_completion.txt"
+  ],
+  "executed_ipynb_imported": false,
+  "original_84_prediction_NPZs_recomputed_locally": false,
+  "original_source_input_hashes_recomputed_locally": false,
+  "source_python_sha256": "f9b437befffade7063c986fdd0a495a1a829446b7018c6a6708259293b1afbff",
+  "supplemental_metadata_review": "Tables/B_validation_V1_metadata_review.json",
+  "supplemental_metadata_checks_passed": 28,
+  "supplemental_metadata_checks_run": 29,
+  "supplemental_metadata_status": "required_scientific_outputs_and_environment_verified_timing_difference_accepted",
+  "saved_manifest_discrepancies": [
+    {
+      "file": "B_validation_timing.csv",
+      "received_bytes": 346,
+      "received_sha256": "86fca105dbce7f97112fd74eeb5248419427b11e28d86126f21e35f4f17fd9cd",
+      "saved_manifest_bytes": 367,
+      "saved_manifest_sha256": "0333685ad263984a936e7c0911697e2a8076564cebf7a63aa8023b851c858f26",
+      "accepted_by_user": true,
+      "classification": "run_specific_timing"
+    }
+  ],
+  "full_output_manifest_records_received": 114,
+  "full_output_manifest_received": true,
+  "environment_original_fingerprint_verified": true,
+  "environment_received": true,
+  "additional_metadata_retained_in_repo": [
+    "Tables/manifest.csv",
+    "Tables/environment.json"
+  ],
+  "earlier_received_timing_total_seconds_part5_unverified_against_saved_manifest": 9199.379801587998,
+  "supplemental_metadata_required_checks_passed": true,
+  "run_specific_timing_difference_accepted_by_user": true,
+  "additional_files_requested": false
+}

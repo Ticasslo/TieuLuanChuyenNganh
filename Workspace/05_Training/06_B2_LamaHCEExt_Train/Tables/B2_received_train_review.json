@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-31",
+  "scope": "received_console_logs_and_original_curve_images_not_raw_training_artifacts",
+  "seeds": {
+    "111": {
+      "log_file": "SEED 111.txt",
+      "log_sha256": "1ebf9a35e117886a941e965548d564dd16f20d8bd8a08f6e6406d49e9ad5e109",
+      "image_file": "Figures/B2_Curve_B2_SeqLSTM_Q_seed111.png",
+      "image_sha256": "223bec9fc73387238be08891277db1b9c58dba180aa4c6432b9b45167ae6bfcd",
+      "image_bytes": 272489,
+      "image_matches_printed_manifest_prefix": true,
+      "printed_manifest_hash_prefix_length": 12,
+      "checks_passed": 18,
+      "validation_epochs": 30,
+      "training_epochs": 30,
+      "selected_epoch": 13,
+      "completed": true,
+      "test_IDs": 451,
+      "cache_fresh_NSE_difference": 0.0,
+      "checkpoint_tensor_equality_passed_in_received_log": true,
+      "selected_epoch_test_metrics_printed_hash_match": true,
+      "notebook": "06_B2_LamaHCEExt_Train_Seed111",
+      "kaggle_version_confirmed_by_user": 1,
+      "stale_message_in_received_log": "08_B2_LamaHCEExt_Compare"
+    },
+    "222": {
+      "log_file": "SEED 222.txt",
+      "log_sha256": "b50bc7a316a42b8d7cdf63dc38b4ebc5e333173a7cb0b7d8ab1a3c68eceedabd",
+      "image_file": "Figures/B2_Curve_B2_SeqLSTM_Q_seed222.png",
+      "image_sha256": "040e4c26685ed91a9c9c1aace3c6636221d18984747175e0c4cefc18e4fcfaa0",
+      "image_bytes": 279530,
+      "image_matches_printed_manifest_prefix": true,
+      "printed_manifest_hash_prefix_length": 12,
+      "checks_passed": 18,
+      "validation_epochs": 30,
+      "training_epochs": 30,
+      "selected_epoch": 12,
+      "completed": true,
+      "test_IDs": 451,
+      "cache_fresh_NSE_difference": 0.0,
+      "checkpoint_tensor_equality_passed_in_received_log": true,
+      "selected_epoch_test_metrics_printed_hash_match": true,
+      "notebook": "06_B2_LamaHCEExt_Train_Seed222",
+      "kaggle_version_confirmed_by_user": 1,
+      "stale_message_in_received_log": "08_B2_LamaHCEExt_Compare"
+    },
+    "333": {
+      "log_file": "SEED 333.txt",
+      "log_sha256": "fc51a6a316727dd205938048771f9090951e167885ec4fe296c21f00aa72ef26",
+      "image_file": "Figures/B2_Curve_B2_SeqLSTM_Q_seed333.png",
+      "image_sha256": "27b9523599ac981a7577f149194df60994c89b926cc68442b722c954da7e48c6",
+      "image_bytes": 281200,
+      "image_matches_printed_manifest_prefix": true,
+      "printed_manifest_hash_prefix_length": 12,
+      "checks_passed": 18,
+      "validation_epochs": 30,
+      "training_epochs": 30,
+      "selected_epoch": 7,
+      "completed": true,
+      "test_IDs": 451,
+      "cache_fresh_NSE_difference": 0.0,
+      "checkpoint_tensor_equality_passed_in_received_log": true,
+      "selected_epoch_test_metrics_printed_hash_match": true,
+      "notebook": "06_B2_LamaHCEExt_Train_Seed333",
+      "kaggle_version_confirmed_by_user": 1,
+      "stale_message_in_received_log": "08_B2_LamaHCEExt_Compare"
+    }
+  },
+  "checks_passed": 54,
+  "source_scores_rounded_to_decimals": 5,
+  "aggregate_from_rounded_scores": {
+    "validation_NSE_median": {
+      "mean": 0.7704633333333333,
+      "sample_sd": 0.00420558359010174
+    },
+    "test_NSE_median": {
+      "mean": 0.7205199999999999,
+      "sample_sd": 0.0013022672536772027
+    },
+    "test_KGE_median": {
+      "mean": 0.7875199999999999,
+      "sample_sd": 0.010640690767050768
+    }
+  },
+  "official_training_complete_according_to_received_logs": true,
+  "train_versions_confirmed_by_user": {
+    "111": 1,
+    "222": 1,
+    "333": 1
+  },
+  "original_environment_manifest_config_weights_and_CSV_audited_locally": false,
+  "executed_ipynb_imported": false,
+  "Compare_Kaggle_run_received": false,
+  "B1b_validation_NSE_mean": 0.7745438767822287,
+  "approximate_validation_mean_difference_B2_minus_B1b": -0.004080543448895413,
+  "B0_Bstar_threshold": 0.007932303438926078,
+  "Bstar_selected": false,
+  "interpretation": "B2 has 451 test NSE IDs; B1b has 450. Compare on common daily mask before attributing a gain.",
+  "figures_reviewed": "Three original images: no label overlap; selected epoch 13/12/7 matches logs; later train loss declines while validation NSE decreases; batch spikes do not imply divergence."
+}

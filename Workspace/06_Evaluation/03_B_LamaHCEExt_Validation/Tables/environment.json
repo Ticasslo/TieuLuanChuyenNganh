@@ -1,0 +1,79 @@
+{
+  "notebook": "03_B_LamaHCEExt_Validation",
+  "python": "3.13.15",
+  "neuralhydrology_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+  "libs": {
+    "numpy": "2.1.3",
+    "pandas": "2.3.3",
+    "xarray": "2025.12.0",
+    "torch": "2.11.0+cu128",
+    "scipy": "1.16.3",
+    "numba": "0.61.2",
+    "ruamel.yaml": "0.19.1"
+  },
+  "gpu": "Tesla T4",
+  "compare_pins": {
+    "B1": [
+      "b1_summary.json",
+      "8290a961e2b65d4d97426b6b0c9ca7172df0f311593a169e43984ae38321adf8",
+      "8ee3102ee1fbcacacebf94afc5b04801a9d2c6ab59b1c38d699a58b2e6d3d2bb"
+    ],
+    "B2": [
+      "b2_summary.json",
+      "b8c4ac9a3f3ef68c33711f4af8e575f7620c706e7f64fedb03c34b630a47973c",
+      "65d8821e7a1d3977f43441df262296ff803d621c4cc10ea7ffd115d1150a0cc6"
+    ],
+    "B3": [
+      "b3_summary.json",
+      "5905009431072896bf2c0d04be5a739f6de1cb2ce63fb9cf0d66930a5796ced1",
+      "6b1353ac18b5ee37d8b4ad3ea8371705dfff1e92ac94507ce107201981a20a43"
+    ]
+  },
+  "protocol": {
+    "complete": true,
+    "notebook": "03_B_LamaHCEExt_Validation",
+    "period": "validation",
+    "first_date": "2010-01-01",
+    "last_date": "2013-12-31",
+    "steps": [
+      "B1b",
+      "B2",
+      "B3_P10S12",
+      "B3_P05S05"
+    ],
+    "seeds": [
+      111,
+      222,
+      333
+    ],
+    "scenarios": [
+      "S0",
+      "S1_Q1",
+      "S1_Q3",
+      "S1_Q7",
+      "S2",
+      "S3",
+      "S4"
+    ],
+    "contracts": 84,
+    "S0_basin_checks": 5412,
+    "common_day_IDs": 652489,
+    "IDs_with_days": 450,
+    "B0_bstar_threshold": 0.007932303438926078,
+    "imputation_B1b": "masked_cells_only_LOCFin_visible_window_then_train_month_day_then_train_feature_mean",
+    "original_missing_outside_scenario_preserved": true,
+    "normalization_refit": false,
+    "train_climatology_period": [
+      "2003-01-01",
+      "2009-12-31"
+    ],
+    "family_aggregation": "mean_S1_Q1_Q3_Q7_then_equal_mean_S1_S2_S3_S4",
+    "selection_status": "handoff_only_Bstar_owner_must_review_policy_and_apply_predeclared_rule",
+    "Bstar_selected": false,
+    "test_predictions_read": false,
+    "optimizer_steps": 0,
+    "inference_library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+    "source_versions": 1,
+    "training_rerun": false
+  }
+}

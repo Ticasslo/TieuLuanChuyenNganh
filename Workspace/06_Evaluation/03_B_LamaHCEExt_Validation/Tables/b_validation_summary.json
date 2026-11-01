@@ -1,0 +1,47 @@
+{
+  "complete": true,
+  "notebook": "03_B_LamaHCEExt_Validation",
+  "period": "validation",
+  "first_date": "2010-01-01",
+  "last_date": "2013-12-31",
+  "steps": [
+    "B1b",
+    "B2",
+    "B3_P10S12",
+    "B3_P05S05"
+  ],
+  "seeds": [
+    111,
+    222,
+    333
+  ],
+  "scenarios": [
+    "S0",
+    "S1_Q1",
+    "S1_Q3",
+    "S1_Q7",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "contracts": 84,
+  "S0_basin_checks": 5412,
+  "common_day_IDs": 652489,
+  "IDs_with_days": 450,
+  "B0_bstar_threshold": 0.007932303438926078,
+  "imputation_B1b": "masked_cells_only_LOCFin_visible_window_then_train_month_day_then_train_feature_mean",
+  "original_missing_outside_scenario_preserved": true,
+  "normalization_refit": false,
+  "train_climatology_period": [
+    "2003-01-01",
+    "2009-12-31"
+  ],
+  "family_aggregation": "mean_S1_Q1_Q3_Q7_then_equal_mean_S1_S2_S3_S4",
+  "selection_status": "handoff_only_Bstar_owner_must_review_policy_and_apply_predeclared_rule",
+  "Bstar_selected": false,
+  "test_predictions_read": false,
+  "optimizer_steps": 0,
+  "inference_library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+  "source_versions": 1,
+  "training_rerun": false
+}

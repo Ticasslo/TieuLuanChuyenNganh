@@ -1,0 +1,8 @@
+﻿metric,checked_rows,matched_rows,passed
+NSE,4961,4961,True
+PNSE,4961,4961,True
+KGE,4961,4961,True
+r,4961,4961,True
+alpha,4961,4961,True
+beta,4961,4961,True
+n,4961,4961,True

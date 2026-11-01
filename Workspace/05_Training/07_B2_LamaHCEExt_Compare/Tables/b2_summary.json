@@ -1,0 +1,50 @@
+{
+  "complete": true,
+  "step": "B2",
+  "scope": "test_S0_lead1_three_seeds",
+  "library_commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+  "training_versions_expected": {
+    "111": 1,
+    "222": 1,
+    "333": 1
+  },
+  "saved_epoch": {
+    "111": 13,
+    "222": 12,
+    "333": 7
+  },
+  "seed_val_nse_median": {
+    "111": 0.7657323042654012,
+    "222": 0.7737715032737152,
+    "333": 0.7718918364631528
+  },
+  "seed_test_nse_median": {
+    "111": 0.7194452111387617,
+    "222": 0.7201443814385415,
+    "333": 0.7219677280354703
+  },
+  "seed_test_nse_mean": 0.7205191068709245,
+  "seed_test_nse_sd": 0.00130233914008641,
+  "contracts": {
+    "111": "contracts/SeqLSTM_Q_B2_seed111_test_S0_lead1.npz",
+    "222": "contracts/SeqLSTM_Q_B2_seed222_test_S0_lead1.npz",
+    "333": "contracts/SeqLSTM_Q_B2_seed333_test_S0_lead1.npz"
+  },
+  "B1b_source": {
+    "notebook": "05_B1_LamaHCEExt_Compare",
+    "version": 1,
+    "summary_sha256": "8290a961e2b65d4d97426b6b0c9ca7172df0f311593a169e43984ae38321adf8",
+    "environment_sha256": "8ee3102ee1fbcacacebf94afc5b04801a9d2c6ab59b1c38d699a58b2e6d3d2bb"
+  },
+  "B1b_validation_comparison": {
+    "comparison": "B2 - B1b",
+    "B1b_validation_NSE_mean": 0.7745438767822287,
+    "B2_validation_NSE_mean": 0.7704652146674231,
+    "validation_NSE_mean_difference": -0.004078662114805565,
+    "B0_Bstar_threshold": 0.007932303438926078,
+    "common_mask_evaluation_completed": false,
+    "Bstar_selected": false
+  },
+  "Bstar_selected": false,
+  "operational_scenarios_run": false
+}

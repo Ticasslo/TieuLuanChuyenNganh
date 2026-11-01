@@ -1,16 +1,16 @@
 # B2 — Bộ nạp và mô hình Extended LamaH-CE
 
-Notebook kiểm source, bộ nạp và mô hình B2 trên nền `f229e02`, trước khi huấn luyện ba seed. Output Kaggle đã nhận tới hết Phần 9.2: **47/47 kiểm đạt**, `B2_LOADER_INDEPENDENT_OK=True`, `B2_READY_FOR_TRAINING=False`. Phần kiểm độc lập đã đạt theo các bảng/log được cung cấp; đang chờ bàn giao B1b và commit thư viện được duyệt trước huấn luyện chính thức.
+Notebook kiểm source, bộ nạp và mô hình B2 trên nền `f229e02`. Output có **48/48 kiểm độc lập đạt**, gồm probe CUDA; Phần 9.3 đạt đủ **57 + 4 kiểm trên Tesla T4**, không failure/error/skip, với commit `2ccaa14`. B1b đã bàn giao qua `main` tại `de17718`. Ba seed B2 và sáu run B3 sau đó đã hoàn tất 30 epoch, Compare Version 1, Evaluation Version 8 và validation S0–S4 Version 1. Notebook Setup chỉ kiểm kỹ thuật, có 0 bước optimizer; kết quả train nằm trong [báo cáo B2](../05_Training/06_B2_LamaHCEExt_Train/06_B2_LamaHCEExt_Train.md) và [B3](../05_Training/08_B3_LamaHCEExt_Train/08_B3_LamaHCEExt_Train.md).
 
 ## Mã B2 theo phân công hiện hành
 
-Người 1 thực hiện trọn B2 và B3 theo `ASSIGNMENT.md`, gồm bộ nạp, mô hình, huấn luyện, so sánh và đánh giá. Thư viện B2 được chia sẻ trên nhánh [`codex/b2-source-masked-mean`](https://github.com/Ticasslo/neuralhydrology/tree/codex/b2-source-masked-mean), commit [`cac96c54379853af4f3f430fcd5ec0df55e5fb30`](https://github.com/Ticasslo/neuralhydrology/commit/cac96c54379853af4f3f430fcd5ec0df55e5fb30), từ nền `f229e02bf98cbd979835a4b6cd503d0e3adb8bc3`; chưa gộp `research`.
+Người 1 thực hiện trọn B2 và B3 theo `ASSIGNMENT.md`, gồm bộ nạp, mô hình, huấn luyện, so sánh và đánh giá. Các thí nghiệm đã lưu pin commit `2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f`, tạo từ mã B2 `cac96c5` và `research` tại `fed53dc` trên nhánh [`codex/b2-source-masked-mean`](https://github.com/Ticasslo/neuralhydrology/tree/codex/b2-source-masked-mean). Bản tích hợp bàn giao cho C là `db6dc1ffcd8c14994cd80be3ed8ff417002c01a1`, kết hợp B2 với `research` tại `5844037` trên nhánh `codex/b2-c-ready`; mốc thí nghiệm 2ccaa14 và output đã lưu giữ nguyên.
 
 Các thay đổi ở `NeuralHydrology/` gồm flatten nhóm biến LamaH; giữ mẫu thiếu đầu vào khi bật masked mean nhưng vẫn kiểm nhãn, lịch sử và thuộc tính; dùng chung quy tắc counter/che forecast cho mẫu thường và batch vector hóa. `configure_lamah_b2` trong `neuralhydrology/datautils/source_groups.py` tạo cấu hình B2 từ B1b, giữ kích thước nhúng, hidden size, head, loss và chuẩn hóa của B1b. Nhóm hindcast là ERA5-Land 21, E-OBS 7, MSWEP 1, GLEAM 2, Q 2; forecast gồm ECMWF HRES 5. Mô hình dùng `SequentialForecastLSTM` với masked mean của `InputLayer`. Cách (b) bước H dùng `forecast_input_mode: first_day`, counter bật và zero overlap; các bản HRES phát hành sau ngày đầu bị che trên bản sao dữ liệu.
 
 Kiểm cục bộ mã thư viện mới: 13 ca B2 và 13 ca hồi quy đạt trên CPU; một ca CUDA chưa chạy vì máy không có CUDA. Mã kiểm thử đơn vị nằm trong `NeuralHydrology/test/test_b2_source_inputs.py`, theo yêu cầu kiểm thử thư viện. Các kiểm thử này không xác nhận dữ liệu thật, tích hợp B1b hay huấn luyện chính thức.
 
-Notebook hiện có 31 code cell, mã `.py` và `.ipynb` đã đồng bộ tới hết Phần 9.2. Bản ứng viên được tạo từ patch B2 đóng băng, có kiểm nguồn, giữ nguyên chuẩn hóa và nạp trên bản sao package. Người dùng tự chạy Kaggle; notebook không chạy epoch hay optimizer. Điểm dừng là bàn giao B1b và commit thư viện đã kiểm trước huấn luyện chính thức.
+Notebook hiện có **32 code cell**, mã `.py` và `.ipynb` đồng bộ tới Phần 9.3. Phần 1–9.2 giữ phép kiểm độc lập bằng patch B2 đóng băng. Phần 9.3 chạy unit test trên fixture thư viện, không huấn luyện B2 chính thức trên LamaH. Khi chạy CPU, phần này ghi trạng thái chưa kiểm T4. Khi Save & Run All trên T4, chạy từ Phần 1.1 trong phiên sạch; Output kiểm T4 là Input cần có của ba notebook train B2.
 
 Phiên tương tác đang có đủ biến tới hết 4.3 có thể tiếp tục từ **4.4**. Khi dùng Save & Run All, chạy từ đầu trong phiên mới để tránh module NeuralHydrology cũ còn nạp. Input giữ như các Phần 1–4 đã kiểm: dataset `lamah-ce-ext`, Output A1 Version 3; Output A2 dùng đối chiếu bản sao config nếu có. CPU đủ cho notebook kiểm, GPU là tùy chọn. Output nằm trong `/kaggle/working/b2_output`.
 
@@ -251,7 +251,7 @@ Thay Q/tái phân tích từ ngày phát hành và HRES phát hành sau ngày đ
 
 ### 9.1. Trạng thái bằng chứng
 
-`B2_LOADER_INDEPENDENT_OK` chỉ True khi các kiểm giả, đếm raw, đối chiếu A1, lookup, mô hình và probe hybrid đều đạt. `B2_READY_FOR_TRAINING=False` cho tới khi bàn giao B1b, cấu hình/dữ liệu được đối chiếu và commit thư viện được duyệt. Chỉ có mặt config chưa đủ xác nhận bàn giao. Chưa merge research hoặc huấn luyện ba seed trong notebook này.
+`B2_LOADER_INDEPENDENT_OK` chỉ True khi các kiểm giả, đếm raw, đối chiếu A1, lookup, mô hình và probe hybrid đều đạt. B1b đã bàn giao; Output seed B1b được kiểm ở notebook train. Phần 9.2 là tổng kết trước cổng T4 nên chưa bật sẵn sàng train. Phần 9.3 cập nhật trạng thái cuối: `B2_READY_FOR_TRAINING=True` khi cả kiểm độc lập và 57+4 kiểm T4 đạt, với nghĩa sẵn sàng chạy notebook train có bước kiểm Input/config riêng. Cập nhật summary/CSV trạng thái đi kèm tính lại SHA-256 trong hai manifest. Cờ này không ghi nhận đã huấn luyện hoặc đã gộp vào `research`.
 
 ### 9.2. Output và manifest
 
@@ -263,9 +263,29 @@ Toàn bộ **31 code cell** đã chạy bằng IPython trên cây Input giả đ
 
 Kiểm thư viện: **13 ca B2 và 13 ca hồi quy đạt trên CPU**; một ca CUDA bỏ qua vì môi trường không có CUDA. Các kiểm huấn luyện dài của bộ hồi quy không được chạy lại trong lượt này. Output Kaggle 4.4–9.2 của bản hiện tại đã nhận và được đối chiếu bên dưới.
 
+## Kiểm chuẩn bị tích hợp và cơ chế B3 trên CPU
+
+Bản sao kiểm độc lập kết hợp source B2 `cac96c54379853af4f3f430fcd5ec0df55e5fb30` với nhánh lõi chung tại `fed53dca9815df963a5fa362558c448c769a6499`; không checkout, merge hoặc thay gitlink. Cả hai nhánh cùng bổ sung thuộc tính vào `utils/config.py`, phép gộp văn bản không có xung đột. Công cụ [B2_Preparation_Check.py](../../Tools/B2_Preparation_Check.py) tạo lại bản sao từ hai commit cố định và bổ sung các kiểm tích hợp, không sửa thư viện nguồn.
+
+Bộ kiểm gồm kiểm B2, tám ca che B3, bốn ca giao nhau B2–lõi và các kiểm mô hình chung: **60 đạt, một CUDA bỏ qua, tám ca huấn luyện/evaluation dài không chạy**. LSTM, GRU, Transformer và S4D chạy forward/backward hữu hạn với đầu vào nhóm B2 và mặt nạ thiếu. Lõi LSTM chung nạp trọng số B2 qua ánh xạ tên tham số cho đầu ra trùng từng bit. Không có kiểm forward Mamba/CUDA trong kết quả này; chưa kết luận các lõi đã được kiểm trên T4.
+
+Tám ca B3 kiểm hai cặp xác suất step/sequence **0,1/0,12** và **0,05/0,05** trên loader thường và vector hóa, cùng hai tình huống biên ở cả hai loader. Các biến cùng nhóm Q chia sẻ phần mặt nạ được thêm; nhãn và tensor lưu nguồn không đổi; validation không bị che; mô hình xử lý được bước thiếu toàn bộ nguồn. Bộ che chỉ ngăn lựa chọn che toàn chuỗi đồng thời ở tất cả nhóm, không bảo đảm luôn có nguồn quan sát ở mọi bước. NumPy và torch dùng các bộ sinh ngẫu nhiên khác nhau; kiểm không đòi hai loader có cùng mặt nạ từng bit khi chỉ đặt cùng seed. [Mã kiểm B3](../../NeuralHydrology/test/test_b3_masking.py).
+
+Các kiểm trên xác nhận đường mã trước huấn luyện. Thí nghiệm thực tế đã hoàn tất: [B2 ba seed](../05_Training/06_B2_LamaHCEExt_Train/06_B2_LamaHCEExt_Train.md), [B3 hai mức × ba seed](../05_Training/08_B3_LamaHCEExt_Train/08_B3_LamaHCEExt_Train.md), [Evaluation Version 8](../06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md) và [validation S0–S4 Version 1](../06_Evaluation/03_B_LamaHCEExt_Validation/03_B_LamaHCEExt_Validation.md). Bộ kiểm artifact giả của train/Compare có 36 kiểm đạt; số liệu khoa học được lấy từ các lần chạy Kaggle đã lưu, không từ fixture.
+
+## Phần 9.3. Kiểm bắt buộc trên T4 của commit tích hợp
+
+Commit `2ccaa14` đã được kiểm trực tiếp bằng `test/test_b2_source_inputs.py`, toàn bộ `test/test_sequential_forecast.py` và tám ca B3: **64 kiểm CPU đạt, một CUDA bỏ qua**, mã thoát 0. Toàn bộ 43 kiểm mô hình chung đã chạy, gồm cả các ca huấn luyện/evaluation của bộ đó. Kết quả này không thay kiểm CUDA hoặc bốn ca so huấn luyện cũ/vector hóa trong `test_gpu_loader.py`.
+
+Phần 9.3 dùng cùng mã [B2_T4_Check.py](../../Tools/B2_T4_Check.py): checkout commit đã pin trong thư mục riêng, chạy đủ **57 kiểm B2 + mô hình chung, không skip**; tiếp đó chạy **bốn** `training_and_evaluation_identical` của GPU loader. Fixture gốc của bốn ca này đặt CPU; công cụ chỉ đổi bản clone tạm sang `cuda:0` rồi khôi phục trong `finally`, để kiểm đúng đường CUDA. Output được cung cấp xác nhận **57 kiểm đạt trong 54,94 giây**, bốn kiểm CUDA đạt trong **22,61 giây**; chín ca deselected là các ca không thuộc bộ bốn được chọn, không phải skip. Thiết bị Tesla T4, Python 3.13.15, torch 2.11.0+cu128, CUDA 12.8; fixture được khôi phục. Log/XML, `B2_t4_check.json` và `manifest.json` được lưu tại `/kaggle/working/b2_t4_check`.
+
+Gắn Output Save Version của notebook Setup đã chạy Phần 9.3 trên T4 vào ba notebook train B2. Mã train kiểm commit, số ca, trạng thái không skip và hash các tệp output trước khi bắt đầu. Phần đối chiếu B1b đọc Output seed thật, kiểm manifest/config và dựng lại Q bằng đúng Phần 3 B1b; không yêu cầu thư mục Q tạm đã bị notebook B1b xóa.
+
+Bản tích hợp `db6dc1ffcd8c14994cd80be3ed8ff417002c01a1` cho `configure_lamah_b2` nhận cả `sequential_forecast_lstm` và `sequential_forecast`. Mặc định builder đặt xác suất che về 0 như B2; khi chuyển B3 sang mô hình chung cần `preserve_masking=True` để giữ đúng xác suất step/sequence của B* đã chọn. Có **15 kiểm mới đạt** cho giao diện này; kết quả bộ kiểm hồi quy rộng được ghi tại [biên bản tích hợp](Tables/B2_C_integration_checks.json). Bằng chứng 57 + 4 kiểm T4 ở trên chỉ thuộc commit 2ccaa14, không xác nhận thay đổi C mới đã chạy trên T4. Khuôn C hiện lấy B1b làm nền; cần áp đầy đủ cấu hình B* đã đóng băng trước khi khớp số tham số, rồi kiểm lại cấu hình sinh ra.
+
 ## Kết quả Kaggle bản f229e02 theo output đã nhận
 
-Nguồn bằng chứng là các bảng/log người dùng gửi, chưa phải tệp `.ipynb` tải từ một Save Version đã xác định. Đã đối chiếu **8/8 hash source** của Phần 4.4 với source ứng viên cục bộ; cùng patch `d801c7ec70fb3db032f8795aeefa6684f6a97146f2e4fe8db94132daa5108945`. Cả tám class/hàm tại 4.5 được nạp từ cùng thư mục ứng viên. `datautils/utils.py` giữ nguyên hash nền, các phương thức chuẩn hóa được bảo toàn.
+Nguồn bằng chứng là tệp `01_B2_LamaHCEExt_DataLoader output.txt` và các bảng/log đã cung cấp, chưa phải `.ipynb` tải từ Save Version được xác định. Tệp log đã được đọc và băm SHA-256 cục bộ; JSON cuối log xác nhận đầy đủ 57+4 kiểm. Chưa nhận các JSON/XML/CSV nguyên gốc để kiểm riêng SHA-256 của từng artifact. Đã đối chiếu **8/8 hash source** của Phần 4.4 với source ứng viên cục bộ; cùng patch `d801c7ec70fb3db032f8795aeefa6684f6a97146f2e4fe8db94132daa5108945`. Cả tám class/hàm tại 4.5 được nạp từ cùng thư mục ứng viên. `datautils/utils.py` giữ nguyên hash nền, các phương thức chuẩn hóa được bảo toàn.
 
 Fixture có 22 mẫu train, 16 validation. Cả chín kiểm loader, năm kiểm model CPU, ba kiểm hợp đồng và kiểm bộ đếm cửa sổ đều đạt. Đã đếm đủ **451 ID**, đối chiếu A1 theo hợp đồng `Wb741da88055e`: **18/18 dòng chênh lệch bằng 0**. Điều này xác nhận số đếm trên hợp đồng chung, không tự xác nhận mọi tệp raw lịch sử giống byte.
 
@@ -280,11 +300,11 @@ Lookup thực trên **10 ID** khớp toàn bộ tập ngày ở cả 365/730: m�
 
 Cả **sáu kiểm hybrid** đạt, gồm mẫu/batch vector hóa bằng nhau và can thiệp dữ liệu tương lai giữ nguyên đầu vào được phép/dự báo. YAML scaler đọc lại đúng định dạng gốc. Probe nhiều hạn trên ID 2 phát hành 01/01/2010, hindcast kết thúc 31/12/2009, dự báo tới 07/01/2010: 364 bước hindcast, 7 forecast, `HRES_from_future_releases_used=False`, dự báo hữu hạn. Bảng 9.1 báo probe gradient và batch thật đạt; bảng chi tiết 7.3 không có trong phần dán nên chưa ghi giá trị loss hoặc hình dạng dự báo cụ thể của lần chạy này.
 
-Tổng kết 9.2 có **47/47 kiểm đạt, 451 ID đếm raw, 10 ID probe, 0 bước optimizer**; kiểm độc lập True và sẵn sàng huấn luyện False. CUDA ghi `not_run_no_CUDA`; chưa xác nhận GPU. B1b chưa được bàn giao/đối chiếu, nhánh thư viện chưa merge, ba seed B2 chưa được huấn luyện.
+Tổng kết 9.2 có **48/48 kiểm đạt, 451 ID đếm raw, 10 ID probe, 0 bước optimizer**, probe CUDA đạt. Cờ sẵn sàng False trong log thuộc mốc kiểm độc lập trước Phần 9.3; sau đó đủ 57 + 4 kiểm T4 trên 2ccaa14. B1b đã bàn giao, train B2/B3 và các bước Compare/Evaluation/validation đã hoàn thành. Các cờ trong log cũ không mô tả một đầu vào còn thiếu hiện nay.
 
 Các SyntaxWarning về `\d` trong `datautils/utils.py` và `\s` trong `datasetzoo/camelsus.py` thuộc chuỗi regex của mã nền. Chúng không phải traceback và không làm các kiểm nhận được thất bại; giữ source pin/hash hiện tại. Cảnh báo thiếu std tại 324/600/623 phù hợp với 0 nhãn train; không điền std bằng nhãn evaluation.
 
-Phần dán lặp bảng 7.2 và thiếu ba ô cuối hàng test/730 của bảng 6.2. Chưa nhận CSV/JSON gốc để kiểm riêng nội dung/hashes; không ghi các ô suy ra như số đo trực tiếp. Các hạn chế này không tạo thêm lỗi thuật toán trong output đã cung cấp. Mã `.py` không thay đổi sau đợt rà này; chưa cần chạy lại chỉ vì các cảnh báo trên. Bản `.ipynb` cục bộ chỉ cập nhật receipt/diễn giải, không giả lập output thực thi. Số Save Version chưa được xác nhận.
+Log thiếu ba ô cuối hàng test/730 của bảng 6.2; không điền số suy ra như số đo trực tiếp. CSV/JSON gốc của lần Setup và số Save Version chưa được xác nhận riêng. Bảy kiểm readiness/manifest cục bộ đạt; notebook train kiểm file T4 gốc, không dùng cờ False ở summary 9.2. Các `.ipynb` nguồn trong repo không giả lập output thực thi.
 
 ## Output cần đối chiếu sau khi chạy
 
@@ -390,20 +410,20 @@ Mốc tiến độ cuối Phần 6.2 là **415,4 giây kể từ STARTED ở Ph�
 
 Các SyntaxWarning về escape `\d` trong datautils/utils.py và `\s` trong datasetzoo/camelsus.py thuộc chuỗi regex của mã nền NeuralHydrology. Package datasetzoo import cả lớp CamelsUS khi nạp các dataset, dù notebook dùng LamaH. Chúng là cảnh báo khi biên dịch/import, không phải traceback thất bại trong lần chạy được cung cấp. Giữ nguyên nguồn pin và hash; chưa thêm thay đổi thuật toán hoặc yêu cầu chạy lại chỉ vì các cảnh báo này.
 
-Phần kiểm độc lập trên Kaggle đã đạt. Phần còn lại là rà patch cùng Người 2 và tích hợp lên mã/cấu hình B1 cụ thể; sau đó kiểm lại phần tích hợp bị ảnh hưởng và bàn giao commit thư viện. `B2_READY_FOR_TRAINING=False` phản ánh việc này, không phải bộ lọc hoặc phép đếm đang lỗi. Huấn luyện chính thức ba seed B2 thuộc Người 1 theo phân công hiện hành, chưa bắt đầu trong notebook này.
+Phần kiểm độc lập trên Kaggle đã đạt. Trong mốc output này, `B2_READY_FOR_TRAINING=False` ghi nhận chưa tích hợp B1b và chưa qua cổng T4. Các bước đó về sau đã hoàn tất trên 2ccaa14, tiếp theo là ba seed B2, sáu run B3, Compare, Evaluation Version 8 và validation Version 1. Bản tích hợp cho bước C và giới hạn bằng chứng được ghi ở Phần 9.3; Thắng phụ trách xác nhận B* và gắn `freeze-C`.
 
 ### Trạng thái kiểm chứng và giới hạn
 
 Kiểm cục bộ ngày 22/10/2026: 31 cell đã chạy qua IPython với bộ LamaH giả 451 ID, 29 ca kiểm đạt. Bộ giả có lịch, config, thuộc tính và bảng đối chứng giả được ghi rõ nguồn; các số đếm của nó không đưa vào kết quả LamaH thật. Đã kiểm đường đọc CSV, lookup ngày ở 365/730, sinh patch từ cell notebook, scaler YAML, forward/backward và can thiệp tương lai. Môi trường kiểm cục bộ là Python 3.12.6, NumPy 1.26.4, pandas 2.3.3, xarray 2025.12.0, PyTorch 2.9.1 trên CPU; môi trường Kaggle có thể khác và sẽ được notebook ghi lại.
 
-Mã nền được cố định tại dda45fcf19ee7ffd481b9d192778539df46fb074. Bản ứng viên chưa tích hợp B1; B2_READY_FOR_TRAINING vì vậy giữ False trong kết quả hiện có. Lần chạy Kaggle đã nhận đủ CSV A1 để đối chiếu, không có trạng thái not_run cho phần này. Bộ nạp dùng một tần suất ngày, một kỳ train chung và Sequential Forecast overlap=0; cấu hình nhiều tần suất/per-basin periods hoặc kiến trúc khác cần kiểm riêng.
+Kiểm cục bộ ngày 22/10/2026 dùng mã nền `dda45fcf19ee7ffd481b9d192778539df46fb074` và ứng viên chưa tích hợp B1; cờ False là trạng thái của mốc kiểm đó. Các thí nghiệm B2/B3 đã lưu về sau dùng 2ccaa14. Lần Kaggle kiểm độc lập đã nhận đủ CSV A1 để đối chiếu, không có trạng thái `not_run` cho phần này. Phạm vi được kiểm là một tần suất ngày, một kỳ train chung và Sequential Forecast overlap=0; nhiều tần suất hoặc kỳ riêng theo lưu vực cần kiểm riêng.
 
-Không yêu cầu huấn luyện ba seed để xác nhận đường dữ liệu, không gọi kiểm source/ZIP là tái huấn luyện, không lấy điểm test để chọn giải pháp. Việc tích hợp B1, cấu hình huấn luyện chính thức và freeze-C phải được bàn giao ở bước tương ứng.
+Kiểm source và đường dữ liệu độc lập với kết quả huấn luyện ba seed; không lấy điểm test để chọn giải pháp. B0–B3, Evaluation Version 8 và validation Version 1 đã đủ bằng chứng bàn giao. Thắng xác nhận B* theo luật ghi trước và cấu hình đóng băng trước khi chạy C.
 
 ### Nguồn đối chiếu
 
-- [Phân công Người 1](../../../ASSIGNMENT.md), bộ nạp B2 và điểm bàn giao.
-- [Pipeline](../../../Document/01_Plan/02_Pipeline.md), Mục 3, 4.4, 7 và 9.
-- [A1](../02_Exploration/01_A1_LamaHCEExt_Explore.md), hợp đồng Phần 7 và bàn giao Mục 25.
-- [A3](../03_Baseline/02_A3_LamaHCEExt_Benchmarks.md), Q nguồn/diện tích/đơn vị và giới hạn nhãn train.
+- [Phân công Người 1](../../ASSIGNMENT.md), bộ nạp B2 và điểm bàn giao.
+- [Pipeline](../../Document/01_Plan/02_Pipeline.md), Mục 3, 4.4, 7 và 9.
+- [A1](../02_Exploration/01_A1_LamaHCEExt_Explore/01_A1_LamaHCEExt_Explore.md), hợp đồng Phần 7 và bàn giao Mục 25.
+- [A3](../03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md), Q nguồn/diện tích/đơn vị và giới hạn nhãn train.
 - [Mã LamaH nền](../../NeuralHydrology/neuralhydrology/datasetzoo/lamah.py), [BaseDataset](../../NeuralHydrology/neuralhydrology/datasetzoo/basedataset.py), [InputLayer](../../NeuralHydrology/neuralhydrology/modelzoo/inputlayer.py) và [đọc scaler](../../NeuralHydrology/neuralhydrology/datautils/utils.py).
