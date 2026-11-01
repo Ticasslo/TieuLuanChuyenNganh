@@ -1070,7 +1070,7 @@ if installed!=NH_COMMIT:
 SUMMARY.update(step='B2',ready_for_evaluation=EVALUATION_CHECKS_OK,B1b_source=B1_IDENTITY)
 (OUT_DIR/f'summary_{EXP_NAME}.json').write_text(json.dumps(SUMMARY,ensure_ascii=False,indent=2),encoding='utf-8')
 env={'seed':RUN_SEED,'experiment_name':EXP_NAME,'run_dir':RUN_DIR.relative_to(WORK_DIR).as_posix(),
-    'notebook':f'06_B2_LamaHCEExt_Train_Seed{RUN_SEED}','step':'B2','python':sys.version.split()[0],
+    'notebook':f'07_B2_LamaHCEExt_Train_Seed{RUN_SEED}','step':'B2','python':sys.version.split()[0],
     'gpu':torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'cpu','neuralhydrology_commit':NH_COMMIT,
     'config_sha256':sha256(RUN_DIR/'config.yml'),'libs':{name:metadata.version(name) for name in ENV_LIBS},
     'protocol':{'epochs':cfg_saved.epochs,'early_stopping_patience':cfg_saved.early_stopping_patience,
@@ -1089,4 +1089,4 @@ show('Output B2 và hash',manifest.assign(sha256=manifest.sha256.str[:12]))
 if not EVALUATION_CHECKS_OK:
     raise RuntimeError('Đã lưu log, trọng số và audit, nhưng kiểm checkpoint/evaluation chưa đạt; '
                        'không bàn giao run này cho Compare như kết quả hợp lệ.')
-print('Hoàn tất B2 seed',RUN_SEED,'; Save Version rồi gắn ba Output vào 07_B2_LamaHCEExt_Compare.')
+print('Hoàn tất B2 seed',RUN_SEED,'; Save Version rồi gắn ba Output vào 08_B2_LamaHCEExt_Compare.')

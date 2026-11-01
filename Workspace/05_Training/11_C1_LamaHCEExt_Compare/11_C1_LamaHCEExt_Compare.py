@@ -138,7 +138,8 @@ sha_rows = []
 for conf in GRID:
     r = runs[conf]
     man = pd.read_csv(r["out"] / "manifest.csv")
-    bad = [rel for rel, dg in zip(man["tệp"], man["sha256"]) if not (r["root"] / rel).exists() or sha256(r["root"] / rel) != dg]
+    col = "file" if "file" in man else "tệp"     # Output B3 (B*) ghi cột "file", khuôn C ghi "tệp"
+    bad = [rel for rel, dg in zip(man[col], man["sha256"]) if not (r["root"] / rel).exists() or sha256(r["root"] / rel) != dg]
     sha_rows.append({"cấu hình": conf, "tệp": len(man), "lệch": len(bad), "_bad": bad})
 
 # (3) Bảng Output và kiểm config từng run

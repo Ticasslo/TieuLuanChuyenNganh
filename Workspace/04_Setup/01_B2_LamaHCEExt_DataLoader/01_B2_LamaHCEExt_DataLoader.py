@@ -59,8 +59,9 @@ PERIODS = {'train': ('2003-01-01', '2009-12-31'), 'validation': ('2010-01-01', '
 SOURCE_ORDER = ('ERA5L', 'EOBS', 'MSWEP', 'GLEAM', 'Q', 'ECMWF')
 CHECKS, RECEIPTS = [], []
 STARTED = time.perf_counter()
-print('B2: kiểm độc lập trên f229e02; B1b đã bàn giao Version 1; kiểm T4 của commit 2ccaa14 ở Phần 9.3.')
+print('B2: fork f229e02; kiểm bộ nạp/mô hình; chờ bàn giao B1b để huấn luyện.')
 print('Input:', INPUT_ROOT, '| Output:', OUT, '| Python:', platform.python_version())
+
 
 # %% Phần 1.2 - Chuẩn bị thư viện và xác nhận mã nền
 # Cài đúng commit khi bản có sẵn khác nguồn; kiểm hash trước mọi thay đổi B2.
@@ -199,6 +200,7 @@ b2_json(OUT / 'B2_environment.json', {'python': platform.python_version(), 'pack
 b2_table('1.2. Môi trường', [{'package': k, 'version': v} for k, v in VERSIONS.items()])
 b2_table('1.2. Mã nền f229e02', source_rows)
 print('Phần 1.2 đạt:', len(source_rows), 'tệp khớp SHA-256; chưa áp thay đổi B2 hoặc bắt đầu huấn luyện.')
+
 
 # %% Phần 1.3 - Tìm raw, danh sách ID, config và bảng A1
 # Chỉ kiểm cấu trúc, header và danh tính nguồn; chưa nạp chuỗi ngày hoặc fit scaler.
@@ -351,6 +353,7 @@ b2_table('1.3. Cấu hình tìm được', pd.DataFrame(config_rows)[['source', 
 b2_table('1.3. Hai bảng A1 bắt buộc', a1_inventory.loc[a1_inventory.name.isin(required_a1), ['source', 'bytes', 'sha256']])
 print('Phần 1.3 đạt: đủ 451 ID, 902 tệp chuỗi ngày và hai bảng A1; chưa chọn cấu hình B1b hoặc fit scaler.')
 
+
 # %% Phần 2.1 - Hàm nhóm nguồn và kiểm hợp đồng cấu hình
 # Chốt tên biến và pha được phép; chưa chọn config, dựng Q, fit scaler hoặc nạp mô hình.
 B2_Q_INPUTS = ('qmean_mmd', 'qmax_mmd')
@@ -474,8 +477,9 @@ b2_table('2.1. Quy tắc Q và dự báo', [
 ])
 print('Phần 2.1 đạt: đã định nghĩa hợp đồng và hàm kiểm; chưa chọn config hoặc xác nhận dữ liệu thực tế.')
 
+
 # %% Phần 2.2 - Chọn config nền và tạo hợp đồng kiểm B2
-# Chọn mốc tác giả nhúng đơn giản và tạo template kiểm độc lập; config B1b thật được kiểm trong notebook train.
+# Chọn mốc tác giả nhúng đơn giản, so bản sao A2 và tạo template; chưa nhận bàn giao B1b.
 AUTHOR_RUN_NAME = 'Sequential_Forecast_LSTM_RA_with_q_Simple_Embedding'
 RUNTIME_CONFIG_KEYS = {'data_dir', 'run_dir', 'train_dir', 'img_log_dir', 'train_basin_file',
     'validation_basin_file', 'test_basin_file', 'device', 'num_workers', 'verbose', 'experiment_name',
@@ -635,7 +639,7 @@ b2_json(OUT / 'B2_source_contract.json', {'library_base_commit': BASE_COMMIT,
     'derived_B2_input_contract_verified': True,
     'raw': str(RAW), 'basin_ids': IDS, 'Q_inputs': B2_Q_INPUTS, 'Q_unit_expected': 'mm/day_area_gov',
     'Q_origin': 'D_gauges; B1b conversion once; hindcast through t-1',
-    'B1b_config_data_verified_in_this_notebook': False, 'Q_columns_verified_against_raw': False,
+    'B1b_handoff_verified': False, 'Q_columns_verified_against_raw': False,
     'template_only': True, 'runtime_paths_prepared': False, 'official_training_started': False,
     'planned_seeds': [111, 222, 333], 'periods': PERIODS})
 b2_table('2.2. Đối chiếu config nguồn', pd.DataFrame(copy_rows))
@@ -647,10 +651,11 @@ b2_table('2.2. Phạm vi template', [
     {'item': 'training protocol', 'value': '30 epoch; best validation NSE; data_on_gpu=True'},
     {'item': 'B2 architecture', 'value': 'Giữ hidden_size=128 và hai embedding FC 16 chiều; thêm nhóm nguồn và masked mean'},
     {'item': 'Q inputs', 'value': 'qmean_mmd, qmax_mmd; chưa kiểm cột dữ liệu thật'},
-    {'item': 'B1b handoff', 'value': 'Đã bàn giao Version 1; đây là template kiểm độc lập, config thực được kiểm ở notebook train'},
+    {'item': 'B1b handoff', 'value': 'Chưa xác nhận; config kỳ vọng được suy ra từ mốc và quy tắc đã công bố'},
     {'item': 'training', 'value': 'Chưa chuẩn bị đường dẫn chạy, chưa fit scaler và chưa huấn luyện'},
 ])
-print('Phần 2.2 đạt: template B2 có 33/5/33 biến, 38 đầu vào động; B1b đã bàn giao, nguồn thực được kiểm ở notebook train.')
+print('Phần 2.2 đạt: mốc 32/5/33; template B2 có 33/5/33 biến, 38 đầu vào động; chưa xác nhận bàn giao B1b.')
+
 
 # %% Phần 2.3 - Đọc diện tích, thuộc tính và cố định đường dẫn
 # Kiểm đúng tập ID/thứ tự đã chọn; chưa đọc chuỗi ngày, đổi Q hoặc fit scaler.
@@ -761,7 +766,7 @@ b2_json(OUT / 'B2_attribute_contract.json', {'complete': True, 'stage': 'attribu
     'Q_conversion_reference': 'Q_m3_s / (area_gov_km2 * 1e6) * 1000 * 86400',
     'forcing_files_indexed': len(FORCING_FILES), 'gauge_files_indexed': len(Q_FILES),
     'daily_series_values_checked': False, 'Q_converted': False, 'scaler_fitted': False,
-    'B1b_config_data_verified_in_this_notebook': False, 'official_training_started': False})
+    'B1b_handoff_verified': False, 'official_training_started': False})
 b2_table('2.3. Diện tích và thuộc tính', [{'IDs': len(IDS), 'static_fields': len(STATIC),
     'area_min_km2': AREAS.min(), 'area_median_km2': AREAS.median(), 'area_max_km2': AREAS.max(),
     'forcing_files': len(FORCING_FILES), 'gauge_files': len(Q_FILES), 'library_values_matched': True}])
@@ -769,6 +774,7 @@ b2_table('2.3. Nguồn thuộc tính', attribute_sources)
 b2_table('2.3. Kiểm 33 thuộc tính theo config', static_checks)
 print(f'Phần 2.3 đạt: {len(IDS)} ID, {len(STATIC)} thuộc tính, area_gov dương/hữu hạn; '
       'khớp bộ đọc thư viện; chưa đọc chuỗi ngày, đổi Q hoặc fit scaler.')
+
 
 # %% Phần 3.1 - Đọc hàm lọc gốc và xác lập quy tắc đối chiếu
 # Chỉ bỏ decorator JIT khi tách hàm; chưa áp bản sửa bộ nạp hoặc chạy dữ liệu thật.
@@ -845,6 +851,7 @@ b2_table('3.1. Quy tắc lập lookup để đối chiếu', filter_rules)
 print('Phần 3.1 đạt: đã tách nguyên thân hàm _validate_samples từ mã nền; '
       'mới định nghĩa wrapper đối chiếu, chưa kiểm ví dụ 3.2 hoặc lookup dữ liệu thật.')
 
+
 # %% Phần 3.2 - Kiểm các mặt nạ giữ và loại mẫu biết trước
 # Dữ liệu giả với kỳ vọng viết độc lập; kiểm wrapper, chưa xác nhận bộ nạp B2 thật.
 b2_json(OUT / 'B2_filter_fixture_summary.json', {'complete': False, 'stage': 'synthetic_filter_fixtures'})
@@ -910,6 +917,7 @@ b2_json(OUT / 'B2_filter_fixture_summary.json', {'complete': True, 'synthetic_da
     'real_lookup_verified': False, 'official_training_started': False})
 print(f'Phần 3.2 đạt: {fixture_check_count}/{fixture_check_count} kiểm, {len(fixture_cases)} mặt nạ đúng kỳ vọng; '
       'chỉ dữ liệu giả và wrapper; chưa áp patch B2 hoặc kiểm lookup dữ liệu thật.')
+
 
 # %% Phần 4.1 - Đọc ngày và kiểm Q tham chiếu trên một ID
 # Đổi Q tham chiếu từ D_gauges bằng hàm mã nền; không sửa bộ nạp hoặc tệp forcing.
@@ -995,13 +1003,14 @@ b2_json(OUT / 'B2_daily_reference_summary.json', {'complete': True, 'probe_ID': 
     'conversion': 'library _normalize_discharge; daily; area_gov', 'Q_inputs': list(B2_Q_INPUTS),
     'target': 'qmax; separate column, same values as qmax_mmd before warmup handling',
     'alignment': 'reindex gauge to forcing calendar; missing stays NaN',
-    'raw_files_modified': False, 'B1b_config_data_verified_in_this_notebook': False, 'B1b_forcing_columns_checked': False,
+    'raw_files_modified': False, 'B1b_handoff_verified': False, 'B1b_forcing_columns_checked': False,
     'B2_loader_patch_applied': False, 'real_lookup_verified': False, 'scaler_fitted': False,
     'official_training_started': False})
 b2_table('4.1. Nguồn chuỗi ngày của một ID', daily_probe_sources)
 b2_table('4.1. Q tham chiếu mm/ngày từ D_gauges', daily_probe_q_check)
 print(f'Phần 4.1 đạt: đọc chuỗi ngày ID {daily_probe_basin}, {len(daily_probe_weather)} biến khí tượng và Q tham chiếu; '
       'chưa xác nhận cột forcing B1b, áp patch hoặc kiểm lookup thật.')
+
 
 # %% Phần 4.2 - Khóa chuẩn hóa và std nhãn theo mã nền B1b
 # Bảo vệ các phương thức gốc; chưa fit scaler hoặc áp patch B2.
@@ -1078,11 +1087,12 @@ b2_json(OUT / 'B2_normalization_contract.json', {'complete': True, 'library_base
     'loaded_methods_matched': True, 'expected_B1b_template_config_keys_matched': len(normalization_keys),
     'rules': normalization_rules.to_dict('records'), 'custom_scaler_or_target_std_patch': False,
     'source_and_template_checks_only': True, 'scaler_fitted': False, 'raw_normalization_verified': False,
-    'B1b_config_data_verified_in_this_notebook': False, 'B2_loader_patch_applied': False, 'official_training_started': False})
+    'B1b_handoff_verified': False, 'B2_loader_patch_applied': False, 'official_training_started': False})
 b2_table('4.2. Phương thức chuẩn hóa phải giữ nguyên', normalization_method_rows)
 b2_table('4.2. Quy tắc chuẩn hóa và std nhãn của mã nền', normalization_rules)
 print(f'Phần 4.2 đạt: {len(NORMALIZATION_METHODS)} phương thức gốc và {len(normalization_keys)} khóa template khớp; '
       'đã định nghĩa kiểm bảo toàn chuẩn hóa; chưa fit scaler hoặc áp patch B2.')
+
 
 # %% Phần 4.3 - Hàm chung che forecast và chuyển counter cho mẫu hoặc batch
 # Kiểm tensor giả; chưa nối hàm vào bộ nạp, GpuBatchLoader hoặc InputLayer.
@@ -1180,6 +1190,7 @@ b2_json(OUT / 'B2_forecast_helper_summary.json', {'complete': True, 'synthetic_d
     'real_lookup_verified': False, 'official_training_started': False})
 print(f'Phần 4.3 đạt: {forecast_helper_check_count}/{forecast_helper_check_count} kiểm helper trên tensor giả; '
       'mẫu/batch khớp, tensor nguồn giữ nguyên; chưa tích hợp bộ nạp hoặc mô hình.')
+
 
 # %% Phần 4.4 - Tạo bản ứng viên đúng patch B2 trên f229e02
 # Patch đóng băng từ nhánh B2; không thay bộ nạp Q, scaler hoặc phương thức std nhãn.
@@ -1458,6 +1469,7 @@ b2_json(OUT / 'B2_candidate_source.json', {'base_commit': BASE_COMMIT, 'B1b_inte
 b2_table('4.4. Source ứng viên B2, chưa gộp research', candidate_rows)
 print('Phần 4.4 đạt: tạo source và patch; chuẩn hóa gốc giữ nguyên; chưa merge hoặc huấn luyện.')
 
+
 # %% Phần 4.5 - Nạp bản ứng viên và kiểm cấu hình B1b sang B2
 # Nạp lại package từ bản sao; nguồn cài đặt và fork chưa bị ghi đè.
 for name in list(sys.modules):
@@ -1486,9 +1498,10 @@ for relative, source in patched.items():
 constructed = configure_lamah_b2(Config(copy.deepcopy(B1B_EXPECTED_CONFIG)))
 b2_assert(constructed.as_dict() == Config(copy.deepcopy(B2_CONFIG_TEMPLATE)).as_dict(), 'Builder khác template đã kiểm.')
 b2_json(OUT / 'B2_candidate_loaded.json', {'loaded_from_candidate': True, 'builder_matches_template': True,
-    'B1b_config_data_verified_in_this_notebook': False, 'official_training_started': False})
+    'B1b_handoff_verified': False, 'official_training_started': False})
 b2_table('4.5. Module đang nạp', loaded_rows)
 print('Phần 4.5 đạt: loader, model và builder nạp từ cùng source ứng viên.')
+
 
 # %% Phần 5.1 - Bộ dữ liệu giả theo đúng schema LamaH
 # Dựng hai lưu vực có số biết trước; kết quả phần này không phải kết quả thực nghiệm.
@@ -1547,6 +1560,7 @@ SYN_SCALER = copy.deepcopy(SYN_TRAIN.scaler)
 SYN_EVAL = LamaH(SYN_CFG, is_train=False, period='validation', scaler=copy.deepcopy(SYN_SCALER))
 print('5.1. Dataset giả đã qua LamaH/BaseDataset thật:', len(SYN_TRAIN), 'train;', len(SYN_EVAL), 'validation.')
 
+
 # %% Phần 5.2 - Kiểm Q, warmup và chuẩn hóa gốc trên fixture
 # Tính kỳ vọng độc lập từ CSV và so cả scaler lẫn std theo kỳ.
 def b2_test_raw_q():
@@ -1596,6 +1610,7 @@ for name, op in [('Q_converted_once_separate_target', b2_test_raw_q), ('first_wi
                  ('nested_groups_flattened', b2_test_grouped_variables)]:
     b2_check(name, op, 'synthetic_loader')
 
+
 # %% Phần 5.3 - Kiểm lookup thực, chế độ cũ và nhãn thiếu
 # So lookup của BaseDataset với phép đếm trực tiếp bằng các ngày raw đã biết.
 def b2_test_lookup():
@@ -1642,6 +1657,7 @@ for name, op in [('lookup_keeps_input_missing_rejects_label_missing', b2_test_lo
                  ('repeated_overlapping_samples', b2_test_repeated_sample)]:
     b2_check(name, op, 'synthetic_loader')
 b2_require('synthetic_loader')
+
 
 # %% Phần 5.4 - Kiểm lớp nhúng, gradient và counter
 # Dùng InputLayer thật, trọng số khởi tạo giả; không công bố điểm dự báo từ kiểm này.
@@ -1740,6 +1756,7 @@ if torch.cuda.is_available():
     GPU_PROBE_STATUS = 'passed' if CHECKS[-1]['passed'] else 'failed'
 b2_require('synthetic_model')
 
+
 # %% Phần 5.5 - Từ chối hợp đồng sai và can thiệp ngoài kỳ fit
 # Kiểm lỗi đầu vào và bảo đảm thay dữ liệu ngoài train không làm đổi scaler.
 def b2_expect_error(operation, expected=(ValueError, TypeError)):
@@ -1791,6 +1808,7 @@ for name, operation in [('invalid_contracts_rejected', b2_test_bad_contracts),
     b2_check(name, operation, 'input_contract')
 b2_require('input_contract')
 
+
 # %% Phần 6.1 - Hàm đếm cửa sổ độc lập và thống kê gộp train
 # Dùng tổng tích lũy boolean; không sao chép hàng triệu cửa sổ và không gọi bộ lọc NH.
 def b2_window_complete(finite, length):
@@ -1838,6 +1856,7 @@ def b2_test_window_oracle():
 
 b2_check('rolling_mask_matches_explicit_windows', b2_test_window_oracle, 'count_oracle')
 b2_require('count_oracle')
+
 
 # %% Phần 6.2 - Đếm 451 ID và tính scaler bằng nguyên phương thức NH
 # Bộ nhớ ánh xạ chứa train và warmup; chỉ dựng forcing phụ cho các ID probe.
@@ -1956,13 +1975,14 @@ if RUN_REAL_DATA:
     b2_save('B2_sample_counts.csv',COUNT_SUMMARY)
     b2_save('B2_Q_source_audit.csv',pd.DataFrame(Q_AUDIT))
     b2_save('B2_train_target_std.csv',pd.DataFrame([{'basin_id':b,'sigma_mm_day':v[0]} for b,v in TARGET_STDS.items()]))
-    b2_json(OUT/'B2_reference_input.json',{'derived_from_raw':True,'B1b_config_data_verified_in_this_notebook':False,
+    b2_json(OUT/'B2_reference_input.json',{'derived_from_raw':True,'B1b_handoff_verified':False,
         'prepared_IDs':PROBE_BASINS,'raw_IDs_counted':len(IDS),'model_input_float32_roundtrip_verified':True,
         'reference_only':True,'source_raw':str(RAW),'source_library_commit':BASE_COMMIT})
     b2_table('6.2. Số mẫu toàn tập; B1b_inputs là hợp đồng, chưa là run huấn luyện',COUNT_SUMMARY)
 else:
     REAL_SCALER = None
     print('Phần 6.2: not_run, chưa kiểm dữ liệu thật.')
+
 
 # %% Phần 6.3 - Đối chiếu CSV A1 theo đúng hợp đồng biến và pha
 # So phép đếm A2 cũ; không ép số mẫu B2 phải bằng số complete-case A1.
@@ -2031,6 +2051,7 @@ b2_save('B2_A1_count_comparison.csv', pd.DataFrame(A1_COMPARISON))
 b2_table('6.3. Đối chiếu A1', A1_COMPARISON)
 A1_COUNTS_OK = bool(A1_COMPARISON) and all(r['status'] == 'counts_match_source_identity_not_proven' for r in A1_COMPARISON)
 
+
 # %% Phần 6.4 - Hồ sơ thiếu train và bất biến của phép đếm
 # Giữ 451 ID; đếm nhãn, mẫu, lookup và lý do không có mẫu riêng nhau.
 REAL_COUNT_CHECKS_OK = False
@@ -2048,6 +2069,7 @@ if RUN_REAL_DATA:
     b2_table('6.4. Hồ sơ train, khung 365', profiles.loc[profiles.period.eq('train') & profiles.sequence_total_days.eq(365)])
     b2_require('real_counts')
     REAL_COUNT_CHECKS_OK = True
+
 
 # %% Phần 7.1 - Cấu hình probe thật và nguồn Q tham chiếu
 # Chỉ giảm hidden_size cho mô hình ngẫu nhiên; cấu hình huấn luyện B2 vẫn giữ template.
@@ -2079,8 +2101,9 @@ probe_cfg.dump_config(OUT,filename=path.name)
 RECEIPTS.append(path)
 b2_json(OUT/'B2_probe_settings.json',{'IDs':PROBE_BASINS,'source':'derived raw Q reference, not B1b handoff',
     'random_weights':True,'diagnostic_hidden_size':16,'official_template_hidden_size':B2_CONFIG_TEMPLATE['hidden_size'],
-    'optimizer_steps':0,'B1b_config_data_verified_in_this_notebook':False})
+    'optimizer_steps':0,'B1b_handoff_verified':False})
 print('Phần 7.1: probe trên dữ liệu tham chiếu; không phải huấn luyện chính thức.')
+
 
 # %% Phần 7.2 - Lookup thật so với phép đếm độc lập ở 365 và 730
 # Tạo LamaH thực cho tập hồ sơ nhỏ bằng scaler của 451 ID; không fit lại trên tập nhỏ.
@@ -2127,6 +2150,7 @@ if RUN_REAL_DATA:
 else:
     print('7.2. not_run: chưa kiểm lookup từ dữ liệu thật.')
 
+
 # %% Phần 7.3 - Batch thật, loader vector hóa và loss NH
 # Forward/backward bằng trọng số ngẫu nhiên; không tạo optimizer hoặc chạy epoch.
 REAL_MODEL_OK=False
@@ -2156,6 +2180,7 @@ if RUN_REAL_DATA and REAL_LOADER_OK:
 else:
     print('Phần 7.3: not_run, chưa có loader thật được kiểm.')
 
+
 # %% Phần 8.1 - Cửa sổ nhiều hạn và ngày phát hành t
 # Giữ 4 ngày hindcast trong fixture; horizon 7 làm tổng khung 11, không giữ nhầm tổng khung 5.
 HYBRID_CFG = b2_fixture_config(seq_length=11, forecast_seq_length=7, predict_last_n=7,
@@ -2169,6 +2194,7 @@ HORIZON_TABLE = pd.DataFrame({'release_date': [ORIGIN] * 7, 'target_date': hybri
     'last_Q_input_date': [hybrid_dates[-8]] * 7})
 b2_save('B2_hybrid_calendar_example.csv', HORIZON_TABLE)
 b2_table('8.1. Lịch giả minh họa cách (b)', HORIZON_TABLE)
+
 
 # %% Phần 8.2 - Kiểm che forecast, counter và tính bất biến của dữ liệu lưu chung
 # Cơ chế che chạy trong __getitem__; không chỉ che thủ công batch trước khi gọi mô hình.
@@ -2209,6 +2235,7 @@ for name, operation in [('hybrid_mask_and_counters_exact', b2_test_hybrid_values
 
 
 b2_check('hybrid_ordinary_vectorized_batches_equal', lambda: b2_compare_batch_paths(HYBRID_DS), 'hybrid_forecast')
+
 
 # %% Phần 8.3 - Can thiệp dữ liệu tương lai và đối chiếu đầu ra
 # Thay Q/tái phân tích từ t và HRES sau t trong đường đọc của loader; không sửa Input.
@@ -2263,6 +2290,7 @@ b2_check('future_raw_intervention_same_inputs_same_predictions', b2_test_causali
 b2_check('release_day_forecast_remains_active', b2_test_valid_forecast_is_used, 'hybrid_forecast')
 b2_require('hybrid_forecast')
 
+
 # %% Phần 8.4 - Kiểm lưu/đọc scaler và batch nhiều hạn trên raw
 # Giữ định dạng scaler NH; std nhãn vẫn theo kỳ đang nạp, batch nhiều hạn chỉ là probe.
 def b2_test_scaler_roundtrip():
@@ -2300,19 +2328,17 @@ if RUN_REAL_DATA and REAL_LOADER_OK:
     b2_save('B2_real_hybrid_probe.csv',pd.DataFrame(real_hybrid_rows))
     b2_table('8.4. Cửa sổ nhiều hạn thật',real_hybrid_rows)
 
-# %% Phần 9.1 - Trạng thái kiểm độc lập và bàn giao B1b
-# B1b đã bàn giao qua main de17718; Setup không đọc Output seed, notebook train tự kiểm nguồn đó.
+
+# %% Phần 9.1 - Trạng thái kiểm độc lập và điểm chờ B1b
+# Sự hiện diện của config không chứng minh bàn giao; chưa merge hoặc huấn luyện.
 B1_REVIEW={'provided_commit':B1_COMMIT,'provided_config':B1_CONFIG_PATH,
-    'candidate_base_commit':BASE_COMMIT,
-    'handoff_received':True,'handoff_project_commit':'de17718','B1_compare_version':1,
-    'config_data_verified_in_this_notebook':False,
-    'status':'handoff_received_config_data_checked_in_training_preflight'}
+    'candidate_base_commit':BASE_COMMIT,'integrated':False,'status':'waiting_for_B1b_handoff_and_review'}
 if B1_CONFIG_PATH:
     path=Path(B1_CONFIG_PATH)
     if not path.is_file():
         raise FileNotFoundError(f'Không thấy config B1b được cung cấp: {path}')
     received=yaml.load(path.read_text(encoding='utf-8'))
-    B1_REVIEW.update(config_sha256=b2_hash(path),
+    B1_REVIEW.update(config_sha256=b2_hash(path),status='config_received_not_yet_verified',
                      hindcast_inputs=b2_flat(received.get('hindcast_inputs')))
 b2_json(OUT/'B2_B1_review.json',B1_REVIEW)
 ALL_SYNTHETIC_OK=bool(CHECKS) and all(row['passed'] for row in CHECKS)
@@ -2329,28 +2355,25 @@ STATUS=[{'item':item,'status':'pass' if ok else 'review_or_not_run','evidence':e
 STATUS.extend([{'item':'B1b_handoff','status':B1_REVIEW['status'],'evidence':'B2_B1_review.json'},
     {'item':'CUDA_optional_probe','status':GPU_PROBE_STATUS,'evidence':'B2_checks.csv'},
     {'item':'merge_into_research','status':'pending_review_and_tests','evidence':'B2_loader_candidate.patch'},
-    {'item':'official_three_seed_training','status':'waiting_for_T4_section_9_3_then_training_preflight','evidence':''}])
+    {'item':'official_three_seed_training','status':'waiting_for_B1b_and_pinned_library_commit','evidence':''}])
 b2_save('B2_handoff_status.csv',pd.DataFrame(STATUS))
 b2_table('9.1. Kết quả và điểm chờ',STATUS)
 
+
 # %% Phần 9.2 - Lưu manifest, tổng kết và điểm dừng
-# Tổng kết kiểm độc lập trước cổng T4; Phần 9.3 cập nhật trạng thái cuối và hash manifest.
+# Kết thúc kiểm độc lập; các bước huấn luyện chờ dữ liệu/config B1b đã đối chiếu.
 summary={'complete':True,'scope':'independent_loader_model_checks_not_training',
     'base_commit':BASE_COMMIT,'candidate_patch_sha256':patch_sha256,
     'checks_run':len(CHECKS),'checks_passed':sum(row['passed'] for row in CHECKS),
     'real_data_run':RUN_REAL_DATA,'A1_counts_ok':A1_COUNTS_OK,
     'B2_LOADER_INDEPENDENT_OK':B2_LOADER_INDEPENDENT_OK,'B2_READY_FOR_TRAINING':B2_READY_FOR_TRAINING,
-    'B1b_handoff_received':True,
-    'B1b_config_data_verified_in_this_notebook':False,
-    'T4_library_tests_passed':False,'readiness_stage':'before_T4_section_9_3',
-    'official_training_started':False,'optimizer_steps':0,
+    'B1b_integrated':False,'official_training_started':False,'optimizer_steps':0,
     'full_451_raw_counting':REAL_COUNT_CHECKS_OK,'full_451_loader_instantiation':False,
     'real_loader_probe_IDs':PROBE_BASINS,'GPU_probe_status':GPU_PROBE_STATUS,
     'executed_in_Kaggle':IS_KAGGLE,'elapsed_seconds':time.perf_counter()-STARTED}
 b2_json(OUT/'B2_summary.json',summary)
 b2_json(OUT/'environment.json',{'base_commit':BASE_COMMIT,'candidate_patch_sha256':patch_sha256,
-    'packages':VERSIONS,'input_sources':str(OUT/'B2_input_sources.json'),'B1b_handoff_received':True,
-    'B1b_config_data_verified_in_this_notebook':False})
+    'packages':VERSIONS,'input_sources':str(OUT/'B2_input_sources.json'),'B1b_handoff_verified':False})
 paths=set(RECEIPTS)|{CANDIDATE_PACKAGE/name for name in patched}
 rows=[]
 for path in sorted(paths):
@@ -2367,9 +2390,9 @@ b2_table('9.2. Tổng kết kiểm độc lập',[{'checks_passed':summary['chec
     'independent_checks_ok':B2_LOADER_INDEPENDENT_OK,'ready_for_training':False,'optimizer_steps':0}])
 print('Hoàn thành notebook kiểm độc lập; output:',OUT)
 print('B2_LOADER_INDEPENDENT_OK =',B2_LOADER_INDEPENDENT_OK)
-print('B1b đã bàn giao. Đây là tổng kết trước kiểm T4; trạng thái cuối được ghi ở Phần 9.3.')
+print('B2_READY_FOR_TRAINING = False: chờ bàn giao B1b, đối chiếu cấu hình/dữ liệu và commit thư viện đã duyệt.')
 
-# %% Phần 9.3 - Kiểm thư viện trên T4 trước huấn luyện chính thức
+
 # CPU kiểm độc lập; trên T4 lưu kết quả 57+4 kiểm cho notebook train.
 def b2_run_t4_gate():
     # B2 - Cổng kiểm trên Kaggle T4 trước khi gộp vào research.
@@ -2466,46 +2489,7 @@ def b2_run_t4_gate():
     print('Đã kiểm T4; gửi B2_t4_check.json, manifest.json và hai log/XML để rà trước khi gộp research.')
     return result
 
-def b2_finish_setup(t4_result=None):
-    # Sẵn sàng chuyển sang notebook train; notebook train vẫn kiểm Input/scaler/config trước epoch đầu.
-    global B2_READY_FOR_TRAINING
-    t4_ok = bool(t4_result is not None and t4_result.get('complete') is True
-        and t4_result.get('library_commit') == '2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f'
-        and 'T4' in t4_result.get('device', '')
-        and t4_result.get('long_training_fixture_device') == 'cuda:0'
-        and t4_result.get('fixture_config_restored') is True
-        and all(t4_result.get('results', {}).get(name) ==
-            {'tests': count, 'failures': 0, 'errors': 0, 'skipped': 0}
-            for name, count in [('b2_and_cores', 57), ('four_training_cuda', 4)]))
-    if t4_result is not None and not t4_ok:
-        raise ValueError('Kết quả T4 chưa đủ 57+4 kiểm hoặc sai commit/thiết bị; không đánh dấu sẵn sàng.')
-    B2_READY_FOR_TRAINING = bool(B2_LOADER_INDEPENDENT_OK and t4_ok)
-    summary.update(B2_READY_FOR_TRAINING=B2_READY_FOR_TRAINING,
-        T4_library_tests_passed=t4_ok, readiness_stage='after_T4_section_9_3',
-        readiness_scope='ready_to_run_training_notebook_with_its_own_data_config_checks',
-        merged_library_commit='2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f')
-    b2_json(OUT/'B2_summary.json', summary)
-    for row in STATUS:
-        if row['item'] == 'official_three_seed_training':
-            row['status'] = 'ready_to_run_training_preflight' if B2_READY_FOR_TRAINING else 'waiting_for_T4_or_independent_checks'
-        elif row['item'] == 'merge_into_research':
-            row['status'] = 'tests_passed_not_merged' if t4_ok else 'pending_T4_tests'
-    b2_save('B2_handoff_status.csv', pd.DataFrame(STATUS))
-    for name in ('manifest.csv', 'B2_output_manifest.csv'):
-        table = pd.read_csv(OUT/name)
-        table['bytes'] = [int((OUT/path).stat().st_size) for path in table['file']]
-        table['sha256'] = [b2_hash(OUT/path) for path in table['file']]
-        b2_save(name, table)
-    print('B1b đã bàn giao; kiểm độc lập:', B2_LOADER_INDEPENDENT_OK, '| T4 57+4:', t4_ok)
-    print('B2_READY_FOR_TRAINING =', B2_READY_FOR_TRAINING)
-    if B2_READY_FOR_TRAINING:
-        print('Có thể chạy notebook train có kiểm Input/config B1b; chưa huấn luyện B2 hoặc gộp research.')
-    else:
-        print('Cần hoàn tất kiểm độc lập và cổng T4; bàn giao B1b đã có.')
-
-
 if IS_KAGGLE and torch.cuda.is_available() and "T4" in torch.cuda.get_device_name(0):
     B2_T4_RESULT = b2_run_t4_gate()
-    b2_finish_setup(B2_T4_RESULT)
 else:
-    b2_finish_setup()
+    print("Phần 9.3: chưa chạy kiểm T4 57+4; B2 chưa sẵn sàng huấn luyện chính thức.")
