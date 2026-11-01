@@ -7,7 +7,7 @@
 # 5.3 (nhiễu hạt giống), 6.1 (chỉ NSE trung vị validation dùng để chọn), 7 (dòng C1, C2).
 # Notebook Kaggle "11_C1_LamaHCEExt_Compare": Accelerator = None (CPU), Internet = Off, Persistence = Files only,
 # Environment = Pin to original environment. Add Input:
-#   - Output 39 notebook 10_C1_LamaHCEExt_Tune_<cấu hình>_<lr>; với 8 cấu hình chạy hai phiên chỉ gắn Output notebook
+#   - Output 39 notebook 10_C1_Tune_<cấu hình>_<lr>; với cấu hình chạy hai phiên chỉ gắn Output notebook
 #     phiên 2 (_Cont), thư mục run trong đó đủ 30 epoch;
 #   - Output notebook huấn luyện B* hạt giống 111.
 # Không cần GPU, không cần thư viện NeuralHydrology: chỉ đọc config.yml, validation_metrics.csv, output.log của thư mục run.

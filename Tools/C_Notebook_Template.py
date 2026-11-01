@@ -12,14 +12,15 @@
 # chạy tiếp ở notebook phiên 2 cùng tên thêm đuôi "_Cont" (cùng mã, khối CẤU HÌNH chỉ khác tên notebook; thêm Input =
 # Output notebook phiên 1; tài khoản khác chạy được khi notebook phiên 1 đã chia sẻ).
 # Cài đặt: Accelerator = GPU T4 x2 (dùng GPU 0), Internet = On, Persistence = Files only,
-# Environment = Pin to original environment, Add Input => lamah-ce-ext và Output notebook 01_0_MambaSSM_Build
-# (Version 1, wheel mamba-ssm, causal-conv1d). Dán nguyên tệp rồi Save & Run All, không sửa dòng nào.
+# Environment = Pin to original environment, Add Input => lamah-ce-ext, Output notebook 01_0_MambaSSM_Build
+# (Version 1, wheel mamba-ssm, causal-conv1d) và Output notebook 08_B3_LamaHCEExt_Train_P10S12_Seed111 (Version 1, B*:
+# config.yml đối chiếu ở Phần 4). Dán nguyên tệp rồi Save & Run All, không sửa dòng nào.
 #
 # MỤC LỤC
 #   Phần 1 - Cấu hình chạy, cài fork nhánh research và mamba-ssm, kiểm môi trường
 #   Phần 2 - Tìm dữ liệu, danh sách lưu vực, config tác giả của run SeqLSTM có Q
 #   Phần 3 - Dựng thư mục dữ liệu có cột qmean_mmd, qmax_mmd
-#   Phần 4 - Config B1b cho cấu hình của khối CẤU HÌNH, khớp tham số
+#   Phần 4 - Config B* cho cấu hình của khối CẤU HÌNH, khớp tham số
 #   Phần 5 - Huấn luyện (30 epoch, validation mỗi epoch), dừng gọn trước giới hạn phiên; phiên 2 chạy tiếp
 #   Phần 6 - Kiểm best_model.pt, validation theo epoch; C2: chấm test mọi epoch và best_model.pt
 #   Phần 7 - Hình đường học theo epoch và loss theo bước
@@ -36,7 +37,7 @@ import time
 SESSION_T0 = time.time()                 # mốc đầu phiên: Phần 5 trừ thời gian đã dùng khỏi giới hạn huấn luyện
 
 # ---- CẤU HÌNH (Tools/C_Notebooks_Build.py ghi lại khối này) ----
-NOTEBOOK = "10_C1_LamaHCEExt_Tune_mamba_L2_x1_lr1e-3"
+NOTEBOOK = "10_C1_Tune_mamba_L2_x1_lr1e-3"
 STEP = "C1"                              # C1: tinh chỉnh, chỉ validation; C2: chạy chính thức, thêm chấm test mọi epoch
 CORE = "mamba"                           # lstm, gru, transformer, s4d, mamba
 DEPTH = 2                                # số lớp (LSTM, GRU, Transformer 1/2) hoặc số khối (S4D, Mamba 2/4)
@@ -60,10 +61,11 @@ import pandas as pd
 from IPython.display import HTML, display
 
 NH_REPO = "https://github.com/Ticasslo/neuralhydrology.git"
-NH_COMMIT = "5844037995fd242685cbeaf37e0450ebc51d5c77"   # nhánh research: mô hình chung 5 lõi (fed53dc) + chạy tiếp qua hai phiên
+NH_COMMIT = "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1"   # tag freeze-C: 5 lõi (fed53dc) + chạy tiếp (5844037) + B2/B3
 CHECK_LIBS = ["numpy", "pandas", "xarray", "torch", "scipy", "numba", "ruamel.yaml", "matplotlib", "tensorboard", "tqdm"]
 NH_MODULES = ["neuralhydrology.nh_run", "neuralhydrology.evaluation.tester", "neuralhydrology.datautils.gpu_loader",
-              "neuralhydrology.modelzoo.sequential_forecast", "neuralhydrology.modelzoo.sf_cores"]
+              "neuralhydrology.modelzoo.sequential_forecast", "neuralhydrology.modelzoo.sf_cores",
+              "neuralhydrology.datautils.source_groups"]
 TORCH_B0 = "2.11.0+cu128"                # torch của B0, B1a, B1b, 04_0 (ảnh Kaggle 10/2026); khác thì chỉ cảnh báo
 
 IS_KAGGLE = Path("/kaggle/working").exists()
@@ -280,7 +282,7 @@ AUTHOR_RUN_REL = ("Sequential_Forecast_LSTM/Sequential_Forecast_LSTM_with_q/"
 N_BASINS = 451
 Q_OLD = "qmean"                          # cột Q quá khứ của tác giả (m³/s)
 Q_NEW = ["qmean_mmd", "qmax_mmd"]        # cột Q mm/ngày theo area_gov dựng ở Phần 3 (như B1a)
-Q_USE = ["qmean_mmd", "qmax_mmd"]        # cột B1b đưa vào config thay Q_OLD (qmax_mmd ngay sau qmean_mmd)
+Q_USE = ["qmean_mmd", "qmax_mmd"]        # cột B1b, B* đưa vào config thay Q_OLD (qmax_mmd ngay sau qmean_mmd)
 # Giá trị phải có trong config tác giả (như B0 Phần 2) - lệch là đọc nhầm run
 EXPECTED = {"model": "sequential_forecast_lstm", "seed": 111, "hidden_size": 128, "batch_size": 256, "epochs": 30,
             "learning_rate": 0.001, "output_dropout": 0.3, "seq_length": 365, "forecast_seq_length": 1,
@@ -393,7 +395,8 @@ print("=> Đạt. Chạy Phần 3.")
 
 # %% Phần 3 - Dựng thư mục dữ liệu có cột qmean_mmd, qmax_mmd
 # Chép nguyên 05_0_C_Configs_Check Phần 3 (= B1b Phần 3, đã chạy đạt ở 3 notebook B1b Version 1 và 05_0 Version 1);
-# lamah.py, basedataset.py không đổi giữa f229e02 và 5844037.
+# Trùng từng dòng mã B3 Phần 3 (B*). Từ f229e02 tới db6dc1f, lamah.py chỉ đổi _get_list_of_all_variables (B2, nhận danh
+# sách biến theo nhóm, mọi số dòng lamah.py sau dòng 91 lùi 8); 4 hàm dùng ở đây không đổi. Số dòng dưới đây theo f229e02.
 # Bộ nạp chỉ đọc đầu vào từ tệp khí tượng (lamah.py dòng 116-119), Q nằm ở tệp trạm D_gauges => thêm 2 cột vào tệp khí
 # tượng của 451 lưu vực, như B0 Phần 3 nhưng theo mm/ngày (mã B1 cũ, commit a06a224, đã chạy đạt; lamah.py, basedataset.py
 # không đổi giữa dda45fc và f229e02). Đổi đơn vị bằng chính hàm của thư viện: load_lamah_discharge (số âm -999 => NaN,
@@ -572,37 +575,57 @@ if not ok:
 print("=> Đạt. Chạy Phần 4.")
 
 
-# %% Phần 4 - Config B1b cho cấu hình của khối CẤU HÌNH, khớp tham số
-# (1) Như 05_0_C_Configs_Check Phần 4: dựng config B1b từ config tác giả (14 khóa đổi, 5 khóa bỏ), mốc = số tham số lõi
-# LSTM 1 lớp, phải bằng SequentialForecastLSTM của B1b (84.801). (2) Thêm khóa mô hình chung cho CORE, DEPTH, LR (siêu tham
-# số ngoài lưới theo Pipeline Mục 5.2), kích thước từ match_parameters của fork cho LEVEL x mốc, đếm bằng mô hình thật,
-# so với bảng 05_0 Version 1 (Tables/c1_configs.csv). Ghi config cuối, nạp lại bằng Config, so từng khóa với tác giả.
+# %% Phần 4 - Config B* cho cấu hình của khối CẤU HÌNH, khớp tham số
+# B* = B3 P10S12 (02_Pipeline.md Mục 7): B1b + nhóm biến theo 6 nguồn, masked mean, bộ lọc mẫu B2 + che khi huấn luyện
+# (xác suất xóa từng bước 0,1, xóa cả chuỗi 0,12; che ở bộ nạp, basedataset.py dòng 180, gpu_loader.py dòng 105 ở db6dc1f,
+# nên áp như nhau cho mọi lõi). (1) Dựng lại config B* đúng cách notebook B3 Phần 4: config tác giả đổi 14 khóa như B1b,
+# rồi configure_lamah_b2(..., preserve_masking=True) (source_groups.py ở db6dc1f; mặc định builder đặt xác suất che về 0).
+# (2) So mọi khóa khoa học với config.yml của run B* hạt giống 111 trong Output 08_B3_LamaHCEExt_Train_P10S12_Seed111
+# (kiểm sha256 theo manifest.csv); chỉ được lệch khóa đường dẫn, thiết bị, hạt giống, tên run. (3) Mốc = số tham số lõi
+# LSTM 1 lớp của mô hình chung trên config B*, phải bằng SequentialForecastLSTM của B* (84.865, B3 Phần 4). (4) Thêm khóa
+# mô hình chung cho CORE, DEPTH, LR (siêu tham số ngoài lưới theo Pipeline Mục 5.2), kích thước từ match_parameters cho
+# LEVEL x mốc, đếm bằng mô hình thật; ghi config cuối, nạp lại bằng Config, so từng khóa với B*.
+# Cùng config B* và cùng thư mục Q (Phần 3 trùng B3 Phần 3) => cùng tập mẫu huấn luyện của B* (1.112.307 mẫu).
 # Cần chạy Phần 1-3 trước trong phiên.
 import copy
 
+from neuralhydrology.datautils.source_groups import configure_lamah_b2
 from neuralhydrology.modelzoo import get_model
 
 RUNS_DIR = WORK_DIR / "c_runs"           # run_dir: thư mục run nằm trong Output để notebook _Cont gắn làm Input
 CFG_DIR = WORK_DIR / "c_configs"
 N_WORKERS = 2
-PATIENCE = 30                            # như B1b: không dừng sớm, vẫn lưu best_model.pt
-B1B_PARAMS = 84_801                      # SequentialForecastLSTM của B1b (B1b Phần 4)
+PATIENCE = 30                            # như B*: không dừng sớm, vẫn lưu best_model.pt
+P_STEP, P_SEQUENCE = 0.1, 0.12           # mức che của B* (B3 P10S12)
+BSTAR = {"step": "B3", "mask_level": "P10S12", "seed": 111, "commit": "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f",
+         "notebook": "08_B3_LamaHCEExt_Train_P10S12_Seed111"}
+BSTAR_PARAMS = 84_865                    # SequentialForecastLSTM của B* (B3 Phần 4)
 PARAM_TOL = 0.01
 DROPOUT = {"lstm": 0.0, "gru": 0.0, "transformer": 0.1, "s4d": 0.1, "mamba": 0.0}
 INNER_KEYS = ["sf_transformer_dim_feedforward", "sf_mamba_d_inner"]
-# Khóa của mô hình chung được phép khác config tác giả (ngoài KEYS_CHANGE, KEYS_DROP của Phần 2)
+# Khóa của mô hình chung được phép khác config B*
 KEYS_MODEL = ["model", "hidden_size", "learning_rate", "sf_core", "sf_layers", "sf_dropout", "sf_s4d_lr"] + INNER_KEYS
-# Bảng 05_0 Version 1 (config B1b): (lõi, độ sâu, mức) => (hidden_size, kích thước trong, số tham số)
-C0_SIZES = {("lstm", 1, 1): (128, None, 84_801), ("lstm", 1, 3): (235, None, 254_824),
-            ("lstm", 2, 1): (77, None, 84_042), ("lstm", 2, 3): (139, None, 253_736),
-            ("gru", 1, 1): (150, None, 84_679), ("gru", 1, 3): (274, None, 255_179),
-            ("gru", 2, 1): (90, None, 84_439), ("gru", 2, 3): (162, None, 255_583),
-            ("transformer", 1, 1): (80, 335, 84_864), ("transformer", 1, 3): (144, 565, 254_438),
-            ("transformer", 2, 1): (56, 243, 84_759), ("transformer", 2, 3): (100, 416, 254_361),
-            ("s4d", 2, 1): (111, None, 84_757), ("s4d", 2, 3): (216, None, 254_017),
-            ("s4d", 4, 1): (72, None, 84_385), ("s4d", 4, 3): (146, None, 255_769),
-            ("mamba", 2, 1): (72, 143, 84_975), ("mamba", 2, 3): (132, 264, 254_641),
-            ("mamba", 4, 1): (49, 96, 84_525), ("mamba", 4, 3): (91, 183, 254_613)}
+# Khóa không mang nội dung khoa học: đường dẫn, thiết bị, số tiến trình đọc, thanh tiến độ, hạt giống, tên run, khóa thư
+# viện tự ghi vào config.yml của run
+KEYS_RUNTIME = ["data_dir", "run_dir", "train_basin_file", "validation_basin_file", "test_basin_file", "device",
+                "num_workers", "verbose", "seed", "experiment_name"] + KEYS_DROP
+
+
+def sha256(path):
+    h = hashlib.sha256()
+    with Path(path).open("rb") as fp:
+        for chunk in iter(lambda: fp.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def inside(root, relative):
+    # Đường dẫn tương đối trong Output, không cho ra ngoài thư mục Output đó.
+    root = Path(root).resolve()
+    path = (root / relative).resolve()
+    if Path(relative).is_absolute() or not path.is_relative_to(root):
+        raise ValueError(f"Đường dẫn nằm ngoài Output: {relative}")
+    return path
 
 
 def swap_q(inputs):
@@ -620,8 +643,8 @@ def model_update(core, depth, lr):
     return update
 
 
-def write_config(name, extra=None):
-    # Như B1b Phần 4: dựng lại từ config gốc của tác giả, đổi đúng các khóa KEYS_CHANGE, bỏ KEYS_DROP, thêm `extra`.
+def write_b1b_config(name):
+    # Như B1b Phần 4: dựng lại từ config gốc của tác giả, đổi đúng các khóa KEYS_CHANGE, bỏ KEYS_DROP.
     yaml_rt = YAML()
     yaml_rt.width = 4096
     CFG_DIR.mkdir(parents=True, exist_ok=True)
@@ -633,10 +656,9 @@ def write_config(name, extra=None):
                 "hindcast_inputs": swap_q(list(cfg["hindcast_inputs"])),
                 "dynamic_inputs": swap_q(list(cfg["dynamic_inputs"]))}
     assert set(new_vals) == set(KEYS_CHANGE), "new_vals phải đúng các khóa KEYS_CHANGE của Phần 2"
-    assert set(extra or {}) <= set(KEYS_MODEL), "extra chỉ được chứa khóa KEYS_MODEL"
     for k in KEYS_DROP:
         cfg.pop(k, None)
-    for k, v in {**new_vals, **(extra or {})}.items():
+    for k, v in new_vals.items():
         cfg[k] = v
     path = CFG_DIR / f"{name}.yml"
     with open(path, "w", encoding="utf-8") as f:
@@ -644,50 +666,94 @@ def write_config(name, extra=None):
     return path
 
 
-# (1) Config B1b và mốc
-cfg_b1b = Config(write_config("B1b_reference"))
-cfg_base = copy.deepcopy(cfg_b1b)
+def config_diff(cfg_ref, cfg_new, allowed):
+    # Khóa khác nhau giữa hai Config (so giá trị đã phân tích, như B3 Phần 4), đánh dấu khóa ngoài danh sách được phép.
+    da, db = cfg_ref.as_dict(), cfg_new.as_dict()
+    return [{"khóa": k, "B*": brief(da.get(k, "(không có)"), 60), "notebook": brief(db.get(k, "(không có)"), 60),
+             "được phép": "ĐẠT" if k in allowed else "KHÔNG"}
+            for k in sorted(set(da) | set(db)) if da.get(k) != db.get(k)]
+
+
+# (1) Config B* dựng lại từ config tác giả
+cfg_bstar = Config(write_b1b_config("Bstar_from_author"))
+cfg_bstar.update_config({"nan_step_probability": P_STEP, "nan_sequence_probability": P_SEQUENCE})
+cfg_bstar = configure_lamah_b2(cfg_bstar, preserve_masking=True)
+
+# (2) Run B* trong Input: environment.json của Output B3 P10S12 hạt giống 111
+hits = []
+for env_path in Path("/kaggle/input" if IS_KAGGLE else ".").rglob("environment.json"):
+    try:
+        env = json.loads(env_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        continue
+    if (env.get("step"), env.get("mask_level"), env.get("seed")) == (BSTAR["step"], BSTAR["mask_level"], BSTAR["seed"]):
+        hits.append((env_path, env))
+if len(hits) != 1:
+    raise FileNotFoundError(f"Cần đúng 1 Output B* ({BSTAR['notebook']}) trong Input, thấy {len(hits)}: "
+                            f"{[str(h[0]) for h in hits]} - gắn Output notebook {BSTAR['notebook']}")
+BSTAR_ENV_PATH, BSTAR_ENV = hits[0]
+BSTAR_ROOT = BSTAR_ENV_PATH.parent.parent             # thư mục tương ứng /kaggle/working của notebook B*
+BSTAR_RUN = inside(BSTAR_ROOT, BSTAR_ENV["run_dir"])
+bstar_man = pd.read_csv(BSTAR_ENV_PATH.parent / "manifest.csv")
+man_col = "file" if "file" in bstar_man else "tệp"
+bstar_known = dict(zip(bstar_man[man_col], bstar_man["sha256"]))
+bstar_bad = [p.name for p in [BSTAR_RUN / "config.yml", BSTAR_ENV_PATH]
+             if bstar_known.get(p.resolve().relative_to(BSTAR_ROOT.resolve()).as_posix()) != sha256(p)]
+cfg_bstar_saved = Config(BSTAR_RUN / "config.yml")
+bstar_diff = config_diff(cfg_bstar_saved, cfg_bstar, KEYS_RUNTIME)
+bad_bstar = [r for r in bstar_diff if r["được phép"] == "KHÔNG"]
+
+# (3) Mốc: SequentialForecastLSTM của B* và lõi LSTM 1 lớp của mô hình chung trên cùng config
+n_bstar = sf_cores.count_parameters(get_model(copy.deepcopy(cfg_bstar)))
+cfg_base = copy.deepcopy(cfg_bstar)
 cfg_base.update_config(model_update("lstm", 1, LR))
-n_b1b = sf_cores.count_parameters(get_model(copy.deepcopy(cfg_b1b)))
 TARGET = sf_cores.count_model_parameters(cfg_base)
 
-# (2) Cấu hình của notebook: kích thước khớp LEVEL x mốc, ghi config cuối
-cfg_c = copy.deepcopy(cfg_b1b)
+# (4) Cấu hình của notebook: kích thước khớp LEVEL x mốc, ghi config cuối
+cfg_c = copy.deepcopy(cfg_bstar)
 update = model_update(CORE, DEPTH, LR)
 cfg_c.update_config(update)
 size = sf_cores.match_parameters(cfg_c, LEVEL * TARGET, tolerance=PARAM_TOL)
-update = {**update, **size}
-CFG_PATH = write_config(EXP_NAME, update)
+cfg_c.update_config({**size, "experiment_name": EXP_NAME})
+CFG_PATH = CFG_DIR / f"{EXP_NAME}.yml"
+if CFG_PATH.exists():
+    raise RuntimeError(f"Đã có config {CFG_PATH} - dùng phiên mới để tránh ghi đè run.")
+cfg_c.dump_config(CFG_DIR, filename=CFG_PATH.name)
 cfg_run = Config(CFG_PATH)  # báo lỗi nếu có khóa lạ hoặc giá trị sai kiểu
 N_PARAMS = sf_cores.count_parameters(get_model(copy.deepcopy(cfg_run)))
 inner = next((size[k] for k in INNER_KEYS if k in size), None)
-exp = C0_SIZES[(CORE, DEPTH, LEVEL)]
 dev = (N_PARAMS - LEVEL * TARGET) / (LEVEL * TARGET)
 shutil.copy2(CFG_PATH, OUT_DIR / "config.yml")
+run_diff = config_diff(cfg_bstar_saved, cfg_run, KEYS_RUNTIME + KEYS_MODEL)
 
-# So từng khóa với config tác giả
-new = YAML(typ="safe").load(CFG_PATH.read_text(encoding="utf-8"))
-diff_rows = []
-for k in sorted(set(AUTHOR_CFG) | set(new)):
-    a, b = AUTHOR_CFG.get(k, "(không có)"), new.get(k, "(bỏ)")
-    if a != b:
-        diff_rows.append({"khóa": k, "tác giả": brief(a, 60), "notebook": brief(b, 60),
-                          "được phép": "ĐẠT" if k in KEYS_CHANGE + KEYS_DROP + KEYS_MODEL else "KHÔNG"})
-show(f"Khóa khác config tác giả ({len(diff_rows)} khóa)", pd.DataFrame(diff_rows))
+bstar_rows = [
+    {"kiểm": "notebook / bước / mức che / hạt giống",
+     "giá trị": f"{BSTAR_ENV.get('notebook')} / {BSTAR_ENV.get('step')} / {BSTAR_ENV.get('mask_level')} / "
+                f"{BSTAR_ENV.get('seed')}", "đạt": BSTAR_ENV.get("notebook") == BSTAR["notebook"]},
+    {"kiểm": "commit thư viện của B*", "giá trị": str(BSTAR_ENV.get("neuralhydrology_commit")),
+     "đạt": BSTAR_ENV.get("neuralhydrology_commit") == BSTAR["commit"]},
+    {"kiểm": "sha256 config.yml, environment.json khớp manifest.csv", "giá trị": ", ".join(bstar_bad) or "khớp",
+     "đạt": not bstar_bad},
+    {"kiểm": "config B* dựng lại = config.yml của B* (trừ khóa đường dẫn, thiết bị, hạt giống, tên run)",
+     "giá trị": f"{len(bad_bstar)} khóa lệch", "đạt": not bad_bstar}]
+show(f"Run B* trong Input ({BSTAR_RUN.relative_to(BSTAR_ROOT).as_posix()})",
+     pd.DataFrame(bstar_rows).assign(đạt=lambda d: d["đạt"].map({True: "ĐẠT", False: "KHÔNG"})))
+if bad_bstar:
+    show("Khóa khoa học lệch giữa config B* dựng lại và config.yml của B*", pd.DataFrame(bad_bstar))
+show(f"Khóa khác config B* ({len(run_diff)} khóa)", pd.DataFrame(run_diff))
 
-hind, dyn, fc = cfg_run.hindcast_inputs, cfg_run.dynamic_inputs, cfg_run.forecast_inputs
+hind, fc = cfg_run.hindcast_inputs, cfg_run.forecast_inputs
 s4d_lr = min(0.001, LR) if CORE == "s4d" else None
 cfg_rows = [
-    {"kiểm": "tham số SequentialForecastLSTM B1b / lõi LSTM 1 lớp (mốc)", "giá trị": f"{n_b1b:,} / {TARGET:,}",
-     "đạt": n_b1b == TARGET == B1B_PARAMS},
+    {"kiểm": "tham số SequentialForecastLSTM B* / lõi LSTM 1 lớp (mốc)", "giá trị": f"{n_bstar:,} / {TARGET:,}",
+     "đạt": n_bstar == TARGET == BSTAR_PARAMS},
     {"kiểm": "model / sf_core / sf_layers / sf_dropout / learning_rate / sf_s4d_lr",
      "giá trị": f"{cfg_run.model} / {cfg_run.sf_core} / {cfg_run.sf_layers} / {cfg_run.sf_dropout} / "
                 f"{cfg_run.learning_rate} / {cfg_run.sf_s4d_lr}",
      "đạt": [cfg_run.model, cfg_run.sf_core, cfg_run.sf_layers, cfg_run.sf_dropout, cfg_run.learning_rate,
              cfg_run.sf_s4d_lr] == ["sequential_forecast", CORE, DEPTH, DROPOUT[CORE], LR, s4d_lr]},
-    {"kiểm": f"hidden_size / kích thước trong / số tham số (bảng 05_0: {exp[0]} / {exp[1] or '-'} / {exp[2]:,})",
-     "giá trị": f"{cfg_run.hidden_size} / {inner or '-'} / {N_PARAMS:,}",
-     "đạt": (cfg_run.hidden_size, inner, N_PARAMS) == exp},
+    {"kiểm": "hidden_size / kích thước trong / số tham số",
+     "giá trị": f"{cfg_run.hidden_size} / {inner or '-'} / {N_PARAMS:,}", "đạt": N_PARAMS > 0},
     {"kiểm": f"lệch so với {LEVEL} x mốc = {LEVEL * TARGET:,} (<= {PARAM_TOL:.0%})", "giá trị": f"{dev:+.3%}",
      "đạt": abs(dev) <= PARAM_TOL},
     {"kiểm": "epochs / early_stopping_patience / data_on_gpu / seed / experiment_name",
@@ -695,18 +761,22 @@ cfg_rows = [
                 f"{cfg_run.experiment_name}",
      "đạt": [cfg_run.epochs, cfg_run.early_stopping_patience, cfg_run.data_on_gpu, cfg_run.seed,
              cfg_run.experiment_name] == [30, PATIENCE, True, RUN_SEED, EXP_NAME]},
-    {"kiểm": "số biến quá khứ / ngày t / động (mong đợi 33 / 5 / 38)", "giá trị": f"{len(hind)} / {len(fc)} / {len(dyn)}",
-     "đạt": [len(hind), len(fc), len(dyn)] == [33, 5, 38] and dyn == hind + fc},
-    {"kiểm": f"{Q_OLD} => {', '.join(Q_USE)} tại cùng vị trí, không còn {Q_OLD}",
-     "giá trị": ", ".join(f"{c} ở vị trí {hind.index(c) + 1}" for c in Q_USE if c in hind),
-     "đạt": hind == swap_q(AUTHOR_CFG["hindcast_inputs"]) and Q_OLD not in dyn}]
+    {"kiểm": "số biến mỗi nguồn quá khứ / ngày t (mong đợi [21, 7, 1, 2, 2] / [5])",
+     "giá trị": f"{list(map(len, hind))} / {list(map(len, fc))}",
+     "đạt": list(map(len, hind)) == [21, 7, 1, 2, 2] and list(map(len, fc)) == [5]},
+    {"kiểm": "nan_handling_method / che từng bước / che cả chuỗi / timestep_counter",
+     "giá trị": f"{cfg_run.nan_handling_method} / {cfg_run.nan_step_probability} / "
+                f"{cfg_run.nan_sequence_probability} / {cfg_run.timestep_counter}",
+     "đạt": [cfg_run.nan_handling_method, cfg_run.nan_step_probability, cfg_run.nan_sequence_probability,
+             cfg_run.timestep_counter] == ["masked_mean", P_STEP, P_SEQUENCE, False]}]
 show(f"Config {EXP_NAME} (đọc lại bằng Config)",
      pd.DataFrame(cfg_rows).assign(đạt=lambda d: d["đạt"].map({True: "ĐẠT", False: "KHÔNG"})))
 print("Thuộc tính khác của lõi giữ mặc định:", {k: getattr(cfg_run, k) for k in
       ["sf_transformer_nheads", "sf_s4d_d_state", "sf_mamba_d_state", "sf_mamba_d_conv", "output_dropout"]})
 print("Config:", CFG_PATH)
 
-ok = all(r["được phép"] == "ĐẠT" for r in diff_rows) and all(r["đạt"] for r in cfg_rows)
+ok = (all(r["đạt"] for r in bstar_rows) and all(r["được phép"] == "ĐẠT" for r in run_diff)
+      and all(r["đạt"] for r in cfg_rows))
 if not ok:
     raise RuntimeError("Phần 4 CHƯA đạt (dòng KHÔNG ở trên) - dừng notebook")
 print("=> Đạt. Chạy Phần 5.")
@@ -740,7 +810,8 @@ STDOUT_NAMES = {1: f"train_{EXP_NAME}_stdout.log", 2: f"train_{EXP_NAME}_session
 STDOUT_LOG = OUT_DIR / STDOUT_NAMES[SESSION]
 SAME_KEYS = ["model", "sf_core", "sf_layers", "sf_dropout", "sf_s4d_lr", "hidden_size", "learning_rate", "seed",
              "epochs", "experiment_name", "batch_size", "hindcast_inputs", "forecast_inputs", "dynamic_inputs",
-             "target_variables", "data_dir", "early_stopping_patience", "data_on_gpu"] + INNER_KEYS
+             "target_variables", "data_dir", "early_stopping_patience", "data_on_gpu", "nan_handling_method",
+             "nan_step_probability", "nan_sequence_probability"] + INNER_KEYS
 
 
 def gpu_now():
@@ -752,14 +823,6 @@ def gpu_now():
         return mem, util
     except Exception:
         return None
-
-
-def sha256(path):
-    h = hashlib.sha256()
-    with Path(path).open("rb") as fp:
-        for chunk in iter(lambda: fp.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
 
 
 def set_config_key(path, key, value):

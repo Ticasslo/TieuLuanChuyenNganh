@@ -8,3 +8,7 @@ Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/** -text whitespace=cr
 Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Archive/** -text whitespace=cr-at-eol
 Workspace/05_Training/06_B2_LamaHCEExt_Train/Tables/** -text whitespace=cr-at-eol
 Workspace/05_Training/08_B3_LamaHCEExt_Train/Tables/** -text whitespace=cr-at-eol
+# Khuôn và notebook C sinh ra giữ LF: Tools/C_Notebooks_Build.py dừng nếu khuôn có CR, sha256 tệp sinh ra tính trên LF.
+Tools/C_Notebook_Template.py text eol=lf
+Workspace/05_Training/10_C1_Tune/*.py text eol=lf
+Workspace/05_Training/12_C2_Train/*.py text eol=lf
