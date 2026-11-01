@@ -214,7 +214,7 @@ Các điểm test trên là kết quả chấm từng run của thư viện/Comp
 
 ### 6.6.4. Kiểm độc lập bộ nạp và mô hình B2
 
-B2 bổ sung nhúng theo nguồn và phép trung bình có mặt nạ (masked mean), đồng thời giữ các mẫu có nhãn nhưng thiếu một phần đầu vào. Năm nhóm hindcast gồm ERA5-Land, E-OBS, MSWEP, GLEAM và Q với lần lượt 21/7/1/2/2 biến; forecast gồm năm biến ECMWF HRES. Hai cột Q quá khứ `qmean_mmd`, `qmax_mmd` được tách khỏi nhãn `qmax`, chỉ dùng đến ngày t−1. Chuẩn hóa và giao thức 30 epoch giữ theo B1b trên nền `f229e02` để phép so không đồng thời thay scaler. [Mã và phạm vi kiểm B2](../../Workspace/04_Setup/01_B2_LamaHCEExt_DataLoader.md).
+B2 bổ sung nhúng theo nguồn và phép trung bình có mặt nạ (masked mean), đồng thời giữ các mẫu có nhãn nhưng thiếu một phần đầu vào. Năm nhóm hindcast gồm ERA5-Land, E-OBS, MSWEP, GLEAM và Q với lần lượt 21/7/1/2/2 biến; forecast gồm năm biến ECMWF HRES. Hai cột Q quá khứ `qmean_mmd`, `qmax_mmd` được tách khỏi nhãn `qmax`, chỉ dùng đến ngày t−1. Chuẩn hóa và giao thức 30 epoch giữ theo B1b trên nền `f229e02` để phép so không đồng thời thay scaler. [Mã và phạm vi kiểm B2](../../Workspace/04_Setup/01_B2_LamaHCEExt_DataLoader/01_B2_LamaHCEExt_DataLoader.md).
 
 Output kiểm độc lập trên Kaggle có **48/48 kiểm đạt**, gồm probe CUDA, đếm dữ liệu raw của **451 ID** và đối chiếu 18 số đếm theo hợp đồng A1, tất cả chênh lệch bằng 0. Số mẫu train đủ điều kiện thay đổi như sau:
 
@@ -223,9 +223,9 @@ Output kiểm độc lập trên Kaggle có **48/48 kiểm đạt**, gồm probe
 | 365 | 1094272 | 1094272 | 1112307 | 18035 |
 | 730 | 928114 | 1079046 | 1112307 | 184193 |
 
-Ở khung 730, phần tăng gồm 150932 mẫu khi chỉ kiểm các ô thực sự được dùng theo pha và 33261 mẫu khi chấp nhận đầu vào thiếu bằng masked mean. Đây là phép đếm điều kiện giữ mẫu, chưa phải kết quả huấn luyện cấu hình 730 ngày của bước D. [Output B2, Phần 6.2–6.4](../../Workspace/04_Setup/01_B2_LamaHCEExt_DataLoader.md#kết-quả-kaggle-bản-f229e02-theo-output-đã-nhận).
+Ở khung 730, phần tăng gồm 150932 mẫu khi chỉ kiểm các ô thực sự được dùng theo pha và 33261 mẫu khi chấp nhận đầu vào thiếu bằng masked mean. Đây là phép đếm điều kiện giữ mẫu, chưa phải kết quả huấn luyện cấu hình 730 ngày của bước D. [Output B2, Phần 6.2–6.4](../../Workspace/04_Setup/01_B2_LamaHCEExt_DataLoader/01_B2_LamaHCEExt_DataLoader.md#kết-quả-kaggle-bản-f229e02-theo-output-đã-nhận).
 
-Lookup thực tế được kiểm trên **10 ID**, ở cả khung 365 và 730: mỗi khung khớp 11923 mục train, 14610 validation và 14610 test, bao gồm ngày và ranh giới hindcast/forecast. Các kiểm batch thường/vector hóa, forward/backward, sáu ca dự báo lai nhiều hạn và đọc lại YAML scaler đều đạt. Phần kiểm độc lập dùng **0 bước optimizer**, không thay thế huấn luyện ba seed trên toàn bộ dữ liệu. Cổng kiểm thư viện chạy trên **Tesla T4**, commit `2ccaa14`: **57 kiểm B2/mô hình chung và bốn kiểm huấn luyện/evaluation CUDA đều đạt**, không failure/error/skip; các bước optimizer trong fixture thư viện không phải huấn luyện B2 trên LamaH. [Phạm vi bằng chứng B2](../../Workspace/04_Setup/01_B2_LamaHCEExt_DataLoader.md).
+Lookup thực tế được kiểm trên **10 ID**, ở cả khung 365 và 730: mỗi khung khớp 11923 mục train, 14610 validation và 14610 test, bao gồm ngày và ranh giới hindcast/forecast. Các kiểm batch thường/vector hóa, forward/backward, sáu ca dự báo lai nhiều hạn và đọc lại YAML scaler đều đạt. Phần kiểm độc lập dùng **0 bước optimizer**, không thay thế huấn luyện ba seed trên toàn bộ dữ liệu. Cổng kiểm thư viện chạy trên **Tesla T4**, commit `2ccaa14`: **57 kiểm B2/mô hình chung và bốn kiểm huấn luyện/evaluation CUDA đều đạt**, không failure/error/skip; các bước optimizer trong fixture thư viện không phải huấn luyện B2 trên LamaH. [Phạm vi bằng chứng B2](../../Workspace/04_Setup/01_B2_LamaHCEExt_DataLoader/01_B2_LamaHCEExt_DataLoader.md).
 
 Các kiểm này xác nhận tính nhất quán của bộ nạp và đường tính toán; riêng số mẫu tăng chưa chứng minh lợi ích dự báo. Thí nghiệm B2 ba seed trên cấu hình B1b Version 1 được báo cáo riêng dưới đây.
 

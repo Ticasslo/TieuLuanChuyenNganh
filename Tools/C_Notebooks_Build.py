@@ -3,10 +3,10 @@
 # Chạy (từ gốc repo):
 #   python Tools/C_Notebooks_Build.py c1 [--out THƯ_MỤC]
 #       39 notebook C1 (5 lõi x 2 độ sâu x 2 mức x 2 learning rate, bỏ lstm_L1_x1_lr1e-3 = B* hạt giống 111) và notebook
-#       phiên 2 (_Cont) cho các cấu hình vượt 12 giờ, mặc định vào Workspace/05_Training/06_C1_LamaHCEExt_Tune/.
+#       phiên 2 (_Cont) cho các cấu hình vượt 12 giờ, mặc định vào Workspace/05_Training/10_C1_LamaHCEExt_Tune/.
 #   python Tools/C_Notebooks_Build.py c2 mamba_L4_x1_lr1e-3 [...] [--cont mamba_L4_x3_lr1e-3 ...] [--out THƯ_MỤC]
 #       3 hạt giống (111, 222, 333) cho mỗi cấu hình C2, _Cont cho cấu hình ghi ở --cont, mặc định vào
-#       Workspace/05_Training/08_C2_Train/. Tên C2 bỏ "LamaHCEExt" để vừa 50 ký tự (giới hạn tên notebook Kaggle).
+#       Workspace/05_Training/12_C2_Train/. Tên C2 bỏ "LamaHCEExt" để vừa 50 ký tự (giới hạn tên notebook Kaggle).
 # Chạy lại với cùng khuôn ra tệp giống hệt (in sha256 từng tệp để so).
 #
 # Mục lục:
@@ -23,9 +23,9 @@ from pathlib import Path
 # %% Phần 1 - Lưới cấu hình, tên tệp
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "Tools" / "C_Notebook_Template.py"
-OUT_DIRS = {"C1": ROOT / "Workspace" / "05_Training" / "06_C1_LamaHCEExt_Tune",
-            "C2": ROOT / "Workspace" / "05_Training" / "08_C2_Train"}
-PREFIX = {"C1": "06_C1_LamaHCEExt_Tune", "C2": "08_C2_Train"}  # số NN đặt lại sau B2, B3 (thứ tự chạy trong 05_Training)
+OUT_DIRS = {"C1": ROOT / "Workspace" / "05_Training" / "10_C1_LamaHCEExt_Tune",
+            "C2": ROOT / "Workspace" / "05_Training" / "12_C2_Train"}
+PREFIX = {"C1": "10_C1_LamaHCEExt_Tune", "C2": "12_C2_Train"}  # NN tiếp sau 09_B3_LamaHCEExt_Compare
 MAX_NAME = 50                                # tên notebook Kaggle tối đa 50 ký tự
 CORE_DEPTHS = {"lstm": (1, 2), "gru": (1, 2), "transformer": (1, 2), "s4d": (2, 4), "mamba": (2, 4)}
 LEVELS = (1, 3)

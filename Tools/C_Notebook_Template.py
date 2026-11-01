@@ -36,7 +36,7 @@ import time
 SESSION_T0 = time.time()                 # mốc đầu phiên: Phần 5 trừ thời gian đã dùng khỏi giới hạn huấn luyện
 
 # ---- CẤU HÌNH (Tools/C_Notebooks_Build.py ghi lại khối này) ----
-NOTEBOOK = "06_C1_LamaHCEExt_Tune_mamba_L2_x1_lr1e-3"
+NOTEBOOK = "10_C1_LamaHCEExt_Tune_mamba_L2_x1_lr1e-3"
 STEP = "C1"                              # C1: tinh chỉnh, chỉ validation; C2: chạy chính thức, thêm chấm test mọi epoch
 CORE = "mamba"                           # lstm, gru, transformer, s4d, mamba
 DEPTH = 2                                # số lớp (LSTM, GRU, Transformer 1/2) hoặc số khối (S4D, Mamba 2/4)

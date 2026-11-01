@@ -1,6 +1,6 @@
 # B2 — Bộ nạp và mô hình Extended LamaH-CE
 
-Notebook kiểm source, bộ nạp và mô hình B2 trên nền `f229e02`. Output có **48/48 kiểm độc lập đạt**, gồm probe CUDA; Phần 9.3 đạt đủ **57 + 4 kiểm trên Tesla T4**, không failure/error/skip, với commit `2ccaa14`. B1b đã bàn giao qua `main` tại `de17718`. Ba seed B2 và sáu run B3 sau đó đã hoàn tất 30 epoch, Compare Version 1, Evaluation Version 8 và validation S0–S4 Version 1. Notebook Setup chỉ kiểm kỹ thuật, có 0 bước optimizer; kết quả train nằm trong [báo cáo B2](../05_Training/06_B2_LamaHCEExt_Train/06_B2_LamaHCEExt_Train.md) và [B3](../05_Training/08_B3_LamaHCEExt_Train/08_B3_LamaHCEExt_Train.md).
+Notebook kiểm source, bộ nạp và mô hình B2 trên nền `f229e02`. Output có **48/48 kiểm độc lập đạt**, gồm probe CUDA; Phần 9.3 đạt đủ **57 + 4 kiểm trên Tesla T4**, không failure/error/skip, với commit `2ccaa14`. B1b đã bàn giao qua `main` tại `de17718`. Ba seed B2 và sáu run B3 sau đó đã hoàn tất 30 epoch, Compare Version 1, Evaluation Version 8 và validation S0–S4 Version 1. Notebook Setup chỉ kiểm kỹ thuật, có 0 bước optimizer; kết quả train nằm trong [báo cáo B2](../../05_Training/06_B2_LamaHCEExt_Train/06_B2_LamaHCEExt_Train.md) và [B3](../../05_Training/08_B3_LamaHCEExt_Train/08_B3_LamaHCEExt_Train.md).
 
 ## Mã B2 theo phân công hiện hành
 
@@ -271,7 +271,7 @@ Bộ kiểm gồm kiểm B2, tám ca che B3, bốn ca giao nhau B2–lõi và c�
 
 Tám ca B3 kiểm hai cặp xác suất step/sequence **0,1/0,12** và **0,05/0,05** trên loader thường và vector hóa, cùng hai tình huống biên ở cả hai loader. Các biến cùng nhóm Q chia sẻ phần mặt nạ được thêm; nhãn và tensor lưu nguồn không đổi; validation không bị che; mô hình xử lý được bước thiếu toàn bộ nguồn. Bộ che chỉ ngăn lựa chọn che toàn chuỗi đồng thời ở tất cả nhóm, không bảo đảm luôn có nguồn quan sát ở mọi bước. NumPy và torch dùng các bộ sinh ngẫu nhiên khác nhau; kiểm không đòi hai loader có cùng mặt nạ từng bit khi chỉ đặt cùng seed. [Mã kiểm B3](../../NeuralHydrology/test/test_b3_masking.py).
 
-Các kiểm trên xác nhận đường mã trước huấn luyện. Thí nghiệm thực tế đã hoàn tất: [B2 ba seed](../05_Training/06_B2_LamaHCEExt_Train/06_B2_LamaHCEExt_Train.md), [B3 hai mức × ba seed](../05_Training/08_B3_LamaHCEExt_Train/08_B3_LamaHCEExt_Train.md), [Evaluation Version 8](../06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md) và [validation S0–S4 Version 1](../06_Evaluation/03_B_LamaHCEExt_Validation/03_B_LamaHCEExt_Validation.md). Bộ kiểm artifact giả của train/Compare có 36 kiểm đạt; số liệu khoa học được lấy từ các lần chạy Kaggle đã lưu, không từ fixture.
+Các kiểm trên xác nhận đường mã trước huấn luyện. Thí nghiệm thực tế đã hoàn tất: [B2 ba seed](../../05_Training/06_B2_LamaHCEExt_Train/06_B2_LamaHCEExt_Train.md), [B3 hai mức × ba seed](../../05_Training/08_B3_LamaHCEExt_Train/08_B3_LamaHCEExt_Train.md), [Evaluation Version 8](../06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md) và [validation S0–S4 Version 1](../06_Evaluation/03_B_LamaHCEExt_Validation/03_B_LamaHCEExt_Validation.md). Bộ kiểm artifact giả của train/Compare có 36 kiểm đạt; số liệu khoa học được lấy từ các lần chạy Kaggle đã lưu, không từ fixture.
 
 ## Phần 9.3. Kiểm bắt buộc trên T4 của commit tích hợp
 
