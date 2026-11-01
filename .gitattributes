@@ -6,3 +6,5 @@ Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/** -text whitespace=cr-a
 Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/** -text whitespace=cr-at-eol
 Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/** -text whitespace=cr-at-eol
 Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Archive/** -text whitespace=cr-at-eol
+Workspace/05_Training/06_B2_LamaHCEExt_Train/Tables/** -text whitespace=cr-at-eol
+Workspace/05_Training/08_B3_LamaHCEExt_Train/Tables/** -text whitespace=cr-at-eol
