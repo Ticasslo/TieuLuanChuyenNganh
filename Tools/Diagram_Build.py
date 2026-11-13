@@ -31,14 +31,14 @@ SEQUENCE = [
     ("A", "A. Tái lập, persistence, PNSE, DLinear, nhiễu 3 hạt giống (6 lần)"),
     ("B", "B. LSTM cải tiến, thêm từng thay đổi: B0 nền 30 epoch, B1a đơn vị Q, B1b qmax, B2 masked mean, B3 che dữ liệu (18 lần)"),
     ("C", "C. 5 lõi cùng tham số, tinh chỉnh 8 cấu hình, 3 hạt giống (tối đa 70 lần)"),
-    ("C", "H → D → E → F → GV. Dự báo 1–7 ngày, 730 ngày, biến thể, CMAL, kiểm chứng lấy mẫu lũ (42 lần)"),
+    ("C", "H → D. Dự báo 1–7 ngày, chuỗi quá khứ 730 ngày (27 lần)"),
     ("EV", "Đánh giá: mức, sự kiện lũ, kịch bản vận hành, kiểm định"),
     ("G", "G. Giải thích mô hình, dò trạng thái ẩn, demo (dùng ngưỡng lũ của A1)"),
     ("keep", "BÁO CÁO"),
 ]
 LEGEND = [
     ("keep", "Giữ nguyên"), ("A", "A: tái lập, mốc"), ("B", "B: LSTM cải tiến"),
-    ("C", "C, D, E, H: lõi, chuỗi dài, biến thể, nhiều ngày"), ("F", "F: xác suất"),
+    ("C", "C, D, H: lõi, chuỗi dài, nhiều ngày"),
     ("EV", "Đánh giá thêm"), ("G", "G: giải thích, demo"),
 ]
 # Mỗi tầng: (tên, [(khối bài gốc, [(bước, khối sửa đổi), ...]), ...])
@@ -64,10 +64,9 @@ BANDS = [
         ("Nhúng tuyến tính, ghép 32 chiều/bước",
          [("B", "B2. Nhúng riêng từng nguồn, masked mean các nguồn có dữ liệu")]),
         ("LSTM 32→128: 364 bước hindcast + 1 bước forecast, trạng thái chạy liên tục",
-         [("C", "C. Mô hình chung nhận lõi bất kỳ: LSTM, GRU, Transformer, S4D, Mamba (cùng tham số, lệch ≤1%)"),
-          ("C", "E. Mamba hai chiều, Transformer patch")]),
+         [("C", "C. Mô hình chung nhận lõi bất kỳ: LSTM, GRU, Transformer, S4D, Mamba (cùng tham số, lệch ≤1%)")]),
         ("Dropout 0,3, tuyến tính 128→1 → qmax",
-         [("F", "F. Đầu CMAL → xác suất vượt ngưỡng lũ"), ("C", "H. Đầu ra 7 bước: qmax ngày t … t+6")]),
+         [("C", "H. Đầu ra 7 bước: qmax ngày t … t+6")]),
     ]),
     ("4. Huấn luyện", [
         ("Hàm mất mát NSE*: (ŷ−y)² / (σ lưu vực + 0,1)²", []),

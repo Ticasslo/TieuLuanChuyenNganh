@@ -22,7 +22,7 @@
 #   Phần 2 - Validation theo epoch, thời gian từng epoch, bảng 40 cấu hình
 #   Phần 3 - Vòng 1: chọn cấu hình chạy tiếp tới epoch 30, kiểm vòng 2 đã đủ chưa
 #   Phần 4 - Chọn cấu hình C2 mỗi lõi, so với nhiễu hạt giống (khi đủ vòng 2)
-#   Phần 5 - Hình
+#   Phần 5 - Hình: 8 hình riêng (NSE 40 cấu hình, đường validation từng lõi, NSE theo giờ GPU, NSE từng lưu vực)
 #   Phần 6 - Lưu kết quả, danh sách _Cont hoặc lệnh sinh notebook C2, môi trường
 # =============================================================================
 
@@ -297,7 +297,7 @@ print("=> Đạt. Chạy Phần 3.")
 # tới epoch 15 và tới epoch 30 là 0,99 (giữa các lần chạy) và 1,00 (giữa 6 cấu hình); sau epoch 15 tăng thêm trung
 # vị 0, lớn nhất 0,004 (một lần chạy).
 # Tính lại được ở cả hai lần chạy vì epoch 1-15 của run _Cont là của phiên 1 chép sang. Vòng 2 đủ khi mọi cấu hình được
-# giữ có 30 epoch; chưa đủ => in danh sách notebook _Cont cần chạy, Phần 4 không chọn C2.
+# giữ (theo luật và mở rộng) có 30 epoch; chưa đủ => in danh sách notebook _Cont cần chạy, Phần 4 không chọn C2.
 CUT_COL = f"NSE val <= {C1_CUT}"
 keep_rows = []
 for core in CORE_DEPTHS:
@@ -313,11 +313,39 @@ for core in CORE_DEPTHS:
                           "giờ vòng 2 ước": row["giờ GPU"] / EPOCHS * (EPOCHS - C1_CUT) + 0.3
                           if why and row["số epoch"] < EPOCHS else 0.0})
 KEEP = pd.DataFrame(keep_rows)
-KEPT = KEEP.loc[KEEP["giữ"] == "có", "cấu hình"].tolist()
-TODO = KEEP.loc[(KEEP["giữ"] == "có") & (KEEP["số epoch"] < EPOCHS), "cấu hình"].tolist()
+# Mở rộng vòng 2 (Pipeline Mục 5.2): khi mọi cấu hình giữ theo luật trên đã có 30 epoch, đo mức tăng sau epoch 15 lớn
+# nhất của chúng (RISE_MAX) và chạy tiếp cả cấu hình bị loại còn có thể vượt: cần tăng (đích - NSE val <= 15) không quá
+# RISE_MAX, đích là NSE val 30 epoch cao nhất trong các cấu hình giữ theo luật của lõi (cấu hình x1: chỉ trong cấu hình
+# x1 được giữ, vì C2 cần cả tốt nhất x1). RISE_MAX và đích chỉ lấy từ cấu hình giữ theo luật nên không đổi khi cấu hình
+# mở rộng chạy xong.
+T = TABLE.set_index("cấu hình")
+ORIG_KEPT = KEEP.loc[KEEP["giữ"] == "có", "cấu hình"].tolist()
+RISE_MAX = (float((T.loc[ORIG_KEPT, "NSE val"] - T.loc[ORIG_KEPT, CUT_COL]).max())
+            if (T.loc[ORIG_KEPT, "số epoch"] >= EPOCHS).all() else None)
+KEEP["tăng cần để vượt"] = np.nan
+for i, row in KEEP.iterrows():
+    conf = row["cấu hình"]
+    pool = [c for c in ORIG_KEPT if T.loc[c, "lõi"] == row["lõi"] and (T.loc[conf, "mức"] != "x1" or T.loc[c, "mức"] == "x1")]
+    need = float(T.loc[pool, "NSE val"].max() - row[CUT_COL])
+    KEEP.loc[i, "tăng cần để vượt"] = need if row["giữ"] == "" else np.nan
+    if RISE_MAX is not None and row["giữ"] == "" and need <= RISE_MAX:
+        KEEP.loc[i, ["giữ", "lý do"]] = ["mở rộng", f"cần +{need:.4f} <= tăng lớn nhất {RISE_MAX:.4f}"]
+        if row["số epoch"] < EPOCHS:
+            KEEP.loc[i, "giờ vòng 2 ước"] = T.loc[conf, "giờ GPU"] / EPOCHS * (EPOCHS - C1_CUT) + 0.3
+EXTENDED = KEEP.loc[KEEP["giữ"] == "mở rộng", "cấu hình"].tolist()
+KEPT = ORIG_KEPT + EXTENDED
+TODO = KEEP.loc[KEEP["cấu hình"].isin(KEPT) & (KEEP["số epoch"] < EPOCHS), "cấu hình"].tolist()
 ROUND2_DONE = not TODO
 CONT_NOTEBOOKS = [f"10_C1_Tune_{c}_Cont" for c in TODO]
-show(f"Vòng 1 - giữ {len(KEPT)} / {len(KEEP)} cấu hình (ngưỡng {NOISE_SD} = nhiễu hạt giống)", KEEP)
+show(f"Vòng 1 - giữ {len(ORIG_KEPT)} / {len(KEEP)} cấu hình theo luật (ngưỡng {NOISE_SD} = nhiễu hạt giống)"
+     + (f", mở rộng {len(EXTENDED)} (tăng sau epoch {C1_CUT} lớn nhất {RISE_MAX:.4f})" if RISE_MAX is not None else ""), KEEP)
+if RISE_MAX is not None:
+    orig = T.loc[ORIG_KEPT]
+    rise = orig["NSE val"] - orig[CUT_COL]
+    print(f"{len(ORIG_KEPT)} cấu hình giữ theo luật đã có {EPOCHS} epoch. Spearman giữa {CUT_COL} và NSE val {EPOCHS} epoch "
+          f"của chúng: {orig[CUT_COL].rank().corr(orig['NSE val'].rank()):.2f}; tăng sau epoch {C1_CUT}: trung vị "
+          f"{rise.median():.4f}, lớn nhất {RISE_MAX:.4f} ({rise.idxmax()}). Mở rộng {len(EXTENDED)} cấu hình: "
+          f"{EXTENDED or 'không'}.")
 if TODO:
     print(f"Vòng 2 chưa đủ: chạy {len(TODO)} notebook _Cont (Input thêm Output notebook phiên 1 cùng tên), khoảng "
           f"{KEEP['giờ vòng 2 ước'].sum():.0f} giờ GPU:")
@@ -325,18 +353,14 @@ if TODO:
         print("  " + name)
     print("Xong thì gắn Output các notebook _Cont thay cho phiên 1 rồi chạy lại notebook này.")
 else:
-    kept = TABLE.set_index("cấu hình").loc[KEPT]
-    rise = kept["NSE val"] - kept[CUT_COL]
-    print(f"Vòng 2 đủ: {len(KEPT)} cấu hình được giữ có {EPOCHS} epoch. Spearman giữa {CUT_COL} và NSE val {EPOCHS} epoch "
-          f"của các cấu hình được giữ: {kept[CUT_COL].rank().corr(kept['NSE val'].rank()):.2f}; tăng sau epoch {C1_CUT}: "
-          f"trung vị {rise.median():.4f}, lớn nhất {rise.max():.4f}.")
+    print(f"Vòng 2 đủ: {len(KEPT)} cấu hình được giữ (kể cả mở rộng) có {EPOCHS} epoch.")
 print("=> Đạt. Chạy Phần 4.")
 
 
 # %% Phần 4 - Chọn cấu hình C2 mỗi lõi, so với nhiễu hạt giống (khi đủ vòng 2)
 # Pipeline Mục 5.2: mỗi lõi chạy C2 hai cấu hình - NSE trung vị validation cao nhất trong các cấu hình mức cùng tham số
-# (x1) và cao nhất trong cả lõi (trùng thì một), chỉ xét cấu hình đủ 30 epoch (được giữ ở vòng 1; tốt nhất x1 của vòng 1
-# luôn được giữ). Vòng 2 chưa đủ thì bỏ qua Phần này. Chọn theo giá trị cao nhất, không ngưỡng; ghi rõ khoảng cách tới cấu hình đứng
+# (x1) và cao nhất trong cả lõi (trùng thì một), chỉ xét cấu hình đủ 30 epoch (giữ theo luật vòng 1 hoặc mở rộng ở Phần 3;
+# tốt nhất x1 của vòng 1 luôn được giữ). Vòng 2 chưa đủ thì bỏ qua Phần này. Chọn theo giá trị cao nhất, không ngưỡng; ghi rõ khoảng cách tới cấu hình đứng
 # sau so với nhiễu hạt giống (NOISE_SD) và khi epoch chọn là epoch cuối (đường học có thể chưa đạt đỉnh). Kèm hiệu NSE
 # từng lưu vực so với B* (trung vị của hiệu, số lưu vực hơn) - chỉ để mô tả, so sánh chính thức ở C2 với 3 hạt giống.
 # Ước giờ một lần C2 (30 epoch, thêm chấm test mỗi epoch): giờ GPU C1 + 30 lượt test, mỗi lượt lấy bằng một lượt
@@ -386,21 +410,29 @@ else:
 print("=> Đạt. Chạy Phần 5.")
 
 
-# %% Phần 5 - Hình
-# Hình 1 (2 hàng x 5 lõi): (a) NSE trung vị validation của 8 cấu hình mỗi lõi (trục ngang độ sâu và mức, màu learning
-# rate; chấm đặc = được giữ ở vòng 1, rỗng = dừng ở epoch 15), đánh dấu cấu hình chọn cho C2; (b) đường học NSE trung vị
-# validation theo epoch của 8 cấu hình, vạch đứt ở epoch 15.
-# Hình 2: (a) NSE validation theo giờ GPU của 40 cấu hình (màu lõi, hình mức); (b) phân bố NSE từng lưu vực của các
-# cấu hình chọn và B*. Chữ trong hình tiếng Anh, chú thích tiếng Việt in ngay dưới bằng caption.
+# %% Phần 5 - Hình (8 hình riêng cho báo cáo Word)
+# Mỗi hình một tệp ở c1_compare/Figures/ (tên bắt đầu C1_), rộng 8 inch, 200 dpi, chú giải dưới hình để vừa khổ trang:
+#   C1_Best_All.png - NSE trung vị validation tốt nhất của 40 cấu hình, số ghi ở cột phải;
+#   C1_Curves_<Lõi>.png (5 hình) - NSE trung vị validation theo epoch của 8 cấu hình một lõi;
+#   C1_Cost.png - NSE theo giờ GPU 30 epoch, ghi tên và số cho cấu hình chọn C2;
+#   C1_Basin_Spread.png - phân bố NSE từng lưu vực của B* và cấu hình chọn C2.
+# Chữ trong hình tiếng Anh, chú thích tiếng Việt in ngay dưới bằng caption(); số trong chú thích lấy từ bảng Phần 2-4.
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 FIG_DIR = OUT_DIR / "Figures"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
+FIG_W = 8.0                                        # inch; trang A4 lề 2,5 cm rộng khoảng 6,3 inch
+plt.rcParams.update({"font.size": 10})
 CORE_LABEL = {"lstm": "LSTM", "gru": "GRU", "transformer": "Transformer", "s4d": "S4D", "mamba": "Mamba"}
 CORE_COLOR = {"lstm": "C0", "gru": "C1", "transformer": "C2", "s4d": "C3", "mamba": "C4"}
 LR_COLOR = {"lr1e-3": "C0", "lr5e-4": "C3"}
 UNIT = {"lstm": "L", "gru": "L", "transformer": "L", "s4d": "B", "mamba": "B"}
+SHAPE_STYLE = {(0, "x1"): "-", (0, "x3"): "--", (1, "x1"): "-.", (1, "x3"): ":"}   # (chỉ số độ sâu, mức) => kiểu nét
+BOX = dict(boxstyle="round,pad=0.12", fc="white", ec="none", alpha=0.85)
+T = TABLE.set_index("cấu hình")
 
 
 def caption(text):
@@ -418,89 +450,223 @@ def conf_label(conf):
     return f"{CORE_LABEL[core]} {depth}{UNIT[core]} x{level} {lr_tag.removeprefix('lr')}"
 
 
-# Hình 1
-fig, axes = plt.subplots(2, 5, figsize=(22, 9), sharey="row")
-for j, core in enumerate(CORE_DEPTHS):
-    t = TABLE[TABLE["lõi"] == core]
-    ax = axes[0, j]
-    slots = [(d, lv) for d in CORE_DEPTHS[core] for lv in LEVELS]
-    for k, (d, lv) in enumerate(slots):
-        for i, lr_tag in enumerate(LRS):
-            row = t[(t["độ sâu"] == d) & (t["mức"] == f"x{lv}") & (t["lr"] == lr_tag)].iloc[0]
-            chosen, kept = row["cấu hình"] in C2_CONFS, row["cấu hình"] in KEPT
-            ax.scatter(k + (i - 0.5) * 0.25, row["NSE val"], s=90 if chosen else 40,
-                       color=LR_COLOR[lr_tag] if kept else "white",
-                       edgecolor="black" if chosen else LR_COLOR[lr_tag], linewidth=1.5, zorder=3)
-    ax.set_xticks(range(len(slots)), [f"{d}{UNIT[core]} x{lv}" for d, lv in slots])
-    ax.set_title(f"(a{j + 1}) {CORE_LABEL[core]}: best validation NSE")
-    ax.grid(alpha=0.3)
-    ax = axes[1, j]
-    for conf in t["cấu hình"]:
-        cur = CURVES[conf]
-        ax.plot(cur["epoch"], cur["NSE"], lw=2 if conf in C2_CONFS else 0.9, alpha=1 if conf in C2_CONFS else 0.6,
-                label=conf_label(conf).split(" ", 1)[1])
-    ax.axvline(C1_CUT, color="grey", ls="--", lw=1)
-    ax.set(xlabel="epoch", title=f"(b{j + 1}) {CORE_LABEL[core]}: validation NSE per epoch")
-    ax.grid(alpha=0.3)
-    ax.legend(fontsize=7, loc="lower right")
-axes[0, 0].set_ylabel(f"median NSE of {N_BASINS} basins")
-axes[1, 0].set_ylabel(f"median NSE of {N_BASINS} basins")
-handles = ([Line2D([], [], marker="o", ls="", color=LR_COLOR[k], label=f"lr {k.removeprefix('lr')}") for k in LRS]
-           + [Line2D([], [], marker="o", ls="", color="white", markeredgecolor="grey", label=f"stopped at epoch {C1_CUT}"),
-              Line2D([], [], marker="o", ls="", color="white", markeredgecolor="black", markersize=9,
-                     label="selected for C2")])
-axes[0, 4].legend(handles=handles, fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1))
-fig.suptitle(f"C1 tuning: 8 configurations per core (L = layers, B = blocks, x1 = {TARGET:,} parameters, x3 = about "
-             f"three times), seed {SEED}, round 1 to epoch {C1_CUT}, kept configurations to epoch {EPOCHS}")
-fig.tight_layout()
-fig.savefig(FIG_DIR / "C1_Configs.png", dpi=150, bbox_inches="tight")
-plt.show()
-best_all = TABLE.loc[TABLE["NSE val"].idxmax()]
-caption(f"tinh chỉnh C1, mỗi cột một lõi. Hàng trên: NSE trung vị {N_BASINS} lưu vực của kỳ validation ở epoch tốt nhất "
-        f"cho 8 cấu hình (trục ngang: số lớp L hoặc số khối B và mức dung lượng; màu: learning rate); chấm đặc là cấu "
-        f"hình được giữ ở vòng 1 ({len(KEPT)} / {len(KEEP)}), chấm rỗng dừng ở epoch {C1_CUT}; chấm viền đen là cấu hình "
-        f"chạy chính thức C2" + ("" if ROUND2_DONE else " (chưa chọn: vòng 2 chưa đủ)") + f". Hàng dưới: NSE trung vị "
-        f"validation theo epoch, vạch đứt ở epoch {C1_CUT}, đường đậm là cấu hình chọn. Cao nhất cả lưới là "
-        f"{conf_label(best_all['cấu hình'])} (NSE {vn(best_all['NSE val'])}); nhiễu giữa 3 hạt giống của LSTM là "
-        f"{vn(NOISE_SD, 4)}, nên các chấm cách nhau ít hơn mức này chưa phân biệt được với 1 hạt giống.")
+def finish(fig, name, handles, ncol=2):
+    # Chú giải dưới hình (ngoài vùng vẽ), lưu PNG rồi hiện.
+    fig.tight_layout()
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.0), ncol=ncol, fontsize=9)
+    fig.savefig(FIG_DIR / name, dpi=200, bbox_inches="tight")
+    plt.show()
 
-# Hình 2
-fig, axes = plt.subplots(1, 2, figsize=(17, 6.5), gridspec_kw={"width_ratios": [1.2, 1]})
-ax = axes[0]
+
+def status(conf):
+    # Trạng thái một cấu hình: chọn C2 / chạy tới 30 / dừng ở 15.
+    return "C2" if conf in C2_CONFS else ("30" if conf in KEPT else "15")
+
+
+best_all = TABLE.loc[TABLE["NSE val"].idxmax()]
+n_c2 = len(C2_CONFS) if ROUND2_DONE else 0
+
+# Hình 1: NSE validation tốt nhất của 40 cấu hình, mỗi lõi một khối (dòng tiêu đề lõi, đường kẻ ngăn khối), trong khối
+# xếp từ cao xuống; que ngang từ mép trái tới điểm cho dễ dóng; dải xám = trong 1 lần nhiễu hạt giống của cấu hình tốt
+# nhất lõi; đường gạch đứng = B*
+rows, y = [], 0                                    # (y, cấu hình hoặc None cho dòng tiêu đề lõi, lõi)
+for core in CORE_DEPTHS:
+    rows.append((y, None, core))
+    y += 1
+    for c in TABLE[TABLE["lõi"] == core].sort_values("NSE val", ascending=False)["cấu hình"]:
+        rows.append((y, c, core))
+        y += 1
+    y += 0.6                                       # khoảng trống giữa hai khối
+x_lo = TABLE["NSE val"].min() - 0.006
+x_hi = TABLE["NSE val"].max() + 0.004
+fig, ax = plt.subplots(figsize=(FIG_W, 12))
+for core in CORE_DEPTHS:
+    ys = [r[0] for r in rows if r[2] == core]
+    top, bottom = min(ys) - 0.5, max(ys) + 0.5
+    best_core = TABLE.loc[TABLE["lõi"] == core, "NSE val"].max()
+    ax.fill_betweenx([top + 1, bottom], best_core - NOISE_SD, best_core, color="0.88", zorder=0, lw=0)
+    if core != list(CORE_DEPTHS)[-1]:
+        ax.axhline(bottom + 0.3, color="0.25", lw=1.2, zorder=1)
+for y, conf, core in rows:
+    if conf is None:
+        continue
+    lr_tag, st, v = T.loc[conf, "lr"], status(conf), T.loc[conf, "NSE val"]
+    ax.plot([x_lo, v], [y, y], color=LR_COLOR[lr_tag], lw=1 if st != "15" else 0.8, alpha=0.45, zorder=2)
+    ax.scatter(v, y, s=120 if st == "C2" else 60, marker="s" if conf == B_STAR_CONF else "o",
+               color=LR_COLOR[lr_tag] if st != "15" else "white", edgecolor="black" if st == "C2" else LR_COLOR[lr_tag],
+               linewidth=2 if st == "C2" else 1.4, zorder=3)
+    ax.annotate(f"{v:.4f}" + ("  C2" if st == "C2" else ""), (1, y), xytext=(8, 0), xycoords=("axes fraction", "data"),
+                textcoords="offset points", va="center", fontsize=8.5, fontweight="bold" if st == "C2" else "normal")
+bstar = T.loc[B_STAR_CONF, "NSE val"]
+ax.axvline(bstar, color="0.3", ls="--", lw=1, zorder=1)
+ax.annotate(f"B* {bstar:.4f}", (bstar, 0), xytext=(4, 0), textcoords="offset points", va="center", fontsize=8.5,
+            color="0.3", bbox=BOX)
+ax.set_yticks([r[0] for r in rows], [CORE_LABEL[r[2]] if r[1] is None else
+                                     ("B* " if r[1] == B_STAR_CONF else "") + conf_label(r[1]).split(" ", 1)[1]
+                                     for r in rows], fontsize=8.5)
+for lab, r in zip(ax.get_yticklabels(), rows):
+    if r[1] is None:
+        lab.set_fontweight("bold")
+        lab.set_fontsize(10)
+        lab.set_color(CORE_COLOR[r[2]])
+ax.tick_params(axis="y", length=0)
+ax.set_ylim(rows[-1][0] + 0.7, -0.7)
+ax.set_xlim(x_lo, x_hi)
+ax.set_xlabel(f"Best validation median NSE of {N_BASINS} basins (seed {SEED})")
+ax.set_title(f"C1 tuning: best validation NSE of {len(TABLE)} configurations (L = layers, B = blocks)", fontsize=11)
+ax.grid(alpha=0.3, axis="x")
+finish(fig, "C1_Best_All.png",
+       [Line2D([], [], marker="o", ls="", color=LR_COLOR[k], label=f"lr {k.removeprefix('lr')}, run to epoch {EPOCHS}")
+        for k in LRS]
+       + [Line2D([], [], marker="o", ls="", color="white", markeredgecolor="0.4", label=f"stopped at epoch {C1_CUT} (round 1)"),
+          Line2D([], [], marker="o", ls="", color="0.6", markeredgecolor="black", markeredgewidth=2, markersize=9,
+                 label="selected for C2"),
+          Line2D([], [], marker="s", ls="", color="0.6", label=f"B* (seed {SEED})"),
+          Patch(color="0.88", label=f"within {NOISE_SD} (seed noise) of the best of the core")])
+caption(f"NSE trung vị {N_BASINS} lưu vực của kỳ validation ở epoch tốt nhất, {len(TABLE)} cấu hình C1 (hạt giống {SEED}), "
+        f"mỗi lõi một khối, trong khối xếp từ cao xuống; số ở cột phải, \"C2\" là cấu hình chọn chạy chính thức. Màu là "
+        f"learning rate; chấm đặc là cấu hình chạy tới epoch {EPOCHS} ({len(ORIG_KEPT)} giữ theo luật + {len(EXTENDED)} "
+        f"mở rộng), chấm rỗng là cấu hình dừng ở epoch {C1_CUT}; ô vuông và đường gạch đứng là B* ({vn(bstar, 4)}). Dải "
+        f"xám là khoảng {vn(NOISE_SD, 4)} (độ lệch chuẩn giữa 3 hạt giống) dưới cấu hình tốt nhất của lõi: cấu hình trong "
+        f"dải chưa phân biệt được với cấu hình tốt nhất khi chỉ có 1 hạt giống. Cao nhất cả lưới "
+        f"{conf_label(best_all['cấu hình'])} ({vn(best_all['NSE val'], 4)}).")
+
+# Hình 2-6: NSE validation theo epoch, mỗi lõi một hình, hai ô xếp dọc theo learning rate (mỗi ô 4 đường = 2 độ sâu x 2
+# mức, màu theo độ sâu và mức, giống nhau ở mọi lõi). Nét đậm = chọn C2, nét nhạt mảnh = dừng ở epoch 15; chấm = epoch
+# tốt nhất; chú giải bên phải mỗi ô ghi NSE @ epoch. Trục dọc chung hai ô, từ giá trị thấp nhất kể từ epoch Y_FROM (epoch
+# 1-2 của mô hình mới khởi tạo thấp hẳn); cấu hình sụp hẳn (epoch cuối thấp hơn tốt nhất quá COLLAPSE) không tính vào
+# trục, ghi chú trong ô.
+Y_FROM = 3
+COLLAPSE = 0.1
+SHAPE_COLOR = {(0, "x1"): "#1b9e77", (0, "x3"): "#d95f02", (1, "x1"): "#7570b3", (1, "x3"): "#e7298a"}
+for core in CORE_DEPTHS:
+    confs = TABLE[TABLE["lõi"] == core].sort_values(["độ sâu", "mức"])["cấu hình"].tolist()
+    vals = pd.concat([CURVES[c].assign(conf=c) for c in confs])
+    collapsed = [c for c in confs if CURVES[c]["NSE"].iloc[-1] < T.loc[c, "NSE val"] - COLLAPSE]
+    in_axis = vals[~vals["conf"].isin(collapsed)]
+    y_lo = in_axis.loc[in_axis["epoch"] >= Y_FROM, "NSE"].min() - 0.005
+    y_hi = vals["NSE"].max() + 0.008
+    early_cut = vals[(vals["NSE"] < y_lo) & (vals["epoch"] < Y_FROM)]
+    fig, axes = plt.subplots(2, 1, figsize=(FIG_W, 7.5), sharex=True, sharey=True)
+    for ax, (lr_tag, panel) in zip(axes, zip(LRS, "ab")):
+        ax.axvline(C1_CUT, color="grey", ls="--", lw=1)
+        handles = []
+        for conf in [c for c in confs if T.loc[c, "lr"] == lr_tag]:
+            d_i = CORE_DEPTHS[core].index(int(T.loc[conf, "độ sâu"]))
+            st, cur, e = status(conf), CURVES[conf], int(T.loc[conf, "epoch chọn"])
+            style = dict(color=SHAPE_COLOR[(d_i, T.loc[conf, "mức"])], lw={"C2": 2.6, "30": 1.4, "15": 1.0}[st],
+                         alpha=0.55 if st == "15" else 1)
+            ax.plot(cur["epoch"], cur["NSE"], **style, zorder=3 if st == "C2" else 2)
+            ax.plot(e, T.loc[conf, "NSE val"], "o", color=style["color"], ms=7 if st == "C2" else 4.5,
+                    markeredgecolor="black" if st == "C2" else style["color"], zorder=4)
+            name = conf_label(conf).split(" ", 1)[1].rsplit(" ", 1)[0] + (" (B*)" if conf == B_STAR_CONF else "")
+            handles.append(Line2D([], [], **style, label=f"{name}: {T.loc[conf, 'NSE val']:.4f} @ {e}"
+                                  + {"C2": " [C2]", "30": "", "15": f" [stop {C1_CUT}]"}[st]))
+            if conf in collapsed:
+                low = cur[cur["NSE"] < y_lo]
+                ax.annotate(f"{name} collapses to {low['NSE'].min():.3f} from epoch {int(low['epoch'].min())}",
+                            (low["epoch"].min(), y_lo), xytext=(10, 18), textcoords="offset points", fontsize=8.5,
+                            color=style["color"], bbox=BOX, arrowprops=dict(arrowstyle="->", color=style["color"]))
+        ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.01, 1), fontsize=8.5, frameon=False)
+        ax.set_title(f"({panel}) learning rate {lr_tag.removeprefix('lr')}", fontsize=10, loc="left")
+        ax.set_ylabel("Validation median NSE")
+        ax.grid(alpha=0.3)
+    axes[0].set_ylim(y_lo, y_hi)
+    axes[0].set_xlim(0.5, EPOCHS + 0.5)
+    axes[1].set_xlabel(f"Epoch (dashed line: end of round 1, epoch {C1_CUT})")
+    fig.suptitle(f"C1 tuning, {CORE_LABEL[core]}: validation NSE of {N_BASINS} basins per epoch (seed {SEED})",
+                 fontsize=11)
+    finish(fig, f"C1_Curves_{CORE_LABEL[core]}.png",
+           [Line2D([], [], color=SHAPE_COLOR[(i, lv)], lw=2,
+                   label=f"{CORE_DEPTHS[core][i]}{UNIT[core]} {lv}") for i in (0, 1) for lv in ("x1", "x3")]
+           + [Line2D([], [], color="0.3", lw=2.6, label="selected for C2"),
+              Line2D([], [], color="0.3", lw=1.4, label=f"run to epoch {EPOCHS}"),
+              Line2D([], [], color="0.3", lw=1.0, alpha=0.55, label=f"stopped at epoch {C1_CUT}")], ncol=4)
+    sel = [c for c in confs if c in C2_CONFS]
+    caption(f"{CORE_LABEL[core]}: NSE trung vị validation theo epoch của 8 cấu hình C1 (hạt giống {SEED}); ô (a) learning "
+            f"rate 10^-3, ô (b) 5x10^-4; màu là độ sâu và mức dung lượng, nét đậm là cấu hình chọn C2 "
+            f"({', '.join(conf_label(c) for c in sel) or 'không có'}), nét nhạt mảnh dừng ở epoch {C1_CUT} là cấu hình bị "
+            f"loại ở vòng 1; chấm là epoch tốt nhất, chú giải ghi NSE @ epoch đó. Trục dọc từ {vn(y_lo, 3)}"
+            + (f"; {len(early_cut)} điểm ở epoch 1-{Y_FROM - 1} thấp hơn, nằm ngoài trục (nhỏ nhất "
+               f"{vn(early_cut['NSE'].min(), 3)})" if len(early_cut) else "")
+            + "".join(f"; {conf_label(c)} sụp xuống {vn(CURVES[c]['NSE'].min(), 3)} và không hồi lại (ghi trong hình)"
+                      for c in collapsed)
+            + f". Đường dao động mạnh giữa các epoch (một hạt giống), nên NSE tốt nhất của mỗi cấu hình là đỉnh của "
+              f"một đường nhiễu.")
+
+# Hình 7: NSE theo giờ GPU 30 epoch; cấu hình chọn C2 khoanh đen, đánh số theo NSE giảm dần, tên + NSE + giờ ở chú giải
+# dưới hình (tên ghi thẳng cạnh điểm bị đè vì nhiều cấu hình cùng vùng)
+fig, ax = plt.subplots(figsize=(FIG_W, 6))
 for core in CORE_DEPTHS:
     for lv, mk in [("x1", "o"), ("x3", "^")]:
         t = TABLE[(TABLE["lõi"] == core) & (TABLE["mức"] == lv)]
-        ax.scatter(t["giờ GPU"], t["NSE val"], marker=mk, color=CORE_COLOR[core], s=45,
-                   label=f"{CORE_LABEL[core]} {lv}")
-ax.set(xlabel="GPU hours for 30 epochs (T4, training + validation; estimated if stopped at round 1)",
-       ylabel="median validation NSE",
-       title="(a) Accuracy versus cost, 40 configurations")
+        filled = t["cấu hình"].isin(KEPT)
+        ax.scatter(t.loc[filled, "giờ GPU"], t.loc[filled, "NSE val"], marker=mk, color=CORE_COLOR[core], s=45, zorder=3)
+        ax.scatter(t.loc[~filled, "giờ GPU"], t.loc[~filled, "NSE val"], marker=mk, facecolor="white",
+                   edgecolor=CORE_COLOR[core], s=45, zorder=3)
+sel_handles = []
+for k, conf in enumerate(sorted(C2_CONFS, key=lambda c: -T.loc[c, "NSE val"]), 1):
+    x, y = T.loc[conf, "giờ GPU"], T.loc[conf, "NSE val"]
+    ax.scatter(x, y, s=150, facecolor="none", edgecolor="black", linewidth=1.6, zorder=4)
+    ax.annotate(str(k), (x, y), xytext=(-9, 7), textcoords="offset points", ha="right", fontsize=9, fontweight="bold",
+                bbox=BOX, zorder=5)
+    sel_handles.append(Line2D([], [], ls="", marker=f"${k}$", color="black", markersize=7,
+                              label=f"{conf_label(conf)}: {y:.4f}, {T.loc[conf, 'giờ GPU']:.1f} h"))
+ax.set_xlabel(f"GPU hours for {EPOCHS} epochs (one T4, training + validation; estimated if stopped at epoch {C1_CUT})")
+ax.set_ylabel("Best validation median NSE")
+ax.set_title(f"C1 tuning: accuracy versus cost, {len(TABLE)} configurations (seed {SEED})", fontsize=11)
 ax.grid(alpha=0.3)
-ax.legend(fontsize=8, ncol=5, loc="upper center", bbox_to_anchor=(0.5, -0.13))
-ax = axes[1]
+finish(fig, "C1_Cost.png",
+       [Line2D([], [], marker="o", ls="", color=CORE_COLOR[c], label=CORE_LABEL[c]) for c in CORE_DEPTHS]
+       + [Line2D([], [], marker="o", ls="", color="0.4", label="x1 (same parameters as B*)"),
+          Line2D([], [], marker="^", ls="", color="0.4", label="x3"),
+          Line2D([], [], marker="o", ls="", color="white", markeredgecolor="0.4", label=f"stopped at epoch {C1_CUT}"),
+          Line2D([], [], marker="o", ls="", color="white", markeredgecolor="black", markeredgewidth=1.6, markersize=10,
+                 label="selected for C2 (number below)")]
+       + sel_handles, ncol=2)
+cheap, dear = TABLE.loc[TABLE["giờ GPU"].idxmin()], TABLE.loc[TABLE["giờ GPU"].idxmax()]
+caption(f"NSE trung vị validation tốt nhất theo số giờ GPU của {EPOCHS} epoch (huấn luyện + validation trên một T4; cấu "
+        f"hình dừng ở epoch {C1_CUT} ước theo tốc độ vòng 1); màu theo lõi, tròn là mức cùng tham số, tam giác là mức "
+        f"gấp 3, chấm rỗng là cấu hình dừng ở epoch {C1_CUT}, vòng đen đánh số là {n_c2} cấu hình chọn C2 (tên, NSE và số giờ ở chú giải dưới hình). Rẻ nhất "
+        f"{conf_label(cheap['cấu hình'])} ({vn(cheap['giờ GPU'], 1)} giờ), đắt nhất {conf_label(dear['cấu hình'])} "
+        f"({vn(dear['giờ GPU'], 1)} giờ); số giờ phụ thuộc cài đặt cụ thể, không phải độ phức tạp thuật toán.")
+
+# Hình 8: phân bố NSE validation từng lưu vực của B* và cấu hình chọn C2 (hoặc giữ ở vòng 1), trung vị ghi ở cột phải
 box_confs = [B_STAR_CONF] + [c for c in (C2_CONFS if ROUND2_DONE else KEPT) if c != B_STAR_CONF]
-data = [PER_BASIN[c][int(TABLE.set_index("cấu hình").loc[c, "epoch chọn"])].dropna().clip(lower=-1) for c in box_confs]
-bp = ax.boxplot(data, vert=False, showfliers=False, patch_artist=True)
+data = [PER_BASIN[c][int(T.loc[c, "epoch chọn"])].dropna() for c in box_confs]
+n_low = [int((d < -1).sum()) for d in data]
+med = [float(d.median()) for d in data]
+iqr = [float(d.quantile(0.75) - d.quantile(0.25)) for d in data]
+# matplotlib >= 3.10 đổi vert=False thành orientation="horizontal" (vert báo lỗi thời từ 3.11)
+HORIZONTAL = ({"orientation": "horizontal"} if tuple(int(x) for x in matplotlib.__version__.split(".")[:2]) >= (3, 10)
+              else {"vert": False})
+fig, ax = plt.subplots(figsize=(FIG_W, 5.5))
+bp = ax.boxplot([d.clip(lower=-1) for d in data], **HORIZONTAL, showfliers=False, patch_artist=True,
+                medianprops=dict(color="black"))
 for patch, c in zip(bp["boxes"], box_confs):
     patch.set_facecolor(CORE_COLOR[c.split("_")[0]])
     patch.set_alpha(0.5)
+for i, d in enumerate(data, 1):
+    ax.annotate(f"{d.median():.4f}", (1, i), xytext=(8, 0), xycoords=("axes fraction", "data"),
+                textcoords="offset points", va="center", fontsize=8.5)
+ax.annotate("median", (1, 0.4), xytext=(8, 0), xycoords=("axes fraction", "data"), textcoords="offset points",
+            va="center", fontsize=8.5, fontweight="bold")
+ax.set_ylim(len(data) + 0.5, 0.1)
 ax.set_yticks(range(1, len(box_confs) + 1), [("B* " if c == B_STAR_CONF else "") + conf_label(c) for c in box_confs],
-              fontsize=8)
-ax.set(xlabel="validation NSE per basin (clipped at -1, outliers hidden)",
-       title="(b) Basin NSE of B* and the configurations " + ("selected for C2" if ROUND2_DONE else "kept in round 1"))
+              fontsize=8.5)
+ax.set_xlabel("Validation NSE per basin (box: quartiles, whiskers: 1.5 IQR, outliers hidden)")
+ax.set_title(f"C1 tuning: per-basin validation NSE of B* and the configurations "
+             + ("selected for C2" if ROUND2_DONE else "kept in round 1") + f" (seed {SEED})", fontsize=10)
 ax.grid(alpha=0.3, axis="x")
-fig.suptitle(f"C1 tuning: cost and per-basin spread (seed {SEED})")
 fig.tight_layout()
-fig.savefig(FIG_DIR / "C1_Cost_Basins.png", dpi=150, bbox_inches="tight")
+fig.savefig(FIG_DIR / "C1_Basin_Spread.png", dpi=200, bbox_inches="tight")
 plt.show()
-cheap = TABLE.loc[TABLE["giờ GPU"].idxmin()]
-dear = TABLE.loc[TABLE["giờ GPU"].idxmax()]
-caption(f"(a) NSE trung vị validation theo số giờ GPU của 30 epoch (huấn luyện + validation trên T4; cấu hình dừng ở "
-        f"epoch {C1_CUT} ước theo tốc độ vòng 1), màu theo lõi, chấm tròn là mức cùng tham số, tam giác là mức gấp 3; rẻ "
-        f"nhất {conf_label(cheap['cấu hình'])} ({vn(cheap['giờ GPU'], 1)} giờ), đắt nhất {conf_label(dear['cấu hình'])} "
-        f"({vn(dear['giờ GPU'], 1)} giờ). (b) phân bố NSE validation từng lưu vực (hộp: tứ phân vị, vạch: trung vị; cắt ở "
-        f"-1, ẩn điểm ngoại lai) của B* và {len(box_confs) - 1} cấu hình "
-        + ("chọn cho C2." if ROUND2_DONE else "được giữ ở vòng 1."))
+caption(f"Phân bố NSE validation từng lưu vực ({N_BASINS} lưu vực, epoch tốt nhất của mỗi cấu hình, hạt giống {SEED}) "
+        f"của B* và {len(box_confs) - 1} cấu hình " + ("chọn C2" if ROUND2_DONE else "giữ ở vòng 1")
+        + f"; hộp là tứ phân vị, vạch đen là trung vị (số ở cột phải), râu dài tới 1,5 lần khoảng tứ phân vị, ẩn điểm "
+        f"ngoại lai; NSE dưới -1 tính là -1 ({max(n_low)} lưu vực nhiều nhất ở một cấu hình). Trung vị các cấu hình "
+        f"chênh nhau tối đa {vn(max(med) - min(med), 4)}, còn khoảng tứ phân vị mỗi cấu hình rộng "
+        f"{vn(min(iqr), 2)}-{vn(max(iqr), 2)}: khác biệt giữa các cấu hình nhỏ so với khác biệt giữa các lưu vực.")
 print("=> Đạt. Chạy Phần 6.")
 
 
@@ -518,7 +684,8 @@ C2_BUILD = [c for c in C2_CONFS if c != B_STAR_CONF]
 build_cmd = ("python Tools/C_Notebooks_Build.py c2 " + " ".join(C2_BUILD)
              + (" --cont " + " ".join(c for c in C2_CONT if c != B_STAR_CONF) if set(C2_CONT) - {B_STAR_CONF} else "")
              ) if ROUND2_DONE else None
-selection = {"round2_done": ROUND2_DONE, "c1_cut": C1_CUT, "kept": KEPT, "cont_to_run": CONT_NOTEBOOKS,
+selection = {"round2_done": ROUND2_DONE, "c1_cut": C1_CUT, "kept": KEPT, "kept_rule": ORIG_KEPT, "extended": EXTENDED,
+             "rise_max": RISE_MAX, "cont_to_run": CONT_NOTEBOOKS,
              "c2_configs": C2_CONFS, "c2_build": C2_BUILD, "c2_reuse_b_star": B_STAR_CONF in C2_CONFS,
              "c2_cont": C2_CONT, "build_command": build_cmd, "noise_sd": NOISE_SD,
              "target_params": TARGET, "b_star_run": runs[B_STAR_CONF]["cfg"]["experiment_name"],
