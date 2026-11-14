@@ -327,12 +327,12 @@ Tổng tối đa 121 lần huấn luyện ở tiểu luận (A: 6; B: 18 gồm B
 | Masked mean, che dữ liệu làm giảm NSE ở S0 | Vẫn báo cáo; chọn B* theo validation; lợi ích ở kịch bản S1–S4 |
 | Ngưỡng lũ 10 năm có ít sự kiện trong 4 năm test | Báo cáo số sự kiện; kết luận chính dựa trên 1,5 và 2 năm |
 | Thời gian chạy vượt dự kiến | Cắt theo Mục 8.3 |
-| PyTorch không chạy được trên CPU ARM của VPS, hoặc Mamba bằng `mambapy` trên CPU lệch kết quả hay quá chậm | Kiểm ở bước D2 trên Kaggle, D4 trên VPS (Mục 9.6); Mamba không đạt thì phần chạy trực tiếp chỉ dùng LSTM cải tiến, các lõi khác đọc kết quả tính sẵn; VPS không đạt thì dùng bản laptop (D3) |
+| PyTorch không chạy được trên CPU ARM của VPS, hoặc Mamba bằng `mambapy` trên CPU lệch kết quả hay quá chậm | Kiểm ở bước D2 trên Kaggle, D4 trên VPS (Mục 9.6); lõi nào không đạt (thường là Mamba) thì lõi đó chỉ phát lại, các lõi khác vẫn chạy trực tiếp; VPS không đạt thì dùng bản laptop (D3) |
 | VPS Oracle Always Free bị thu hồi khi rảnh (7 ngày dưới 20% CPU, mạng, bộ nhớ — tài liệu Oracle, cập nhật 12/6/2026) | Đóng gói demo bằng Docker để dựng lại nhanh; giữ bản chạy trên laptop (Mục 9.6, bước D3) cho ngày bảo vệ |
 
 ### 8.3. Thứ tự cắt nếu thiếu thời gian
 
-Cắt từ trên xuống; RQ1–RQ4 giữ nguyên, RQ5 và RQ6 chỉ thu hẹp: (1) 730 ngày cho S4D; (2) cả bước D (RQ5 chuyển sang khóa luận); (3) cách (c) ở bước H (dự báo hoàn hảo, cận trên); (4) dò trạng thái ẩn ở phần giải thích mô hình, giữ Integrated Gradients. Demo bắt buộc, không cắt; khi thiếu thời gian dừng ở bước D3 (laptop). Bước E, F, GV đã chuyển sang khóa luận (Mục 11).
+Cắt từ trên xuống; RQ1–RQ4 giữ nguyên, RQ5 và RQ6 chỉ thu hẹp: (1) 730 ngày cho S4D; (2) cả bước D (RQ5 chuyển sang khóa luận); (3) cách (c) ở bước H (dự báo hoàn hảo, cận trên); (4) dò trạng thái ẩn ở phần giải thích mô hình, giữ Integrated Gradients. Demo bắt buộc, không cắt; khi thiếu thời gian dừng ở bước D3 (laptop) và bớt trang theo thứ tự ở Mục 9.6. Bước E, F, GV đã chuyển sang khóa luận (Mục 11).
 
 ---
 
@@ -396,24 +396,39 @@ Bộ đánh giá chỉ đọc dự báo đã lưu, không gọi mô hình. Demo 
 
 ### 9.6. Đưa mô hình vào demo
 
-Demo có hai phần. Phần phát lại đọc tệp dự báo ở Mục 9.5 (bản đồ 451 lưu vực, đường Q, ngưỡng lũ, mức ảnh hưởng của các nhóm nguồn). Phần chạy mô hình trực tiếp nhận lưu vực và ngày t trong kỳ test, lấy cửa sổ hindcast, dự báo ECMWF HRES ngày t và thuộc tính lưu vực từ dữ liệu đã lưu, chuẩn hóa bằng thông số chuẩn hóa lúc huấn luyện, chạy mô hình rồi đổi kết quả sang m³/s; phần thử "nếu… thì…" cho người xem nhân lượng mưa hoặc cộng nhiệt độ của ECMWF HRES ngày t rồi chạy lại. Dữ liệu Extended LamaH-CE chỉ tới 2017 nên đây vẫn là phát lại, không phải dự báo thời gian thực (Mục 11).
+Demo cho thấy mọi mô hình đã huấn luyện chính thức (C, H, D) cùng mốc so sánh, tổ chức theo câu hỏi của người xem ("lưu vực này, ngày này, các mô hình dự báo thế nào") thay vì theo bước thí nghiệm. Dữ liệu Extended LamaH-CE chỉ tới 2017 nên mọi trang là phát lại kỳ test 2014–2017, không phải dự báo thời gian thực (Mục 11).
 
-Mô hình chạy trong demo chọn theo tầng 1 của Mục 6.1: trong các lần chạy chính thức (bước C2 và các bước mở rộng có dự báo hạn 1 ngày), lấy lần chạy có NSE trung vị validation cao nhất; kết quả test của mô hình này báo cáo như mọi mô hình khác, không dùng để chọn lại.
+Hai cách đưa kết quả lên trang (lựa chọn của đề tài):
 
-Huấn luyện chạy trên GPU (Kaggle); demo chạy trên CPU. Mỗi lần dự báo một lưu vực, một ngày là một lượt chạy xuôi của mô hình khoảng 85 nghìn tham số trên chuỗi 365 bước, nên CPU đủ dùng. GPU miễn phí để phục vụ web không phù hợp: Hugging Face ZeroGPU tính hạn mức GPU theo tài khoản người xem (tài khoản miễn phí 5 phút mỗi ngày) và chỉ chạy Gradio; Space Gradio hoặc Docker trên CPU Basic cần gói trả phí mới tạo được (tài liệu Hugging Face *Spaces ZeroGPU*, *Using GPU Spaces*). Giao diện chạy trong notebook Kaggle không dùng làm demo vì chỉ sống trong phiên notebook (tối đa 12 giờ).
+- **Phát lại** (phần chính): đọc tệp dự báo kỳ test ở Mục 9.5 và bảng chỉ số đã tính ở bộ đánh giá. Nhanh, không phụ thuộc thiết bị chạy mô hình, trùng đúng số trong báo cáo.
+- **Chạy trực tiếp** (chỉ cho phần thử "nếu… thì…"): người xem nhân lượng mưa hoặc cộng nhiệt độ của ECMWF HRES ngày t; hàm dự báo lấy cửa sổ hindcast, ECMWF HRES ngày t (đã đổi) và thuộc tính lưu vực từ dữ liệu đã lưu, chuẩn hóa bằng thông số lúc huấn luyện, chạy mô hình rồi đổi sang m³/s. Chỉ các mô hình nhận ECMWF HRES ngày t mới cần chạy trực tiếp: năm lõi của C2 và cách (b) của bước H; cách (a) không nhận dự báo thời tiết, cách (c) dùng dữ liệu tương lai nên chỉ phát lại.
 
-`mamba-ssm` chỉ chạy trên GPU CUDA, nên khi chạy trên CPU, khối Mamba thay bằng `mambapy` (PyTorch thuần). `MambaBlock` của `mambapy` 1.2.0 có cùng tên tham số và cùng mặc định với `mamba_ssm.Mamba`: nạp `state_dict` với `strict=True` không thiếu, không thừa khóa, và cho đầu ra trùng trên GPU và CPU (`Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md` Phần 8). LSTM, GRU, Transformer chạy CPU bằng nguyên mã; S4D chạy CPU nếu cài đặt không dùng kernel CUDA riêng (chọn khi viết lõi ở bước C).
+Mọi run C, H, D là cùng mô hình chung `sequential_forecast`, chỉ khác tệp cấu hình và trọng số (Mục 4.1, 4.4), nên một hàm dự báo nạp được mọi run; kiểm đúng bằng vòng lặp so từng run với tệp dự báo của nó.
+
+| Trang | Nội dung | Cách đưa lên |
+|---|---|---|
+| 1. Dự báo (trang chính) | Chọn lưu vực trên bản đồ và ngày; đường qmax quan trắc và dự báo (m³/s); bật/tắt từng mô hình: 5 lõi C2, LSTM và Mamba 1–7 ngày (H, ba cách), hindcast 730 ngày (D), mốc BiasCast của tác giả (A2) và persistence; chọn hạn 1–7 ngày; vạch ngưỡng chu kỳ lặp lại 1,5/2/5/10 năm (Mục 6.2); phần thử "nếu… thì…" | Phát lại; chạy trực tiếp cho 5 lõi C2 và H cách (b) |
+| 2. So sánh mô hình | Bản đồ 451 lưu vực tô theo NSE hoặc hiệu NSE giữa hai mô hình; bảng trung bình ± độ lệch chuẩn 3 hạt giống của C2, H theo hạn, D (365 so với 730 ngày), kịch bản S0–S4; thời gian và bộ nhớ theo lõi (Mục 6.5) | Phát lại |
+| 3. Cảnh báo lũ | Từng trận lũ trong kỳ test: mô hình bắt được, bỏ sót, báo nhầm; chỉ số theo 4 mức lưu lượng (Mục 6.2) | Phát lại |
+| 4. Giải thích mô hình | Integrated Gradients theo ngày trong cửa sổ và theo nhóm nguồn; so độ dài nhớ LSTM và Mamba (Mục 6.7) | Phát lại (tính sẵn ở bước G) |
+| 5. Giới thiệu | Bài toán, dữ liệu, kiến trúc (khối giữ của BiasCast và khối đề tài thêm), cách đọc NSE và chu kỳ lặp lại; nguồn dữ liệu, giấy phép, ghi chú phát lại (Mục 9.5) | Trang tĩnh |
+
+Mỗi cấu hình đưa lên trang 1 một run: hạt giống có NSE trung vị validation cao nhất (tầng 1 của Mục 6.1); bảng ở trang 2 tính đủ 3 hạt giống. Mô hình bật sẵn khi mở trang là run có NSE trung vị validation cao nhất trong các run dự báo 1 ngày chính thức (C2: `gru_L2_x1_lr1e-3` hạt giống 111, 0,7707); kết quả test của mô hình này báo cáo như mọi mô hình khác, không dùng để chọn lại.
+
+Huấn luyện chạy trên GPU (Kaggle); demo chạy trên CPU. Mỗi lần dự báo một lưu vực, một ngày là một lượt chạy xuôi của mô hình khoảng 85 nghìn tham số trên chuỗi 365 bước (371 ở bước H, 730 ở bước D), nên CPU đủ dùng; thời gian thật đo ở D2. GPU miễn phí để phục vụ web không phù hợp: Hugging Face ZeroGPU tính hạn mức GPU theo tài khoản người xem (tài khoản miễn phí 5 phút mỗi ngày) và chỉ chạy Gradio; Space Gradio hoặc Docker trên CPU Basic cần gói trả phí mới tạo được (tài liệu Hugging Face *Spaces ZeroGPU*, *Using GPU Spaces*). Giao diện chạy trong notebook Kaggle không dùng làm demo vì chỉ sống trong phiên notebook (tối đa 12 giờ).
+
+`mamba-ssm` chỉ chạy trên GPU CUDA, nên khi chạy trên CPU, khối Mamba thay bằng `mambapy` (PyTorch thuần). `MambaBlock` của `mambapy` 1.2.0 có cùng tên tham số và cùng mặc định với `mamba_ssm.Mamba`: nạp `state_dict` với `strict=True` không thiếu, không thừa khóa, và cho đầu ra trùng trên GPU và CPU (`Workspace/04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md` Phần 8). LSTM, GRU, Transformer chạy CPU bằng nguyên mã; S4D của đề tài là mã PyTorch thuần theo mã tham chiếu của tác giả S4 (FFT, không có kernel CUDA riêng; Mục 6.5) nên cũng chạy CPU bằng nguyên mã.
 
 Thứ tự thực hiện, bước sau chỉ làm khi bước trước đạt:
 
 | Bước | Nơi chạy | Thiết bị | Việc | Điều kiện đạt |
 |---|---|---|---|---|
-| D1 | Kaggle | GPU | Viết hàm dự báo tách khỏi mã huấn luyện: nạp trọng số và thông số chuẩn hóa, nhận mã lưu vực và ngày t, trả qmax; chạy lại trên toàn kỳ test | Trùng tệp dự báo của bộ đánh giá (Mục 9.5), chỉ lệch ở mức làm tròn số thực; ngưỡng sai khác đặt khi viết mã |
-| D2 | Kaggle | CPU | Chạy cùng hàm trên CPU; Mamba dùng `mambapy` | Trùng kết quả D1; đo thời gian mỗi lần dự báo và bộ nhớ |
-| D3 | Laptop | CPU | Tải trọng số, thông số chuẩn hóa và dữ liệu đầu vào từ Kaggle; dựng giao diện demo (phần phát lại và phần chạy trực tiếp) | Trùng kết quả D2; giao diện chạy đủ hai phần |
+| D1 | Kaggle | GPU | Viết một hàm dự báo tách khỏi mã huấn luyện cho mọi run: nạp config, trọng số và thông số chuẩn hóa, nhận mã lưu vực, ngày t, ECMWF HRES ngày t (có thể đã đổi), trả qmax các hạn; chạy lại toàn kỳ test cho từng run đưa lên trang 1 (C2 trước, H và D khi có) | Mỗi run trùng tệp dự báo của bộ đánh giá (Mục 9.5), chỉ lệch ở mức làm tròn số thực; ngưỡng sai khác đặt khi viết mã |
+| D2 | Kaggle | CPU | Chạy cùng hàm trên CPU; Mamba dùng `mambapy` | Trùng kết quả D1; đo thời gian mỗi lần dự báo và bộ nhớ của từng lõi, từng độ dài chuỗi |
+| D3 | Laptop | CPU | Tải trọng số, thông số chuẩn hóa, dữ liệu đầu vào và tệp phát lại từ Kaggle; dựng giao diện 5 trang. Bản tối thiểu: trang 1 với 5 lõi C2 và trang 5; sau đó thêm H, D vào trang 1, trang 2, 3, 4 | Trùng kết quả D2; bản tối thiểu chạy được trước khi thêm trang |
 | D4 | VPS Oracle (CPU ARM) | CPU | Chép đúng mã D3 lên VPS, cài PyTorch bản CPU cho ARM, đóng gói Docker (Mục 8.2), đưa ra Internet | Trùng kết quả D3; có đường dẫn công khai |
 
-Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu Mamba trên CPU không đạt ở D2 (lệch kết quả hoặc quá chậm), phần chạy trực tiếp chỉ dùng LSTM cải tiến, các lõi khác hiển thị kết quả tính sẵn.
+Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu một lõi trên CPU không đạt ở D2 (lệch kết quả hoặc quá chậm, ví dụ Mamba qua `mambapy`), lõi đó chỉ phát lại, không chạy trực tiếp. Thiếu thời gian thì cắt theo thứ tự: (1) trang 4; (2) chạy trực tiếp các lõi chậm; (3) trang 3; (4) mô hình D trên trang 1. Trang 1 với 5 lõi C2, mô hình H và phần thử "nếu… thì…" cùng trang 5 giữ đến cùng.
 
 ### 9.7. Lịch theo hai luồng
 
@@ -425,8 +440,8 @@ Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu
 | 2 | Xong 31/10/2026 | Chấm B0; B2 trọn gói: bộ nạp (nhóm theo nguồn, sửa bộ lọc, cách (b) của bước H) và mô hình (nhúng theo nguồn, masked mean), kiểm thử đơn vị | Đo tốc độ bộ nạp, để sẵn dữ liệu trên GPU (bước 0, xong); B0, B1a, B1b 30 epoch (xong); song song: mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) — xong | B0, B1a, B1b: 9 lần, đo thật 22,4 giờ (B0 7,4; B1a 7,5; B1b 7,5) |
 | 3 | Xong 01/11/2026 | Huấn luyện B2, B3 (3 hạt giống); đánh giá bước B, gồm kịch bản S0–S4 trên validation cho B* | B* khi B1b–B3 đã chấm, gắn mốc `freeze-C` | B2, B3: 9 lần, khoảng 23 giờ |
 | 4 | Xong 13/11/2026 | Đánh giá bước C (chấm C2 khi có tệp dự báo); demo D1, D2 (Mục 9.6) | C1 tinh chỉnh (vòng 1 và vòng 2 có mở rộng), C2 chạy chính thức 8 cấu hình × 3 hạt giống | Đo thật (huấn luyện + validation): C1 239,5 giờ, C2 178,4 giờ |
-| 5 | 16/11 – 28/11/2026 | Đánh giá bước C, H, D; demo D3 | H, rồi D nếu còn thời gian (thứ tự cắt Mục 8.3); giải thích mô hình (Mục 6.7) | H 18 lần, ước khoảng 70 giờ theo tốc độ C2 (LSTM x1 2,1 giờ, Mamba x1 5,3 giờ mỗi lần, chưa tính phần tăng do 7 hạn); D 9 lần, đo khi tới bước |
-| 6 | 29/11 – 06/12/2026 | Hoàn thiện đánh giá, khối demo D3 bàn giao | Demo D4 trên VPS nếu kịp; bản laptop (D3) là bản dùng khi bảo vệ | – |
+| 5 | 16/11 – 28/11/2026 | D trọn gói (Mục 7); đánh giá bước C, H, D; demo D1, D2 (một hàm dự báo cho mọi run), D3 bản tối thiểu (Mục 9.6) | H 18 lần và so sánh H (xuất tệp dự báo 7 hạn cho đánh giá và demo); giải thích mô hình (Mục 6.7) | H 18 lần, ước khoảng 87 giờ (TEST T4: LSTM khoảng 3,3 giờ, Mamba khoảng 6,4 giờ mỗi lần); D 9 lần, đo khi tới bước |
+| 6 | 29/11 – 06/12/2026 | Hoàn thiện đánh giá; demo D3 đủ 5 trang (thêm H, D, so sánh, cảnh báo lũ, giải thích), bàn giao | Kết quả giải thích mô hình cho trang 4; demo D4 trên VPS nếu kịp; bản laptop (D3) là bản dùng khi bảo vệ | – |
 | 7 | Song song từ bước 4, bảo vệ dự kiến 07/12 – 14/12/2026 | Báo cáo, slide (Mục 9.8) | Báo cáo, slide (Mục 9.8) | – |
 
 Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.
