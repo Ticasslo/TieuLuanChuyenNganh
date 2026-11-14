@@ -1480,8 +1480,9 @@ if best is not None:
     best_txt += ")"
 lead_txt = ""
 if LEAD_TABLE is not None and LEAD_TABLE["NSE test"].notna().any():
-    lead_txt = (f" NSE test trung vị giảm từ {vn(LEAD_TABLE['NSE test'].iloc[0])} ở hạn 1 xuống "
-                f"{vn(LEAD_TABLE['NSE test'].iloc[HORIZON - 1])} ở hạn {HORIZON}.")
+    nse_1, nse_h = LEAD_TABLE["NSE test"].iloc[0], LEAD_TABLE["NSE test"].iloc[HORIZON - 1]
+    lead_txt = (f" NSE test trung vị {'giảm' if nse_h < nse_1 else 'đổi'} từ {vn(nse_1)} ở hạn 1 "
+                f"{'xuống' if nse_h < nse_1 else 'thành'} {vn(nse_h)} ở hạn {HORIZON}.")
 mode_vn = {"past": "chỉ quá khứ, nhóm ECMWF HRES bị che cả 7 ngày",
            "hybrid": "lai, ECMWF HRES thật ngày t, che ngày t+1 tới t+6",
            "perfect": "dự báo hoàn hảo bằng 5 biến tái phân tích cả 7 ngày"}[MODE]
