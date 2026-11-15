@@ -1,0 +1,304 @@
+{
+  "pass_count": 86,
+  "checks": [
+    "main complete exactly test S0 lead1",
+    "old and new protocol same for S0 lead1",
+    "all legacy and C2 source flags",
+    "205 distinct passing checks",
+    "A3 reference 4961 rows x six metrics and day counts",
+    "legacy 100 input byte counts and hashes unchanged",
+    "all input hashes/bytes valid",
+    "A4 source checks and seed contracts",
+    "A4 contract run names and seeds",
+    "B0 source checks and seed contracts",
+    "B0 contract run names and seeds",
+    "B1a source checks and seed contracts",
+    "B1a contract run names and seeds",
+    "B1b source checks and seed contracts",
+    "B1b contract run names and seeds",
+    "B2 source checks and seed contracts",
+    "B2 contract run names and seeds",
+    "B3 source checks and seed contracts",
+    "B3 contract run names and seeds",
+    "C2 source checks and seed contracts",
+    "C2 contract run names and seeds",
+    "C2 manifest entries match main manifest",
+    "published Compare table C2_C1_vs_C2_seed111.csv",
+    "published Compare table C2_config_table.csv",
+    "published Compare table C2_contract_check.csv",
+    "published Compare table C2_cost_seed_table.csv",
+    "published Compare table C2_cost_table.csv",
+    "published Compare table C2_ensemble_table.csv",
+    "published Compare table C2_handoff.csv",
+    "published Compare table C2_seed_table.csv",
+    "42 C2 Compare manifest entries",
+    "56 unique run-index rows",
+    "SF_lstm_L2_x1_lr1e-3_C2_seed111",
+    "SF_lstm_L2_x1_lr1e-3_C2_seed222",
+    "SF_lstm_L2_x1_lr1e-3_C2_seed333",
+    "SF_gru_L2_x1_lr1e-3_C2_seed111",
+    "SF_gru_L2_x1_lr1e-3_C2_seed222",
+    "SF_gru_L2_x1_lr1e-3_C2_seed333",
+    "SF_transformer_L2_x1_lr1e-3_C2_seed111",
+    "SF_transformer_L2_x1_lr1e-3_C2_seed222",
+    "SF_transformer_L2_x1_lr1e-3_C2_seed333",
+    "SF_transformer_L2_x3_lr5e-4_C2_seed111",
+    "SF_transformer_L2_x3_lr5e-4_C2_seed222",
+    "SF_transformer_L2_x3_lr5e-4_C2_seed333",
+    "SF_s4d_L4_x1_lr1e-3_C2_seed111",
+    "SF_s4d_L4_x1_lr1e-3_C2_seed222",
+    "SF_s4d_L4_x1_lr1e-3_C2_seed333",
+    "SF_s4d_L4_x3_lr1e-3_C2_seed111",
+    "SF_s4d_L4_x3_lr1e-3_C2_seed222",
+    "SF_s4d_L4_x3_lr1e-3_C2_seed333",
+    "SF_mamba_L2_x1_lr1e-3_C2_seed111",
+    "SF_mamba_L2_x1_lr1e-3_C2_seed222",
+    "SF_mamba_L2_x1_lr1e-3_C2_seed333",
+    "SF_mamba_L4_x3_lr1e-3_C2_seed111",
+    "SF_mamba_L4_x3_lr1e-3_C2_seed222",
+    "SF_mamba_L4_x3_lr1e-3_C2_seed333",
+    "56 x 451 x three masks",
+    "common counts equal across all runs",
+    "coverage matches all 56 and Version 8",
+    "NSE from stored terms",
+    "PNSE from stored terms",
+    "KGE from stored terms",
+    "all summary statistics from metrics",
+    "legacy run summary metrics reproduce Version 8",
+    "1485 pairs per metric, 4455 rows",
+    "recompute Wilcoxon, Cohen dz, counts, Holm",
+    "16 confusion and four level rows per run-basin",
+    "confusion row count matches common n",
+    "per-basin classes match confusion",
+    "pooled levels recomputed",
+    "events expected groups and lengths",
+    "event matches one-to-one and onset tolerance",
+    "event matches counts and timing",
+    "events pooled reconstructed",
+    "events_tolerance1 expected groups and lengths",
+    "event matches_tolerance1 one-to-one and onset tolerance",
+    "event matches_tolerance1 counts and timing",
+    "events pooled_tolerance1 reconstructed",
+    "USWRC event cases exact hit/miss/false counts",
+    "USWRC event case hit dates exactly equal match table",
+    "missed case excludes opposite event",
+    "false_alarm case excludes opposite event",
+    "S0 scenario deltas empty",
+    "56 run by three metrics in CDF",
+    "168 CDF series reproduced",
+    "CDF PNG decodes"
+  ],
+  "files": {
+    "Evaluation_A3_reference_check.csv": {
+      "bytes": 176,
+      "sha256": "04bb336ca9c5dd3dc64ffda6738790941459bd58da77fb6feaebccb58b988d45"
+    },
+    "Evaluation_A4_contract_check.csv": {
+      "bytes": 833,
+      "sha256": "541ad433efaedb2341a9a003fdc8b160fd5b2418e3b804e66e056667af6aae1b"
+    },
+    "Evaluation_A4_input_check.csv": {
+      "bytes": 3604,
+      "sha256": "ebdc16f329205a2cf9c75625224664a1d75a94fc809e30835554822490c1e6f5"
+    },
+    "Evaluation_B0_contract_check.csv": {
+      "bytes": 833,
+      "sha256": "abf1fe4d80b3df98033396d298b6b3696c312ec7ee6dc2ad3b573b662ba853dc"
+    },
+    "Evaluation_B0_input_check.csv": {
+      "bytes": 4630,
+      "sha256": "f7c37c169edf51083a6646256348d427529591c444acf3f0c89a169e32a47f9a"
+    },
+    "Evaluation_B1a_contract_check.csv": {
+      "bytes": 834,
+      "sha256": "93ab882c30c0c2d84fbcb205c3980f6de9ff09c3b7faa50db99fd5b68d1170b1"
+    },
+    "Evaluation_B1a_input_check.csv": {
+      "bytes": 7079,
+      "sha256": "194028da63e6fe6a47799bf8ae346e809aef6079b547662d4069e95fd14f6ecd"
+    },
+    "Evaluation_B1b_contract_check.csv": {
+      "bytes": 835,
+      "sha256": "be30cf6a0a085ee012d24f7bcf92f5e455b840830fe9296e6cb77a78db1f772d"
+    },
+    "Evaluation_B1b_input_check.csv": {
+      "bytes": 7079,
+      "sha256": "3a570b9df1196c63b1cd13b373306f8203a5a54185f8765e3ce05a09e853b761"
+    },
+    "Evaluation_B2_contract_check.csv": {
+      "bytes": 1278,
+      "sha256": "6d3af73051154ef88da25bea7bd4cdb138dbb77557786fa9b418a9fe40a94243"
+    },
+    "Evaluation_B2_input_check.csv": {
+      "bytes": 4151,
+      "sha256": "12c1ef21989b78d1192c70976642e363a3487ab2845527401f94345d86c96077"
+    },
+    "Evaluation_B3_contract_check.csv": {
+      "bytes": 2199,
+      "sha256": "d24ec3c7bc1271e8fcb5f4974c930e4e7662712596152ea29889965c362e0649"
+    },
+    "Evaluation_B3_input_check.csv": {
+      "bytes": 5183,
+      "sha256": "b583df35e21b18eca880b07790b8aaaeae9fce141ac0db363c2cc441e3e8cdac"
+    },
+    "Evaluation_C2_contract_check.csv": {
+      "bytes": 6309,
+      "sha256": "f10b0a20dda88a7757fe75ba9b53d9758ac77608cac953e66aab1f2ffdd7109c"
+    },
+    "Evaluation_C2_input_check.csv": {
+      "bytes": 10321,
+      "sha256": "ede46d994bb40c13253cee14d0567a6a795fccc3fbd02906f1aa2e7d071352b0"
+    },
+    "Evaluation_CDF_points.csv": {
+      "bytes": 5803837,
+      "sha256": "6e1c431ca007fcb5c1fec385de6d1c7d53db385817bf9c9bb59c595712ce5780"
+    },
+    "Evaluation_checks.csv": {
+      "bytes": 7487,
+      "sha256": "73b3c80ea437bb0dfba73b045995300d3818e70c2abdb8529815272175005639"
+    },
+    "Evaluation_confusion.csv": {
+      "bytes": 31753606,
+      "sha256": "82bf08c83512b823bfdaa47c1be209a215914bb1d06593c56ee919ea42995486"
+    },
+    "Evaluation_coverage.csv": {
+      "bytes": 82,
+      "sha256": "1fd948a76c83619f346c5e4de7d0f1b8172ad69b2df9b78b7102ec1b4528c2b6"
+    },
+    "Evaluation_event_cases.csv": {
+      "bytes": 34239744,
+      "sha256": "9d9de824be42497845ce94e305b3aedb452dc199ee269f7eb5a50f9349006a12"
+    },
+    "Evaluation_event_matches.csv": {
+      "bytes": 8391393,
+      "sha256": "8b41bc606b41f6b92abe9e369ef405f01dfff54ffb50060606f61ae82843bf2e"
+    },
+    "Evaluation_event_matches_tolerance1.csv": {
+      "bytes": 17360061,
+      "sha256": "fc352514376abf7d3ebc7f44e88b304e732e07bf6cfffdf68b24ae0e41a436b0"
+    },
+    "Evaluation_events.csv": {
+      "bytes": 29924412,
+      "sha256": "c7a743c312956cb5b27e24c090e995e3f57dd6e6ae43e51c4a1e00bc0fa88bb2"
+    },
+    "Evaluation_events_pooled.csv": {
+      "bytes": 273707,
+      "sha256": "60478a7f4b0ed1ba125ed5d3c77047da4a6ee75e7db74b3c4866b00eef0e675c"
+    },
+    "Evaluation_events_pooled_tolerance1.csv": {
+      "bytes": 280721,
+      "sha256": "76ee895e78c69a4e5414d1a7b855e824ba1147f04b30193638ac8d71c6cb4cb4"
+    },
+    "Evaluation_events_tolerance1.csv": {
+      "bytes": 30577503,
+      "sha256": "df9354902362bfa4e0f1cd3227fc8b220136c845579b3e9b4e53421d69cceee5"
+    },
+    "Evaluation_input_manifest.csv": {
+      "bytes": 25340,
+      "sha256": "9ea40c8edf0b328e390a6450ed34240d90db57cc96d90187fed8806c06c823c2"
+    },
+    "Evaluation_levels.csv": {
+      "bytes": 15320372,
+      "sha256": "d0cd38cb927d26fb526381716f9958dafb4cb8cea4a93203c18e125de996a17e"
+    },
+    "Evaluation_levels_pooled.csv": {
+      "bytes": 34874,
+      "sha256": "0dd4f9607688f7fe691e4e9045fdfca66eac058fc48efb43d552a01e80d1eb58"
+    },
+    "Evaluation_metrics.csv": {
+      "bytes": 24475615,
+      "sha256": "8fe82523bf5579207fafcc1af7f8b323b1c72220196dd321f143032f2fd9dfbd"
+    },
+    "Evaluation_paired_tests.csv": {
+      "bytes": 957744,
+      "sha256": "c15c8086b6388f4ad46af22e57a1550f541a05e8b5b049e9eae24f6b8a3addd8"
+    },
+    "Evaluation_scenario_changes.csv": {
+      "bytes": 137,
+      "sha256": "e2796683c51a720eb26f635504fb3a2d9c8340619ad9008d7f9783aa526253fc"
+    },
+    "Evaluation_summary.csv": {
+      "bytes": 287374,
+      "sha256": "b8a25bee0a941dffa1773b498ff5fda110fc713b278a6c4e125d87297de0374d"
+    },
+    "Evaluation_summary.json": {
+      "bytes": 3358,
+      "sha256": "3c844595af9f0a3a341cdd15c357f0602a1ff875b67a97eda83dab78744f4da8"
+    },
+    "Evaluation_protocol.json": {
+      "bytes": 2461,
+      "sha256": "3449bfac65857dd3ff9b2fc733edbdf7059b8eb26a56f29032035bd97f12e7c1"
+    },
+    "Evaluation_run_index.json": {
+      "bytes": 65690,
+      "sha256": "a1ae22c62bb1d5c6ea1adcb54c58b19ebf7927b459c10e15e1efea5d94332847"
+    },
+    "Evaluation_CDF_test_S0_lead1.png": {
+      "bytes": 517130,
+      "sha256": "2b4966b88a5bf66add23de34207ba8577c4c8c253691cca7f90c40e8bc63ff20"
+    }
+  },
+  "sizes": {
+    "inputs": 143,
+    "metrics": 75768,
+    "paired": 4455,
+    "summary": 1512,
+    "cases": 260797,
+    "cdf": 75598,
+    "figure": [
+      2382,
+      1394
+    ],
+    "events_per_tolerance": 202048
+  },
+  "threshold_counts": {
+    "missed": 165153,
+    "false_alarm": 68325,
+    "hit": 27319
+  },
+  "coverage": [
+    {
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "runs": 56,
+      "common_day_IDs": 652628,
+      "IDs_with_days": 450
+    }
+  ],
+  "zero_day_ids": [
+    "55"
+  ],
+  "c2_max_abs_NSE_delta": 3.8122440093601995e-08,
+  "c2_common_nse_range": [
+    0.688557565505013,
+    0.7269930259418762
+  ],
+  "c2_group_seed_medians": "metric                         NSE                PNSE                 KGE          \n                              mean       std      mean       std      mean       std\nconfig                                                                              \ngru_L2_x1_lr1e-3          0.711901  0.005873  0.533976  0.004154  0.781701  0.012461\nlstm_L2_x1_lr1e-3         0.718406  0.001354  0.533332  0.003300  0.771238  0.009037\nmamba_L2_x1_lr1e-3        0.720863  0.005737  0.526274  0.010447  0.763705  0.017348\nmamba_L4_x3_lr1e-3        0.712463  0.006198  0.525273  0.009555  0.772941  0.011787\ns4d_L4_x1_lr1e-3          0.693108  0.005567  0.486841  0.003362  0.728869  0.003086\ns4d_L4_x3_lr1e-3          0.697706  0.006363  0.490674  0.008514  0.736435  0.009728\ntransformer_L2_x1_lr1e-3  0.700218  0.006486  0.508517  0.008140  0.774882  0.003380\ntransformer_L2_x3_lr5e-4  0.695990  0.003482  0.499311  0.009922  0.754023  0.019561",
+  "local_verification_scope": "Downloaded output and archived source tables. Original Kaggle NPZ and checkpoint bytes unavailable for local recheck.",
+  "kaggle": {
+    "notebook": "01_Evaluation_LamaHCEExt",
+    "saved_version": 9,
+    "version_confirmed_by": "Huỳnh Thanh Nhân",
+    "input_A1_version": 3,
+    "compare_C2_version": 1,
+    "executed_notebook_archived": false
+  },
+  "archived_outputs": [
+    "Figures/Evaluation_CDF_test_S0_lead1.png",
+    "Tables/Evaluation_A3_reference_check.csv",
+    "Tables/Evaluation_C2_contract_check.csv",
+    "Tables/Evaluation_C2_input_check.csv",
+    "Tables/Evaluation_checks.csv",
+    "Tables/Evaluation_coverage.csv",
+    "Tables/Evaluation_events_pooled.csv",
+    "Tables/Evaluation_events_pooled_tolerance1.csv",
+    "Tables/Evaluation_input_manifest.csv",
+    "Tables/Evaluation_levels_pooled.csv",
+    "Tables/Evaluation_paired_tests.csv",
+    "Tables/Evaluation_protocol.json",
+    "Tables/Evaluation_run_index.json",
+    "Tables/Evaluation_summary.csv",
+    "Tables/Evaluation_summary.json"
+  ]
+}

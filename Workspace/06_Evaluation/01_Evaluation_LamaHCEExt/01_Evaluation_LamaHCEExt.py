@@ -3,11 +3,11 @@
 #
 # Notebook đọc dự báo đã lưu, kiểm đầu vào và tính cùng một giao thức cho các mốc A2, DLinear, persistence, LSTM A4, B0, B1a, B1b, B2 và hai mức B3. Bộ đánh giá không huấn luyện mô hình.
 #
-# **Phạm vi lần chấm:** test 2014–2017, kịch bản S0, hạn một ngày; 32 run, giữ danh sách 451 lưu vực. S0 không che thêm dữ liệu; các giá trị thiếu gốc vẫn được giữ. Các phép so chính dùng chung mặt nạ ngày–lưu vực có quan trắc, persistence và dự báo hữu hạn.
+# **Phạm vi Version 10:** test 2014–2017, hạn một ngày, giữ 451 lưu vực. Bảng chính chấm 56 run S0 như Version 9. Thư mục C2_scenarios chấm 24 run C2 qua S0, S1_Q1, S1_Q3, S1_Q7, S2, S3 và S4 trên một giao ngày–lưu vực chung.
 #
 # ## Cài đặt và đầu vào
 #
-# Dùng CPU. Giữ các Input đã gắn và bổ sung Output `09_B3_LamaHCEExt_Compare` Version 1. Không cần các Output huấn luyện riêng hoặc dataset gốc.
+# Dùng CPU, Internet Off. Giữ chín Notebook Output của Version 9 và thêm toàn bộ Output `04_C2_LamaHCEExt_Scenarios` Version 1 đã hoàn thành.
 #
 # | Output notebook | Version | Vai trò |
 # |---|---:|---|
@@ -19,6 +19,8 @@
 # | `05_B1_LamaHCEExt_Compare` | 1 | Ba seed B1a, ba seed B1b và manifest |
 # | `07_B2_LamaHCEExt_Compare` | 1 | Ba seed B2, audit nguồn, manifest và NPZ |
 # | `09_B3_LamaHCEExt_Compare` | 1 | Hai mức che B3, mỗi mức ba seed, sáu NPZ |
+# | `13_C2_LamaHCEExt_Compare` | 1 | 24 NPZ C2, manifest và bảng bàn giao |
+# | `04_C2_LamaHCEExt_Scenarios` | 1 | 144 NPZ kịch bản, mặt nạ chung, audit S0, summary và manifest |
 #
 # Mã tự tìm tệp trong `/kaggle/input`, kiểm manifest/sha256 và dừng khi thiếu, trùng nguồn hoặc sai hợp đồng. Các bảng CSV, metadata JSON và hình được lưu trực tiếp vào `/kaggle/working/evaluation_output`.
 #
@@ -53,7 +55,7 @@
 # %% Phần 1.1 - Thư viện và hằng số
 # Không cài hay thay phiên bản môi trường khi chạy đánh giá.
 from dataclasses import dataclass, field, replace
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import argparse
 import hashlib
 import itertools
@@ -91,6 +93,19 @@ B2_LIBRARY_COMMIT = "2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f"
 B3_SEEDS = (111, 222, 333)
 B3_COMPARE_VERSION = 1
 B3_LIBRARY_COMMIT = B2_LIBRARY_COMMIT
+FREEZE_C = "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1"
+FREEZE_H = "6f68f471bec255f67d446acd6c6556358ff9bfea"
+C2_NOTEBOOK = "13_C2_LamaHCEExt_Compare"
+C2_CONFIGS = ("lstm_L2_x1_lr1e-3", "gru_L2_x1_lr1e-3", "transformer_L2_x1_lr1e-3",
+              "transformer_L2_x3_lr5e-4", "s4d_L4_x1_lr1e-3", "s4d_L4_x3_lr1e-3",
+              "mamba_L2_x1_lr1e-3", "mamba_L4_x3_lr1e-3")
+C2_SEEDS = (111, 222, 333)
+H_CONFIGS = ("lstm_L2_x1_lr1e-3", "mamba_L2_x1_lr1e-3")
+H_MODES = ("past", "hybrid", "perfect")
+C2_SCENARIOS = ("S0", "S1_Q1", "S1_Q3", "S1_Q7", "S2", "S3", "S4")
+C2_SCENARIOS_NOTEBOOK = "04_C2_LamaHCEExt_Scenarios"
+H_NAME = re.compile(r"^(SF_(?:lstm_L2_x1_lr1e-3|mamba_L2_x1_lr1e-3)_H(?:past|hybrid|perfect)"
+                    r"_seed(111|222|333))_test_S0_lead([1-7])\.npz$")
 B3_MASKS = {"P10S12": (.1, .12), "P05S05": (.05, .05)}
 RETURN_PERIODS = (1.5, 2.0, 5.0, 10.0)
 LOG_FLOOR_MM_DAY = 1e-6
@@ -487,7 +502,7 @@ def event_rates(hit, missed, false_alarm):
 
 
 def score_events(obs, sim, threshold, area, mask, lead=1, grouped=True, forecast_horizon=None,
-                 tolerance=None):
+                 tolerance=None, case_rows=None):
     primary_tolerance = primary_event_tolerance_days(lead, forecast_horizon)
     if tolerance is None:
         tolerance = primary_tolerance
@@ -534,6 +549,15 @@ def score_events(obs, sim, threshold, area, mask, lead=1, grouped=True, forecast
                     obs_peak=obs_events[i]["first_peak"], sim_peak=sim_events[j]["first_peak"],
                     peak_timing_days=sim_events[j]["first_peak"] - obs_events[i]["first_peak"])
                for i, j in pairs]
+    if case_rows is not None:
+        case_rows.extend(dict(status="hit", **row) for row in details)
+        matched_obs = {i for i, _ in pairs}
+        matched_sim = {j for _, j in pairs}
+        for events, matched, prefix, status in ((obs_events, matched_obs, "obs", "missed"),
+                                                (sim_events, matched_sim, "sim", "false_alarm")):
+            case_rows.extend({"status": status, f"{prefix}_onset": event["start"],
+                              f"{prefix}_peak": event["first_peak"]}
+                             for i, event in enumerate(events) if i not in matched)
     return result, details
 
 # %% [markdown]
@@ -589,7 +613,7 @@ def holm(pvalues):
     return adjusted
 
 
-def scenario_changes(forecasts):
+def scenario_changes(forecasts, *, shared_mask=None):
     rows = []
     index = {(f.name, f.period, f.lead, f.scenario): f for f in forecasts}
     for forecast in forecasts:
@@ -599,7 +623,10 @@ def scenario_changes(forecasts):
         if base is None:
             raise ValueError(f"Thiếu S0 để đối chiếu {forecast.name}/{forecast.scenario}")
         check_same_context(base, forecast)
-        mask = common_mask([base, forecast])
+        own_mask = common_mask([base, forecast])
+        if shared_mask is not None and (shared_mask.shape != own_mask.shape or (shared_mask & ~own_mask).any()):
+            raise ValueError("Mặt nạ chênh lệch kịch bản nằm ngoài cặp hợp lệ.")
+        mask = own_mask if shared_mask is None else shared_mask
         for j, identifier in enumerate(forecast.ids):
             before = metrics(base.obs[:, j], base.sim[:, j], base.persistence[:, j], mask[:, j])
             after = metrics(forecast.obs[:, j], forecast.sim[:, j], forecast.persistence[:, j], mask[:, j])
@@ -803,6 +830,296 @@ def read_contract(path):
                           area=np.array(data["area_gov_km2"]), obs=np.array(data["obs_mm_day"]),
                           persistence=np.array(data["persistence_mm_day"]), sim=sim, raw=raw, metadata=meta)
     return result.validate()
+
+# %% [markdown]
+# ### 8.3.2. Output C2 Compare Version 1 và dự báo H
+#
+# C2 dùng manifest, summary, environment, bảng checkpoint/hợp đồng và 24 NPZ do Compare xuất.
+# H dùng một manifest với 126 NPZ trên cùng lịch đích. Chấm riêng H vì lịch và persistence khác.
+
+# %% Phần 8.3.2 - Kiểm bàn giao C2 và H
+def digest_string(value):
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+
+
+def contained_file(root, name):
+    if not isinstance(name, str) or not name or "\\" in name or ":" in name:
+        raise ValueError(f"Đường dẫn manifest sai: {name!r}")
+    rel = PurePosixPath(name)
+    root = Path(root).resolve()
+    path = root.joinpath(*rel.parts).resolve()
+    if (rel.is_absolute() or ".." in rel.parts or rel.as_posix() != name
+            or not path.is_relative_to(root) or not path.is_file()):
+        raise ValueError(f"Tệp không hợp lệ trong bàn giao: {name}")
+    return path
+
+
+def verified_manifest(root, manifest=None):
+    root = Path(root)
+    manifest = Path(manifest) if manifest is not None else root / "manifest.csv"
+    table = pd.read_csv(manifest, dtype={"sha256": str})
+    column = "file" if "file" in table else "tệp"
+    if not {column, "sha256"} <= set(table) or table.empty or table[column].duplicated().any():
+        raise ValueError(f"Manifest thiếu cột, rỗng hoặc trùng: {manifest}")
+    files, checks = {}, []
+    for row in table.to_dict("records"):
+        name = row[column]
+        path = contained_file(root, name)
+        digest = sha256(path)
+        size = path.stat().st_size
+        if row["sha256"] != digest or ("bytes" in row and row["bytes"] != size):
+            raise ValueError(f"Manifest sai SHA-256 hoặc bytes: {name}")
+        files[name] = path
+        checks.append(dict(file=name, path=str(path), bytes=size, sha256=digest, passed=True))
+    return files, pd.DataFrame(checks)
+
+
+def c2_records(root, context_paths=(), b3_root=None, b0_noise=None):
+    root = Path(root)
+    files, checks = verified_manifest(root)
+    summary = json.loads(files["c2_summary.json"].read_text(encoding="utf-8"))
+    env = json.loads(files["environment.json"].read_text(encoding="utf-8"))
+    if (summary.get("complete") is not True or summary.get("step") != "C2" or summary.get("epochs") != 30
+            or summary.get("seeds") != list(C2_SEEDS) or summary.get("library_commit") != FREEZE_C
+            or env.get("notebook") != C2_NOTEBOOK or env.get("complete") is not True
+            or env.get("library_commit_of_runs") != FREEZE_C):
+        raise ValueError("C2 Compare sai giao thức hoặc commit")
+    inputs = env["inputs"]
+    if inputs["A3"]["version"] != 1 or any(inputs["A3"]["files"].get(p.name) != sha256(p) for p in context_paths):
+        raise ValueError("C2 Compare dùng A3 khác Input đánh giá")
+    if b3_root is not None and inputs["B3_Compare"] != {
+        "version": 1, "b3_summary_sha256": sha256(Path(b3_root) / "b3_summary.json"),
+        "manifest_sha256": sha256(Path(b3_root) / "manifest.csv")}:
+        raise ValueError("C2 Compare dùng B3 khác Input đánh giá")
+    if b0_noise is not None and not np.isclose(summary["bstar"]["noise_sd"], b0_noise, atol=1e-12, rtol=0):
+        raise ValueError("C2 Compare dùng ngưỡng nhiễu B0 khác")
+    if set(summary["configs"]) != set(C2_CONFIGS):
+        raise ValueError("C2 Compare cần đúng tám cấu hình")
+    handoff = pd.read_csv(files["Tables/C2_handoff.csv"], encoding="utf-8-sig")
+    audits = pd.read_csv(files["Tables/C2_contract_check.csv"], encoding="utf-8-sig")
+    keys = ["cấu hình", "hạt giống"]
+    expected = set(itertools.product(C2_CONFIGS, C2_SEEDS))
+    for table in (handoff, audits):
+        if len(table) != 24 or set(table[keys].itertuples(index=False, name=None)) != expected:
+            raise ValueError("Bảng C2 không đủ đúng 24 cấu hình/seed")
+    handoff, audits = handoff.set_index(keys), audits.set_index(keys)
+    expected_names = {f"{c}_seed{s}": f"contracts/SF_{c}_C2_seed{s}_test_S0_lead1.npz" for c,s in expected}
+    if (summary["contracts"] != expected_names or set(inputs["C2"]) != set(expected_names)
+            or {n for n in files if n.endswith(".npz")} != set(expected_names.values())):
+        raise ValueError("Danh sách NPZ C2 sai hoặc không đủ")
+    records = []
+    for conf in C2_CONFIGS:
+        cfg = summary["configs"][conf]
+        core, depth, level, lr = conf.split("_")
+        if (cfg["core"] != core or cfg["depth"] != int(depth[1:]) or cfg["level"] != int(level[1:])
+                or cfg["lr"] != float(lr[2:]) or cfg["n_seeds"] != 3
+                or type(cfg["n_params"]) is not int or abs(cfg["n_params"] / (84865 * cfg["level"]) - 1) > .01
+                or set(cfg["seeds"]) != {str(s) for s in C2_SEEDS}):
+            raise ValueError(f"C2 sai định danh/tham số: {conf}")
+        for seed in C2_SEEDS:
+            key = f"{conf}_seed{seed}"
+            seed_info = cfg["seeds"][str(seed)]
+            row = handoff.loc[(conf, seed)]
+            audit = audits.loc[(conf, seed)]
+            source = inputs["C2"][key]
+            name = expected_names[key]
+            epoch = seed_info["selected_epoch"]
+            notebook = f"12_C2_Train_{conf}_Seed{seed}" + ("_Cont" if cfg["level"] == 3 else "")
+            hashes = [row[f"sha256 {n}"] for n in ("best_model.pt", "config.yml", "train_data_scaler.yml")]
+            if (type(epoch) is not int or not 1 <= epoch <= 30 or row["epoch chọn"] != epoch
+                    or audit["epoch chọn"] != epoch or row["notebook"] != notebook or source["notebook"] != notebook
+                    or not digest_string(source["environment_sha256"]) or not all(map(digest_string, hashes))
+                    or row["NPZ"] != name or audit["tệp"] != PurePosixPath(name).name
+                    or pd.isna(audit["đạt"]) or str(audit["đạt"]).lower() != "true"
+                    or not np.isclose(row["NSE val"], seed_info["val"], atol=1e-12, rtol=0)
+                    or not np.isclose(row["NSE test"], seed_info["test"], atol=1e-12, rtol=0)
+                    or not np.isclose(audit["NSE trung vị (thư viện)"], seed_info["test"], atol=1e-12, rtol=0)):
+                raise ValueError(f"C2 bảng bàn giao khác nguồn: {key}")
+            records.append(dict(conf=conf, seed=seed, cfg=cfg, epoch=epoch, train_notebook=notebook,
+                                seed_info=seed_info, source=source, handoff=row, audit=audit,
+                                contract=files[name], path=name))
+    return records, files, checks, summary
+
+
+def c2_forecast(record, context):
+    r = record
+    f = read_contract(r["contract"])
+    meta = f.metadata
+    cfg, a, handoff = r["cfg"], r["audit"], r["handoff"]
+    name = f"SF_{r['conf']}_C2_seed{r['seed']}"
+    expected = dict(run=name, period="test", scenario="S0", lead=1, forecast_horizon=1, seed=r["seed"],
+                    clip_to_zero=True, step="C2", model="sequential_forecast", core=cfg["core"], depth=cfg["depth"],
+                    level=cfg["level"], learning_rate=cfg["lr"], config=r["conf"], n_params=cfg["n_params"],
+                    selected_epoch=r["epoch"], grad_guard_skipped_steps=r["seed_info"]["grad_guard_skipped_steps"],
+                    training_notebook=r["train_notebook"], library_commit=FREEZE_C,
+                    config_sha256=handoff["sha256 config.yml"])
+    if any(meta.get(k) != v for k, v in expected.items()):
+        raise ValueError(f"C2 metadata sai: {name}")
+    check_same_context(Forecast(name="A3", sim=context["persistence"], raw=context["persistence"], **context), f)
+    nse = np.array([metrics(f.obs[:, j], f.sim[:, j])["NSE"] for j in range(len(f.ids))])
+    median = float(np.nanmedian(nse))
+    if (str(a["clip_to_zero"]).lower() != "true" or a["ngày-lưu vực có sim"] != np.isfinite(f.sim).sum()
+            or a["dự báo âm trước chặn"] != (f.raw < 0).sum()
+            or not np.isclose(a["NSE trung vị từ NPZ (obs A3)"], median, atol=1e-8, rtol=0)
+            or not np.isclose(r["seed_info"]["test"], median, atol=1e-5, rtol=0)):
+        raise ValueError(f"C2 audit clip/mặt nạ/NSE sai: {name}")
+    f.obs, f.persistence, f.area = context["obs"], context["persistence"], context["area"]
+    f.metadata = dict(meta, compare_notebook=C2_NOTEBOOK, compare_version_expected=1, training_notebook_version_expected=1,
+                      source_file_sha256=sha256(r["contract"]), source=str(r["contract"]),
+                      checkpoint_sha256=handoff["sha256 best_model.pt"], checkpoint_bytes_verified=False,
+                      scaler_sha256=handoff["sha256 train_data_scaler.yml"])
+    return f, dict(run=name, configuration_id=r["conf"], seed=r["seed"], selected_epoch=r["epoch"],
+                   n_params=cfg["n_params"], IDs=len(f.ids), target_days=len(f.dates),
+                   finite_prediction_day_IDs=int(np.isfinite(f.sim).sum()), canonical_context_matches=True,
+                   native_test_NSE=r["seed_info"]["test"], NPZ_test_NSE=median,
+                   contract_sha256=f.metadata["source_file_sha256"], checkpoint_sha256=f.metadata["checkpoint_sha256"])
+
+
+def read_c2_compare(root, context, context_paths, b3_root=None, b0_noise=None):
+    records, files, checks, _ = c2_records(root, context_paths, b3_root, b0_noise)
+    members, audits = zip(*(c2_forecast(r, context) for r in records))
+    return list(members), [Path(root) / "manifest.csv", *files.values()], checks, pd.DataFrame(audits)
+
+
+def read_h_contracts(root, context):
+    root = Path(root)
+    candidates = sorted(root.rglob("SF_*_H*_test_S0_lead*.npz"))
+    expected = {f"SF_{c}_H{m}_seed{s}_test_S0_lead{k}.npz"
+                for c, m, s, k in itertools.product(H_CONFIGS, H_MODES, C2_SEEDS, range(1, 8))}
+    if len(candidates) != 126 or {p.name for p in candidates} != expected:
+        raise ValueError("H cần đúng 18 run × 7 hạn, đủ cách, lõi và seed")
+    manifest_roots = [p for p in candidates[0].parents if p.is_relative_to(root) and (p / "manifest.csv").is_file()]
+    if not manifest_roots:
+        raise ValueError("Thiếu manifest.csv của H Compare")
+    export = manifest_roots[0]
+    files, checks = verified_manifest(export)
+    if {p.resolve() for p in candidates} != {p for name, p in files.items() if name.endswith(".npz")}:
+        raise ValueError("NPZ H không khớp tập tệp manifest")
+    days = context["dates"][6:-6]
+    obs = context["obs"][6:-6]
+    source_q = np.vstack((context["persistence"][:1], context["obs"]))
+    members, hashes = [], {}
+    for p in candidates:
+        match = H_NAME.fullmatch(p.name)
+        run, seed, lead = match[1], int(match[2]), int(match[3])
+        f = read_contract(p)
+        pers = source_q[7-lead:len(source_q)-6-lead]
+        if ((f.name, f.seed, f.period, f.scenario, f.lead) != (run, seed, "test", "S0", lead)
+                or f.metadata["forecast_horizon"] != 7 or f.metadata["library_commit"] != FREEZE_H
+                or not f.metadata["clip_to_zero"] or not digest_string(f.metadata["config_sha256"])):
+            raise ValueError(f"H metadata khác tên hoặc pin: {p.name}")
+        digest = f.metadata["config_sha256"]
+        if hashes.setdefault(run, digest) != digest:
+            raise ValueError(f"Các hạn H không cùng cấu hình: {run}")
+        reference = Forecast(name="A3", dates=days, ids=context["ids"], area=context["area"],
+                             obs=obs, persistence=pers, sim=pers, raw=pers)
+        check_same_context(reference, f)
+        f.obs, f.persistence, f.area = obs, pers, context["area"]
+        members.append(f)
+    return members, checks
+
+
+def read_c2_scenarios(root, c2, c2_root, context_paths):
+    if len(c2) != 24:
+        raise ValueError("Gắn C2 Compare Version 1 để đối chiếu kịch bản C2.")
+    files, checks = verified_manifest(root)
+    summary = json.loads(files["c2_scenarios_summary.json"].read_text(encoding="utf-8"))
+    refs = {f.name: f for f in c2}
+    names = {f"contracts/{name}_test_{scenario}_lead1.npz": (ref, scenario)
+             for name, ref in refs.items() for scenario in C2_SCENARIOS[1:]}
+    mask_name = "C2_scenarios_common_mask.npz"
+    npz_names = {name for name in files if name.endswith(".npz")}
+    if npz_names != {*names, mask_name}:
+        raise ValueError(f"{C2_SCENARIOS_NOTEBOOK}: cần đúng {len(names)} NPZ dự báo và {mask_name}.")
+    if (summary["complete"] is not True or summary["library_commit"] != FREEZE_C
+            or summary.get("notebook") != C2_SCENARIOS_NOTEBOOK
+            or summary.get("period") != "test" or summary.get("lead") != 1
+            or summary.get("configurations") != list(C2_CONFIGS) or summary.get("seeds") != list(C2_SEEDS)
+            or summary.get("C2_compare_version_expected") != 1
+            or summary.get("comparison_scope") != "same_days_all_C2_runs_and_scenarios"
+            or summary["scenarios"] != list(C2_SCENARIOS) or summary["S0_reproduced"] != len(c2)
+            or summary["S0_basin_checks"] != len(c2) * len(c2[0].ids)
+            or summary["new_contracts"] != len(names) or summary["optimizer_steps"] != 0
+            or summary["C2_manifest_sha256"] != sha256(Path(c2_root) / "manifest.csv")
+            or summary["A3"] != {p.name: sha256(p) for p in context_paths}):
+        raise ValueError("Bàn giao các kịch bản C2 không khớp C2 Compare/A3.")
+    audit = pd.read_csv(files["C2_scenarios_S0_check.csv"], dtype={"basin_id": str})
+    keys = ["run", "basin_id"]
+    if (len(audit) != len(c2) * len(c2[0].ids)
+            or set(audit[keys].itertuples(index=False, name=None)) != set(itertools.product(refs, c2[0].ids))
+            or not audit["passed"].eq(True).all()):
+        raise ValueError("Audit tái lập S0 không đủ theo checkpoint và ID.")
+    forecasts = list(c2)
+    for name, (ref, scenario) in names.items():
+        f = read_contract(files[name])
+        if ((f.name, f.seed, f.period, f.scenario, f.lead) != (ref.name, ref.seed, "test", scenario, 1)
+                or f.metadata.get("checkpoint_bytes_verified") is not True
+                or f.metadata.get("training_rerun") is not False
+                or f.metadata.get("inference_library_commit") != FREEZE_C
+                or f.metadata.get("S0_source_contract_sha256") != ref.metadata["source_file_sha256"]
+                or any(f.metadata.get(k) != ref.metadata[k] for k in (
+                    "config_sha256", "checkpoint_sha256", "scaler_sha256", "selected_epoch", "library_commit",
+                    "clip_to_zero", "forecast_horizon", "training_notebook", "step", "config"))):
+            raise ValueError(f"Kịch bản C2 sai nguồn: {name}")
+        check_same_context(ref, f)
+        f.obs, f.persistence, f.area = ref.obs, ref.persistence, ref.area
+        forecasts.append(f)
+    shared = common_mask(forecasts)
+    mask_ref = c2[0]
+    with np.load(files[mask_name], allow_pickle=False) as stored:
+        if (not {"dates", "basin_ids", "mask"} <= set(stored.files)
+                or not np.array_equal(stored["dates"], mask_ref.dates.to_numpy(dtype="datetime64[D]"))
+                or not np.array_equal(stored["basin_ids"], np.array(mask_ref.ids))
+                or stored["mask"].dtype != np.dtype(bool) or not np.array_equal(stored["mask"], shared)
+                or summary.get("shared_days_IDs") != int(shared.sum())
+                or summary.get("IDs_with_days") != int(shared.any(axis=0).sum())):
+            raise ValueError("Mặt nạ chung của 04_C2 khác giao ngày–lưu vực tính lại từ dự báo.")
+    return forecasts, checks
+
+
+def score_partitions(members, levels, floods, output, prefix, key_kind):
+    output = Path(output)
+    output.mkdir(parents=True, exist_ok=True)
+    summary_file = output / f"{prefix}_summary.json"
+    summary_file.write_text('{"complete": false}', encoding="utf-8")
+    shared = np.logical_and.reduce([common_mask(group) for group in members.values()])
+    if not shared.any():
+        raise ValueError(f"{prefix} không có ngày–lưu vực chung")
+    first = next(iter(members.values()))[0]
+    days = first.dates.to_numpy(dtype="datetime64[D]")
+    np.savez_compressed(output / f"{prefix}_common_mask.npz", dates=days, basin_ids=np.array(first.ids), mask=shared)
+    coverage = []
+    for key, group in members.items():
+        base = group[0]
+        print(f"{prefix}: chấm {key}; {len(group)} run và persistence trên giao chung", flush=True)
+        if not base.dates.equals(first.dates) or base.ids != first.ids:
+            raise ValueError(f"{prefix} không cùng lịch hoặc ID.")
+        baseline = replace(base, name="Persistence_qmax", seed=None, sim=base.persistence, raw=base.persistence,
+                           metadata={"forecast_horizon": base.metadata["forecast_horizon"]}).validate()
+        tables, _ = evaluate_group([*group, baseline], levels, floods, shared_mask=shared)
+        tables["summary"] = summarize(tables["metrics"])
+        tables["paired_tests"] = pairwise_tests(tables["metrics"])
+        tables["levels_pooled"] = pool_levels(tables["confusion"])
+        tables["events_pooled"] = pool_events(tables["events"])
+        tables["events_pooled_tolerance1"] = pool_events(tables["events_tolerance1"])
+        label = f"lead{key}" if key_kind == "lead" else key
+        for name, table in tables.items():
+            table.to_csv(output / f"{prefix}_{name}_{label}.csv", index=False, encoding="utf-8-sig")
+        coverage.append(dict(**{key_kind: key}, runs=len(group), days=len(days), start=str(days[0]), end=str(days[-1]),
+                             common_day_IDs=int(shared.sum()), IDs_with_days=int(shared.any(axis=0).sum())))
+    pd.DataFrame(coverage).to_csv(output / f"{prefix}_coverage.csv", index=False)
+    summary_file.write_text(json.dumps(dict(complete=True, contracts=sum(len(g) for g in members.values()),
+                                 coverage=coverage, common_mask_across=key_kind,
+                                 tolerance_days={g[0].lead: primary_event_tolerance_days(
+                                     g[0].lead, g[0].metadata["forecast_horizon"]) for g in members.values()}),
+                                 indent=2), encoding="utf-8")
+    return shared
+
+
+def score_h(forecasts, levels, floods, output):
+    members = {k: [f for f in forecasts if f.lead == k] for k in range(1, 8)}
+    score_partitions(members, levels, floods, output, "Evaluation_H", "lead")
+
 
 # %% [markdown]
 # ### 8.4. Hai mươi mốt NPZ LSTM A4/B0/B1a/B1b/B2/B3 từ Output Compare
@@ -2048,12 +2365,18 @@ def self_test():
 
 # %% Phần 10.1 - Chấm theo lưu vực
 # native không cấp persistence; paired_source và common_source_all dùng sáu chỉ số cùng mask.
-def evaluate_group(forecasts, levels=None, floods=None):
+def evaluate_group(forecasts, levels=None, floods=None, *, shared_mask=None):
     shared = common_mask(forecasts)
+    if shared_mask is not None:
+        shared_mask = np.asarray(shared_mask)
+        if shared_mask.dtype != bool or shared_mask.shape != shared.shape or (shared_mask & ~shared).any():
+            raise ValueError("Mặt nạ chấm phải nằm trong giao hợp lệ của hạn")
+        shared = shared_mask
     metric_rows, level_rows, matrix_rows = [], [], []
     # Vai trò bảng độc lập với số dung sai: hạn 3–5 có cả hai bảng cùng ±1.
     event_rows = {role: [] for role in ("primary", "tolerance1")}
     match_rows = {role: [] for role in event_rows}
+    event_cases = []
     for forecast in forecasts:
         horizon = forecast.metadata.get("forecast_horizon", forecast.lead)
         primary_tolerance = primary_event_tolerance_days(forecast.lead, horizon)
@@ -2089,10 +2412,15 @@ def evaluate_group(forecasts, levels=None, floods=None):
                                           n_fit_years=int(threshold.n_years), threshold_mm_day=float(threshold.threshold_mm_day))
                         for role, tolerance in (("primary", primary_tolerance),
                                                 ("tolerance1", SUPPLEMENTARY_EVENT_TOLERANCE_DAYS)):
+                            cases = [] if role == "primary" and grouped else None
                             score, pairs = score_events(obs, sim, threshold.threshold_mm_day, forecast.area[j], mask,
                                                         lead=forecast.lead, grouped=grouped, tolerance=tolerance,
-                                                        forecast_horizon=horizon)
+                                                        forecast_horizon=horizon, case_rows=cases)
                             event_rows[role].append(dict(**event_meta, **score))
+                            for case in cases or ():
+                                event_cases.append(dict(**event_meta, matching_tolerance_days=tolerance,
+                                    **{key: str(forecast.dates[value].date()) if key.endswith(("_onset", "_peak")) else value
+                                       for key, value in case.items()}))
                             for pair in pairs:
                                 match_rows[role].append(dict(**event_meta, matching_tolerance_days=tolerance,
                                     **{key: str(forecast.dates[value].date()) if key != "peak_timing_days" else value
@@ -2104,6 +2432,7 @@ def evaluate_group(forecasts, levels=None, floods=None):
     return dict(metrics=pd.DataFrame(metric_rows), levels=pd.DataFrame(level_rows), confusion=pd.DataFrame(matrix_rows),
                 events=pd.DataFrame(event_rows["primary"]),
                 event_matches=pd.DataFrame(match_rows["primary"], columns=match_columns),
+                event_cases=pd.DataFrame(event_cases, columns=[*match_columns, "status"]),
                 events_tolerance1=pd.DataFrame(event_rows["tolerance1"]),
                 event_matches_tolerance1=pd.DataFrame(match_rows["tolerance1"], columns=match_columns)), shared
 
@@ -2231,7 +2560,13 @@ def draw_figures(table, output):
             styles[f"SeqLSTM_Q_B3_P10S12_seed{seed}"] = ("#A50F15", linestyle)
             styles[f"SeqLSTM_Q_B3_P05S05_seed{seed}"] = ("#008B8B", linestyle)
             styles[f"DLinear_seed_{seed}"] = ("#D55E00", linestyle)
-        for panel, (ax, metric) in enumerate(zip(axes, ("NSE", "PNSE", "KGE"))):
+        c2_colors = ("#7E2F8E", "#1F77B4", "#E69F00", "#CC79A7", "#009E73",
+                     "#17BECF", "#D55E00", "#A50F15")
+        for conf, color in zip(C2_CONFIGS, c2_colors):
+            for seed, linestyle in zip(C2_SEEDS, ("-", "--", ":")):
+                styles[f"SF_{conf}_C2_seed{seed}"] = color, linestyle
+        metrics_panels = tuple(zip(axes, ("NSE", "PNSE", "KGE")))
+        for panel, (ax, metric) in enumerate(metrics_panels):
             for run, data in part.groupby("run", sort=False):
                 finite = np.sort(data.loc[np.isfinite(data[metric]), metric].to_numpy())
                 if len(finite):
@@ -2240,6 +2575,10 @@ def draw_figures(table, output):
                     label = run.replace("SeqLSTM_Q_A4_seed", "SeqLSTM_Q A4 ").replace("SeqLSTM_Q_B0_seed", "SeqLSTM_Q B0 ").replace("SeqLSTM_Q_B1a_seed", "SeqLSTM_Q B1a ").replace("SeqLSTM_Q_B1b_seed", "SeqLSTM_Q B1b ").replace("SeqLSTM_Q_B2_seed", "SeqLSTM_Q B2 ")
                     if run.startswith("SeqLSTM_Q_B3_"):
                         label = run.replace("SeqLSTM_Q_B3_", "SeqLSTM_Q B3 ").replace("_seed", " ")
+                    if run.startswith("SF_") and "_C2_seed" in run:
+                        conf, seed = run.removeprefix("SF_").split("_C2_seed")
+                        core, depth, level, lr = conf.split("_")
+                        label = f"C2 {core.upper()} {depth} {level} {lr} {seed}"
                     ax.step(finite, y, where="post", color=color, linestyle=linestyle,
                             label=f"{label} (n={len(finite)})")
                     rows.extend(dict(period=group[0], scenario=group[1], lead=group[2], run=run, metric=metric,
@@ -2248,7 +2587,8 @@ def draw_figures(table, output):
             ax.set(xlabel=metric, ylabel="Fraction of finite basin scores", ylim=(0, 1.02))
             ax.set_title(f"({chr(97+panel)}) {metric}")
             ax.grid(alpha=.2)
-        axes[-1].legend(fontsize=7, loc="center left", bbox_to_anchor=(1.01, .5))
+        axes[-1].legend(fontsize=7, loc="center left", bbox_to_anchor=(1.01, .5),
+                        ncol=2 if part.run.nunique() > 40 else 1)
         fig.suptitle(f"Common daily mask | {group[0]} | {group[1]} | lead {group[2]} | all finite scores retained")
         fig.tight_layout()
         fig.savefig(output / f"Evaluation_CDF_{group[0]}_{group[1]}_lead{group[2]}.png", dpi=150, bbox_inches="tight")
@@ -2266,7 +2606,7 @@ def draw_figures(table, output):
 # %% [markdown]
 # ### 11.1. Kiểm đầu vào, chấm và lưu kết quả
 #
-# Chạy toàn bộ notebook từ đầu trong phiên sạch. Luồng thực thi kiểm các ví dụ số, đọc bảy nguồn Output, chấm dự báo, đối chiếu A3 và xuất bảng/hình.
+# Chạy toàn bộ notebook từ đầu trong phiên sạch. Version 10 cần đủ 10 Notebook Output. Kết quả kịch bản C2 nằm trong `C2_scenarios/`.
 #
 # Kết luận cuối ghi trạng thái hoàn thành, số run, giao ngày chấm, kết quả kiểm A4/B0/B1/B2/B3 và phạm vi kịch bản/hạn đã chạy. `complete=true` chỉ được ghi khi toàn bộ bước kiểm và chấm đã thành công. Các bảng `scenario_changes` có thể rỗng khi chỉ có S0.
 #
@@ -2275,12 +2615,16 @@ def draw_figures(table, output):
 # %% Phần 11.1 - Điều phối và lưu kết quả trực tiếp
 # Mọi dữ liệu giả chỉ ở self_test; trạng thái thực nghiệm chỉ đặt sau khi đọc/chấm thành công.
 def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra_contracts=(), *,
-        a4_root=None, b0_root=None, b1_root=None, b2_root=None, b3_root=None, expected_ids=451):
+        a4_root=None, b0_root=None, b1_root=None, b2_root=None, b3_root=None, c2_root=None, h_root=None, expected_ids=451,
+        require_c2_scenarios=False):
     output = Path(output_root)
     output.mkdir(parents=True, exist_ok=True)
     (output / "Evaluation_summary.json").write_text(
         json.dumps(dict(complete=False, status="incomplete", expected_A4_seeds=list(A4_SEEDS), expected_B0_seeds=list(B0_SEEDS), expected_B1_steps=list(B1_STEPS), expected_B2_seeds=list(B2_SEEDS), expected_B3_masks=list(B3_MASKS)), indent=2),
         encoding="utf-8")
+    scenario_source = unique_file(input_root, "c2_scenarios_summary.json", required=False)
+    if scenario_source is None and require_c2_scenarios:
+        raise FileNotFoundError(f"Gắn toàn bộ Notebook Output {C2_SCENARIOS_NOTEBOOK} Version 1 đã hoàn thành.")
     checks = self_test()
     checks.to_csv(output / "Evaluation_checks.csv", index=False, encoding="utf-8-sig")
     a3_root = Path(a3_root) if a3_root else unique_file(input_root, "A3_persistence_predictions.npz").parent
@@ -2350,8 +2694,43 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     show_table("Phần 8.4 - Sáu hợp đồng LSTM B3", b3_contract_check[[
         "run", "mask_level", "seed", "selected_epoch", "training_notebook_version", "IDs", "target_days",
         "finite_prediction_day_IDs", "paired_obs_prediction_day_IDs", "NSE_audit_abs_difference", "canonical_context_matches"]])
+    if c2_root is None:
+        summary_path = unique_file(input_root, "c2_summary.json", required=False)
+        c2_root = summary_path.parent if summary_path else None
+    c2_paths, c2_forecasts, h_count, c2_scenarios_count = [], [], 0, 0
+    if c2_root is not None:
+        c2_forecasts, c2_paths, c2_sources, c2_check = read_c2_compare(
+            c2_root, context, context_paths, b3_root, b0_forecasts[0].metadata["bstar_threshold_val_nse_sd"])
+        forecasts.extend(c2_forecasts)
+        paths.extend(c2_paths)
+        show_table("Phần 8.3.2 - 24 hợp đồng C2 Compare Version 1", c2_check)
+    verified_c2 = {p.resolve() for p in c2_paths if p.suffix == ".npz"}
+    if scenario_source:
+        scenarios_c2, checks_c2 = read_c2_scenarios(scenario_source.parent, c2_forecasts, c2_root, context_paths)
+        scenario_manifest = scenario_source.parent / "manifest.csv"
+        paths.extend([scenario_manifest, *map(Path, checks_c2["path"])])
+        c2_scenarios_count = len(scenarios_c2) - len(c2_forecasts)
+        by_scenario = {s: [f for f in scenarios_c2 if f.scenario == s] for s in C2_SCENARIOS}
+        scenario_output = output / "C2_scenarios"
+        prefix = "Evaluation_C2_scenarios"
+        scenario_mask = score_partitions(by_scenario, levels, floods, scenario_output, prefix, "scenario")
+        checks_c2.to_csv(scenario_output / f"{prefix}_input_check.csv", index=False, encoding="utf-8-sig")
+        scenario_changes(scenarios_c2, shared_mask=scenario_mask).to_csv(
+            scenario_output / f"{prefix}_changes.csv", index=False, encoding="utf-8-sig")
+    if h_root is None and any(Path(input_root).rglob("SF_*_H*_test_S0_lead*.npz")):
+        h_root = Path(input_root)
+    if h_root is not None:
+        h_members, h_checks = read_h_contracts(h_root, context)
+        h_count = len(h_members)
+        h_output = output / "H"
+        score_h(h_members, levels, floods, h_output)
+        h_checks.to_csv(h_output / "Evaluation_H_input_check.csv", index=False, encoding="utf-8-sig")
     for path in extra_contracts:
+        if Path(path).resolve() in verified_c2:
+            continue
         forecast = read_contract(path)
+        if forecast.metadata.get("step") == "C2" or H_NAME.fullmatch(Path(path).name):
+            raise ValueError("Gắn nguyên Output Compare C2/H để kiểm manifest và phạm vi trước khi chấm")
         if forecast.ids != context["ids"]:
             raise ValueError("Hợp đồng mở rộng cần cùng danh sách/thứ tự 451 ID")
         forecasts.append(forecast)
@@ -2370,7 +2749,7 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
                                metadata={"role": "observed_Q_reference_for_scoring"}).validate()
             members.append(baseline)
             forecasts.append(baseline)
-    results = {key: [] for key in ("metrics", "levels", "confusion", "events", "event_matches",
+    results = {key: [] for key in ("metrics", "levels", "confusion", "events", "event_matches", "event_cases",
                                   "events_tolerance1", "event_matches_tolerance1")}
     coverages = []
     for group, members in grouped.items():
@@ -2401,6 +2780,9 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     for step, (input_check, contract_check) in b1_checks.items():
         results[f"{step}_input_check"] = input_check
         results[f"{step}_contract_check"] = contract_check
+    if c2_forecasts:
+        results["C2_input_check"] = c2_sources
+        results["C2_contract_check"] = c2_check
     reference_table = results["metrics"]
     if a4_forecasts or b0_forecasts or b1_forecasts or b2_forecasts or b3_forecasts or extra_contracts:
         shared = common_mask(a3_only)
@@ -2484,15 +2866,35 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
                    B0_compare_version_expected=B0_COMPARE_VERSION,
                    B0_bstar_threshold_val_nse_sd=b0_forecasts[0].metadata["bstar_threshold_val_nse_sd"],
                    A4_compare_version_expected=A4_COMPARE_VERSION,
+                   C2_compare_version_expected=1 if c2_forecasts else None,
+                   C2_runs=[f.name for f in c2_forecasts],
+                   C2_contracts_matched=True if c2_forecasts else None,
+                   C2_new_scenario_contracts=c2_scenarios_count,
+                   C2_scenarios_version_expected=1 if c2_scenarios_count else None,
+                   C2_scenarios_manifest_sha256=sha256(scenario_manifest) if c2_scenarios_count else None,
+                   H_evaluated=bool(h_count), H_contracts=h_count,
                    coverage=coverages, scenarios=sorted({f.scenario for f in forecasts}),
-                   leads=sorted({f.lead for f in forecasts}),
-                   operational_scenarios_run=any(f.scenario != "S0" for f in forecasts),
-                   multi_lead_run=any(f.lead > 1 for f in forecasts),
+                   leads=actual_leads,
+                   C2_scenarios=list(C2_SCENARIOS) if c2_scenarios_count else [],
+                   H_leads=list(range(1, 8)) if h_count else [],
+                   operational_scenarios_run=bool(c2_scenarios_count) or any(f.scenario != "S0" for f in forecasts),
+                   multi_lead_run=bool(h_count) or any(lead > 1 for lead in actual_leads),
                    python=sys.version.split()[0], numpy=np.__version__, pandas=pd.__version__,
                    scipy=__import__("scipy").__version__, output=str(output))
     (output / "Evaluation_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print("Phần 11: hoàn thành; lưu trực tiếp cho Kaggle Save Version.")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
+    if c2_forecasts:
+        print("GỬI LẠI: Evaluation_summary.json, Evaluation_protocol.json, Evaluation_run_index.json, "
+              "Evaluation_coverage.csv, Evaluation_summary.csv, Evaluation_metrics.csv, Evaluation_paired_tests.csv, "
+              "Evaluation_C2_input_check.csv, Evaluation_C2_contract_check.csv, Evaluation_events_pooled.csv, "
+              "Evaluation_event_cases.csv, "
+              "Evaluation_CDF_test_S0_lead1.png.")
+    if c2_scenarios_count:
+        print("GỬI THÊM TỪ C2_scenarios/: Evaluation_C2_scenarios_summary.json, "
+              "Evaluation_C2_scenarios_input_check.csv, Evaluation_C2_scenarios_coverage.csv, "
+              "Evaluation_C2_scenarios_changes.csv, cùng bảng levels_pooled, events_pooled và event_cases "
+              "của bảy kịch bản.")
     return results
 
 
@@ -2509,13 +2911,19 @@ def main():
     parser.add_argument("--b1")
     parser.add_argument("--b2")
     parser.add_argument("--b3")
+    parser.add_argument("--c2")
+    parser.add_argument("--h")
+    parser.add_argument("--require-c2-scenarios", action="store_true")
     parser.add_argument("--extra-contract", action="append", default=[])
     args = parser.parse_args([] if "ipykernel" in sys.modules else None)
     if args.self_test:
         print(self_test().to_string(index=False))
     else:
+        if "ipykernel" in sys.modules and not list(Path(args.input).rglob("c2_summary.json")):
+            raise FileNotFoundError("Gắn Output 13_C2_LamaHCEExt_Compare Version 1.")
         run(args.input, args.output, args.a1, args.a2, args.a3, args.extra_contract, a4_root=args.a4,
-            b0_root=args.b0, b1_root=args.b1, b2_root=args.b2, b3_root=args.b3)
+            b0_root=args.b0, b1_root=args.b1, b2_root=args.b2, b3_root=args.b3, c2_root=args.c2, h_root=args.h,
+            require_c2_scenarios=args.require_c2_scenarios or "ipykernel" in sys.modules)
 
 
 if __name__ == "__main__":

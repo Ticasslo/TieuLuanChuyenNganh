@@ -1,0 +1,73 @@
+{
+  "complete": true,
+  "contracts": 168,
+  "coverage": [
+    {
+      "scenario": "S0",
+      "runs": 24,
+      "days": 1461,
+      "start": "2014-01-01",
+      "end": "2017-12-31",
+      "common_day_IDs": 657347,
+      "IDs_with_days": 451
+    },
+    {
+      "scenario": "S1_Q1",
+      "runs": 24,
+      "days": 1461,
+      "start": "2014-01-01",
+      "end": "2017-12-31",
+      "common_day_IDs": 657347,
+      "IDs_with_days": 451
+    },
+    {
+      "scenario": "S1_Q3",
+      "runs": 24,
+      "days": 1461,
+      "start": "2014-01-01",
+      "end": "2017-12-31",
+      "common_day_IDs": 657347,
+      "IDs_with_days": 451
+    },
+    {
+      "scenario": "S1_Q7",
+      "runs": 24,
+      "days": 1461,
+      "start": "2014-01-01",
+      "end": "2017-12-31",
+      "common_day_IDs": 657347,
+      "IDs_with_days": 451
+    },
+    {
+      "scenario": "S2",
+      "runs": 24,
+      "days": 1461,
+      "start": "2014-01-01",
+      "end": "2017-12-31",
+      "common_day_IDs": 657347,
+      "IDs_with_days": 451
+    },
+    {
+      "scenario": "S3",
+      "runs": 24,
+      "days": 1461,
+      "start": "2014-01-01",
+      "end": "2017-12-31",
+      "common_day_IDs": 657347,
+      "IDs_with_days": 451
+    },
+    {
+      "scenario": "S4",
+      "runs": 24,
+      "days": 1461,
+      "start": "2014-01-01",
+      "end": "2017-12-31",
+      "common_day_IDs": 657347,
+      "IDs_with_days": 451
+    }
+  ],
+  "common_mask_across": "scenario",
+  "tolerance_days": {
+    "1": 0
+  }
+}

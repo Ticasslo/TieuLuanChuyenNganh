@@ -430,6 +430,8 @@ Thứ tự thực hiện, bước sau chỉ làm khi bước trước đạt:
 
 Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu một lõi trên CPU không đạt ở D2 (lệch kết quả hoặc quá chậm, ví dụ Mamba qua `mambapy`), lõi đó chỉ phát lại, không chạy trực tiếp. Thiếu thời gian thì cắt theo thứ tự: (1) trang 4; (2) chạy trực tiếp các lõi chậm; (3) trang 3; (4) mô hình D trên trang 1. Trang 1 với 5 lõi C2, mô hình H và phần thử "nếu… thì…" cùng trang 5 giữ đến cùng.
 
+D1 và D2 đã kiểm trên C2. D1 Version 1 tái lập đủ 24 run và 10.824 phép kiểm với sai số dự báo lớn nhất bằng 0 mm/ngày. D2 Version 1 là 8 cấu hình, 36 lượt mỗi cấu hình và 288 lượt đạt. Evaluation đã chấm C2 trên bảy kịch bản ở hạn một ngày. Xem [kết quả và nguồn bàn giao](../../Workspace/07_Demo/README.md).
+
 ### 9.7. Lịch theo hai luồng
 
 Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu khi điều kiện chuyển bước ở Mục 7 đạt. Lịch tính theo số đo ở B0 (Mục 8.1; giao thức 30 epoch, dữ liệu để sẵn trên GPU): khoảng 2,5 giờ GPU mỗi lần chạy chính thức với lõi LSTM, khoảng 180 giờ GPU mỗi tuần với 6 tài khoản. Cột "giờ GPU" chỉ gồm thời gian huấn luyện theo số lần ở Mục 7, chưa gồm thời gian viết mã và đánh giá; thời gian bước C lấy theo số đo 20 cấu hình ở `05_0_C_Configs_Check` (Mục 8.1); lịch từ bước C trở đi cập nhật lại sau C1. Tuần tính từ thứ Hai.

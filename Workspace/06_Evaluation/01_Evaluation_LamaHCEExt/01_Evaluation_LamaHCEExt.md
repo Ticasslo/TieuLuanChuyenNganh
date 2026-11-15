@@ -1,6 +1,6 @@
 # Bộ đánh giá dự báo lưu lượng — Extended LamaH-CE
 
-Tài liệu đi cùng [mã Python](01_Evaluation_LamaHCEExt.py) và [notebook](01_Evaluation_LamaHCEExt.ipynb). **Kết quả hiện hành là Version 8, 32 run**, đã chấm test/S0/hạn một ngày trên Kaggle CPU. Đã kiểm đủ 34 tệp output bằng 152 kiểm chéo; 205 kiểm giao thức đạt. Bản `.ipynb` trong repo là bản nguồn chưa nhập output tải về. `Tables/`, `Figures/` giữ nguyên byte các kết quả nhỏ/hình Version 8; kết quả Version 7 ở `Archive/Version7/`, Version 4 ở `Archive/Version4/`.
+Tài liệu đi cùng [mã Python](01_Evaluation_LamaHCEExt.py) và [notebook nguồn](01_Evaluation_LamaHCEExt.ipynb). **Kaggle Version 9 đã lưu kết quả test/S0/hạn một ngày của 56 run**, gồm 32 run A–B và 24 run C2. Mục 13.1 mô tả lần chấm, kiểm chéo và các tệp kết quả lưu tại [Archive/Version9](Archive/Version9/Tables/Evaluation_V9_output_review.json). Notebook đã chạy của Version 8 nằm trong [Archive/Version8](Archive/Version8/01_Evaluation_LamaHCEExt.ipynb). `Tables/` và `Figures/` ở thư mục chính lưu kết quả Version 8. Version 7 và Version 4 có thư mục lưu riêng.
 
 **S0** là kịch bản không che thêm đầu vào; dữ liệu gốc vẫn có thể thiếu. **Hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Một **ngày–lưu vực** là một ngày tại một ID; **mặt nạ** là bảng True/False chọn các cặp đó để chấm. **Giao chung** chỉ giữ ngày–lưu vực có quan trắc, persistence và dự báo của mọi run cùng hữu hạn.
 
@@ -10,11 +10,11 @@ Mã dùng **giao thức 3**: dung sai chính ±⌊hạn/3⌋ ngày cho từng h�
 
 ## 1. Đầu vào và cách chạy
 
-**Version 8 đã hoàn tất 32 run**, `complete=true`, toàn bộ hợp đồng A3/A4/B0/B1/B2/B3 đạt. Đã kiểm đủ **34 tệp (30 CSV, 3 JSON, 1 PNG)** bằng 152 kiểm chéo; kết quả tại Mục 12. Giao chính giữ **652628 ngày–ID trên 450 ID có ngày hợp lệ**, danh sách vẫn đủ 451 ID. Chỉ gồm test/S0/hạn 1; chưa có validation S0–S4 để chọn B*.
+**Version 8 đã hoàn tất 32 run**, `complete=true`, toàn bộ hợp đồng A3/A4/B0/B1/B2/B3 đạt. Đã kiểm đủ **34 tệp (30 CSV, 3 JSON, 1 PNG)** bằng 152 kiểm chéo; kết quả tại Mục 12. Giao chính giữ **652628 ngày–ID trên 450 ID có ngày hợp lệ**, danh sách vẫn đủ 451 ID. Phạm vi của Version 8 là test/S0/hạn 1. Validation bước B Version 1 đã hoàn thành và Pipeline chọn B3 P10S12 làm B*.
 
 `Tables/` và `Figures/` giữ 25 tệp kết quả nhỏ/hình Version 8 nguyên byte. Chín bảng chi tiết/khung kịch bản còn ở Output Kaggle và thư mục đã tải về. `Archive/Version7/` giữ 23 tệp nhỏ/hình Version 7 để các p Holm của họ 300 cặp tại Mục 11 không đổi nguồn; `Archive/Version4/` giữ dữ liệu của Mục 10 và báo cáo theo lưu vực. [Biên bản Version 8](Tables/Evaluation_32run_output_review.json).
 
-Chạy **CPU, Internet Off**, từ đầu trong notebook `01_Evaluation_LamaHCEExt` hiện có. Giữ bảy Input của Version 7 và bổ sung **Output `09_B3_LamaHCEExt_Compare` Version 1**:
+Chạy **CPU, Internet Off**, từ đầu trong notebook `01_Evaluation_LamaHCEExt` hiện có. Để lưu Version 10, giữ chín Input của Version 9 và thêm **toàn bộ Notebook Output `04_C2_LamaHCEExt_Scenarios` Version 1** đã hoàn thành:
 
 | Output notebook | Version | Vai trò |
 |---|---:|---|
@@ -26,16 +26,18 @@ Chạy **CPU, Internet Off**, từ đầu trong notebook `01_Evaluation_LamaHCEE
 | `05_B1_LamaHCEExt_Compare` | 1 | Sáu B1a/B1b |
 | `07_B2_LamaHCEExt_Compare` | 1 | Ba B2, bảng nguồn, audit, summary và manifest |
 | `09_B3_LamaHCEExt_Compare` | 1 | P10S12/P05S05, mỗi mức ba seed; sáu NPZ và toàn bộ bảng kiểm |
+| `13_C2_LamaHCEExt_Compare` | 1 | 24 NPZ, manifest, summary, environment và audit C2 |
+| `04_C2_LamaHCEExt_Scenarios` | 1 | 144 NPZ kịch bản, mặt nạ chung, summary, audit tái lập S0 và manifest |
 
-Không cần gắn Output train hoặc raw dataset. Mã tự tìm summary dưới `/kaggle/input`, kiểm hash toàn bộ manifest và xuất trực tiếp `/kaggle/working/evaluation_output`. Script có `--b3` bên cạnh `--a1`…`--b2`; notebook chạy nguyên Save & Run All, không sửa đường dẫn hoặc truyền `--extra-contract` cho B2/B3. Mã tự đọc đủ ba B2 và sáu B3 từ các Input Compare.
+Lần chấm C2 dùng các Output đã xuất dự báo. Mã tự tìm summary dưới `/kaggle/input`, kiểm hash toàn bộ manifest và xuất trực tiếp `/kaggle/working/evaluation_output`. Notebook chạy Save & Run All. Script có tham số chỉ định nguồn khi dùng CLI. Hướng dẫn và tiêu chí nghiệm thu C2, H ở Mục 13.
 
 Phần 8.4 giữ các kiểm A4/B0/B1 và bổ sung B2: manifest `file/bytes/sha256`, commit `2ccaa147a6ec87d0f56fa3e2f11b1bf38079253f`, A3 Version 1 trùng hash/giá trị, đúng B1 Compare hiện gắn, ngưỡng validation B0, ba seed/epoch/clip, bảng audit và NSE canonical tính lại. Tên nguồn thực là `06_B2…Train_Seed…` Version 1; tên cũ `07_B2…` nhúng trong metadata được giữ riêng, không sửa artifact đã Save.
 
 Kaggle Version 7 có 179 kiểm đạt. Mã mở rộng B3 có **205/205 kiểm cục bộ và Kaggle đạt**, giữ đủ 179 kiểm cũ, đường chạy giả **32 run, 1395 dòng kiểm định**, họ Holm tối đa **465 cặp mỗi chỉ số**, bỏ persistence qmean phụ. Đối chiếu A3 vẫn tính riêng trên 11 run gốc; 38 hàm đọc/chấm hiện có giữ nguyên AST, ngoài các hàm điều phối, kiểm thử và vẽ hình. Bằng chứng kiểm mã được tách khỏi lần chấm B3 thật ở Mục 12. [Bằng chứng mở rộng B3](Tables/Evaluation_B3_preparation_checks.json); kết quả thật Version 7 ở Mục 11.
 
-Sau chạy, kiểm `Evaluation_summary.json`: `complete`, `A3_reference_matched`, `A4_contracts_matched`, `B0_contracts_matched`, `B1_contracts_matched`, `B2_contracts_matched`, `B3_contracts_matched` đều true; có sáu `B3_runs`, `B3_runs_by_mask` mỗi mức ba run và coverage 32 run test/S0/lead1. Giữ hai bảng Phần 8.4 B3, log số run/giao ngày, kết luận Phần 11 và toàn bộ Output, gồm `Evaluation_B3_input_check.csv`, `Evaluation_B3_contract_check.csv`, coverage, summary, paired_tests, mức/sự kiện và CDF. Chỉ xác nhận Save Version mới khi có output chạy thật; không ghi số Version dự kiến thành bản đã lưu. Không chọn B* bằng test; còn validation S0–S4.
+Khi tái lập lần chấm C2, kiểm `complete=true`, toàn bộ cờ khớp nguồn A3/A4/B0/B1/B2/B3/C2 bằng true, sáu `B3_runs`, 24 `C2_runs` và coverage 56 run test/S0/hạn 1. Giữ toàn bộ Output theo Mục 13.1.
 
-Mã của 17 code cell `.ipynb` đồng bộ `.py`, schema hợp lệ. Output Version 7 đã được kiểm, nhưng bản `.ipynb` có output tải từ Kaggle chưa được nhập vào repo; không tự điền execution count hoặc giả lập output. Môi trường cần NumPy, pandas, SciPy, xarray, PyYAML, matplotlib; không cài hoặc thay phiên bản khi chấm.
+Bản `.ipynb` chuẩn bị cho Version 10 có 18 code cell đồng bộ với `.py` và đã kiểm định dạng. Môi trường cần NumPy, pandas, SciPy, xarray, PyYAML và matplotlib. Dùng các gói có sẵn trong phiên chấm Kaggle.
 
 ### 1.1. Kiểm output phiên tương tác trước Save Version 5
 
@@ -451,6 +453,55 @@ Mức rất cao có 11759 ngày–ID thật; tỷ lệ được cộng ô đếm
 
 ### 12.5. Kết luận và điểm bàn giao
 
-B3 đã hoàn tất train, Compare Version 1 và chấm test/S0/hạn 1 trong Evaluation Version 8. Kết quả hiện có chưa cho thấy lợi ích S0 đồng đều so B2; đây chưa phải kết quả về chịu thiếu dữ liệu trong S1–S4. Còn xuất/chấm validation S0–S4 cho B1b/B2/hai mức B3 để người phụ trách B* áp dụng luật đã định. Không dùng test để chọn mức che, seed hoặc B*.
+B3 đã hoàn tất train, Compare Version 1 và chấm test/S0/hạn 1 trong Evaluation Version 8. Kết quả hiện có chưa cho thấy lợi ích S0 đồng đều so B2; đây chưa phải kết quả về chịu thiếu dữ liệu trong S1–S4. Validation S0–S4 Version 1 đã hoàn tất. B3 P10S12 được chọn làm B* theo luật ở Pipeline Mục 7. Không dùng test để chọn mức che, seed hoặc B*.
 
 Nguồn hiện hành: [summary](Tables/Evaluation_summary.csv), [coverage](Tables/Evaluation_coverage.csv), [audit B3](Tables/Evaluation_B3_contract_check.csv), [nguồn B3](Tables/Evaluation_B3_input_check.csv), [protocol](Tables/Evaluation_protocol.json), [run index](Tables/Evaluation_run_index.json).
+
+## 13. C2 Compare Version 1, kịch bản C2 và nhiều hạn H
+
+### 13.1. Chấm C2 test S0
+
+Giữ tám Input Version 8 ở Mục 1 và gắn Output C2 Compare Version 1 trong thư mục đầu vào Kaggle. Bộ đọc dùng đúng schema đã xuất với 24 tệp `contracts/SF_<cấu hình>_C2_seed<N>_test_S0_lead1.npz`, `c2_summary.json`, `environment.json`, `Tables/C2_handoff.csv`, `Tables/C2_contract_check.csv` và `manifest.csv`. Mọi mục được kiểm dung lượng và SHA-256. Đối chiếu tập tám cấu hình × ba seed, epoch chọn, số tham số, `freeze-C`, metadata, chính sách chặn âm, A3, B3 Compare và ngưỡng B0. NSE từ NPZ được tính lại rồi đối chiếu bảng nguồn. SHA-256 checkpoint lấy từ bảng bàn giao. Tái lập checkpoint thật thực hiện ở notebook suy luận.
+
+Phạm vi chính có 56 run trên test/S0/hạn 1, giữ 451 ID. Mặt nạ chấm tính từ cả 56 run. Họ Holm gồm 1.485 cặp dự kiến mỗi chỉ số vì loại persistence qmean phụ. Đối chiếu A3 tính riêng trên 11 run nguồn.
+
+Tái lập bằng CPU, Internet Off, Save & Run All. Kiểm `complete=true`, `C2_contracts_matched=true`, danh sách 24 tên và coverage 56 run. Giữ `Evaluation_summary.json`, `Evaluation_protocol.json`, `Evaluation_run_index.json`, `Evaluation_coverage.csv`, `Evaluation_summary.csv`, `Evaluation_metrics.csv`, `Evaluation_paired_tests.csv`, `Evaluation_C2_input_check.csv`, `Evaluation_C2_contract_check.csv`, `Evaluation_events_pooled.csv`, `Evaluation_event_cases.csv` và `Evaluation_CDF_test_S0_lead1.png`.
+
+`Evaluation_event_cases.csv` lưu từng sự kiện USWRC được chấm theo dung sai chính và cùng mặt nạ của bảng sự kiện. Trường `status` nhận `hit`, `missed` hoặc `false_alarm`. Hạn nào có bảng H tương ứng ở `H/Evaluation_H_event_cases_lead<k>.csv`. Sự kiện bị kiểm duyệt vẫn được đếm riêng trong bảng tổng hợp. Demo đọc các bản ghi này cùng `Evaluation_events.csv` và `Evaluation_levels.csv`.
+
+#### Kết quả Kaggle Version 9
+
+Version 9 chạy trên Kaggle CPU, dùng A1 Version 3, C2 Compare Version 1 và các nguồn tại Mục 1. Giao thức 3 dùng dung sai sự kiện chính bằng 0 ngày cho hạn 1 và bảng phụ ±1 ngày. Có **56 run** trên test 2014–2017, S0, hạn 1. Giao chung giữ **652.628 cặp ngày–lưu vực trên 450 lưu vực**. Danh sách có đủ 451 ID và ID 55 có 0 ngày trên giao chung. Các kết quả tổng hợp của 32 run trước khớp Version 8 khi chấm lại với C2. [Kết luận chạy](Archive/Version9/Tables/Evaluation_summary.json), [giao chấm](Archive/Version9/Tables/Evaluation_coverage.csv).
+
+Kaggle ghi **205/205 kiểm thử đạt**. Đối chiếu A3 khớp cả sáu chỉ số và số ngày trên 4.961 cặp run–ID cho mỗi trường. Cả 24 hợp đồng C2 khớp ngày, ID, seed và checkpoint được chọn. Sai khác tuyệt đối lớn nhất giữa hai giá trị NSE trung vị test trong bảng audit C2 là **3,82 × 10⁻⁸**. Manifest C2 có 42 mục, gồm 24 NPZ. Tám CSV đã lưu trong repo của C2 Compare khớp SHA-256 byte gốc. [Bảng kiểm C2](Archive/Version9/Tables/Evaluation_C2_contract_check.csv), [manifest đầu vào](Archive/Version9/Tables/Evaluation_input_manifest.csv).
+
+Bộ **86 kiểm chéo trên 37 tệp tải về** đối chiếu 75.768 dòng chỉ số, 1.512 dòng tổng hợp, **4.455 kiểm định theo cặp** và 75.598 điểm CDF. Bảng từng trận USWRC có **260.797 dòng**, gồm 27.319 lượt bắt đúng, 165.153 lượt bỏ sót và 68.325 lượt báo nhầm cộng qua run, lưu vực và bốn ngưỡng. Cộng theo từng nhóm khớp bảng sự kiện. Vòng kiểm cục bộ dùng các bảng đã tải và thông tin nguồn đã lưu, còn việc đối chiếu dự báo khi nạp byte checkpoint thuộc D1. [Biên bản và SHA-256 đủ 37 tệp](Archive/Version9/Tables/Evaluation_V9_output_review.json), [hình CDF](Archive/Version9/Figures/Evaluation_CDF_test_S0_lead1.png).
+
+Thư mục Version 9 lưu 15 tệp Output nguyên byte. CSV chi tiết, gồm `Evaluation_event_cases.csv` dùng cho demo, nằm ở Kaggle và bản tải về. Bản `.ipynb` có output của Version 9 chưa được lưu trong repo.
+
+### 13.2. Kịch bản C2
+
+Sau khi `04_C2_LamaHCEExt_Scenarios` lưu xong Version 1, kiểm `complete=true`, `S0_reproduced=24`, `S0_basin_checks=10824` và `new_contracts=144` rồi gắn Output. Bản Evaluation chạy trong notebook sẽ dừng nếu thiếu nguồn này. Khi gọi từ CLI, dùng `--require-c2-scenarios` để bật cùng điều kiện.
+
+Manifest 04_C2 liệt kê 144 NPZ dự báo trong `contracts/` và `C2_scenarios_common_mask.npz` ở thư mục gốc của Output. Bộ đọc kiểm đúng hai loại tệp, tính lại giao chung để đối chiếu mặt nạ, kiểm audit tái lập S0 theo từng ID và đối chiếu checkpoint với C2 Compare. `Evaluation_input_manifest.csv` ghi cả manifest 04_C2 và các tệp đã kiểm. Dự báo S0 dùng để đối chiếu lấy từ C2 Compare.
+
+| Nơi xuất | Kết quả cần kiểm ở Version 10 |
+|---|---|
+| `evaluation_output/` | `Evaluation_summary.json` có `complete=true`, `C2_new_scenario_contracts=144` và `operational_scenarios_run=true`. Bảng chính chấm đúng 56 run S0/hạn 1; với cùng nguồn, đối chiếu 652.628 ngày–lưu vực và 450 ID có ngày hợp lệ như Version 9. |
+| `evaluation_output/C2_scenarios/` | `Evaluation_C2_scenarios_summary.json` có `complete=true`, `contracts=168`. Coverage có bảy dòng, mỗi dòng 24 run C2 và cùng giao chung. Bảng chấm mỗi kịch bản có thêm mốc persistence, dung sai sự kiện chính 0 ngày và bảng phụ ±1 ngày. |
+
+Gửi `Evaluation_summary.json`, `Evaluation_coverage.csv`, `Evaluation_input_manifest.csv` và toàn bộ thư mục `C2_scenarios/`. Các tệp mức lưu lượng và sự kiện có dạng `Evaluation_C2_scenarios_levels_pooled_<kịch_bản>.csv`, `Evaluation_C2_scenarios_events_pooled_<kịch_bản>.csv` và `Evaluation_C2_scenarios_event_cases_<kịch_bản>.csv`. Phạm vi Version 10 là C2 S0–S4. Bước chấm H dùng Output H Compare khi có.
+
+Lần chấm Kaggle đã hoàn tất với 205 kiểm thử đạt. Mười ba tệp S0 có bản đối chiếu trực tiếp trong Version 9 trùng từng byte, gồm CDF, bảng tổng hợp và kiểm định. Phần kịch bản khớp toàn bộ 75.768 dòng NSE/PNSE/KGE theo lưu vực với Output 04_C2. Mỗi kịch bản có 24 run C2 và mốc persistence. Tổng ngày theo bốn mức khớp ma trận nhầm lẫn, các trận bắt được, bỏ sót và báo nhầm khớp bảng sự kiện. Repo lưu bảng tổng hợp và số liệu cộng dồn. Bảng theo từng lưu vực và từng trận nằm trong Output Kaggle. [Summary Version 10](Archive/Version10/Tables/Evaluation_summary.json), [coverage C2](Archive/Version10/C2_scenarios/Evaluation_C2_scenarios_coverage.csv), [kiểm manifest 04_C2](Archive/Version10/C2_scenarios/Evaluation_C2_scenarios_input_check.csv).
+
+### 13.3. H với lịch ngày đích chung
+
+H Compare xuất đúng 126 NPZ, một tệp mỗi run/hạn, và một manifest bao phủ toàn bộ. Tên `SF_<cấu hình>_H<past|hybrid|perfect>_seed<N>_test_S0_lead<k>.npz` và metadata `run=SF_<cấu hình>_H<cách>_seed<N>` giữ một định danh xuyên suốt bảy hạn. Commit `freeze-H` là `6f68f471bec255f67d446acd6c6556358ff9bfea`. Đơn vị mm/ngày theo area_gov, giữ sim trước và sau chặn.
+
+Ở kết quả Tester, `date` là ngày đích hạn 7, `time_step` đi từ −6 đến 0. Khi xuất hạn k, lấy cột `time_step=k−7` và `dates = date + (k−7) ngày`. Cắt lịch mục tiêu sau khi dịch. Từ test 2014-01-01–2017-12-31 giữ **2014-01-07–2017-12-25**, 1.449 ngày mỗi hạn. `origin_dates = dates − (k−1) ngày`, `persistence_source_dates = dates − k ngày`, `persistence_mm_day = qmax quan trắc tại persistence_source_dates`. Canonical obs, ID và area lấy từ A3 ở ngày tương ứng. Metadata ghi `lead=k`, `forecast_horizon=7`, `scenario=S0`, `period=test`, seed, hash config và clip. Giữ nguyên mọi NaN.
+
+Evaluator chấm H riêng trong `evaluation_output/H/`. Điểm chính dùng mặt nạ giao qua tất cả 18 run và cả bảy hạn, gồm quan trắc và persistence từng hạn. Dung sai sự kiện chính theo hạn là 0, 0, 1, 1, 1, 2, 2 ngày. Kết quả test native của Trainer H dùng lịch và mặt nạ riêng của từng run. Compare cần tính lại sau khi cắt biên và áp giao chung trước khi đối chiếu số với Evaluation.
+
+JSON chính ghi `coverage`, `scenarios` và `leads` của các bảng tại thư mục gốc. Với Output bổ sung, `C2_scenarios` và `H_leads` ghi phạm vi tương ứng. Hai cờ `operational_scenarios_run` và `multi_lead_run` tính cả các thư mục bổ sung.
+
+Kiểm cục bộ cho H dùng 126 hợp đồng giả trên lịch 1.449 ngày, với một ô thiếu ở một hạn bị loại ở cả bảy. Luồng C2 theo kịch bản đã kiểm 168 hợp đồng giả gồm 24 S0. Hai phạm vi này chờ kết quả thực nghiệm.

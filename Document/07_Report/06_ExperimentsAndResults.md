@@ -345,6 +345,33 @@ Hình: cùng mặt nạ ngày–ID cho cả 84 dự báo; các thanh là SD mẫ
 
 Hồ sơ nguồn gồm [environment](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/environment.json) và [manifest SHA-256 đầy đủ](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/manifest.csv), đã đối chiếu đúng fingerprint của các kết quả khoa học. Bảng thời gian từ lần thực thi khác được lưu riêng, không dùng cho kết luận B*.
 
+### 6.6.10. Năm lõi C2 trên giao chung 56 run
+
+Notebook `01_Evaluation_LamaHCEExt` **Version 9** chấm thêm 24 dự báo C2 từ `13_C2_LamaHCEExt_Compare` Version 1. Tám cấu hình của năm lõi được chấm với ba seed mỗi cấu hình, cùng 32 run A–B trên test 2014–2017, S0, hạn 1. Giao chung có **652.628 cặp ngày–lưu vực trên 450 lưu vực**. Cả 24 NPZ khớp ngữ cảnh A3 và danh tính checkpoint ghi trong bảng bàn giao. [Bảng giao chấm](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_coverage.csv), [kiểm hợp đồng C2](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_C2_contract_check.csv).
+
+| Cấu hình C2 | NSE | PNSE | KGE |
+|---|---:|---:|---:|
+| LSTM L2 x1, lr 10⁻³ | 0,71841 ± 0,00135 | 0,53333 ± 0,00330 | 0,77124 ± 0,00904 |
+| GRU L2 x1, lr 10⁻³ | 0,71190 ± 0,00587 | 0,53398 ± 0,00415 | 0,78170 ± 0,01246 |
+| Transformer L2 x1, lr 10⁻³ | 0,70022 ± 0,00649 | 0,50852 ± 0,00814 | 0,77488 ± 0,00338 |
+| Transformer L2 x3, lr 5 × 10⁻⁴ | 0,69599 ± 0,00348 | 0,49931 ± 0,00992 | 0,75402 ± 0,01956 |
+| S4D L4 x1, lr 10⁻³ | 0,69311 ± 0,00557 | 0,48684 ± 0,00336 | 0,72887 ± 0,00309 |
+| S4D L4 x3, lr 10⁻³ | 0,69771 ± 0,00636 | 0,49067 ± 0,00851 | 0,73643 ± 0,00973 |
+| Mamba L2 x1, lr 10⁻³ | 0,72086 ± 0,00574 | 0,52627 ± 0,01045 | 0,76370 ± 0,01735 |
+| Mamba L4 x3, lr 10⁻³ | 0,71246 ± 0,00620 | 0,52527 ± 0,00956 | 0,77294 ± 0,01179 |
+
+Mỗi ô là trung bình ± độ lệch chuẩn mẫu của ba trung vị theo lưu vực. Trong các cấu hình C2, Mamba L2 x1 đứng đầu theo NSE, cao hơn LSTM L2 x1 khoảng **0,00246**. GRU L2 x1 có PNSE và KGE cao nhất. Mỗi họ Holm có **1.485 cặp**, nên dùng bảng Version 9 khi đối chiếu các cặp trong lần chấm này. Số liệu test phục vụ báo cáo. Checkpoint demo vẫn dựa trên kết quả validation. [Tổng hợp theo run và chỉ số](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_summary.csv), [kiểm định ghép cặp](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_paired_tests.csv).
+
+![CDF của 56 run trên giao chung test S0 hạn một ngày](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Figures/Evaluation_CDF_test_S0_lead1.png)
+
+*Hình. Phân phối NSE, PNSE và KGE theo lưu vực. Mỗi đường biểu diễn một run và giữ toàn bộ điểm hữu hạn, gồm cả điểm âm.*
+
+### 6.6.11. C2 dưới bảy kịch bản vận hành
+
+Evaluation Version 10 giữ nguyên bảng S0 của 56 run và chấm riêng 24 C2 qua bảy kịch bản. Giao riêng có **657.347 ngày–lưu vực trên 451 ID**. Mỗi mức S1_Q1, S1_Q3 và S1_Q7 được báo cáo riêng. Cả 24 checkpoint và scaler giữ nguyên giữa các kịch bản. [Coverage kịch bản C2](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version10/C2_scenarios/Evaluation_C2_scenarios_coverage.csv), [bảng C2 theo seed](../../Workspace/06_Evaluation/04_C2_LamaHCEExt_Scenarios/Archive/Version1/C2_scenarios_seed_scores.csv).
+
+Trên cùng giao C2, trung bình qua ba seed của NSE trung vị theo lưu vực cao nhất ở S0 là **0,72036** (Mamba L2 x1). Ở S2, LSTM L2 x1 đạt **0,60322**, giảm **0,11458** so với S0 của cùng cấu hình. Ở S4, Mamba L4 x3 đạt **0,66623**, giảm **0,04539** so với S0 của chính nó. Các giá trị này thuộc kỳ test và được dùng để báo cáo độ nhạy. [Bảng đầy đủ theo cấu hình và kịch bản](../../Workspace/06_Evaluation/04_C2_LamaHCEExt_Scenarios/Archive/Version1/C2_scenarios_stats.csv).
+
 ## 6.7. Lưu vực có NSE âm lớn
 
 Hai lưu vực 742/758 có biến thiên nhãn nhỏ; khi mẫu số NSE nhỏ, sai lệch nền có thể tạo giá trị âm lớn. Tại **758**, DLinear seed 111 có r ≈ **0,9837** nhưng NSE ≈ **−11,5639**, với β ≈ **3,9076**. Chuỗi khá đồng nhịp nhưng mức trung bình quá cao. EncDec_noQ cho đầu ra hằng ở cả hai ID, làm tương quan và KGE không xác định.
@@ -535,7 +562,7 @@ Bộ đánh giá (notebook Kaggle `01_Evaluation_LamaHCEExt` Version 4, giao th�
 
 Phân tích thuộc tính (`02_Evaluation_LamaHCEExt_ByBasin` Version 2) đọc Output Version 4 của bộ đánh giá, có **41 kiểm thử Kaggle** đạt, **1.674 hệ số** với p từ 9.999 hoán vị và Holm, hai bảng phân tán seed và 186 hàng độ ổn định. [Kết luận chạy](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/Tables/BasinAnalysis_summary.json).
 
-Những kết quả này xác lập một bộ mốc và bộ đánh giá cho **S0, hạn một ngày trên test**. S0 biểu diễn việc không che thêm đầu vào theo kịch bản; dữ liệu nguồn vẫn có thể thiếu và các phạm vi chấm đã xử lý điều đó. Validation S0–S4 cho bước B đã được đối chiếu riêng ở Mục 6.6.9. Test/S1–S4, năm lõi C và nhiều hạn sẽ được chấm khi có dự báo tương ứng. A4 đã đo biến thiên ba seed LSTM; phân tích thuộc tính ở Mục 6.11 đã bao gồm cả ba seed này.
+Những kết quả này xác lập một bộ mốc và bộ đánh giá cho **S0, hạn một ngày trên test**. S0 biểu diễn việc không che thêm đầu vào theo kịch bản; dữ liệu nguồn vẫn có thể thiếu và các phạm vi chấm đã xử lý điều đó. Validation S0–S4 cho bước B đã được đối chiếu riêng ở Mục 6.6.9. Kết quả năm lõi C2 ở S0 và các kịch bản S1–S4 được trình bày tại Mục 6.6.10 và 6.6.11. Nhiều hạn sẽ được chấm khi có Output H. A4 đã đo biến thiên ba seed LSTM; phân tích thuộc tính ở Mục 6.11 đã bao gồm cả ba seed này.
 
 Ảnh hưởng của một thuộc tính lưu vực hoặc một nhóm đầu vào cần được phân biệt với ảnh hưởng kiến trúc. Các kết quả A1/A3 và phân tích thuộc tính cung cấp bằng chứng mô tả về dữ liệu, mốc so sánh và nhóm lưu vực. Thí nghiệm có kiểm soát ở các bước sau bổ sung bằng chứng về đóng góp từng nguồn và từng lõi. Các kết luận trong chương áp dụng cho Extended LamaH-CE và những cấu hình đã chạy.
 

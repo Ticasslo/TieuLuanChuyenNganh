@@ -1,0 +1,44 @@
+{
+  "complete": true,
+  "notebook": "04_C2_LamaHCEExt_Scenarios",
+  "library_commit": "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1",
+  "period": "test",
+  "lead": 1,
+  "configurations": [
+    "lstm_L2_x1_lr1e-3",
+    "gru_L2_x1_lr1e-3",
+    "transformer_L2_x1_lr1e-3",
+    "transformer_L2_x3_lr5e-4",
+    "s4d_L4_x1_lr1e-3",
+    "s4d_L4_x3_lr1e-3",
+    "mamba_L2_x1_lr1e-3",
+    "mamba_L4_x3_lr1e-3"
+  ],
+  "seeds": [
+    111,
+    222,
+    333
+  ],
+  "scenarios": [
+    "S0",
+    "S1_Q1",
+    "S1_Q3",
+    "S1_Q7",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "S0_reproduced": 24,
+  "S0_basin_checks": 10824,
+  "new_contracts": 144,
+  "shared_days_IDs": 657347,
+  "IDs_with_days": 451,
+  "comparison_scope": "same_days_all_C2_runs_and_scenarios",
+  "C2_compare_version_expected": 1,
+  "C2_manifest_sha256": "50cb35873409a945a3f99bb41f6fb5a29553e2af2b6c387dcfd15b47ed094c08",
+  "A3": {
+    "A3_persistence_predictions.npz": "b6857136bf82d09e229207bad70ca1d52188f65f16164121befa5951350cdd79",
+    "A3_Q_source_window.npz": "48a4b3ae0d88afef11c27e646c0313ca3cd3375fac0a978787271f023724929a"
+  },
+  "optimizer_steps": 0
+}
