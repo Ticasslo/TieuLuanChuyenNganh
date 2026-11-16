@@ -1,4 +1,4 @@
-# Kết quả C2, Evaluation và suy luận D1–D2
+# Kết quả C2, Evaluation và demo D1–D3
 
 ## Các phiên đã kiểm
 
@@ -19,6 +19,8 @@ Phiên 04_C2 và hai phiên D1/D2 dùng NeuralHydrology `freeze-C` tại `db6dc1
 - [D2 Version 1](02_D2_LamaHCEExt_CPU/Archive/Version1/) giữ nguyên bốn tệp Output. So CPU với NPZ ở dung sai `2e-5 + 1e-6 × |giá trị NPZ|` mm/ngày.
 - D1/D2 dùng chung mô-đun [DemoRuntime](DemoRuntime/). Từ gốc repo, chạy `python Tools/Demo_Notebooks_Build.py` để sinh lại hai notebook khi sửa mô-đun.
 
-## Bước tiếp theo
+## D3 trên laptop
 
-D3 trên laptop đang chờ tải dữ liệu LamaH Extended, Output ngưỡng A1, các mốc A2/A3, C2 Compare và checkpoint. Năm đại diện C2 cho ô “nếu… thì…” theo validation là LSTM x1 seed 333, GRU x1 seed 111, Transformer x1 seed 222, S4D x1 seed 222 và Mamba x3 seed 222. GRU seed 111 là lựa chọn mặc định. Kiểm lại độ trễ và độ khớp khi chạy trên laptop trước khi chuyển gói D3 cho Thắng triển khai D4. H nhiều hạn, D 730 bước và kết quả giải thích G sẽ được tích hợp theo các Output bàn giao tương ứng.
+[Hướng dẫn dựng và biên bản D3/C2](03_D3_LamaHCEExt_Demo/03_D3_LamaHCEExt_Demo.md) ghi tên các nguồn, lệnh đóng gói và cách bật “Nếu… thì…”. Mốc này phát lại tám cấu hình C2, BiasCast và persistence trên 451 lưu vực kỳ test 2014–2017. Năm lõi C2 đã đối chiếu suy luận CPU với NPZ trên laptop. GRU seed 111 là lựa chọn mặc định. Kiểm lại trên giao diện xác nhận phản hồi cũ được bỏ qua khi đổi mưa hoặc nhiệt lúc đang chạy.
+
+H hạn 1–7, D 730 bước và G Integrated Gradients tiếp tục theo các Output bàn giao tương ứng. D4 trên VPS là bước triển khai sau bàn giao.

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo dự báo dòng chảy | Extended LamaH-CE</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="/plotly.js"></script>
+  <script defer src="/static/demo.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="shell top-inner">
+      <span class="brand">LamaH-CE</span>
+      <nav aria-label="Trang demo">
+        <button data-page="forecast" aria-current="page">Dự báo</button>
+        <button data-page="comparison">So sánh mô hình</button>
+        <button data-page="flood">Cảnh báo lũ</button>
+        <button data-page="explanation">Giải thích</button>
+        <button data-page="about">Giới thiệu</button>
+      </nav>
+    </div>
+  </header>
+  <main class="shell">
+    <p id="error" class="error" role="alert" hidden></p>
+    <section id="forecast" class="page">
+      <div class="heading"><h1>Dự báo lưu lượng dòng chảy</h1><p>Phát lại kỳ test Extended LamaH-CE, 2014–2017.</p></div>
+      <div class="dashboard">
+        <aside class="panel controls">
+          <h2>Lưu vực và thời điểm</h2>
+          <div id="map" class="map" aria-label="Chọn lưu vực trên bản đồ"></div>
+          <div class="fields">
+            <label>Lưu vực <select id="basin"></select></label>
+            <label>Ngày đích <input id="day" type="date"></label>
+            <label>Hạn <select id="lead"></select></label>
+          </div>
+          <fieldset><legend>Mô hình hiển thị</legend><div id="models"></div></fieldset>
+        </aside>
+        <div class="stack">
+          <section class="panel">
+            <div class="panel-head"><h2>Lưu lượng cực đại ngày</h2><p id="plot-subtitle"></p></div>
+            <div id="hydrograph" aria-label="Đường quan trắc và dự báo qmax"></div>
+          </section>
+          <section class="panel counterfactual">
+            <h2>Nếu… thì…</h2>
+            <p id="what-if-status">Đang kiểm tra checkpoint CPU.</p>
+            <form id="what-if-form">
+              <label>Mô hình <select id="live-model"></select></label>
+              <label>Ngày phát hành <input id="live-day" type="date" required></label>
+              <label>Hệ số mưa <input id="rain" type="number" min="0" step="0.1" value="1" required></label>
+              <label>Cộng nhiệt độ (°C) <input id="temp" type="number" step="0.1" value="0" required></label>
+              <button class="action" id="run-live" type="submit">Chạy thử</button>
+            </form>
+            <div id="what-if-results" aria-live="polite"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+    <section id="comparison" class="page" hidden>
+      <div class="heading"><h1>So sánh mô hình</h1><p>NSE theo lưu vực và bảng tổng hợp kết quả.</p></div>
+      <div class="panel detail">
+        <div class="fields">
+          <label>Mô hình <select id="comparison-run"></select></label>
+          <label>Trừ mô hình <select id="comparison-ref"></select></label>
+          <label>Hạn <select id="comparison-lead"></select></label>
+        </div>
+        <div id="nse-map" aria-label="Bản đồ NSE"></div>
+        <p id="nse-status"></p>
+        <label>Bảng <select id="comparison-table"></select></label>
+        <div id="comparison-content"></div>
+      </div>
+    </section>
+    <section id="flood" class="page" hidden>
+      <div class="heading"><h1>Cảnh báo lũ</h1><p>Sự kiện và bốn mức lưu lượng trên dữ liệu kỳ test.</p></div>
+      <div class="panel detail">
+        <div class="fields">
+          <label>Mô hình <select id="flood-model"></select></label>
+          <label>Lưu vực <select id="flood-basin"></select></label>
+          <label>Hạn <select id="flood-lead"></select></label>
+        </div>
+        <div id="flood-content"></div>
+      </div>
+    </section>
+    <section id="explanation" class="page" hidden>
+      <div class="heading"><h1>Giải thích mô hình</h1><p>Integrated Gradients theo nhóm nguồn và ngày trong cửa sổ.</p></div>
+      <div class="panel detail">
+        <label id="explanation-picker" hidden>Cửa sổ giải thích <select id="explanation-case"></select></label>
+        <div id="explanation-plot" aria-label="Integrated Gradients theo ngày và nhóm nguồn"></div>
+        <div id="explanation-content"></div>
+      </div>
+    </section>
+    <section id="about" class="page" hidden>
+      <div class="heading"><h1>Giới thiệu</h1><p>Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy.</p></div>
+      <article class="panel detail about">
+        <h2>Dữ liệu</h2><p>Extended LamaH-CE theo ngày. Giao diện phát lại qmax tại 451 lưu vực trong giai đoạn 2014–2017.</p>
+        <h2>Kiến trúc</h2><p>Khung dự báo tuần tự theo BiasCast kết hợp lịch sử dòng chảy và khí tượng với pha dự báo. Đề tài bổ sung cơ chế nhúng theo nguồn, masked mean và các lõi GRU, Transformer, S4D, Mamba để so sánh với LSTM.</p>
+        <h2>Đọc kết quả</h2><p>NSE càng gần 1 càng tốt. Giá trị âm có thể xuất hiện. Ngưỡng lũ theo chu kỳ lặp lại là ngưỡng qmax ước tính từng lưu vực. Đường dự báo và ngưỡng trên trang chính dùng m³/s.</p>
+        <h2>Nguồn</h2><p>Dữ liệu Extended LamaH-CE phát hành theo CC BY-NC. <a href="https://doi.org/10.5281/zenodo.17119635" rel="noopener">Bản dữ liệu</a> · <a href="https://github.com/conestone/biascast" rel="noopener">Mã BiasCast</a></p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
