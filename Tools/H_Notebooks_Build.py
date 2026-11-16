@@ -1,11 +1,12 @@
-# Sinh các notebook huấn luyện bước H từ khuôn Tools/H_Notebook_Template.py: mỗi tệp là khuôn chép nguyên, chỉ thay khối
-# CẤU HÌNH ở Phần 1 (NOTEBOOK, CORE, MODE, RUN_SEED). Bước H: Document/01_Plan/02_Pipeline.md Mục 4.4 (2 lõi x 3 cách
-# x 3 hạt giống = 18 run).
+# Sinh các notebook huấn luyện bước H từ khuôn Tools/H_Notebook_Template.py (ba cách past, hybrid, perfect) hoặc
+# Tools/H_GEFS_Notebook_Template.py (cách gefs): mỗi tệp là khuôn chép nguyên, chỉ thay khối CẤU HÌNH ở Phần 1 (NOTEBOOK,
+# CORE, MODE, RUN_SEED). Bước H: Document/01_Plan/02_Pipeline.md Mục 4.4 (2 lõi x 4 cách x 3 hạt giống = 24 run).
 # Chạy (từ gốc repo):
-#   python Tools/H_Notebooks_Build.py [--cont lstm_hybrid_Seed111 ...] [--out THƯ_MỤC]
+#   python Tools/H_Notebooks_Build.py [--gefs] [--cont lstm_hybrid_Seed111 ...] [--out THƯ_MỤC]
 #       18 notebook 14_H_Train_<cấu hình>_<cách>_Seed<N> (lstm_L2_x1_lr1e-3, mamba_L2_x1_lr1e-3 x past, hybrid, perfect
-#       x 111, 222, 333), mặc định vào Workspace/05_Training/14_H_Train/. --cont <lõi>_<cách>_Seed<N> sinh thêm notebook
-#       phiên 2 (_Cont) cho run không xong trong một phiên.
+#       x 111, 222, 333), mặc định vào Workspace/05_Training/14_H_Train/; --gefs thay bằng 6 notebook cách gefs từ khuôn
+#       GEFS. --cont <lõi>_<cách>_Seed<N> sinh thêm notebook phiên 2 (_Cont) cho run không xong trong một phiên (cách
+#       gefs cần --gefs).
 # Chạy lại với cùng khuôn ra tệp giống hệt (in sha256 từng tệp để so).
 #
 # Mục lục:
@@ -22,13 +23,15 @@ from pathlib import Path
 # %% Phần 1 - Lưới cấu hình, tên tệp
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "Tools" / "H_Notebook_Template.py"
+TEMPLATE_GEFS = ROOT / "Tools" / "H_GEFS_Notebook_Template.py"
 OUT_DIR = ROOT / "Workspace" / "05_Training" / "14_H_Train"
 PREFIX = "14_H_Train"                        # NN tiếp sau 13_C2_LamaHCEExt_Compare
 MAX_NAME = 50                                # tên notebook Kaggle tối đa 50 ký tự
 CONFS = {"lstm": "lstm_L2_x1_lr1e-3", "mamba": "mamba_L2_x1_lr1e-3"}   # Pipeline Mục 4.4
 MODES = ("hybrid", "past", "perfect")        # thứ tự chạy: (b) => (a) => (c)
+MODES_GEFS = ("gefs",)                       # cách (d), khuôn GEFS
 SEEDS = (111, 222, 333)
-JOB_RE = re.compile(r"^(lstm|mamba)_(past|hybrid|perfect)_Seed(111|222|333)$")
+JOB_RE = re.compile(r"^(lstm|mamba)_(past|hybrid|perfect|gefs)_Seed(111|222|333)$")
 BLOCK_START = "# ---- CẤU HÌNH (Tools/H_Notebooks_Build.py ghi lại khối này) ----\n"
 BLOCK_END = "# ---- HẾT CẤU HÌNH ----\n"
 
@@ -59,8 +62,8 @@ def render(template, core, mode, seed, cont):
     return name, template[:a] + "".join(lines) + template[b:]
 
 
-def build(jobs, out_dir):
-    template = TEMPLATE.read_text(encoding="utf-8")
+def build(jobs, out_dir, template_path=TEMPLATE):
+    template = template_path.read_text(encoding="utf-8")
     if "\r" in template:
         raise ValueError("Khuôn có ký tự CR - lưu khuôn với xuống dòng LF")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -84,17 +87,20 @@ def build(jobs, out_dir):
 # %% Phần 3 - Dòng lệnh
 def main(argv=None):
     sys.stdout.reconfigure(encoding="utf-8")                         # console Windows mặc định cp1252 => lỗi khi in tiếng Việt
-    ap = argparse.ArgumentParser(description="Sinh 18 notebook huấn luyện bước H từ khuôn")
+    ap = argparse.ArgumentParser(description="Sinh 18 notebook huấn luyện bước H (hoặc 6 notebook cách gefs) từ khuôn")
+    ap.add_argument("--gefs", action="store_true", help="6 notebook cách gefs từ Tools/H_GEFS_Notebook_Template.py")
     ap.add_argument("--cont", nargs="*", default=[], help="run cần notebook phiên 2, dạng lstm_hybrid_Seed111")
     ap.add_argument("--out", type=Path, default=OUT_DIR, help="thư mục ghi (mặc định Workspace/05_Training/14_H_Train)")
     args = ap.parse_args(argv)
-    jobs = [(core, mode, seed, False) for mode in MODES for core in CONFS for seed in SEEDS]
+    modes = MODES_GEFS if args.gefs else MODES
+    jobs = [(core, mode, seed, False) for mode in modes for core in CONFS for seed in SEEDS]
     for job in args.cont:
         m = JOB_RE.match(job)
-        if not m:
-            ap.error(f"--cont {job}: cần dạng <lstm|mamba>_<past|hybrid|perfect>_Seed<111|222|333>")
+        if not m or m.group(2) not in modes:
+            ap.error(f"--cont {job}: cần dạng <lstm|mamba>_<{'|'.join(modes)}>_Seed<111|222|333>"
+                     + ("" if args.gefs else " (cách gefs cần --gefs)"))
         jobs.append((m.group(1), m.group(2), int(m.group(3)), True))
-    build(jobs, args.out)
+    build(jobs, args.out, TEMPLATE_GEFS if args.gefs else TEMPLATE)
 
 
 if __name__ == "__main__":

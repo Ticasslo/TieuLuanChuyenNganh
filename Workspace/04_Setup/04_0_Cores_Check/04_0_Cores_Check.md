@@ -33,7 +33,7 @@ Tài liệu đi cùng [mã Python](04_0_Cores_Check.py) của notebook Kaggle `0
 | S4D | Chiếu tuyến tính → `sf_layers` lần `x + Dropout(khối(LayerNorm(x)))` → LayerNorm cuối; khối S4D tính tích chập nhân SSM bằng FFT dài 2L, cắt L bước đầu (nhân quả); tham số SSM có tốc độ học riêng `sf_s4d_lr`, không weight decay | Chép từ `models/s4/s4d.py` của `state-spaces/s4` (Apache-2.0), chỉ đổi định dạng trục và thay `einops` |
 | Mamba | Cùng khung dư như S4D, khối là `mamba_ssm.Mamba` 2.3.2.post1; kích thước trong `sf_mamba_d_inner` | `mamba_ssm` |
 
-Các lõi đều là bản gốc (vanilla) của từng kiến trúc; khung dư chuẩn hóa trước cho S4D, Mamba theo cách các bài gốc xếp khối (Gu và cs. 2022; Gu & Dao 2023). Bản `modelzoo/mamba.py` có sẵn trong thư viện quét sai trục (`.claude/rules/library.md`) nên không dùng.
+Các lõi đều là bản gốc (vanilla) của từng kiến trúc; khung dư chuẩn hóa trước cho S4D, Mamba theo cách các bài gốc xếp khối (Gu và cs. 2022; Gu & Dao 2023). Bản `modelzoo/mamba.py` có sẵn trong thư viện quét sai trục (`01_BasePaper.md` Mục 11.5) nên không dùng.
 
 **Sửa ngoài `modelzoo`.** `training/__init__.py`: tham số mang thuộc tính `_optim` (tham số SSM của S4D) vào nhóm optimizer riêng, như `example.py` của `state-spaces/s4`; mô hình không có tham số này thì optimizer như cũ. `utils/config.py`: 13 khóa `sf_*`. Kiểm thử mới `test/test_sequential_forecast.py` (43 kiểm thử) và tài liệu `docs/`.
 

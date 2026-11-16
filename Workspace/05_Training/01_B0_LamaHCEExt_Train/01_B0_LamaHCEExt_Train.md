@@ -40,7 +40,7 @@ B0 là mốc của cả bước B (`Document/01_Plan/02_Pipeline.md` Mục 5.1, 
 | `01_B0_LamaHCEExt_Train_Seed333` | như trên | như trên | Version 1 |
 | `02_B0_LamaHCEExt_Compare` | CPU, Internet On, Persistence Files only, Pin to original environment | Output ba notebook trên (Version 1); Output `03_A4_LamaHCEExt_Retrain_Seed111` Version 1, `_Seed222` Version 2, `_Seed333` Version 2 (trọng số mọi epoch, validation từng epoch, dự báo test của A4); Output `02_A3_LamaHCEExt_Benchmarks` Version 1 (tài khoản `hunhthanhnhn`); Dataset `lamah-ce-ext` | Version 1 |
 
-Ba tệp huấn luyện giống hệt nhau, chỉ khác dòng `RUN_SEED`, để mỗi notebook chạy Save & Run All mà không sửa dòng nào. Mỗi hạt giống một notebook, một GPU; một lần huấn luyện nằm trọn một phiên vì chức năng chạy tiếp của thư viện không khôi phục trạng thái dừng sớm và bộ lập lịch learning rate (`.claude/rules/library.md`).
+Ba tệp huấn luyện giống hệt nhau, chỉ khác dòng `RUN_SEED`, để mỗi notebook chạy Save & Run All mà không sửa dòng nào. Mỗi hạt giống một notebook, một GPU; một lần huấn luyện nằm trọn một phiên vì chức năng chạy tiếp của thư viện không khôi phục trạng thái dừng sớm và bộ lập lịch learning rate (fork `f229e02`: `training/basetrainer.py` dòng 309–330, `nh_run.py` dòng 80–109 chỉ nạp lại trọng số và optimizer).
 
 Môi trường: ảnh Kaggle dựng ngày 22/10/2026, Python 3.13.15, torch 2.11.0+cu128 (notebook so sánh: 2.11.0+cpu), NumPy 2.1.3, pandas 2.3.3, xarray 2025.12.0, SciPy 1.16.3, tensorboard 2.20.0; NeuralHydrology cài từ fork `Ticasslo/neuralhydrology` commit `f229e02` (nhánh `research`: bản sửa lưu mô hình tốt nhất `e794d7c` và khóa `data_on_gpu`, `02_Pipeline.md` Mục 9.1).
 
@@ -140,7 +140,7 @@ A4 (`dda45fc`, bộ nạp cũ, dừng sớm) và B0 (`f229e02`, `data_on_gpu`, 3
 | 222 | 1–20 | 20 / 20 | 0 | 15 / 15 | 0 | 451/451 lưu vực trùng từng bit |
 | 333 | 1–19 | 19 / 19 | 0 | 14 / 14 | 0 | 451/451 lưu vực trùng từng bit |
 
-Trọng số mọi epoch chung trùng từng bit (`model_epochNNN.pt`, so từng tensor), NSE/KGE validation từng lưu vực trùng, test của cùng trọng số trùng, dự báo test thô từng ngày của hạt giống 222, 333 trùng từng bit dù chấm bằng hai bộ nạp khác nhau. Như vậy với LSTM này trên T4, cùng hạt giống cho cùng mô hình ở hai lần chạy cách nhau hai ngày, trên hai commit thư viện và hai bộ nạp khác nhau: phần không tất định của GPU không đóng góp vào nhiễu, nhiễu giữa các lần chạy B0 chỉ do hạt giống. Kết luận này chỉ cho LSTM trên cuDNN ở cấu hình này; lõi Mamba có đạo hàm không tất định từng bit (`gpuAtomicAdd`, `.claude/rules/library.md`) nên phải kiểm lại ở bước C.
+Trọng số mọi epoch chung trùng từng bit (`model_epochNNN.pt`, so từng tensor), NSE/KGE validation từng lưu vực trùng, test của cùng trọng số trùng, dự báo test thô từng ngày của hạt giống 222, 333 trùng từng bit dù chấm bằng hai bộ nạp khác nhau. Như vậy với LSTM này trên T4, cùng hạt giống cho cùng mô hình ở hai lần chạy cách nhau hai ngày, trên hai commit thư viện và hai bộ nạp khác nhau: phần không tất định của GPU không đóng góp vào nhiễu, nhiễu giữa các lần chạy B0 chỉ do hạt giống. Kết luận này chỉ cho LSTM trên cuDNN ở cấu hình này; lõi Mamba có đạo hàm không tất định từng bit (`gpuAtomicAdd` trong `csrc/selective_scan/selective_scan_bwd_kernel.cuh` của `state-spaces/mamba`) nên phải kiểm lại ở bước C.
 
 Hệ quả: A4 hạt giống 222, 333 chính là B0 dừng ở epoch 20, 19; khác biệt duy nhất của giao thức 30 epoch so với dừng sớm nằm ở hạt giống 111.
 
