@@ -31,7 +31,7 @@ SEQUENCE = [
     ("A", "A. Tái lập, persistence, PNSE, DLinear, nhiễu 3 hạt giống (6 lần)"),
     ("B", "B. LSTM cải tiến, thêm từng thay đổi: B0 nền 30 epoch, B1a đơn vị Q, B1b qmax, B2 masked mean, B3 che dữ liệu (18 lần)"),
     ("C", "C. 5 lõi cùng tham số, tinh chỉnh 8 cấu hình, 3 hạt giống (tối đa 70 lần)"),
-    ("C", "H → D. Dự báo 1–7 ngày, chuỗi quá khứ 730 ngày (27 lần)"),
+    ("C", "H → D. Dự báo 1–7 ngày, chuỗi quá khứ 730 ngày (33 lần)"),
     ("EV", "Đánh giá: mức, sự kiện lũ, kịch bản vận hành, kiểm định"),
     ("G", "G. Giải thích mô hình, dò trạng thái ẩn, demo (dùng ngưỡng lũ của A1)"),
     ("keep", "BÁO CÁO"),
@@ -50,7 +50,7 @@ BANDS = [
          [("B", "B1a. Q cùng đơn vị mm/ngày với nhãn; B1b: thêm qmax quá khứ; B2: nhóm Q riêng"),
           ("B", "B3. Che dữ liệu khi huấn luyện (0,1/0,12 và 0,05/0,05)")]),
         ("Forecast ngày t: 5 biến ECMWF HRES",
-         [("C", "H. Dự báo 1–7 ngày: ngày đầu ECMWF HRES thật, các ngày sau để trống; so với chỉ quá khứ và dự báo hoàn hảo")]),
+         [("C", "H. Dự báo 1–7 ngày: ngày đầu ECMWF HRES thật, các ngày sau để trống hoặc dự báo GEFSv12; so với chỉ quá khứ và dự báo hoàn hảo")]),
         ("33 thuộc tính tĩnh · nhãn qmax ngày t (mm/ngày theo diện tích)", []),
     ]),
     ("2. Tiền xử lý", [

@@ -60,7 +60,7 @@ Bản tích hợp bàn giao `db6dc1ffcd8c14994cd80be3ed8ff417002c01a1` kết h�
 | 2 | A4 — **xong** | Notebook `Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain_Seed111/222/333.py` (mỗi hạt giống một notebook) và `04_A4_LamaHCEExt_Compare.py`: đo thời gian trên T4; huấn luyện lại mô hình tốt nhất của bài với hạt giống 111, 222, 333 | Độ lệch chuẩn giữa hạt giống; thời gian mỗi lần chạy để gắn ngày cho lịch; 3 tệp dự báo NPZ cho bộ đánh giá | Thư mục Q (A2 Phần 4) |
 | 3 | B0, B1a, B1b, B* | B0 (LSTM nền 30 epoch, fork `f229e02` đã sửa lưu mô hình tốt nhất, dữ liệu để sẵn trên GPU) — **xong**; B1a (B0 + đơn vị Q mm/ngày), B1b (B1a + `qmax` quá khứ) — **xong** (notebook so sánh chung `05_B1_LamaHCEExt_Compare` Version 1); B*: chọn theo luật ghi sẵn trong B1b–B3; gắn mốc `freeze-C` | Trọng số, nhật ký, tệp dự báo | A4; B2, B3 của người 1 đã chấm (cho B*) |
 | 4 | C — **xong** | C1 tinh chỉnh 5 lõi × 8 cấu hình ([báo cáo C1](Workspace/05_Training/11_C1_LamaHCEExt_Compare/11_C1_LamaHCEExt_Compare.md)); C2 chạy chính thức 8 cấu hình × 3 hạt giống ([báo cáo C2](Workspace/05_Training/13_C2_LamaHCEExt_Compare/13_C2_LamaHCEExt_Compare.md)) | 24 NPZ test/S0/hạn 1, bảng 24 checkpoint `Tables/C2_handoff.csv` | `freeze-C` |
-| 5 | Mở rộng | H (dự báo 1–7 ngày; LSTM `lstm_L2_x1_lr1e-3` + Mamba `mamba_L2_x1_lr1e-3`, `02_Pipeline.md` Mục 4.4); D (730 ngày) do người 1 làm trọn, chạy song song với H; E, F, GV chuyển sang khóa luận, cắt theo `02_Pipeline.md` Mục 8.3 khi thiếu thời gian | Tệp dự báo | C xong |
+| 5 | Mở rộng | H (dự báo 1–7 ngày, 4 cách gồm GEFSv12 reforecast; LSTM `lstm_L2_x1_lr1e-3` + Mamba `mamba_L2_x1_lr1e-3`, `02_Pipeline.md` Mục 4.4); D (730 ngày) do người 1 làm trọn, chạy song song với H; E, F, GV chuyển sang khóa luận, cắt theo `02_Pipeline.md` Mục 8.3 khi thiếu thời gian | Tệp dự báo | C xong |
 | 6 | G | Integrated Gradients (Captum), dò trạng thái ẩn; xuất kết quả theo lưu vực cho demo | Hình, tệp kết quả XAI | Mô hình chính thức |
 | 7 | Demo D4 | Đưa khối demo D3 vào trang web trên VPS Oracle (CPU ARM): cài PyTorch bản CPU cho ARM, Docker, tên miền và cách đưa ra Internet (Mục 9.6, 12); giữ máy chạy liên tục (VPS rảnh 7 ngày có thể bị thu hồi) | Đường dẫn công khai của demo | Khối demo D3 của người 1 |
 | 8 | Báo cáo | Chương Cơ sở lý thuyết, Phương pháp, Thí nghiệm; slide phần tương ứng | | Kết quả các bước |
@@ -83,7 +83,7 @@ Bản tích hợp bàn giao `db6dc1ffcd8c14994cd80be3ed8ff417002c01a1` kết h�
 | Người 1 | Người 2 | B2, B3 đã chấm (NPZ, bảng validation) | Trước B* |
 | Người 2 | Người 1 | Tệp dự báo theo định dạng chung (`02_Pipeline.md` Mục 9.5), kèm mã cấu hình và mã commit thư viện | Sau mỗi bước huấn luyện |
 | Người 2 | Người 1 | C2: 24 NPZ `SF_<cấu hình>_C2_seed<N>_test_S0_lead1.npz` (Output `13_C2_LamaHCEExt_Compare` Version 1, `c2_compare/contracts/`) cho Evaluation; 24 checkpoint kèm sha256 (`Tables/C2_handoff.csv`) cho kịch bản S1–S4; mô hình demo `gru_L2_x1_lr1e-3` hạt giống 111 — **đã sẵn sàng** (13/11/2026) | Sau C2 |
-| Người 2 | Người 1 | H: 18 run (trọng số, config, thông số chuẩn hóa) và NPZ 7 hạn (Output `15_H_LamaHCEExt_Compare`) cho đánh giá và trang 1 của demo | Sau so sánh H |
+| Người 2 | Người 1 | H: 24 run, 4 cách (trọng số, config, thông số chuẩn hóa) và NPZ 7 hạn (Output `15_H_LamaHCEExt_Compare`) cho đánh giá và trang 1 của demo | Sau so sánh H |
 | Người 2 | Người 1 | Kết quả giải thích mô hình tổng hợp theo lưu vực cho trang 4 của demo | Sau bước G |
 | Người 1 | Người 2 | Khối demo D3 đã chạy trên laptop | Trước demo D4 |
 

@@ -166,3 +166,36 @@ Chạy lại `best_model.pt` của tác giả trên kỳ test 2014–2017 cho s�
 - Quan trắc trùng hoàn toàn; dự báo theo ngày lệch dưới 0,03 mm/ngày ở mức 99,9%. Chỉ lưu vực 742 và 758 lệch NSE trên 0,01, do phương sai `qmax` quan trắc kỳ test gần 0.
 - Tác giả đưa `qmean` vào mô hình theo **m³/s** (nhãn `qmax` theo mm/ngày), lấy nguyên từ `D_gauges`, ngày thiếu để trống: thống kê chuẩn hóa tính lại khớp tệp chuẩn hóa của tác giả (trung bình 4,5778, độ lệch chuẩn 16,1461). Thư mục có Q (`LamaH_expanded_q_input`) không công bố, A2 dựng lại bằng cách chép `qmean` vào tệp khí tượng mức A (451 tệp, 1,35 GB).
 - Lưu vực 55 không có dự báo ở hai run có Q (cửa sổ 365 ngày luôn chứa ô `qmean` trống); lưu vực 800 không có mẫu train ở run có Q (chỉ có `qmean` từ 24/11/2009).
+
+## 7. GEFSv12 reforecast 7 ngày (bước H, cách d)
+
+Notebook [`04_GEFS_Download`](../../Workspace/01_Download/04_GEFS_Download/04_GEFS_Download.py) (Kaggle CPU, Version 6) tải dự báo GEFSv12 reforecast và gộp về 451 lưu vực Extended LamaH-CE thành 35 cột theo hạn cho cách (d) của bước H (`01_Plan/02_Pipeline.md` Mục 4.4).
+
+- **Nguồn:** NOAA GEFSv12 reforecast (Guan và cs., *Monthly Weather Review* 150, 2022), kho AWS `noaa-gefs-retrospective`, giấy phép NOAA NODD (dùng tự do, ghi nguồn). Mô hình vật lý FV3 cùng một phiên bản cho cả kỳ 2000–2019, khởi tạo 00 UTC hằng ngày, 5 thành viên (c00, p01–p04), lưới 0,25°, bước 3 giờ trong 10 ngày đầu. Mỗi lần dự báo chỉ dùng điều kiện đầu tại ngày khởi tạo nên không chứa thông tin sau ngày đó.
+- **Ngày dự báo** tính từ 00 UTC như ECMWF HRES của Extended LamaH-CE (BiasCast Mục 2.3). Lấy các lần khởi tạo 26/12/2002–31/12/2017 để mọi ngày 01/01/2003–31/12/2017 có đủ 7 hạn.
+- **Gộp về lưu vực:** trọng số = diện tích phần giao ô lưới 0,25° với lưu vực / diện tích lưu vực, tính ở EPSG:3035 trên `Basins_A.shp`.
+- **Năm biến**, cùng thứ tự 5 biến ECMWF HRES:
+
+| Cột | Từ tệp GEFS | Cách tính |
+|---|---|---|
+| `t2m` (°C) | `tmp_2m` (c00) | trung bình ngày giá trị tức thời 3 giờ |
+| `d2m` (°C) | `spfh_2m`, `pres_sfc` (c00) | áp suất hơi từ độ ẩm riêng và áp suất (trung bình ngày, lưu vực), đổi ra điểm sương theo công thức Magnus (Alduchov & Eskridge, 1996) |
+| `ssrd` (W/m²) | `dswrf_sfc` (c00) | trung bình ngày bức xạ sóng ngắn xuống |
+| `tp` (mm/ngày) | `apcp_sfc` (5 thành viên) | tổng mưa ngày, trung bình 5 thành viên |
+| `e` (mm/ngày) | `lhtfl_sfc` (c00) | ẩn nhiệt × 86400 / 2,501·10⁶ J/kg |
+
+- **Cột `GEFS_<biến>_lead<k>`** ở ngày d là dự báo cho ngày d phát lúc 00 UTC ngày d−k+1. Tệp `gefs/gefs_lamah_daily.npz`: float32 [451 lưu vực, 5479 ngày, 35 cột], sha256 `bcc0c55cc46c17d24de7517147c9b86a971f563703970d37ee0726b23dc681d4`; khuôn huấn luyện cách (d) kiểm sha256 này rồi ghi 35 cột vào tệp khí tượng của thư mục Q.
+- **Ô trống:** 30 ô mỗi lưu vực (13.530 ô), đều trong kỳ train, do tệp trên kho NOAA thiếu hoặc là bản chép của thành viên khác (tệp `.idx` ghi số thành viên khác, cùng ETag):
+
+| Ngày khởi tạo | Tệp | Lý do | Biến, hạn trống |
+|---|---|---|---|
+| 09/11/2004 | `dswrf_sfc` c00 | thiếu tệp `.grib2` | `ssrd`, 7 hạn |
+| 08/05/2005 | `dswrf_sfc`, `lhtfl_sfc` c00 | thiếu bản tin 0–3, 0–6 giờ | `ssrd`, `e`, hạn 1 |
+| 08/02/2006 | `dswrf_sfc` c00 | thiếu tệp `.grib2` | `ssrd`, 7 hạn |
+| 15/09/2006 | `apcp_sfc` p01 | thiếu tệp `.grib2` | `tp`, 7 hạn |
+| 01/10/2006 | `apcp_sfc` p02, p03, p04 | bản chép của thành viên p01 | `tp`, 7 hạn |
+
+  Quét tệp chỉ mục `.idx` và danh sách tệp trên kho cho mọi tệp cần dùng 2002–2017: ngoài 5 chỗ trên, 17 tệp mưa ghi trùng bản tin (khởi tạo 11/04/2003, 02/06/2007, 04/06/2007, 09/11/2013), các bản trùng giống nhau từng byte; notebook chọn bản tin theo mô tả (biến, khoảng thời gian), không theo vị trí. `tp` thiếu một thành viên thì để trống, không lấy trung bình các thành viên còn lại, để mọi ô cùng một định nghĩa. Masked mean của mô hình bỏ nhóm GEFS của hạn có ô trống.
+- **Kiểm (Phần 4):** đủ 35 cột × 5479 ngày × 451 lưu vực, ô trống đúng 5 chỗ trên; mưa, bức xạ không âm (dung sai 0,001 do nén GRIB); nhiệt độ trong −40…40 °C. Điểm sương có thể vượt nhiệt độ trung bình ngày do tính từ độ ẩm riêng và áp suất đã lấy trung bình (Magnus phi tuyến): vượt ở 0,38% số ô, lớn nhất 1,21 °C (hạn 1, tháng 12–1, lưu vực 305–332); ECMWF HRES và ERA5-Land không có ô nào vượt. Ngưỡng kiểm (vượt ≤ 2 °C và ở < 1% số ô) đặt sau khi xem số đo này, chỉ để bắt lỗi đơn vị hay công thức; dữ liệu không bị cắt.
+- **So với tái phân tích, kỳ validation 2010–2013** (tương quan theo ngày của từng lưu vực, trung vị 451 lưu vực; mưa so với `MSWEP_RR`, nhiệt độ, điểm sương với ERA5-Land, bức xạ với `EOBS_qq`, bốc hơi với `GLEAM_ETA`): mưa trung bình 5 thành viên hạn 1 0,825 (ECMWF HRES 0,829), hạn 7 0,378; `t2m`, `d2m` hạn 7 trên 0,93; `e` cùng dấu với GLEAM (tương quan 0,90). Hình `Figures/GEFS_Skill_by_Lead.png`.
+- **Thời gian:** tải và giải mã 16 năm khoảng 4,1 giờ trên Kaggle CPU; Version 6 chép 16 năm từ Output phiên trước, 229 giây.
