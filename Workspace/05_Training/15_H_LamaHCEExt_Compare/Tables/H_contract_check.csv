@@ -1,0 +1,25 @@
+lõi,cách,hạt giống,run,tệp,MB,commit,sim thô trùng Phần 3,max |ΔNSE| NPZ - Phần 3,max |ΔPNSE| NPZ - Phần 3,lỗi
+lstm,past,111,SF_lstm_L2_x1_lr1e-3_Hpast_seed111,7,97.855688,6f68f47,True,0.0,0.0,-
+lstm,past,222,SF_lstm_L2_x1_lr1e-3_Hpast_seed222,7,97.873926,6f68f47,True,0.0,0.0,-
+lstm,past,333,SF_lstm_L2_x1_lr1e-3_Hpast_seed333,7,97.819281,6f68f47,True,0.0,0.0,-
+mamba,past,111,SF_mamba_L2_x1_lr1e-3_Hpast_seed111,7,97.87094,6f68f47,True,0.0,0.0,-
+mamba,past,222,SF_mamba_L2_x1_lr1e-3_Hpast_seed222,7,97.944667,6f68f47,True,0.0,0.0,-
+mamba,past,333,SF_mamba_L2_x1_lr1e-3_Hpast_seed333,7,97.824268,6f68f47,True,0.0,0.0,-
+lstm,hybrid,111,SF_lstm_L2_x1_lr1e-3_Hhybrid_seed111,7,97.811583,6f68f47,True,0.0,0.0,-
+lstm,hybrid,222,SF_lstm_L2_x1_lr1e-3_Hhybrid_seed222,7,97.865881,6f68f47,True,0.0,0.0,-
+lstm,hybrid,333,SF_lstm_L2_x1_lr1e-3_Hhybrid_seed333,7,97.81041,6f68f47,True,0.0,0.0,-
+mamba,hybrid,111,SF_mamba_L2_x1_lr1e-3_Hhybrid_seed111,7,97.924831,6f68f47,True,0.0,0.0,-
+mamba,hybrid,222,SF_mamba_L2_x1_lr1e-3_Hhybrid_seed222,7,97.904867,6f68f47,True,0.0,0.0,-
+mamba,hybrid,333,SF_mamba_L2_x1_lr1e-3_Hhybrid_seed333,7,97.885475,6f68f47,True,0.0,0.0,-
+lstm,gefs,111,SF_lstm_L2_x1_lr1e-3_Hgefs_seed111,7,97.969381,840450f,True,0.0,0.0,-
+lstm,gefs,222,SF_lstm_L2_x1_lr1e-3_Hgefs_seed222,7,97.991014,840450f,True,0.0,0.0,-
+lstm,gefs,333,SF_lstm_L2_x1_lr1e-3_Hgefs_seed333,7,97.850617,840450f,True,0.0,0.0,-
+mamba,gefs,111,SF_mamba_L2_x1_lr1e-3_Hgefs_seed111,7,97.915589,840450f,True,0.0,0.0,-
+mamba,gefs,222,SF_mamba_L2_x1_lr1e-3_Hgefs_seed222,7,97.890013,840450f,True,0.0,0.0,-
+mamba,gefs,333,SF_mamba_L2_x1_lr1e-3_Hgefs_seed333,7,97.922672,840450f,True,0.0,0.0,-
+lstm,perfect,111,SF_lstm_L2_x1_lr1e-3_Hperfect_seed111,7,98.008715,6f68f47,True,0.0,0.0,-
+lstm,perfect,222,SF_lstm_L2_x1_lr1e-3_Hperfect_seed222,7,98.0616,6f68f47,True,0.0,0.0,-
+lstm,perfect,333,SF_lstm_L2_x1_lr1e-3_Hperfect_seed333,7,97.993846,6f68f47,True,0.0,0.0,-
+mamba,perfect,111,SF_mamba_L2_x1_lr1e-3_Hperfect_seed111,7,98.045289,6f68f47,True,0.0,0.0,-
+mamba,perfect,222,SF_mamba_L2_x1_lr1e-3_Hperfect_seed222,7,98.001592,6f68f47,True,0.0,0.0,-
+mamba,perfect,333,SF_mamba_L2_x1_lr1e-3_Hperfect_seed333,7,98.052856,6f68f47,True,0.0,0.0,-
