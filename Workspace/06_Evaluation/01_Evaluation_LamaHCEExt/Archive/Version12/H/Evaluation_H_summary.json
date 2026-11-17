@@ -1,0 +1,79 @@
+{
+  "complete": true,
+  "contracts": 168,
+  "coverage": [
+    {
+      "lead": 1,
+      "runs": 24,
+      "days": 1449,
+      "start": "2014-01-07",
+      "end": "2017-12-25",
+      "common_day_IDs": 651841,
+      "IDs_with_days": 451
+    },
+    {
+      "lead": 2,
+      "runs": 24,
+      "days": 1449,
+      "start": "2014-01-07",
+      "end": "2017-12-25",
+      "common_day_IDs": 651841,
+      "IDs_with_days": 451
+    },
+    {
+      "lead": 3,
+      "runs": 24,
+      "days": 1449,
+      "start": "2014-01-07",
+      "end": "2017-12-25",
+      "common_day_IDs": 651841,
+      "IDs_with_days": 451
+    },
+    {
+      "lead": 4,
+      "runs": 24,
+      "days": 1449,
+      "start": "2014-01-07",
+      "end": "2017-12-25",
+      "common_day_IDs": 651841,
+      "IDs_with_days": 451
+    },
+    {
+      "lead": 5,
+      "runs": 24,
+      "days": 1449,
+      "start": "2014-01-07",
+      "end": "2017-12-25",
+      "common_day_IDs": 651841,
+      "IDs_with_days": 451
+    },
+    {
+      "lead": 6,
+      "runs": 24,
+      "days": 1449,
+      "start": "2014-01-07",
+      "end": "2017-12-25",
+      "common_day_IDs": 651841,
+      "IDs_with_days": 451
+    },
+    {
+      "lead": 7,
+      "runs": 24,
+      "days": 1449,
+      "start": "2014-01-07",
+      "end": "2017-12-25",
+      "common_day_IDs": 651841,
+      "IDs_with_days": 451
+    }
+  ],
+  "common_mask_across": "lead",
+  "tolerance_days": {
+    "1": 0,
+    "2": 0,
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 2,
+    "7": 2
+  }
+}

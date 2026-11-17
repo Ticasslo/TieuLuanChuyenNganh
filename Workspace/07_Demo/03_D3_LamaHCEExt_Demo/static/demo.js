@@ -120,7 +120,7 @@ async function refreshForecast() {
   const basin = $("basin").value, date = $("day").value, lead = $("lead").value;
   const data = await api("/api/forecast" + query({basin, date, lead, run: [...chosen]}));
   if (page !== "forecast" || serial !== revision) return;
-  $("plot-subtitle").textContent = `Lưu vực ${basin} · Hạn ${lead} ngày · ${dateText(date)}`;
+  $("plot-subtitle").textContent = `Lưu vực ${basin} · Hạn ${lead} ngày · Ngày đích ${dateText(date)}`;
   const series = [{x: data.dates, y: data.observed, name: "Quan trắc", line: {color: "#172e29", width: 2.5}}];
   for (const {run, values} of data.predictions) {
     const i = catalog.models.findIndex(m => m.run === run);
@@ -146,13 +146,20 @@ const tableNames = {C2_config_table: "C2 · Hiệu năng", C2_cost_table: "C2 ·
 function showComparisonTable() {
   table($("comparison-content"), comparisonTables[$("comparison-table").value] ?? []);
 }
+function updateModelLeads(modelPicker, leadPicker) {
+  const active = catalog.models.find(m => m.run === $(modelPicker).value);
+  options($(leadPicker), active.leads.map(lead => [lead, `${lead} ngày`]), $(leadPicker).value);
+}
 function updateReferences() {
   const active = catalog.models.find(m => m.run === $("comparison-run").value);
+  const lead = Number($("comparison-lead").value);
   let choices = [];
   if (active.stage === "D") {
     choices = [["C2_same_seed", "C2 365 bước cùng cấu hình và seed"]];
   } else {
-    choices = catalog.models.filter(m => (active.stage === "H") === (m.stage === "H") && m.stage !== "D")
+    const inH = active.stage === "H" || (active.run === "Persistence_qmax" && lead > 1);
+    choices = catalog.models.filter(m => m.leads.includes(lead) && m.stage !== "D" &&
+      (m.run === "Persistence_qmax" || inH === (m.stage === "H")))
       .map(m => [m.run, m.name]);
   }
   options($("comparison-ref"), [["", "NSE tuyệt đối"], ...choices], $("comparison-ref").value);
@@ -242,10 +249,12 @@ async function run(action) {
 async function start() {
   catalog = await api("/api/catalog");
   const leads = Array.from({length: Math.max(...catalog.models.flatMap(m => m.leads))}, (_, i) => [i+1, `${i+1} ngày`]);
-  for (const id of ["lead", "comparison-lead", "flood-lead"]) options($(id), leads, 1);
+  options($("lead"), leads, 1);
   for (const id of ["basin", "flood-basin"]) options($(id), catalog.ids.map(id => [id, `ID ${id}`]), catalog.ids[0]);
   const names = catalog.models.map(m => [m.run, m.name]);
   for (const id of ["comparison-run", "flood-model"]) options($(id), names, catalog.default_run);
+  updateModelLeads("comparison-run", "comparison-lead");
+  updateModelLeads("flood-model", "flood-lead");
   updateReferences();
   $("day").min = catalog.dates[0];
   $("day").max = catalog.dates.at(-1);
@@ -291,9 +300,18 @@ async function start() {
   $("day").addEventListener("change", () => { $("live-day").value = $("day").value; });
   for (const id of ["live-model", "live-day"]) $(id).addEventListener("change", clearLiveResult);
   for (const id of ["rain", "temp"]) $(id).addEventListener("input", clearLiveResult);
-  $("comparison-run").addEventListener("change", () => { updateReferences(); run(refreshComparison); });
-  for (const id of ["comparison-ref", "comparison-lead"]) $(id).addEventListener("change", () => run(refreshComparison));
-  for (const id of ["flood-model", "flood-basin", "flood-lead"]) $(id).addEventListener("change", () => run(refreshFlood));
+  $("comparison-run").addEventListener("change", () => {
+    updateModelLeads("comparison-run", "comparison-lead");
+    updateReferences();
+    run(refreshComparison);
+  });
+  $("comparison-lead").addEventListener("change", () => { updateReferences(); run(refreshComparison); });
+  $("comparison-ref").addEventListener("change", () => run(refreshComparison));
+  $("flood-model").addEventListener("change", () => {
+    updateModelLeads("flood-model", "flood-lead");
+    run(refreshFlood);
+  });
+  for (const id of ["flood-basin", "flood-lead"]) $(id).addEventListener("change", () => run(refreshFlood));
   $("comparison-table").addEventListener("change", showComparisonTable);
   $("explanation-case").addEventListener("change", () => run(refreshExplanation));
   document.querySelectorAll("[data-page]").forEach(button => button.addEventListener("click", () => loadPage(button.dataset.page)));

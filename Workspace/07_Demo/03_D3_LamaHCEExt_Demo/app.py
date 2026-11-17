@@ -77,6 +77,9 @@ def create_app(bundle, raw=None):
     def points(arr):
         return [float(x) if np.isfinite(x) else None for x in arr]
 
+    def uses_h_tables(run, lead):
+        return models.get(run, {}).get("stage") == "H" or (run == "Persistence_qmax" and lead > 1)
+
     @app.get("/")
     def home():
         return app.send_static_file("index.html")
@@ -143,7 +146,7 @@ def create_app(bundle, raw=None):
         run, reference = request.args.get("run"), request.args.get("reference")
         lead = integer_arg("lead", 1, 7)
         scope = models.get(run, {}).get("stage")
-        suffix = f"H_metrics_lead{lead}" if scope == "H" else "metrics"
+        suffix = f"H_metrics_lead{lead}" if uses_h_tables(run, lead) else "metrics"
         frame = table(suffix)
         metrics = []
         if scope == "D" and lead == 1:
@@ -179,7 +182,7 @@ def create_app(bundle, raw=None):
             abort(400, "Chọn run và lưu vực.")
         result = {}
         for name in ("events", "levels", "event_cases"):
-            key = f"H_{name}_lead{lead}" if models[run]["stage"] == "H" else ("events_by_case" if name=="event_cases" else name)
+            key = f"H_{name}_lead{lead}" if uses_h_tables(run, lead) else ("events_by_case" if name=="event_cases" else name)
             frame = table(key)
             if frame is None:
                 continue

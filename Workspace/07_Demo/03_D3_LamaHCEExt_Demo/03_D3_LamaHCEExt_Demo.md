@@ -1,6 +1,6 @@
 # D3 • Demo phát lại Extended LamaH-CE
 
-**Mốc bàn giao C2 đã kiểm thử trên laptop ngày 16/11/2026.** Dự báo, So sánh mô hình, Cảnh báo lũ và Giới thiệu dùng dữ liệu thật. Trang Giải thích hiển thị trạng thái chờ G. Phần phát lại H hạn 1–7, D 730 bước và biểu đồ G chờ Output bàn giao để kiểm trên dữ liệu thật.
+**Demo D3 phát lại được C2 và H trên laptop.** Gói `downloads/D3_H_V12` kết hợp H Compare Version 1 với các bảng chấm H của Evaluation Version 12. Trang Dự báo, So sánh mô hình và Cảnh báo lũ đã kiểm với dữ liệu thật. Phần chạy trực tiếp hiện dùng năm lõi C2. Trang Giải thích và phần phát lại D chuỗi 730 bước chờ dữ liệu bàn giao tương ứng.
 
 Trang Dự báo có bản đồ vùng nghiên cứu, 451 trạm, lịch test, các đường qmax và ngưỡng lũ theo m³/s. C2 giữ tám cấu hình thuộc năm lõi, mỗi cấu hình dùng một seed theo NSE validation. GRU seed 111 bật sẵn. Chức năng “nếu… thì…” dùng một cấu hình đại diện mỗi lõi C2, lấy cấu hình và seed có NSE validation cao nhất của lõi trong số đã kiểm CPU.
 
@@ -19,7 +19,7 @@ Giải nén các Output vào các thư mục con riêng trong `downloads/` cạn
 | Bản đồ NSE, cảnh báo lũ | Evaluation Version 10. Bản đồ và trang lũ dùng dữ liệu S0 từ bốn bảng `Evaluation_metrics.csv`, `Evaluation_events.csv`, `Evaluation_levels.csv` và `Evaluation_event_cases.csv` |
 | Bảng S0–S4 của trang So sánh | `C2_scenarios_stats.csv` từ Output `04_C2_LamaHCEExt_Scenarios` Version 1 |
 | D | Output D Compare sau khi có các run 730 bước |
-| H | Output H Compare có 126 NPZ và `H_demo_selection.csv` gồm 18 dòng validation. Có thể lấy thông tin chọn seed từ 18 Output train H khi bảng này chưa có. Chỉ số chọn H dùng NSE_lead_mean của checkpoint |
+| H | Giải nén toàn bộ Output `15_H_LamaHCEExt_Compare` Version 1 vào `downloads/H_Compare_V1/`. Giữ nguyên thư mục `h_compare/`, gồm 168 NPZ, manifest và hai bảng bàn giao. Truyền thư mục `H/` của Evaluation Version 12 vào `--h-evaluation` để ghép đúng các bảng điểm và sự kiện. |
 | CPU “nếu… thì…” | Output `02_D2_LamaHCEExt_CPU` Version 1 đã kiểm và Output train Version 1 của năm cấu hình được chọn |
 
 | Lõi | Output train Version 1 cho chạy trực tiếp |
@@ -58,6 +58,29 @@ Khi lệnh đóng gói báo thành công, truyền đường dẫn raw mà lện
 ```
 
 Mở [demo trên laptop](http://127.0.0.1:8050). Nếu chạy phát lại trước, tạo gói mới bằng `prepare.py` với một đường dẫn `--output` khác, bỏ tùy chọn `--with-live`, rồi mở `app.py` với `--bundle` tương ứng. Dùng `--replay-only <lõi>` khi chuẩn bị gói chạy trực tiếp trên máy có lõi đã được xác định quá chậm.
+
+### Phát lại H hạn 1–7
+
+Trên laptop đã lưu Output `15_H_LamaHCEExt_Compare` Version 1 ở `downloads/H_Compare_V1/h_compare/` và bảng điểm H trong [Evaluation Version 12](../../06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#kết-quả-kaggle-version-12). Các lệnh sau dùng để kiểm đầu vào và dựng gói mới từ thư mục D3. Với gói `downloads/D3_H_V12` đã dựng, dùng dòng cuối để mở lại [demo tại cổng 8052](http://127.0.0.1:8052/).
+
+```powershell
+$env:PYTHONUTF8 = "1"
+$demo_python = ".\.venv\Scripts\python.exe"
+$evaluationH = "..\..\06_Evaluation\01_Evaluation_LamaHCEExt\downloads\Evaluation_V12\evaluation_output\H"
+& $demo_python prepare.py --inputs .\downloads --with-live --h-evaluation $evaluationH --check-inputs
+& $demo_python prepare.py --inputs .\downloads --with-live --h-evaluation $evaluationH --output .\downloads\D3_H_V12
+& $demo_python app.py --bundle .\downloads\D3_H_V12 --raw .\downloads\lamah-ce-ext\lamah_ce_ext\LamaH_extended --port 8052
+```
+
+Khi đóng gói, 191 mục của manifest H Compare khớp SHA-256 với bảng kiểm nguồn của Evaluation. Gói giữ tám run do H Compare chọn trên validation, mỗi cặp lõi và cách một run. Ngày đích của H nằm từ 07/01/2014 đến 25/12/2017.
+
+**Kiểm thử trên laptop ngày 17/11/2026.** Toàn bộ 56 ma trận phát lại khớp NPZ sau quy đổi sang m³/s. Persistence dùng ngày đích trừ số ngày của hạn dự báo. Cả 42 yêu cầu dự báo khớp các cửa sổ tương ứng, gồm ngày nhuận và hai biên lịch. Tính lại 25.256 giá trị NSE theo lưu vực, run và hạn trên mặt nạ chung. Kết quả khớp Evaluation Version 12. So sánh chênh NSE qua API khớp cả 56 cặp run–hạn. Cảnh báo tại ID 6 đọc được bảng sự kiện và mức lưu lượng của cả bảy hạn. Trên trình duyệt, đã kiểm biểu đồ GEFS đi cùng persistence, bản đồ chênh NSE và bảng cảnh báo ở hạn 7. Các lượt kiểm này ghi nhận 0 lỗi và 0 cảnh báo trong console trình duyệt.
+
+Cả 34 tệp dữ liệu và checkpoint C2 giữ nguyên SHA-256 so với gói đã kiểm trước đó. Trong gói kết hợp, API “Nếu… thì…” chạy lại được trên CPU với LSTM và Mamba của C2.
+
+Dựng lại demo từ bản sao sạch của nhánh `main` với mã bàn giao. Cả 132 tệp trong gói dựng lại khớp SHA-256 với gói đã kiểm trên laptop. Kiểm lại API dự báo, chênh NSE và cảnh báo lũ ở hạn 7 đều đạt.
+
+Để kiểm chạy trực tiếp H cách lai, dùng Output Version 1 của `14_H_Train_lstm_L2_x1_lr1e-3_hybrid_Seed333` và `14_H_Train_mamba_L2_x1_lr1e-3_hybrid_Seed222`. Mỗi run cần `config.yml`, `best_model.pt` và `train_data/train_data_scaler.yml` trong thư mục ghi ở `H_handoff.csv`. Đối chiếu SHA-256 và đầu ra CPU cả bảy hạn với NPZ trước khi bật tính năng.
 
 ## Kiểm trước khi bàn giao
 
@@ -110,7 +133,7 @@ Mở [phiên có “nếu… thì…”](http://127.0.0.1:8051/). Để mở l�
 .\.venv\Scripts\python.exe .\app.py --bundle .\downloads\D3_C2_live --raw .\downloads\lamah-ce-ext\lamah_ce_ext\LamaH_extended --port 8051
 ```
 
-**Phạm vi còn chờ kiểm** gồm phát lại H hạn 1–7, D chuỗi 730 ngày, biểu đồ Integrated Gradients từ G và triển khai VPS D4.
+Phạm vi của lần kiểm ngày 16/11/2026 là C2. Kết quả phát lại H được ghi trong mục Phát lại H hạn 1–7.
 
 ### Kiểm thử đầy đủ gói D3 trên laptop ngày 16/11/2026
 
@@ -149,11 +172,10 @@ Cả hai lần kiểm xác nhận nút **Chạy thử** trở lại trạng thá
 
 Trước khi bàn giao mốc C2, dựng lại gói từ bản sao sạch của `main` với đúng các tệp mã D3 sẽ đưa lên Git. Catalog trùng nội dung và 34 tệp còn lại trùng SHA-256 với gói đã kiểm. Bản phát lại, bảng so sánh, bảng cảnh báo và API “Nếu… thì…” của cả năm lõi đều qua kiểm tra trên bản dựng này.
 
-**Bản D3 dùng C2 đã đạt kiểm thử trên laptop. Bản D3 đủ phạm vi đang chờ tích hợp và đối chiếu các nguồn thực tế dưới đây.**
+**Bản D3 đã qua kiểm thử phát lại C2 và H trên laptop.** Các đầu vào sau cần cho phần chạy trực tiếp H, kết quả D và giải thích mô hình.
 
 | Phần | Đầu vào và việc cần xác nhận |
 |---|---|
-| H phát lại 1–7 ngày | Output H Compare với 126 NPZ, manifest và `H_demo_selection.csv` hoặc 18 Output train theo hướng dẫn ở trên. Dùng các bảng Evaluation H theo hạn cho so sánh và cảnh báo lũ. |
 | H chạy trực tiếp | Config, checkpoint và scaler của LSTM lai và Mamba lai đã chọn. Rà môi trường H, tích hợp vào mục “Nếu… thì…” và đối chiếu 7 hạn với NPZ trên CPU. |
 | D chuỗi 730 ngày | Output D Compare gồm `d_summary.json`, `D_score_stats.csv`, `D_cost.csv`, `D_basin_scores.csv`, manifest và các NPZ kỳ test hạn 1. |
 | Giải thích G | `G_IntegratedGradients.csv` hoặc bảng bàn giao tương đương để kiểm đường đọc và biểu đồ theo lưu vực, ngày và lõi. |

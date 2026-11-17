@@ -3,7 +3,7 @@
 #
 # Notebook đọc dự báo đã lưu, kiểm đầu vào và tính cùng một giao thức cho các mốc A2, DLinear, persistence, LSTM A4, B0, B1a, B1b, B2 và hai mức B3. Bộ đánh giá không huấn luyện mô hình.
 #
-# **Phạm vi Version 10:** test 2014–2017, hạn một ngày, giữ 451 lưu vực. Bảng chính chấm 56 run S0 như Version 9. Thư mục C2_scenarios chấm 24 run C2 qua S0, S1_Q1, S1_Q3, S1_Q7, S2, S3 và S4 trên một giao ngày–lưu vực chung.
+# **Phạm vi:** test 2014–2017, giữ 451 lưu vực. Bảng chính chấm 56 run S0/hạn 1. Thư mục C2_scenarios chấm bảy kịch bản C2. Khi gắn H Compare, thư mục H chấm riêng bốn cách dự báo trên bảy hạn.
 #
 # ## Cài đặt và đầu vào
 #
@@ -21,6 +21,7 @@
 # | `09_B3_LamaHCEExt_Compare` | 1 | Hai mức che B3, mỗi mức ba seed, sáu NPZ |
 # | `13_C2_LamaHCEExt_Compare` | 1 | 24 NPZ C2, manifest và bảng bàn giao |
 # | `04_C2_LamaHCEExt_Scenarios` | 1 | 144 NPZ kịch bản, mặt nạ chung, audit S0, summary và manifest |
+# | `15_H_LamaHCEExt_Compare` | 1 | Gắn khi chấm H. Thư mục `h_compare/` có 168 NPZ, manifest và bảng bàn giao |
 #
 # Mã tự tìm tệp trong `/kaggle/input`, kiểm manifest/sha256 và dừng khi thiếu, trùng nguồn hoặc sai hợp đồng. Các bảng CSV, metadata JSON và hình được lưu trực tiếp vào `/kaggle/working/evaluation_output`.
 #
@@ -101,11 +102,21 @@ C2_CONFIGS = ("lstm_L2_x1_lr1e-3", "gru_L2_x1_lr1e-3", "transformer_L2_x1_lr1e-3
               "mamba_L2_x1_lr1e-3", "mamba_L4_x3_lr1e-3")
 C2_SEEDS = (111, 222, 333)
 H_CONFIGS = ("lstm_L2_x1_lr1e-3", "mamba_L2_x1_lr1e-3")
-H_MODES = ("past", "hybrid", "perfect")
+H_LIBRARY_COMMITS = {
+    "past": FREEZE_H,
+    "hybrid": FREEZE_H,
+    "gefs": "840450f85958538903b16f281ca432d40e0a88e1",
+    "perfect": FREEZE_H,
+}
+H_MODES = tuple(H_LIBRARY_COMMITS)
+H_LEADS = tuple(range(1, 8))
 C2_SCENARIOS = ("S0", "S1_Q1", "S1_Q3", "S1_Q7", "S2", "S3", "S4")
 C2_SCENARIOS_NOTEBOOK = "04_C2_LamaHCEExt_Scenarios"
-H_NAME = re.compile(r"^(SF_(?:lstm_L2_x1_lr1e-3|mamba_L2_x1_lr1e-3)_H(?:past|hybrid|perfect)"
-                    r"_seed(111|222|333))_test_S0_lead([1-7])\.npz$")
+H_NAME = re.compile(
+    rf"(?P<run>SF_(?P<config>{'|'.join(map(re.escape, H_CONFIGS))})"
+    rf"_H(?P<mode>{'|'.join(H_MODES)})_seed(?P<seed>{'|'.join(map(str, C2_SEEDS))}))"
+    r"_test_S0_lead(?P<lead>[1-7])\.npz"
+)
 B3_MASKS = {"P10S12": (.1, .12), "P05S05": (.05, .05)}
 RETURN_PERIODS = (1.5, 2.0, 5.0, 10.0)
 LOG_FLOOR_MM_DAY = 1e-6
@@ -835,7 +846,7 @@ def read_contract(path):
 # ### 8.3.2. Output C2 Compare Version 1 và dự báo H
 #
 # C2 dùng manifest, summary, environment, bảng checkpoint/hợp đồng và 24 NPZ do Compare xuất.
-# H dùng một manifest với 126 NPZ trên cùng lịch đích. Chấm riêng H vì lịch và persistence khác.
+# H dùng một manifest với 168 NPZ trên cùng lịch đích. Chấm riêng H vì lịch và persistence khác.
 
 # %% Phần 8.3.2 - Kiểm bàn giao C2 và H
 def digest_string(value):
@@ -985,9 +996,12 @@ def read_h_contracts(root, context):
     root = Path(root)
     candidates = sorted(root.rglob("SF_*_H*_test_S0_lead*.npz"))
     expected = {f"SF_{c}_H{m}_seed{s}_test_S0_lead{k}.npz"
-                for c, m, s, k in itertools.product(H_CONFIGS, H_MODES, C2_SEEDS, range(1, 8))}
-    if len(candidates) != 126 or {p.name for p in candidates} != expected:
-        raise ValueError("H cần đúng 18 run × 7 hạn, đủ cách, lõi và seed")
+                for c, m, s, k in itertools.product(H_CONFIGS, H_MODES, C2_SEEDS, H_LEADS)}
+    names = {p.name for p in candidates}
+    if len(candidates) != len(expected) or names != expected:
+        raise ValueError(f"H cần đủ {len(expected)} NPZ (24 run × 7 hạn) cho {', '.join(H_MODES)}. "
+                         f"Tìm thấy {len(candidates)} tệp, thiếu {len(expected - names)} tên, "
+                         f"thừa {len(names - expected)} tên, trùng {len(candidates) - len(names)} tệp.")
     manifest_roots = [p for p in candidates[0].parents if p.is_relative_to(root) and (p / "manifest.csv").is_file()]
     if not manifest_roots:
         raise ValueError("Thiếu manifest.csv của H Compare")
@@ -995,19 +1009,28 @@ def read_h_contracts(root, context):
     files, checks = verified_manifest(export)
     if {p.resolve() for p in candidates} != {p for name, p in files.items() if name.endswith(".npz")}:
         raise ValueError("NPZ H không khớp tập tệp manifest")
-    days = context["dates"][6:-6]
-    obs = context["obs"][6:-6]
+    horizon = H_LEADS[-1]
+    trim = horizon - 1
+    days = context["dates"][trim:-trim]
+    obs = context["obs"][trim:-trim]
     source_q = np.vstack((context["persistence"][:1], context["obs"]))
     members, hashes = [], {}
+    contract_checks = []
     for p in candidates:
         match = H_NAME.fullmatch(p.name)
-        run, seed, lead = match[1], int(match[2]), int(match[3])
+        run, mode, config = match["run"], match["mode"], match["config"]
+        seed, lead = int(match["seed"]), int(match["lead"])
         f = read_contract(p)
-        pers = source_q[7-lead:len(source_q)-6-lead]
+        pers = source_q[horizon - lead:len(source_q) - trim - lead]
         if ((f.name, f.seed, f.period, f.scenario, f.lead) != (run, seed, "test", "S0", lead)
-                or f.metadata["forecast_horizon"] != 7 or f.metadata["library_commit"] != FREEZE_H
+                or f.metadata["forecast_horizon"] != horizon
+                or f.metadata.get("mode", mode) != mode or f.metadata.get("config", config) != config
                 or not f.metadata["clip_to_zero"] or not digest_string(f.metadata["config_sha256"])):
-            raise ValueError(f"H metadata khác tên hoặc pin: {p.name}")
+            raise ValueError(f"H metadata khác hợp đồng: {p.name}")
+        commit = f.metadata["library_commit"]
+        expected_commit = H_LIBRARY_COMMITS[mode]
+        if commit != expected_commit:
+            raise ValueError(f"H library_commit sai cho {mode} ({p.name}): {commit!r}, kỳ vọng {expected_commit}.")
         digest = f.metadata["config_sha256"]
         if hashes.setdefault(run, digest) != digest:
             raise ValueError(f"Các hạn H không cùng cấu hình: {run}")
@@ -1016,7 +1039,8 @@ def read_h_contracts(root, context):
         check_same_context(reference, f)
         f.obs, f.persistence, f.area = obs, pers, context["area"]
         members.append(f)
-    return members, checks
+        contract_checks.append(dict(path=str(p.resolve()), run=run, mode=mode, lead=lead, library_commit=commit))
+    return members, checks.merge(pd.DataFrame(contract_checks), on="path", how="left", validate="one_to_one")
 
 
 def read_c2_scenarios(root, c2, c2_root, context_paths):
@@ -1117,7 +1141,7 @@ def score_partitions(members, levels, floods, output, prefix, key_kind):
 
 
 def score_h(forecasts, levels, floods, output):
-    members = {k: [f for f in forecasts if f.lead == k] for k in range(1, 8)}
+    members = {k: [f for f in forecasts if f.lead == k] for k in H_LEADS}
     score_partitions(members, levels, floods, output, "Evaluation_H", "lead")
 
 
@@ -2616,7 +2640,7 @@ def draw_figures(table, output):
 # Mọi dữ liệu giả chỉ ở self_test; trạng thái thực nghiệm chỉ đặt sau khi đọc/chấm thành công.
 def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra_contracts=(), *,
         a4_root=None, b0_root=None, b1_root=None, b2_root=None, b3_root=None, c2_root=None, h_root=None, expected_ids=451,
-        require_c2_scenarios=False):
+        require_c2_scenarios=False, require_h=False):
     output = Path(output_root)
     output.mkdir(parents=True, exist_ok=True)
     (output / "Evaluation_summary.json").write_text(
@@ -2625,6 +2649,14 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     scenario_source = unique_file(input_root, "c2_scenarios_summary.json", required=False)
     if scenario_source is None and require_c2_scenarios:
         raise FileNotFoundError(f"Gắn toàn bộ Notebook Output {C2_SCENARIOS_NOTEBOOK} Version 1 đã hoàn thành.")
+    if h_root is None:
+        h_summary = unique_file(input_root, "h_summary.json", required=False)
+        if h_summary:
+            h_root = h_summary.parent
+        elif any(Path(input_root).rglob("SF_*_H*_test_S0_lead*.npz")):
+            h_root = Path(input_root)
+        elif require_h:
+            raise FileNotFoundError("Gắn toàn bộ Notebook Output 15_H_LamaHCEExt_Compare Version 1.")
     checks = self_test()
     checks.to_csv(output / "Evaluation_checks.csv", index=False, encoding="utf-8-sig")
     a3_root = Path(a3_root) if a3_root else unique_file(input_root, "A3_persistence_predictions.npz").parent
@@ -2697,7 +2729,7 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
     if c2_root is None:
         summary_path = unique_file(input_root, "c2_summary.json", required=False)
         c2_root = summary_path.parent if summary_path else None
-    c2_paths, c2_forecasts, h_count, c2_scenarios_count = [], [], 0, 0
+    c2_paths, c2_forecasts, h_members, c2_scenarios_count = [], [], [], 0
     if c2_root is not None:
         c2_forecasts, c2_paths, c2_sources, c2_check = read_c2_compare(
             c2_root, context, context_paths, b3_root, b0_forecasts[0].metadata["bstar_threshold_val_nse_sd"])
@@ -2717,11 +2749,8 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
         checks_c2.to_csv(scenario_output / f"{prefix}_input_check.csv", index=False, encoding="utf-8-sig")
         scenario_changes(scenarios_c2, shared_mask=scenario_mask).to_csv(
             scenario_output / f"{prefix}_changes.csv", index=False, encoding="utf-8-sig")
-    if h_root is None and any(Path(input_root).rglob("SF_*_H*_test_S0_lead*.npz")):
-        h_root = Path(input_root)
     if h_root is not None:
         h_members, h_checks = read_h_contracts(h_root, context)
-        h_count = len(h_members)
         h_output = output / "H"
         score_h(h_members, levels, floods, h_output)
         h_checks.to_csv(h_output / "Evaluation_H_input_check.csv", index=False, encoding="utf-8-sig")
@@ -2872,13 +2901,14 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
                    C2_new_scenario_contracts=c2_scenarios_count,
                    C2_scenarios_version_expected=1 if c2_scenarios_count else None,
                    C2_scenarios_manifest_sha256=sha256(scenario_manifest) if c2_scenarios_count else None,
-                   H_evaluated=bool(h_count), H_contracts=h_count,
+                   H_evaluated=bool(h_members), H_contracts=len(h_members),
+                   H_modes=list(H_MODES) if h_members else [],
                    coverage=coverages, scenarios=sorted({f.scenario for f in forecasts}),
                    leads=actual_leads,
                    C2_scenarios=list(C2_SCENARIOS) if c2_scenarios_count else [],
-                   H_leads=list(range(1, 8)) if h_count else [],
+                   H_leads=list(H_LEADS) if h_members else [],
                    operational_scenarios_run=bool(c2_scenarios_count) or any(f.scenario != "S0" for f in forecasts),
-                   multi_lead_run=bool(h_count) or any(lead > 1 for lead in actual_leads),
+                   multi_lead_run=bool(h_members) or any(lead > 1 for lead in actual_leads),
                    python=sys.version.split()[0], numpy=np.__version__, pandas=pd.__version__,
                    scipy=__import__("scipy").__version__, output=str(output))
     (output / "Evaluation_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -2895,6 +2925,9 @@ def run(input_root, output_root, a1_root=None, a2_root=None, a3_root=None, extra
               "Evaluation_C2_scenarios_input_check.csv, Evaluation_C2_scenarios_coverage.csv, "
               "Evaluation_C2_scenarios_changes.csv, cùng bảng levels_pooled, events_pooled và event_cases "
               "của bảy kịch bản.")
+    if h_members:
+        print("GỬI THÊM TỪ H/: Evaluation_H_summary.json, Evaluation_H_coverage.csv, "
+              "Evaluation_H_input_check.csv và các bảng theo hạn.")
     return results
 
 
@@ -2914,6 +2947,7 @@ def main():
     parser.add_argument("--c2")
     parser.add_argument("--h")
     parser.add_argument("--require-c2-scenarios", action="store_true")
+    parser.add_argument("--require-h", action="store_true")
     parser.add_argument("--extra-contract", action="append", default=[])
     args = parser.parse_args([] if "ipykernel" in sys.modules else None)
     if args.self_test:
@@ -2923,7 +2957,8 @@ def main():
             raise FileNotFoundError("Gắn Output 13_C2_LamaHCEExt_Compare Version 1.")
         run(args.input, args.output, args.a1, args.a2, args.a3, args.extra_contract, a4_root=args.a4,
             b0_root=args.b0, b1_root=args.b1, b2_root=args.b2, b3_root=args.b3, c2_root=args.c2, h_root=args.h,
-            require_c2_scenarios=args.require_c2_scenarios or "ipykernel" in sys.modules)
+            require_c2_scenarios=args.require_c2_scenarios or "ipykernel" in sys.modules,
+            require_h=args.require_h)
 
 
 if __name__ == "__main__":

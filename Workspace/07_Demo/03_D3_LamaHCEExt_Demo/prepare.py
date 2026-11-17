@@ -17,6 +17,11 @@ DEMO = HERE.parent
 sys.path.insert(0, str(DEMO / "DemoRuntime"))
 from forecast import qmax_m3_s
 
+H_REPORT_TABLES = ("summary", "metrics", "events", "levels", "event_cases")
+H_AUDIT_COLUMNS = ["file", "bytes", "sha256", "passed", "run", "mode", "lead", "library_commit"]
+H_MODE_LABELS = {"past": "Chỉ dữ liệu quá khứ", "hybrid": "ECMWF HRES ngày đầu",
+                 "gefs": "ECMWF HRES và GEFS", "perfect": "Thời tiết tái phân tích (tham chiếu lý tưởng)"}
+
 
 def load_audit():
     code = runpy.run_path(str(DEMO / "01_D1_LamaHCEExt_Inference/01_D1_LamaHCEExt_Inference.py"))
@@ -35,7 +40,7 @@ def locate_a2(source):
     return roots.pop()
 
 
-def check_inputs(source, with_live=False, replay_only_cores=()):
+def check_inputs(source, with_live=False, replay_only_cores=(), h_evaluation=None):
     audit = load_audit()
     problems = []
 
@@ -73,6 +78,10 @@ def check_inputs(source, with_live=False, replay_only_cores=()):
             _, compare, records = checked
             check("Checkpoint chạy trực tiếp",
                   lambda: live_c2_sources(source, compare, audit["c2_winners"](records), audit, replay_only_cores))
+    if h_evaluation is not None:
+        evaluator = load_evaluator()
+        check("H Compare", lambda: require_h_compare(source, audit, evaluator))
+        check("Evaluation H", lambda: h_report_files(h_evaluation, audit, evaluator))
     if problems:
         print("Đầu vào D3 cần bổ sung hoặc chỉnh:\n" + "\n".join(f"- {line}" for line in problems))
     else:
@@ -126,9 +135,41 @@ def add_model(output, name, stage, title, forecasts, context, **metadata):
     return dict(run=name, stage=stage, name=title, leads=sorted(leads), **metadata)
 
 
-def prepare(source, output, with_live=False, replay_only_cores=()):
+def require_h_compare(source, audit, evaluator):
+    summary = audit["unique_file"](source, "h_summary.json")
+    root = summary.parent
+    contracts = list(root.glob("contracts/SF_*_H*_test_S0_lead*.npz"))
+    expected = len(evaluator["H_CONFIGS"]) * len(evaluator["H_MODES"]) * len(evaluator["C2_SEEDS"]) * len(evaluator["H_LEADS"])
+    if not (root/"manifest.csv").is_file() or len(contracts) != expected:
+        raise ValueError(f"Cần Output H Compare với manifest.csv và đủ {expected} NPZ. Tìm thấy {len(contracts)} NPZ.")
+    return root
+
+
+def h_report_files(root, audit, evaluator):
+    summary = audit["read_json"](root/"Evaluation_H_summary.json")
+    if (summary.get("complete") is not True
+            or [row["lead"] for row in summary.get("coverage", [])] != list(evaluator["H_LEADS"])):
+        raise ValueError("Evaluation H chưa chấm đủ các hạn.")
+    paths = {f"H_{label}_lead{lead}.csv": root/f"Evaluation_H_{label}_lead{lead}.csv"
+             for lead in evaluator["H_LEADS"] for label in H_REPORT_TABLES}
+    for path in paths.values():
+        if not path.is_file() or path.stat().st_size == 0:
+            raise FileNotFoundError(path)
+    checked = pd.read_csv(root/"Evaluation_H_input_check.csv")
+    if (not set(H_AUDIT_COLUMNS) <= set(checked) or checked["file"].duplicated().any()
+            or not checked["passed"].eq(True).all()
+            or checked["run"].notna().sum() != summary.get("contracts")):
+        raise ValueError("Bảng kiểm nguồn Evaluation H thiếu tệp hoặc có tệp chưa đạt.")
+    return paths, checked[H_AUDIT_COLUMNS].sort_values("file", ignore_index=True)
+
+
+def prepare(source, output, with_live=False, replay_only_cores=(), h_evaluation=None):
     evaluator = load_evaluator()
     audit = load_audit()
+    h_source, h_tables, h_checked = source, {}, None
+    if h_evaluation is not None:
+        h_source = require_h_compare(source, audit, evaluator)
+        h_tables, h_checked = h_report_files(h_evaluation, audit, evaluator)
     context, compare, records = audit["compare_inputs"](source)
     raw = audit["locate_raw"](source)
     output.mkdir(parents=True, exist_ok=True)
@@ -160,7 +201,7 @@ def prepare(source, output, with_live=False, replay_only_cores=()):
     for filename in ("C2_config_table.csv", "C2_cost_table.csv"):
         shutil.copy2(compare_files[f"Tables/{filename}"], output/filename)
 
-    append_extensions(source, output, context, models, evaluator, audit)
+    append_extensions(source, output, context, models, evaluator, audit, h_source=h_source, h_checked=h_checked)
     if with_live:
         package_live_c2(source, output, compare, winners, models, audit, replay_only_cores)
 
@@ -174,11 +215,15 @@ def prepare(source, output, with_live=False, replay_only_cores=()):
         path = audit["unique_file"](source, pattern, required=False)
         if path is not None:
             shutil.copy2(path, output/f"{label}.csv")
-    for lead in range(1, 8):
-        for label in ("summary", "metrics", "events", "levels", "event_cases"):
-            path = audit["unique_file"](source, f"Evaluation_H_{label}_lead{lead}.csv", required=False)
-            if path is not None:
-                shutil.copy2(path, output/f"H_{label}_lead{lead}.csv")
+    if not h_tables:
+        for lead in evaluator["H_LEADS"]:
+            for label in H_REPORT_TABLES:
+                name = f"H_{label}_lead{lead}.csv"
+                path = audit["unique_file"](source, f"Evaluation_{name}", required=False)
+                if path is not None:
+                    h_tables[name] = path
+    for name, path in h_tables.items():
+        shutil.copy2(path, output/name)
     selected = next(m["run"] for m in models if m["run"] == audit["C2_DEFAULT"])
     audit["write_json"](summary_file, dict(schema=1, test_start=str(context["dates"][0].date()),
                                         dates=context["dates"].strftime("%Y-%m-%d").tolist(), ids=ids, areas=areas,
@@ -190,7 +235,7 @@ def prepare(source, output, with_live=False, replay_only_cores=()):
     print(f"Gói demo: {output} – {len(ids)} lưu vực, {len(models)} đường dự báo theo cấu hình.")
 
 
-def append_extensions(source, output, context, models, evaluator, audit):
+def append_extensions(source, output, context, models, evaluator, audit, *, h_source=None, h_checked=None):
     d_root = audit["unique_file"](source, "d_summary.json", required=False)
     if d_root is not None:
         files, _ = audit["verified_manifest"](d_root.parent)
@@ -212,28 +257,109 @@ def append_extensions(source, output, context, models, evaluator, audit):
                 raise ValueError(f"Hợp đồng D sai danh tính: {run}")
             models.append(add_model(output, run, "D", f"{r.configuration} / 730 bước", [(1, f)], context,
                                     configuration=r.configuration, seed=int(r.seed), validation_nse=r.validation_NSE))
-    if any(source.rglob("SF_*_H*_test_S0_lead*.npz")):
-        forecasts, _ = evaluator["read_h_contracts"](source, context)
+    h_source = source if h_source is None else h_source
+    if any(h_source.rglob("SF_*_H*_test_S0_lead*.npz")):
+        forecasts, checked = evaluator["read_h_contracts"](h_source, context)
+        if h_checked is not None:
+            source_audit = checked[H_AUDIT_COLUMNS].sort_values("file", ignore_index=True)
+            if not source_audit.equals(h_checked):
+                raise ValueError("Tệp H Compare trên máy khác bộ đầu vào đã chấm trong Evaluation H.")
         by_run = {}
         for forecast in forecasts:
             by_run.setdefault(forecast.name, []).append(forecast)
-        winners = h_winners(source, by_run, audit)
+        winners = h_winners(source, by_run, audit, evaluator, checked)
         for (configuration, mode), record in winners.items():
             run = record["run"]
             series = sorted(((f.lead, f) for f in by_run[run]), key=lambda pair: pair[0])
-            models.append(add_model(output, run, "H", f"{configuration} / {mode}", series, context,
-                                    seed=record["seed"], validation_nse_lead_mean=record["score"]))
+            core = configuration.split("_", 1)[0]
+            label = f"{'LSTM' if core == 'lstm' else 'Mamba'} · {H_MODE_LABELS[mode]}"
+            models.append(add_model(output, run, "H", label, series, context, core=core,
+                                    configuration=configuration, mode=mode, seed=record["seed"],
+                                    validation_nse_lead_mean=record["score"], **record.get("checkpoint", {})))
+        persistence = next((model for model in models if model["run"] == "Persistence_qmax"), None)
+        if persistence is not None:
+            reference_run = next(iter(by_run.values()))
+            references = [
+                (f.lead, evaluator["Forecast"](name=persistence["run"], sim=f.persistence, raw=f.persistence,
+                                              dates=f.dates, ids=f.ids, area=f.area, obs=f.obs,
+                                              persistence=f.persistence))
+                for f in reference_run if f.lead > 1
+            ]
+            added = add_model(output, persistence["run"], persistence["stage"], persistence["name"], references, context)
+            persistence["leads"] = sorted(persistence["leads"] + added["leads"])
 
 
-def h_winners(source, all_runs, audit):
-    # Ưu tiên bảng 18 run do H Compare xuất. Giữ được cách đọc Output train cũ khi chưa có bảng.
+def h_winners_from_compare(files, all_runs, evaluator):
+    handoff = pd.read_csv(files["Tables/H_handoff.csv"])
+    selection = pd.read_csv(files["Tables/H_demo_runs.csv"])
+    key_cols = ["lõi", "cách", "hạt giống"]
+    checkpoint_hashes = {"sha256 best_model.pt": "checkpoint_sha256",
+                         "sha256 config.yml": "config_sha256",
+                         "sha256 train_data_scaler.yml": "scaler_sha256"}
+    handoff_columns = {*key_cols, *checkpoint_hashes, "notebook", "thư mục run", "epoch chọn",
+                       "library_commit", "forecast_input_mode", "số tham số", "demo", "NPZ"}
+    selection_columns = {*key_cols, "epoch chọn", "NSE_lead_mean val", "notebook"}
+    runs = {}
+    for run in all_runs:
+        match = evaluator["H_NAME"].fullmatch(f"{run}_test_S0_lead1.npz")
+        key = (match["config"].split("_", 1)[0], match["mode"], int(match["seed"]))
+        runs[key] = (run, match["config"])
+    if (not handoff_columns <= set(handoff) or not selection_columns <= set(selection)
+            or handoff.duplicated(key_cols).any()
+            or set(handoff[key_cols].itertuples(index=False, name=None)) != set(runs)
+            or not handoff["demo"].isin([True, False]).all()
+            or selection.duplicated(key_cols[:2]).any()
+            or set(selection[key_cols[:2]].itertuples(index=False, name=None)) != {key[:2] for key in runs}
+            or set(selection[key_cols].itertuples(index=False, name=None))
+            != set(handoff.loc[handoff["demo"].eq(True), key_cols].itertuples(index=False, name=None))):
+        raise ValueError("Hai bảng H Compare thiếu run hoặc không cùng danh sách chọn demo.")
+
+    rows = {}
+    for row in handoff.to_dict("records"):
+        key = tuple(row[col] for col in key_cols)
+        run = runs[key][0]
+        if (row["NPZ"] != f"contracts/{run}_test_S0_lead{{1..{evaluator['H_LEADS'][-1]}}}.npz"
+                or any(not evaluator["digest_string"](row[field]) for field in checkpoint_hashes)):
+            raise ValueError(f"Bàn giao H sai đường dẫn NPZ hoặc mã băm: {run}.")
+        metadata = dict(config_sha256=row["sha256 config.yml"], library_commit=row["library_commit"],
+                        selected_epoch=row["epoch chọn"], forecast_input_mode=row["forecast_input_mode"],
+                        n_params=row["số tham số"], training_notebook=row["notebook"])
+        if any(f.metadata.get(field) != value for f in all_runs[run] for field, value in metadata.items()):
+            raise ValueError(f"Bàn giao H khác metadata NPZ: {run}.")
+        rows[key] = (row, metadata)
+
+    winners = {}
+    for selected in selection.to_dict("records"):
+        key = tuple(selected[col] for col in key_cols)
+        run, configuration = runs[key]
+        row, metadata = rows[key]
+        score = float(selected["NSE_lead_mean val"])
+        if (not np.isfinite(score) or selected["epoch chọn"] != row["epoch chọn"]
+                or selected["notebook"] != row["notebook"]):
+            raise ValueError(f"Bảng chọn H không khớp checkpoint bàn giao: {run}.")
+        checkpoint = dict(metadata, run_directory=row["thư mục run"],
+                          **{dest: row[field] for field, dest in checkpoint_hashes.items()
+                             if dest != "config_sha256"})
+        winners[(configuration, key[1])] = dict(run=run, seed=int(key[2]), score=score, checkpoint=checkpoint)
+    return winners
+
+
+def h_winners(source, all_runs, audit, evaluator, checked):
+    files = dict(zip(checked["file"], map(Path, checked["path"])))
+    handoff_names = {"Tables/H_handoff.csv", "Tables/H_demo_runs.csv"}
+    if handoff_names & files.keys():
+        if not handoff_names <= files.keys():
+            raise ValueError("Manifest H Compare phải có cả Tables/H_handoff.csv và Tables/H_demo_runs.csv.")
+        return h_winners_from_compare(files, all_runs, evaluator)
+
+    # Giữ tương thích với nguồn chọn seed trước khi H Compare có hai bảng bàn giao.
     selection = audit["unique_file"](source, "H_demo_selection.csv", required=False)
     candidates = {}
     if selection is not None:
         files, _ = audit["verified_manifest"](selection.parent)
         table = pd.read_csv(files[selection.name])
         if table["run"].duplicated().any() or set(table["run"]) != set(all_runs):
-            raise ValueError("Bảng chọn H phải có đủ 18 run.")
+            raise ValueError(f"Bảng chọn H phải có đủ {len(all_runs)} run.")
         for r in table.itertuples(index=False):
             f = all_runs[r.run][0]
             name = f"SF_{r.configuration}_H{r.mode}_seed{r.seed}"
@@ -245,7 +371,7 @@ def h_winners(source, all_runs, audit):
     else:
         candidates = h_candidates_from_training(source, all_runs, audit)
     if set(candidates) != set(all_runs):
-        raise ValueError("Cần H_demo_selection.csv hoặc Output huấn luyện hoàn thành của 18 run.")
+        raise ValueError(f"Cần bảng bàn giao H Compare hoặc Output huấn luyện đủ {len(all_runs)} run.")
     winners = {}
     for candidate in sorted(candidates.values(), key=lambda row: (-row["score"], row["seed"])):
         winners.setdefault(candidate["key"], candidate)
@@ -320,12 +446,14 @@ if __name__ == "__main__":
     parser.add_argument("--inputs", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--check-inputs", action="store_true", help="Liệt kê nguồn còn thiếu trước khi đóng gói.")
+    parser.add_argument("--h-evaluation", type=Path,
+                        help="Thư mục H/ của Evaluation, yêu cầu kèm H Compare trong --inputs.")
     parser.add_argument("--with-live", action="store_true")
     parser.add_argument("--replay-only", choices=("lstm", "gru", "transformer", "s4d", "mamba"),
                         action="append", default=[], help="Lõi đã chọn chỉ phát lại sau khi xem thời gian D2.")
     args = parser.parse_args()
     if args.check_inputs:
-        sys.exit(0 if check_inputs(args.inputs, args.with_live, args.replay_only) else 2)
+        sys.exit(0 if check_inputs(args.inputs, args.with_live, args.replay_only, args.h_evaluation) else 2)
     if args.output is None:
         parser.error("Cần --output khi đóng gói.")
-    prepare(args.inputs, args.output, args.with_live, args.replay_only)
+    prepare(args.inputs, args.output, args.with_live, args.replay_only, args.h_evaluation)

@@ -1,0 +1,148 @@
+{
+  "complete": true,
+  "protocol_version": 3,
+  "event_tolerance": "plus_minus_floor_actual_lead_divided_by_3_calendar_days",
+  "event_tolerance_days": 0,
+  "event_tolerance_days_by_lead": {
+    "1": 0
+  },
+  "supplementary_event_tolerance_days": 1,
+  "fixture_checks": 205,
+  "A3_reference_matched": true,
+  "A4_contracts_matched": true,
+  "A4_runs": [
+    "SeqLSTM_Q_A4_seed111",
+    "SeqLSTM_Q_A4_seed222",
+    "SeqLSTM_Q_A4_seed333"
+  ],
+  "B3_contracts_matched": true,
+  "B3_runs": [
+    "SeqLSTM_Q_B3_P10S12_seed111",
+    "SeqLSTM_Q_B3_P10S12_seed222",
+    "SeqLSTM_Q_B3_P10S12_seed333",
+    "SeqLSTM_Q_B3_P05S05_seed111",
+    "SeqLSTM_Q_B3_P05S05_seed222",
+    "SeqLSTM_Q_B3_P05S05_seed333"
+  ],
+  "B3_runs_by_mask": {
+    "P10S12": [
+      "SeqLSTM_Q_B3_P10S12_seed111",
+      "SeqLSTM_Q_B3_P10S12_seed222",
+      "SeqLSTM_Q_B3_P10S12_seed333"
+    ],
+    "P05S05": [
+      "SeqLSTM_Q_B3_P05S05_seed111",
+      "SeqLSTM_Q_B3_P05S05_seed222",
+      "SeqLSTM_Q_B3_P05S05_seed333"
+    ]
+  },
+  "B3_compare_version_expected": 1,
+  "B2_contracts_matched": true,
+  "B2_runs": [
+    "SeqLSTM_Q_B2_seed111",
+    "SeqLSTM_Q_B2_seed222",
+    "SeqLSTM_Q_B2_seed333"
+  ],
+  "B2_compare_version_expected": 1,
+  "B1_contracts_matched": true,
+  "B1a_runs": [
+    "SeqLSTM_Q_B1a_seed111",
+    "SeqLSTM_Q_B1a_seed222",
+    "SeqLSTM_Q_B1a_seed333"
+  ],
+  "B1b_runs": [
+    "SeqLSTM_Q_B1b_seed111",
+    "SeqLSTM_Q_B1b_seed222",
+    "SeqLSTM_Q_B1b_seed333"
+  ],
+  "B1_compare_version_expected": 1,
+  "B0_contracts_matched": true,
+  "B0_runs": [
+    "SeqLSTM_Q_B0_seed111",
+    "SeqLSTM_Q_B0_seed222",
+    "SeqLSTM_Q_B0_seed333"
+  ],
+  "B0_compare_version_expected": 1,
+  "B0_bstar_threshold_val_nse_sd": 0.007932303438926078,
+  "A4_compare_version_expected": 2,
+  "C2_compare_version_expected": 1,
+  "C2_runs": [
+    "SF_lstm_L2_x1_lr1e-3_C2_seed111",
+    "SF_lstm_L2_x1_lr1e-3_C2_seed222",
+    "SF_lstm_L2_x1_lr1e-3_C2_seed333",
+    "SF_gru_L2_x1_lr1e-3_C2_seed111",
+    "SF_gru_L2_x1_lr1e-3_C2_seed222",
+    "SF_gru_L2_x1_lr1e-3_C2_seed333",
+    "SF_transformer_L2_x1_lr1e-3_C2_seed111",
+    "SF_transformer_L2_x1_lr1e-3_C2_seed222",
+    "SF_transformer_L2_x1_lr1e-3_C2_seed333",
+    "SF_transformer_L2_x3_lr5e-4_C2_seed111",
+    "SF_transformer_L2_x3_lr5e-4_C2_seed222",
+    "SF_transformer_L2_x3_lr5e-4_C2_seed333",
+    "SF_s4d_L4_x1_lr1e-3_C2_seed111",
+    "SF_s4d_L4_x1_lr1e-3_C2_seed222",
+    "SF_s4d_L4_x1_lr1e-3_C2_seed333",
+    "SF_s4d_L4_x3_lr1e-3_C2_seed111",
+    "SF_s4d_L4_x3_lr1e-3_C2_seed222",
+    "SF_s4d_L4_x3_lr1e-3_C2_seed333",
+    "SF_mamba_L2_x1_lr1e-3_C2_seed111",
+    "SF_mamba_L2_x1_lr1e-3_C2_seed222",
+    "SF_mamba_L2_x1_lr1e-3_C2_seed333",
+    "SF_mamba_L4_x3_lr1e-3_C2_seed111",
+    "SF_mamba_L4_x3_lr1e-3_C2_seed222",
+    "SF_mamba_L4_x3_lr1e-3_C2_seed333"
+  ],
+  "C2_contracts_matched": true,
+  "C2_new_scenario_contracts": 144,
+  "C2_scenarios_version_expected": 1,
+  "C2_scenarios_manifest_sha256": "f32120566c4109cfb6d4e86ad27fad6c984717df6c805dc0374c6c8d24930291",
+  "H_evaluated": true,
+  "H_contracts": 168,
+  "H_modes": [
+    "past",
+    "hybrid",
+    "gefs",
+    "perfect"
+  ],
+  "coverage": [
+    {
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "runs": 56,
+      "common_day_IDs": 652628,
+      "IDs_with_days": 450
+    }
+  ],
+  "scenarios": [
+    "S0"
+  ],
+  "leads": [
+    1
+  ],
+  "C2_scenarios": [
+    "S0",
+    "S1_Q1",
+    "S1_Q3",
+    "S1_Q7",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "H_leads": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "operational_scenarios_run": true,
+  "multi_lead_run": true,
+  "python": "3.13.15",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3",
+  "scipy": "1.16.3",
+  "output": "/kaggle/working/evaluation_output"
+}
