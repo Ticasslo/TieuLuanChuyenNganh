@@ -1,6 +1,6 @@
 # D3 • Demo phát lại Extended LamaH-CE
 
-**Demo D3 phát lại được C2 và H trên laptop.** Gói `downloads/D3_H_V12` kết hợp H Compare Version 1 với các bảng chấm H của Evaluation Version 12. Trang Dự báo, So sánh mô hình và Cảnh báo lũ đã kiểm với dữ liệu thật. Phần chạy trực tiếp hiện dùng năm lõi C2. Trang Giải thích và phần phát lại D chuỗi 730 bước chờ dữ liệu bàn giao tương ứng.
+**Demo D3 đã kiểm phát lại và suy luận CPU trên laptop.** Gói `downloads/D3_H_CPU_V12` kết hợp H Compare Version 1 với các bảng chấm H của Evaluation Version 12. Phần “Nếu… thì…” hỗ trợ năm lõi C2 và hai checkpoint H cách lai. Trang Giải thích và phần phát lại D chuỗi 730 bước chờ dữ liệu bàn giao tương ứng.
 
 Trang Dự báo có bản đồ vùng nghiên cứu, 451 trạm, lịch test, các đường qmax và ngưỡng lũ theo m³/s. C2 giữ tám cấu hình thuộc năm lõi, mỗi cấu hình dùng một seed theo NSE validation. GRU seed 111 bật sẵn. Chức năng “nếu… thì…” dùng một cấu hình đại diện mỗi lõi C2, lấy cấu hình và seed có NSE validation cao nhất của lõi trong số đã kiểm CPU.
 
@@ -18,9 +18,10 @@ Giải nén các Output vào các thư mục con riêng trong `downloads/` cạn
 | C2 | `13_C2_LamaHCEExt_Compare` Version 1, gồm đủ 24 NPZ và manifest |
 | Bản đồ NSE, cảnh báo lũ | Evaluation Version 10. Bản đồ và trang lũ dùng dữ liệu S0 từ bốn bảng `Evaluation_metrics.csv`, `Evaluation_events.csv`, `Evaluation_levels.csv` và `Evaluation_event_cases.csv` |
 | Bảng S0–S4 của trang So sánh | `C2_scenarios_stats.csv` từ Output `04_C2_LamaHCEExt_Scenarios` Version 1 |
-| D | Output D Compare sau khi có các run 730 bước |
+| D | Output `17_D_LamaHCEExt_Compare` sau khi có các run 730 bước; truyền thêm thư mục `D/` của Evaluation vào `--d-evaluation` (hoặc đặt cùng `--inputs`) để nối bảng mức lưu lượng và sự kiện lũ USWRC của D vào trang Cảnh báo lũ |
 | H | Giải nén toàn bộ Output `15_H_LamaHCEExt_Compare` Version 1 vào `downloads/H_Compare_V1/`. Giữ nguyên thư mục `h_compare/`, gồm 168 NPZ, manifest và hai bảng bàn giao. Truyền thư mục `H/` của Evaluation Version 12 vào `--h-evaluation` để ghép đúng các bảng điểm và sự kiện. |
-| CPU “nếu… thì…” | Output `02_D2_LamaHCEExt_CPU` Version 1 đã kiểm và Output train Version 1 của năm cấu hình được chọn |
+| CPU “nếu… thì…” C2 | Output `02_D2_LamaHCEExt_CPU` Version 1 đã kiểm và Output train Version 1 của năm cấu hình được chọn |
+| CPU “nếu… thì…” H | Hai Output H Train Version 1 của LSTM lai seed 333 và Mamba lai seed 222. Giữ `h_output/` và ba tệp checkpoint, config, scaler của thư mục run tương ứng |
 
 | Lõi | Output train Version 1 cho chạy trực tiếp |
 |---|---|
@@ -80,7 +81,48 @@ Cả 34 tệp dữ liệu và checkpoint C2 giữ nguyên SHA-256 so với gói 
 
 Dựng lại demo từ bản sao sạch của nhánh `main` với mã bàn giao. Cả 132 tệp trong gói dựng lại khớp SHA-256 với gói đã kiểm trên laptop. Kiểm lại API dự báo, chênh NSE và cảnh báo lũ ở hạn 7 đều đạt.
 
-Để kiểm chạy trực tiếp H cách lai, dùng Output Version 1 của `14_H_Train_lstm_L2_x1_lr1e-3_hybrid_Seed333` và `14_H_Train_mamba_L2_x1_lr1e-3_hybrid_Seed222`. Mỗi run cần `config.yml`, `best_model.pt` và `train_data/train_data_scaler.yml` trong thư mục ghi ở `H_handoff.csv`. Đối chiếu SHA-256 và đầu ra CPU cả bảy hạn với NPZ trước khi bật tính năng.
+### Chạy trực tiếp H cách lai
+
+Dùng Output Version 1 của `14_H_Train_lstm_L2_x1_lr1e-3_hybrid_Seed333` và `14_H_Train_mamba_L2_x1_lr1e-3_hybrid_Seed222`. Giải nén từng Output vào một thư mục riêng dưới `downloads/H_Train_V1/`. Mỗi Output cần `h_output/environment.json`, `h_output/manifest.csv` và ba tệp `config.yml`, `best_model.pt`, `train_data/train_data_scaler.yml` trong thư mục run ghi ở [H_handoff.csv](../../05_Training/15_H_LamaHCEExt_Compare/Tables/H_handoff.csv). Khâu đóng gói đối chiếu môi trường, epoch chọn và SHA-256 với H Compare trước khi nạp mô hình.
+
+Hai checkpoint H dùng NeuralHydrology `freeze-H` tại `6f68f471bec255f67d446acd6c6556358ff9bfea`, PyTorch CPU 2.11.0 và mambapy 1.2.0. Tiến trình H chạy riêng theo đường dẫn `--h-python`. Ứng dụng và các mô hình C2 dùng môi trường `freeze-C` đã kiểm. Từ thư mục D3, chuẩn bị Python cho H và dựng gói mới bằng các lệnh sau. Để mở lại [demo tại cổng 8053](http://127.0.0.1:8053/) với gói `D3_H_CPU_V12` đã có, khai báo hai đường dẫn Python rồi chạy lệnh `app.py` ở dòng cuối.
+
+```powershell
+$env:PYTHONUTF8 = "1"
+$demo_python = ".\.venv\Scripts\python.exe"
+$h_python = ".\downloads\.venv-h\Scripts\python.exe"
+$evaluationH = "..\..\06_Evaluation\01_Evaluation_LamaHCEExt\downloads\Evaluation_V12\evaluation_output\H"
+& $demo_python -m venv .\downloads\.venv-h
+& $h_python -m pip install -r requirements.txt
+& $h_python -m pip install "torch==2.11.0+cpu" --index-url https://download.pytorch.org/whl/cpu
+& $h_python -m pip install "mambapy==1.2.0" "git+https://github.com/Ticasslo/neuralhydrology.git@6f68f471bec255f67d446acd6c6556358ff9bfea"
+& $h_python -m pip check
+& $demo_python prepare.py --inputs .\downloads --with-live --h-evaluation $evaluationH --h-python $h_python --output .\downloads\D3_H_CPU_V12
+& $demo_python app.py --bundle .\downloads\D3_H_CPU_V12 --raw .\downloads\lamah-ce-ext\lamah_ce_ext\LamaH_extended --h-python $h_python --port 8053
+```
+
+Trong **Dự báo → Nếu… thì…**, chọn LSTM hoặc Mamba có nhãn **ECMWF HRES ngày đầu**. Ngày phát hành nằm trong khoảng 07/01/2014–19/12/2017 để cả bảy ngày đích nằm trên lịch H đã đối chiếu. Hệ số mưa và mức cộng nhiệt áp dụng tại ngày phát hành. Sáu ngày khí tượng tiếp theo giữ giá trị thiếu theo giao thức H cách lai. Mỗi lần gọi API đối chiếu dự báo gốc với chuỗi phát lại ở cả bảy hạn trước khi trả bảng gốc và bảng sau thay đổi.
+
+**Kiểm thử trên laptop ngày 17/11/2026.** Ở mỗi mô hình, kiểm 24 cửa sổ từ bốn lưu vực và sáu ngày phát hành, gồm ngày nhuận và hai biên. Cả 336 giá trị theo hạn khớp NPZ trước và sau chặn âm trong dung sai `2 × 10⁻⁵ + 10⁻⁶ × |giá trị NPZ|` mm/ngày. p95 đo trên yêu cầu gốc sau khi nạp lưu vực, qua tiến trình H với tối đa bốn luồng PyTorch. Lần đầu của LSTM gồm khởi tạo tiến trình, PyTorch và mô hình. Lần đầu của Mamba dùng tiến trình đã khởi tạo. [Bảng kiểm CPU](Archive/H_CPU_V12/H_CPU_check.csv).
+
+| Mô hình | Epoch | Sai số tuyệt đối lớn nhất (mm/ngày) | Yêu cầu đầu (ms) | p95 sau nạp (ms) |
+|---|---:|---:|---:|---:|
+| LSTM lai seed 333 | 2 | 2,29 × 10⁻⁵ | 10.206 | 8,6 |
+| Mamba lai seed 222 | 1 | 9,54 × 10⁻⁶ | 484 | 28,5 |
+
+Trên trình duyệt, tại ID 6 ngày phát hành 15/06/2016, nhân mưa 1,5 và cộng nhiệt độ 2 °C cho bảng đủ bảy ngày đích từ 15/06 đến 21/06. Ở hạn 1, LSTM đổi từ 19,8888 sang 21,5528 m³/s, Mamba đổi từ 21,5690 sang 22,6395 m³/s. Kết quả là kịch bản minh họa tại một lưu vực và ngày. Console trong lượt kiểm không ghi lỗi hay cảnh báo.
+
+Qua API, cả hai mô hình đã kiểm thay mưa riêng, thay nhiệt độ riêng, đặt mưa bằng 0 và gửi đồng thời các yêu cầu H. Kiểm lại phần “Nếu… thì…” của cả năm lõi C2 đạt. Trong gói hợp nhất, 131 tệp dữ liệu và checkpoint có sẵn khớp SHA-256 với gói phát lại trước đó.
+
+#### Kiểm mở rộng trên toàn kỳ test
+
+Kiểm API phát lại qua 3.297 yêu cầu bao phủ 451 lưu vực và bảy hạn. Đối chiếu 2.015.928 giá trị trên đường dự báo, 144 truy vấn bản đồ NSE và 360 truy vấn cảnh báo. Tất cả khớp dữ liệu trong gói. Tính lại số ca trúng, bỏ sót và báo nhầm từ 969.816 bản ghi sự kiện rồi đối chiếu 416.724 hàng tổng hợp. Kiểm thêm cùng số hàng mức lưu lượng. Mở đủ năm trang trên trình duyệt ẩn và kiểm lại LSTM ở ca từng lỗi, Mamba tại ngày phát hành cuối kỳ. [Báo cáo API](Archive/H_CPU_V12/D3_replay_API_summary.json) · [Báo cáo đối chiếu bảng cảnh báo](Archive/H_CPU_V12/D3_flood_tables_summary.json).
+
+Trên mẫu ban đầu, 336 giá trị đạt dung sai tuyệt đối `2 × 10⁻⁵` mm/ngày cộng sai số tương đối đã ghi ở trên. Khi quét rộng, một số giá trị LSTM từ CPU khác NPZ chấm trên Kaggle vượt dung sai đó dù lịch và quan trắc khớp. Chạy lại CPU 64 bit trên các ca đại diện không loại bỏ chênh lệch, nên phạm vi này chưa xác định được nguồn chính xác của sai số. Demo dùng dung sai riêng cho H là `5 × 10⁻⁴ + 10⁻⁶ × |giá trị NPZ|` mm/ngày. Cả 20 ca từng vượt dung sai cũ trả đủ bảy hạn. Thử thay sai 1 m³/s trong bản sao tệp phát lại vẫn bị API từ chối. [Báo cáo kiểm lại dung sai](Archive/H_CPU_V12/H_CPU_numeric_guard_regression.json).
+
+Lượt suy luận CPU toàn phần chạy trên 451 lưu vực × 1.449 ngày đích × 7 hạn cho từng checkpoint (tổng 9.148.986 điểm kiểm). LSTM kiểm đủ 4.574.493 giá trị trong 681,58 giây, đúng lịch và không thiếu dự báo, với sai số tuyệt đối lớn nhất 0,00013542 mm/ngày trước và sau chặn âm (11.919 điểm vượt dung sai cũ `2 × 10⁻⁵` mm/ngày của C2). Mamba hoàn tất đủ 451 lưu vực và 4.574.493 giá trị trong 12.453,70 giây (~3,46 giờ), không thiếu mục tiêu hay lệch quan trắc, sai số tuyệt đối lớn nhất 0,00003529 mm/ngày trước và sau chặn âm (3 điểm vượt dung sai cũ tại lưu vực 30 và 318). [Kết quả LSTM toàn kỳ](Archive/H_CPU_V12/H_CPU_LSTM_full_summary.json) · [Tổng hợp toàn kỳ](Archive/H_CPU_V12/H_CPU_full_summary.json).
+
+`H_CPU_release_check.json` ghi nhận `complete=true`, `passed=true`, `coverage_ok=true`, `numeric_ok=true` cho cả 9.148.986 điểm với ngưỡng dung sai tuyệt đối 0,0005 mm/ngày cộng `10⁻⁶ × |giá trị NPZ|`. Nhật ký lỗi trống 0 byte. [Biên bản nghiệm thu H CPU](Archive/H_CPU_V12/H_CPU_release_check.json) (nhật ký chạy ngầm lưu cục bộ tại `downloads/D3_H_CPU_V12/verification/H_CPU_full.log`).
 
 ## Kiểm trước khi bàn giao
 
@@ -89,7 +131,7 @@ Dựng lại demo từ bản sao sạch của nhánh `main` với mã bàn giao.
 - Với năm lõi chạy trực tiếp, thử cùng một lưu vực và ngày có HRES. Máy chủ tự đối chiếu dự báo gốc với chuỗi phát lại trước khi trả kết quả “nếu… thì…”. Đo riêng lần đầu và lần tiếp theo ở laptop.
 - Sau khi kiểm trên dữ liệu thật, bàn giao gói đã tạo trong `downloads/D3_C2_live`, mã `app.py`, thư mục `static/`, `requirements.txt`, mô-đun `DemoRuntime/forecast.py` và đường dẫn dataset cho Thắng. Giữ `DemoRuntime/` ngang cấp với thư mục D3 như trong repo để ứng dụng nạp được bộ dự báo. Thắng dùng gói này để kiểm lại trên VPS ở D4.
 
-Các mục H/D và G hiện số liệu khi gói có nguồn tương ứng. Trang Giải thích nhận CSV `G_IntegratedGradients.csv` dự kiến với `basin_id,origin_date,core,group,day_offset,attribution` và vẽ theo từng lõi. Định dạng này cần đối chiếu với Output bước G khi bàn giao. H cách lai cần checkpoint, đối chiếu với NPZ trên freeze-H và kết quả CPU trước khi tích hợp vào ô chạy trực tiếp. Phiên bản localhost dành cho laptop. Việc triển khai VPS D4 thuộc bước tiếp theo.
+Các mục H/D và G hiện số liệu khi gói có nguồn tương ứng. Trang Giải thích nhận CSV `G_IntegratedGradients.csv` dự kiến với `basin_id,origin_date,core,group,day_offset,attribution` và vẽ theo từng lõi. Định dạng này cần đối chiếu với Output bước G khi bàn giao. Phiên bản localhost dành cho laptop. Việc triển khai VPS D4 thuộc bước tiếp theo.
 
 ## Biên bản kiểm thử D3 trên laptop ngày 16/11/2026
 
@@ -172,14 +214,20 @@ Cả hai lần kiểm xác nhận nút **Chạy thử** trở lại trạng thá
 
 Trước khi bàn giao mốc C2, dựng lại gói từ bản sao sạch của `main` với đúng các tệp mã D3 sẽ đưa lên Git. Catalog trùng nội dung và 34 tệp còn lại trùng SHA-256 với gói đã kiểm. Bản phát lại, bảng so sánh, bảng cảnh báo và API “Nếu… thì…” của cả năm lõi đều qua kiểm tra trên bản dựng này.
 
-**Bản D3 đã qua kiểm thử phát lại C2 và H trên laptop.** Các đầu vào sau cần cho phần chạy trực tiếp H, kết quả D và giải thích mô hình.
+**Bản D3 đã qua kiểm thử phát lại và suy luận C2, H trên laptop.** Các đầu vào sau cần cho phần kết quả D và giải thích mô hình.
 
 | Phần | Đầu vào và việc cần xác nhận |
 |---|---|
-| H chạy trực tiếp | Config, checkpoint và scaler của LSTM lai và Mamba lai đã chọn. Rà môi trường H, tích hợp vào mục “Nếu… thì…” và đối chiếu 7 hạn với NPZ trên CPU. |
-| D chuỗi 730 ngày | Output D Compare gồm `d_summary.json`, `D_score_stats.csv`, `D_cost.csv`, `D_basin_scores.csv`, manifest và các NPZ kỳ test hạn 1. |
-| Giải thích G | `G_IntegratedGradients.csv` hoặc bảng bàn giao tương đương để kiểm đường đọc và biểu đồ theo lưu vực, ngày và lõi. |
+| D chuỗi 730 ngày | Output `17_D_LamaHCEExt_Compare` (`d_summary.json`, `D_score_stats.csv`, `D_ensemble_scores.csv`, `D_cost.csv`, `D_basin_scores.csv`, `D_demo_runs.csv`, `D_handoff.csv`, `manifest.csv` và các NPZ kỳ test hạn 1) cùng thư mục `evaluation_output/D/` (`Evaluation_D_summary.json`, `Evaluation_D_input_check.csv`, `Evaluation_D_{summary,length_pairs,metrics,events,levels,event_cases}.csv`). `prepare.py --d-evaluation <thư_mục_D>` đối chiếu manifest và bảng bàn giao của D Compare với bảng kiểm nguồn Evaluation rồi nối trực tiếp vào trang Dự báo, So sánh và Cảnh báo lũ. |
+| Giải thích G | Tệp `G_IntegratedGradients.csv` từ Thắng với tối thiểu sáu cột `basin_id,origin_date,core,group,day_offset,attribution` (kèm manifest/version nguồn và danh sách ca lũ/khô hạn đại diện theo Pipeline Mục 8.5). `prepare.py` kiểm các cột bắt buộc, giá trị hữu hạn và chuẩn hóa `basin_id` về mã số khớp danh mục trước khi xuất `G.csv`. |
+| Triển khai VPS D4 | Bàn giao cho Thắng gói đã kiểm (`D3_H_CPU_V12` hoặc gói gộp sau khi có D/G), `app.py`, `prepare.py`, `static/`, `requirements.txt`, `DemoRuntime/{audit.py,forecast.py,h_cpu.py}`, phiên bản hai môi trường Python (`freeze-C` và `freeze-H`) và bảng đối chiếu CPU x86_64 để Thắng kiểm lại suy luận CPU trên kiến trúc ARM64 (`linux/aarch64`, Oracle Cloud Ampere A1) trước khi công bố theo Pipeline Mục 9.6. |
 
-Các nguồn này chưa có trong bộ đầu vào laptop đã rà. D4 là bước triển khai VPS sau bàn giao D3.
+### Hoàn thiện giao diện công khai và cấu hình WSGI cho D4 (cập nhật 18/11/2026)
+
+- **Thang màu bản đồ trang So sánh (`static/demo.js`):** Khóa dải màu hiển thị `[-1; 1]` quanh `0` cho NSE tuyệt đối và đối xứng `±P95(|ΔNSE|)` (giới hạn trong `[0,05; 1,0]`) cho hiệu NSE, tránh trường hợp một vài trạm phương sai nhỏ có NSE âm sâu (như ID 758 ≈ −13,22) kéo giãn toàn bộ thang màu làm nhạt 448 trạm còn lại. Hộp thoại rê chuột (`hover`) vẫn giữ nguyên giá trị thực chưa cắt.
+- **Tuân thủ giấy phép và miễn trừ trên trang Giới thiệu (`static/index.html`):** Ghi đầy đủ ba nguồn LamaH-CE (CC BY 4.0), Extended LamaH-CE (CC BY-NC 4.0, DOI `10.5281/zenodo.17119635`) và BiasCast (bài báo HESS 2026, trọng số `10.5281/zenodo.17292895`, mã nguồn), nêu rõ giao diện chỉ phát lại kỳ kiểm tra 2014–2017 để minh họa nghiên cứu, không phải dự báo thời gian thực hay cảnh báo lũ chính thức (ghi nhận nguồn lưu lượng CHMI tại Cộng hòa Séc theo Pipeline Mục 1.6, 9.5) và phục vụ phi thương mại, không thu phí, không quảng cáo.
+- **Điểm vào WSGI, kiểm sức khỏe và luồng CPU cho VPS ARM64 (`app.py`, `DemoRuntime/h_cpu.py`):** Bổ sung hàm `from_env()` đọc `DEMO_BUNDLE`, `DEMO_RAW`, `DEMO_H_PYTHON`, biến `DEMO_THREADS` giới hạn số luồng PyTorch, tham số `--host` (mặc định `127.0.0.1` trên laptop) và đường dẫn `GET /api/health`. Trên máy chủ ARM64 ít nhân vật lý (Oracle Ampere A1 Always Free, 2 OCPU / 12 GB RAM, không siêu phân luồng), cài wheel `torch==2.11.0` CPU `linux_aarch64` từ `https://download.pytorch.org/whl/cpu` và `mambapy==1.2.0`, đặt `OMP_NUM_THREADS=2`, `OPENBLAS_NUM_THREADS=2`, `OMP_WAIT_POLICY=PASSIVE`, `DEMO_THREADS=2`, chạy **1 tiến trình worker nhiều luồng** (`gunicorn --workers 1 --threads 4 --timeout 120 -b 0.0.0.0:8050 "app:from_env()"`) để chia sẻ bộ nhớ đệm `DemoForecaster` (`RLock`) và duy nhất một tiến trình con `HWorker` (`Lock`), giữ tổng RSS dưới 1,5 GB và tránh tranh chấp luồng OpenMP.
+
+Các nguồn D và G chưa có trong bộ đầu vào laptop đã rà. D4 là bước triển khai VPS sau bàn giao D3.
 
 Nguồn [Pipeline Mục 9.6](../../../Document/01_Plan/02_Pipeline.md#96-đưa-mô-hình-vào-demo), [wheel PyTorch CPU](https://download.pytorch.org/whl/cpu/torch/), [Flask](https://flask.palletsprojects.com/en/stable/quickstart/) và [Plotly.js](https://plotly.com/javascript/plotlyjs-function-reference/).

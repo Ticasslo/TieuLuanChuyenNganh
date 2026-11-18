@@ -1,0 +1,38 @@
+{
+  "complete": true,
+  "passed": false,
+  "threads": 4,
+  "batch": 128,
+  "atol_mm_day": 2e-05,
+  "rtol": 1e-06,
+  "results": [
+    {
+      "run": "SF_lstm_L2_x1_lr1e-3_Hhybrid_seed333",
+      "basins": 451,
+      "seconds": 681.5797914000323,
+      "targets": 4574493,
+      "finite_predictions": 4574493,
+      "missing_targets": 0,
+      "raw_failed": 11919,
+      "clipped_failed": 11919,
+      "obs_failed": 0,
+      "max_raw_mm_day": 0.0001354217529296875,
+      "max_clip_mm_day": 0.0001354217529296875,
+      "max_obs_mm_day": 1.1280656664780508e-05
+    },
+    {
+      "run": "SF_mamba_L2_x1_lr1e-3_Hhybrid_seed222",
+      "basins": 451,
+      "seconds": 12453.704635699945,
+      "targets": 4574493,
+      "finite_predictions": 4574493,
+      "missing_targets": 0,
+      "raw_failed": 3,
+      "clipped_failed": 3,
+      "obs_failed": 0,
+      "max_raw_mm_day": 3.528594970703125e-05,
+      "max_clip_mm_day": 3.528594970703125e-05,
+      "max_obs_mm_day": 1.1280656664780508e-05
+    }
+  ]
+}

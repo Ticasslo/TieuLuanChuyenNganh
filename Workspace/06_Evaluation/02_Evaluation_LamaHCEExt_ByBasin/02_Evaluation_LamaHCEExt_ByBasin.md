@@ -1,12 +1,14 @@
 # Quan hệ giữa đặc điểm lưu vực và kết quả dự báo — Extended LamaH-CE
 
-Tài liệu đi cùng [mã Python](02_Evaluation_LamaHCEExt_ByBasin.py) và [notebook Kaggle](02_Evaluation_LamaHCEExt_ByBasin.ipynb), mở rộng phân tích theo lưu vực ở [pipeline Mục 6.4](../../../Document/01_Plan/02_Pipeline.md#64-theo-lưu-vực). Phân tích sử dụng các dự báo A2, DLinear, LSTM A4 và persistence đã lưu để trả lời: **mức cải thiện dự báo thay đổi thế nào theo diện tích, độ cao, tỷ phần tuyết, độ khô hạn và mức đầy đủ dữ liệu; các liên hệ có ổn định qua ba seed LSTM hay không?**
+Tài liệu đi cùng [mã Python](02_Evaluation_LamaHCEExt_ByBasin.py) và [notebook Kaggle](02_Evaluation_LamaHCEExt_ByBasin.ipynb), mở rộng phân tích theo lưu vực ở [pipeline Mục 6.4](../../../Document/01_Plan/02_Pipeline.md#64-theo-lưu-vực). Mã chuẩn bị nhận các dự báo A2, DLinear, LSTM A4, B0–B3, năm lõi C2 (và phân vùng D 730 bước nếu có) cùng persistence đã lưu để trả lời: **mức cải thiện dự báo thay đổi thế nào theo diện tích, độ cao, tỷ phần tuyết, độ khô hạn và mức đầy đủ dữ liệu; các liên hệ có ổn định qua ba seed LSTM hay không?**
 
-Bản chính thức là **Version 2** của notebook Kaggle `02_Evaluation_LamaHCEExt_ByBasin` (Save & Run All trên CPU, có output), chạy trên Output [bộ đánh giá](../01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md) Version 4 với **14 run, 18 phép so**, giữ 451 ID và giao chung 652.628 ngày–lưu vực; 41 kiểm thử đạt. **Ba seed LSTM A4 giữ liên hệ âm của ΔNSE với độ cao và tuyết, dương với độ khô hạn**, đồng thời cho thấy biến thiên đáng kể ở một số lưu vực.
+Kết quả thực nghiệm đã lưu hiện là **Version 2** của notebook Kaggle `02_Evaluation_LamaHCEExt_ByBasin` (Save & Run All trên CPU, có output), chạy trên Output [bộ đánh giá](../01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md) Version 4 với **14 run, 18 phép so**, giữ 451 ID và giao chung 652.628 ngày–lưu vực; 41 kiểm thử đạt. **Ba seed LSTM A4 giữ liên hệ âm của ΔNSE với độ cao và tuyết, dương với độ khô hạn**, đồng thời cho thấy biến thiên đáng kể ở một số lưu vực.
 
 Trên 450 lưu vực có ngày chấm, **mức cải thiện NSE của SeqLSTM_Q so persistence có liên hệ âm với độ cao trung bình (ρ = −0,422) và tỷ phần tuyết (ρ = −0,263), liên hệ dương với chỉ số khô hạn (ρ = 0,211)**. Diện tích có liên hệ yếu trong phép so này (ρ = −0,075), nhưng liên hệ dương rõ hơn với chênh lệch SeqLSTM có Q so không Q (ρ = 0,274). Kết luận phụ thuộc vào mô hình, mốc tham chiếu và chỉ số đang xét. [Kết quả thực nghiệm](#11-kết-quả-thực-nghiệm-và-kiểm-chứng) trình bày hệ số, phân nhóm, số trận và độ nhạy.
 
 Các hệ số mô tả mối liên hệ giữa các lưu vực. Những thuộc tính như độ cao, tuyết và thực vật có thể cùng biến đổi theo vùng, nên hệ số riêng lẻ chưa xác định đóng góp nhân quả của một đầu vào. Thí nghiệm che nguồn và giải thích mô hình cung cấp bằng chứng bổ sung ở các bước tiếp theo.
+
+Mã `.py` và `.ipynb` cùng tên hiện ở **giao thức phân tích 4** (bản chuẩn bị chưa thực thi trên Kaggle), hỗ trợ đầy đủ bốn hồ sơ S0 hoàn chỉnh gồm **11 run (12 phép so), 14 run (18 phép so), 32 run (36 phép so, Evaluation Version 8) và 56 run (105 phép so, Evaluation Version 9/10/12 có đủ năm lõi C2)**, đồng thời tự động chạy phân tích con cho **phân vùng D (6 hoặc 9 cặp 730 trừ 365 bước)** khi gắn Output Evaluation có thư mục `D/`. Notebook chính thức Version 2 và mã tương ứng được giữ nguyên ở [Archive/Version2](Archive/Version2/02_Evaluation_LamaHCEExt_ByBasin.ipynb). Các bảng và hình kết quả trong `Tables/`, `Figures/` vẫn thuộc Version 2 trên 14 run; chưa có kết quả tương quan thuộc tính của B0–B3. Bản chuẩn bị không dùng output cũ làm output của mã mới.
 
 ## 1. Phạm vi và thuật ngữ
 
@@ -23,17 +25,17 @@ Notebook chạy bằng CPU, đọc đầu vào dưới `/kaggle/input` và ghi t
 | Nguồn | Nội dung dùng trong phân tích |
 |---|---|
 | Dataset `lamah-ce-ext` | `A_basins_total_upstrm/1_attributes/Catchment_attributes.csv` và `D_gauges/1_attributes/Gauge_attributes.csv` |
-| Output A1 | `A1_P3_static_attribute_sources.csv`; bảng topology nếu có |
-| Output A3 | `A3_DLinear_data_audit.npz`, `A3_final_evaluation_masks.npz`, `A3_DLinear_loss_stats.csv` |
-| Output bộ đánh giá | `Evaluation_summary.json`, `Evaluation_protocol.json`, `Evaluation_metrics.csv`, `Evaluation_events.csv`; với A4 cần thêm `Evaluation_A4_input_check.csv` và `Evaluation_A4_contract_check.csv` |
+| Output A1 Version 3 | `A1_P3_static_attribute_sources.csv`; bảng topology nếu có |
+| Output A3 Version 1 | `A3_DLinear_data_audit.npz`, `A3_final_evaluation_masks.npz`, `A3_DLinear_loss_stats.csv` |
+| Output bộ đánh giá Version 8 | `Evaluation_summary.json`, `Evaluation_protocol.json`, `Evaluation_run_index.json`, `Evaluation_metrics.csv`, `Evaluation_events.csv`; các cặp `Evaluation_<A4/B0/B1a/B1b/B2/B3>_input_check.csv` và `Evaluation_<A4/B0/B1a/B1b/B2/B3>_contract_check.csv` |
 
 Output A1 xác nhận ánh xạ 33 thuộc tính đã dùng; giá trị thuộc tính được đọc từ bảng gốc. Output A3 cung cấp lịch, ID, diện tích, Q số thô và mặt nạ đánh giá. Output bộ đánh giá cung cấp chỉ số theo lưu vực và số trận đã chấm bằng giao thức cùng ngày bắt đầu. Không cần gắn lại Output A2/A4 Compare hoặc chạy lại mô hình.
 
-Để phân tích A4, gắn Output bộ đánh giá **Version 4** (lần chấm 14 run). Các CSV tổng hợp như `Evaluation_summary.csv` hoặc `Evaluation_events_pooled.csv` không thay được bảng từng lưu vực `Evaluation_metrics.csv` và `Evaluation_events.csv`. Phần 2 in số run, số phép so và cờ A4; lần phân tích mở rộng phải báo **14 run, 18 phép so, A4=True**.
+Để phân tích toàn bộ bước B, gắn Output bộ đánh giá **Version 8**. Phần 2 phải xác nhận **32 run, 36 phép so**, gồm ba seed ở mỗi B0/B1a/B1b/B2 và ba seed riêng cho từng mức B3. Không cần gắn lại các Output Compare hoặc huấn luyện. Các CSV tổng hợp như `Evaluation_summary.csv` hoặc `Evaluation_events_pooled.csv` không thay được bảng từng lưu vực `Evaluation_metrics.csv` và `Evaluation_events.csv`. Nguồn Version 4 vẫn dùng được khi tái lập kết quả 14 run/18 phép so của Version 2.
 
-Nguồn 11 run gốc được nhận từ giao thức đánh giá 2; nguồn 14 run cần giao thức từ 3, xác nhận đủ ba hợp đồng A4 Compare Version 2 và các hàng kiểm nguồn đều đạt. Metadata seed trong chỉ số/sự kiện phải khớp bảng hợp đồng. Thiếu một seed hoặc có run chưa khai báo làm chương trình dừng. Cả hai chế độ đều dùng test/S0/hạn một ngày, cùng giao chung và dung sai khớp trận chính bằng 0. Nguồn trùng tên cần được chỉ rõ; không tự chọn một phiên bản giữa nhiều ứng viên.
+Mã giữ ba hồ sơ nguồn hoàn chỉnh: 11 run gốc, 14 run có A4, hoặc 32 run có toàn bộ B0–B3. Hồ sơ 32 run cần giao thức 3, các cờ hợp đồng A4/B đều đạt, bảng nguồn/hợp đồng và run index nhất quán về seed, epoch, commit, Version, mức che B3 và ngữ cảnh A3. Thiếu seed, thiếu một bước hoặc có run chưa khai báo làm chương trình dừng. Mọi hồ sơ đều dùng test/S0/hạn một ngày, giao chung và dung sai khớp trận chính bằng 0. Nguồn trùng tên cần được chỉ rõ; không tự chọn một phiên bản giữa nhiều ứng viên.
 
-Mã `.py` là nguồn chỉnh sửa chính; `.ipynb` trong repo là Version 2 tải từ Kaggle, mã trùng từng dòng với `.py`. Notebook trình bày theo phần, đề mục Markdown và cell code theo chức năng. Kết quả ghi trực tiếp, không đóng ZIP.
+Mã `.py` và notebook chuẩn bị cùng tên có mã thực thi khớp nhau; các cell của bản chuẩn bị chưa có execution count hoặc output. Notebook trình bày theo phần, đề mục Markdown và cell code theo chức năng. Chạy từ đầu bằng CPU, Save & Run All rồi tải bản đã thực thi về sau khi kiểm kết quả. Kết quả ghi trực tiếp vào `/kaggle/working/basin_analysis_output`, không đóng ZIP.
 
 ## 3. Ghép dữ liệu và kiểm tính nhất quán
 
@@ -290,3 +292,57 @@ Những kết quả này xác định được các nhóm cần phân tích và 
 - [Klingler và cs. (2021), LamaH-CE](https://essd.copernicus.org/articles/13/4529/2021/), Mục 5 và Phụ lục A: định nghĩa, đơn vị và nguồn thuộc tính.
 - [Konold và cs. (2026), BiasCast](https://hess.copernicus.org/articles/30/5067/2026/index.html), phân tích theo lưu vực và liên hệ đặc điểm với mức cải thiện; phần phân tích chọn riêng ΔNSE dương của bài được phân biệt với tập đầy đủ dùng ở đây.
 - [SciPy — Spearman](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.spearmanr.html) và [permutation test](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html): hệ số thứ hạng và phép thử bằng hoán vị.
+
+
+## 12. Phân tích bước B đã chuẩn bị, chờ chạy trên bốn nguồn thật
+
+### 12.1. Các phép so được xác định trước
+
+Hồ sơ 32 run giữ nguyên 18 phép so của nguồn 14 run và thêm 18 phép so ablation. Mỗi cặp dưới đây được ghép cùng seed 111, 222 hoặc 333; hiệu là vế trái trừ vế phải.
+
+| Bước | Vế trái | Mốc tham chiếu | Số phép so |
+|---|---|---|---:|
+| Giao thức 30 epoch | B0 | A4 cùng seed | 3 |
+| Đơn vị Q | B1a | B0 cùng seed | 3 |
+| Q cực đại quá khứ | B1b | B1a cùng seed | 3 |
+| Nhúng theo nguồn và masked mean | B2 | B1b cùng seed | 3 |
+| Che bước/chuỗi 0,1/0,12 | B3 P10S12 | B2 cùng seed | 3 |
+| Che bước/chuỗi 0,05/0,05 | B3 P05S05 | B2 cùng seed | 3 |
+
+Tương quan vẫn dùng 31 thuộc tính số và ba outcome đã định: ΔNSE, ΔPNSE, ΔPOD tại ngưỡng hai năm. Họ Holm gồm các p hữu hạn của 31 thuộc tính trong từng phép so/outcome; không đổi sang chọn thuộc tính sau khi xem kết quả. Số ngày, `obs_tss` và mặt nạ A3 phải khớp trước khi ghép, nên các hiệu không lấy từ hai phạm vi native khác nhau.
+
+Có tám nhóm seed: DLinear, A4, B0, B1a, B1b, B2 và từng mức B3. DLinear/A4 giữ mốc persistence như phân tích đã lưu. Với B, bảng độ ổn định dùng hiệu của các cặp ablation cùng seed; nhãn bảng ghi rõ mốc tham chiếu. SD mẫu của ba hiệu và tính ổn định dấu tương quan mô tả biến thiên giữa seed, không phải điểm của tổ hợp ba dự báo.
+
+### 12.2. Hình và kiểm chứng chuẩn bị
+
+Heatmap 18 phép so cũ giữ tên `BasinAnalysis_static_delta_NSE_rho.png`; 18 phép so B có `BasinAnalysis_B_static_delta_NSE_rho.png` riêng để giữ nhãn đọc được. Bốn hình mới `BasinAnalysis_B_block1_quartile_delta_NSE.png`, `BasinAnalysis_B_block1_quartile_flood_POD.png`, `BasinAnalysis_B_block2_quartile_delta_NSE.png`, `BasinAnalysis_B_block2_quartile_flood_POD.png` chia sáu bước B thành hai nhóm, mỗi hàng ba seed cùng mốc. Chú thích và tiêu đề phân biệt các mốc tham chiếu.
+
+Bộ kiểm độc lập đạt **71/71**, giữ đủ 41 kiểm của bản 14 run. Kiểm hồi quy riêng xác nhận 18 phép so cũ cùng các bảng SD DLinear/A4 không đổi giá trị khi dùng điểm V8. Kiểm chuẩn bị đọc bộ Evaluation Version 8 đã nhận: 32 run × 451 ID, đủ 17 tệp nguồn dùng trong bước đọc, tạo 36 × 451 = 16236 hàng phép so. Việc chạy thử thống kê/hình tại máy dùng thuộc tính giả, không phải kết quả liên hệ thuộc tính LamaH thật. Raw attributes và ba tệp A3 phục vụ chẩn đoán chưa được đọc đầy đủ trong lượt kiểm này; kết quả mới phải chạy trên bốn Input đã nêu ở Mục 2. Biên bản phạm vi kiểm được giữ trong [BasinAnalysis_B_preparation_checks.json](Tables/BasinAnalysis_B_preparation_checks.json).
+
+Sau khi chạy, gửi toàn bộ thư mục `basin_analysis_output`; các tệp kiểm tối thiểu gồm `BasinAnalysis_summary.json`, `BasinAnalysis_protocol.json`, `BasinAnalysis_checks.csv`, `BasinAnalysis_input_manifest.csv`. Số Save Version chỉ ghi khi đã lưu thành công trên Kaggle.
+
+## 13. Mở rộng giao thức 4 cho năm lõi C2 (56 run) và độ dài chuỗi bước D (730 trừ 365 bước)
+
+### 13.1. Hồ sơ 56 run của Evaluation Version 9/10/12
+
+Khi gắn Output `01_Evaluation_LamaHCEExt` từ Version 9 trở lên (56 run trên giao chung 652.628 ngày–lưu vực / 450 ID), mã giữ nguyên 36 phép so của hồ sơ 32 run và bổ sung **69 phép so cố định trước** cho 24 run C2 (tám cấu hình × ba seed 111/222/333 ở `freeze-C` = `db6dc1f`), nâng tổng số phép so chính lên **105**:
+
+| Nhóm phép so C2 | Vế trái | Mốc tham chiếu | Số phép so | Câu hỏi nghiên cứu |
+|---|---|---|---:|---|
+| C2 so với persistence | 24 run C2 (8 cấu hình × 3 seed) | `Persistence_qmax` | 24 | Mức cải thiện so với số đo hôm trước và biến thiên ba seed của từng cấu hình C2 trên cùng mốc với A4/DLinear |
+| C2 so với B* cùng seed | 24 run C2 | `SeqLSTM_Q_B3_P10S12` cùng seed | 24 | So năm lõi thời gian với LSTM cải tiến B* theo tỷ phần tuyết, độ cao, khô hạn và diện tích ([Pipeline Mục 6.4](../../../Document/01_Plan/02_Pipeline.md#64-theo-lưu-vực)) |
+| Lõi khác so với LSTM C2 cùng seed | 21 run C2 ngoài `lstm_L2_x1_lr1e-3` | `SF_lstm_L2_x1_lr1e-3_C2` cùng seed | 21 | Cô lập chênh lệch giữa GRU, Transformer, S4D, Mamba với LSTM hai lớp cùng ngân sách tham số và cùng commit `freeze-C` |
+
+Cổng `audit_C2_evaluation` đối chiếu `Evaluation_summary.json`, `Evaluation_run_index.json`, `Evaluation_C2_contract_check.csv` và `Evaluation_C2_input_check.csv` (đủ 24 run, đúng số tham số từng cấu hình, `library_commit` = `db6dc1f`, sai lệch `native_test_NSE` so với `NPZ_test_NSE` không quá 10⁻⁵ và khớp SHA-256 của từng NPZ/checkpoint). Sáu hình bổ sung cho C2 gồm `BasinAnalysis_C2_vs_Bstar_static_delta_NSE_rho.png`, `BasinAnalysis_C2_vs_LSTM_static_delta_NSE_rho.png` và bốn hình tứ phân vị `BasinAnalysis_C2_block{1,2}_quartile_{delta_NSE,flood_POD}.png`. Mọi hình trong notebook đều gọi `plt.show()` và in chú thích tiếng Việt ngay dưới hình.
+
+Notebook chạy bằng **CPU** (`Accelerator = None`, khoảng 2–3 phút, không tốn hạn mức GPU) với bốn Input đã có sẵn trên Kaggle (`lamah-ce-ext`, `01-a1-lamahceext-explore` Version 3, `02-a3-lamahceext-benchmarks` Version 1 và `01-evaluation-lamahceext` Version 12).
+
+### 13.2. Phân vùng D (730 trừ 365 bước) trong `basin_analysis_output/D/`
+
+Khi Output của `01_Evaluation_LamaHCEExt` có thêm thư mục con `D/` (hoặc truyền `--d-evaluation`), mã giữ nguyên toàn bộ bảng chính 56 run ở thư mục gốc và xuất riêng bộ `BasinAnalysis_D_*` vào `/kaggle/working/basin_analysis_output/D/`:
+
+- Kiểm `Evaluation_D_summary.json`, `Evaluation_D_coverage.csv`, `Evaluation_D_contract_check.csv`, `Evaluation_D_input_check.csv`, `Evaluation_D_common_mask.npz`, `Evaluation_D_metrics.csv` và `Evaluation_D_events.csv` (6 cặp nếu cắt S4D theo Mục 8.3 hoặc 9 cặp nếu đủ LSTM, Mamba, S4D; ghi nhận `strict_pair_equivalent` và `grad_guard_skipped_steps`).
+- Tính `SF_<cấu hình>_D_seed<N> − SF_<cấu hình>_C2_seed<N>` trên đúng giao ngày–lưu vực chung của phân vùng D (cùng `n`, `obs_tss` và mẫu số trận thật `hit + missed` ở từng ID).
+- Xuất tương quan Spearman + 9.999 hoán vị + Holm trên 31 thuộc tính tĩnh, chẩn đoán chuỗi Q, phân nhóm tứ phân vị bốn thuộc tính ưu tiên (`area_calc`, `elev_mean`, `frac_snow`, `arid_1`), nhóm đầu nguồn 322 ID, độ ổn định dấu qua ba seed và bốn hình `BasinAnalysis_D_{static_delta_NSE_rho,quartile_delta_NSE,quartile_flood_POD,seed_spread}.png` để kiểm giả thuyết lưu vực tuyết tan / độ cao lớn hưởng lợi từ cửa sổ nhớ hai năm (RQ5).
+
+Bộ kiểm thử độc lập `self_test()` đạt **84/84** ca kiểm (bao gồm cả bốn hồ sơ 11/14/32/56 run, các ca từ chối hợp đồng C2 sai lệch và hai chế độ 6/9 cặp của bước D). Đối chiếu hồi quy trên dữ liệu `Evaluation_V12` thực tế xác nhận 1.674 hàng tương quan của 18 phép so Version 2 trùng khớp tới 10⁻¹² ở cả `rho`, `p_permutation_iid` và `p_holm_iid`.

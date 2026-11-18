@@ -1,0 +1,58 @@
+{
+  "complete": true,
+  "totals": {
+    "event_groups": 416724,
+    "event_cases": 969816,
+    "level_rows": 416724
+  },
+  "bands": [
+    {
+      "lead": 1,
+      "event_groups": 101024,
+      "event_cases": 260797,
+      "level_rows": 101024
+    },
+    {
+      "lead": 1,
+      "event_groups": 45100,
+      "event_cases": 110326,
+      "level_rows": 45100
+    },
+    {
+      "lead": 2,
+      "event_groups": 45100,
+      "event_cases": 105319,
+      "level_rows": 45100
+    },
+    {
+      "lead": 3,
+      "event_groups": 45100,
+      "event_cases": 99644,
+      "level_rows": 45100
+    },
+    {
+      "lead": 4,
+      "event_groups": 45100,
+      "event_cases": 99655,
+      "level_rows": 45100
+    },
+    {
+      "lead": 5,
+      "event_groups": 45100,
+      "event_cases": 98994,
+      "level_rows": 45100
+    },
+    {
+      "lead": 6,
+      "event_groups": 45100,
+      "event_cases": 97762,
+      "level_rows": 45100
+    },
+    {
+      "lead": 7,
+      "event_groups": 45100,
+      "event_cases": 97319,
+      "level_rows": 45100
+    }
+  ]
+}

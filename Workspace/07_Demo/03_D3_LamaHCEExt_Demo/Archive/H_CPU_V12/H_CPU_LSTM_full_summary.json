@@ -1,0 +1,19 @@
+{
+  "complete": true,
+  "passed": true,
+  "run": "SF_lstm_L2_x1_lr1e-3_Hhybrid_seed333",
+  "basins": 451,
+  "target_days_per_lead": 1449,
+  "leads": 7,
+  "targets": 4574493,
+  "lost_targets": 0,
+  "elapsed_seconds": 681.5797914000323,
+  "abs_bound_mm_day": 0.0005,
+  "max_raw_abs_mm_day": 0.0001354217529296,
+  "max_clipped_abs_mm_day": 0.0001354217529296,
+  "strict_atol_mm_day": 2e-05,
+  "strict_rtol": 1e-06,
+  "strict_raw_excess": 11919,
+  "strict_clipped_excess": 11919,
+  "obs_failed": 0
+}

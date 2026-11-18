@@ -521,3 +521,20 @@ Version 12 chấm H Compare Version 1 trên 168 NPZ. Cả 191 mục trong bảng
 Ở hạn 7, trung bình qua ba hạt giống của NSE trung vị theo lưu vực là 0,240 với LSTM và 0,225 với Mamba khi dùng GEFS. Với ECMWF HRES ngày đầu, các giá trị tương ứng là 0,082 và 0,062. Với thời tiết tái phân tích của cả bảy ngày, giá trị tham chiếu là 0,644 và 0,646. Các số trên cùng kỳ test và mặt nạ chung. [Bảng chỉ số hạn 7](Archive/Version12/H/Evaluation_H_summary_lead7.csv).
 
 [Archive/Version12](Archive/Version12/) giữ nguyên byte các bảng kiểm, tóm tắt chỉ số và bảng cộng dồn phân mức, sự kiện theo dung sai chính của cả bảy hạn. Bản tải đầy đủ, gồm mặt nạ và các bảng chi tiết D3 cần, nằm tại `downloads/Evaluation_V12/evaluation_output/` trên máy kiểm thử. Output H Compare chứa các NPZ dùng để vẽ đường qmax. Tệp `.ipynb` trong Git là notebook nguồn có thể chạy lại. Bản notebook có đầu ra nằm trong phiên Kaggle Version 12.
+
+### 13.4. Chấm bước D (cửa sổ 730 bước) trong `evaluation_output/D/`
+
+Gắn toàn bộ Notebook Output `17_D_LamaHCEExt_Compare` để chấm bước D theo phương án tách riêng phân vùng `evaluation_output/D/`. Notebook tự phát hiện `d_summary.json` trong `/kaggle/input`; khi gọi từ CLI, dùng `--d <thư_mục_d_compare>` để chỉ định đường dẫn cụ thể và `--require-d` để bắt buộc có nguồn D. Bộ đọc từ chối tệp NPZ `step = "D"` truyền lẻ qua `--extra-contract` nhằm giữ nguyên 56 run trong bốn bảng S0 ở thư mục gốc.
+
+`read_d_compare` kiểm đầy đủ dung lượng và SHA-256 theo `manifest.csv` của `d_compare/`, đối chiếu mã băm `manifest.csv` của C2 Compare Version 1 và hai tệp ngữ cảnh A3 Version 1, kiểm `freeze-C` (`db6dc1ffcd8c14994cd80be3ed8ff417002c01a1`), kiểm 6 hợp đồng (khi cắt S4D theo Mục 8.3) hoặc đủ 9 hợp đồng `contracts/SF_<cấu hình>_D_seed<N>_test_S0_lead1.npz`, đối chiếu `D_config_check.csv`, `D_contract_check.csv`, `D_handoff.csv`, `D_demo_runs.csv`, thông tin `grad_guard` (`strict_pair_equivalent`) và tính lại giao ngày–lưu vực để xác nhận khớp từng phần tử với `D_common_mask.npz`.
+
+Trong `evaluation_output/D/`, `score_d` chấm các run D (730 bước), các run C2 đối chứng cùng cấu hình và seed (365 bước) cùng `Persistence_qmax` trên cùng giao ngày–lưu vực chung (`Evaluation_D_common_mask.npz`). Các tệp xuất ra gồm `Evaluation_D_{metrics,summary,paired_tests,length_pairs,levels,confusion,levels_pooled,events,event_matches,event_cases,events_pooled,events_tolerance1,event_matches_tolerance1,events_pooled_tolerance1,coverage,input_check,contract_check}.csv` và `Evaluation_D_summary.json`. Bảng `Evaluation_D_length_pairs.csv` ghi riêng phép kiểm định ghép cặp 730 trừ 365 theo cùng cấu hình và cùng seed trên cả sáu chỉ số liên tục và ba chữ ký FDC (kèm hiệu chỉnh Holm). Trang **Cảnh báo lũ** của D3 đọc trực tiếp `Evaluation_D_events.csv`, `Evaluation_D_levels.csv` và `Evaluation_D_event_cases.csv` cho các run thuộc bước D.
+
+Tiêu chí nghiệm thu bất biến đối với bốn bảng S0 56 run ở thư mục gốc (trùng SHA-256 với Version 10 và Version 12):
+
+| Tệp S0 56 run | SHA-256 chuẩn (Version 10 / Version 12) |
+|---|---|
+| `Evaluation_metrics.csv` | `8fe82523bf5579207fafcc1af7f8b323b1c72220196dd321f143032f2fd9dfbd` |
+| `Evaluation_levels.csv` | `d0cd38cb927d26fb526381716f9958dafb4cb8cea4a93203c18e125de996a17e` |
+| `Evaluation_events.csv` | `c7a743c312956cb5b27e24c090e995e3f57dd6e6ae43e51c4a1e00bc0fa88bb2` |
+| `Evaluation_event_cases.csv` | `9d9de824be42497845ce94e305b3aedb452dc199ee269f7eb5a50f9349006a12` |

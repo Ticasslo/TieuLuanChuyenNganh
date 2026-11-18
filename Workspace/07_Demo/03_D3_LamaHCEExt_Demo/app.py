@@ -1,4 +1,5 @@
 import argparse
+import atexit
 import json
 import os
 import re
@@ -15,13 +16,14 @@ from werkzeug.exceptions import HTTPException
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "DemoRuntime"))
 from forecast import DemoForecaster, PRED_ATOL, PRED_RTOL, qmax_m3_s
+from h_cpu import H_PRED_ATOL, HWorker, HWorkerError
 
 
 def columns_for_view(frame):
     return frame.astype(object).where(frame.notna(), None).to_dict(orient="records")
 
 
-def create_app(bundle, raw=None):
+def create_app(bundle, raw=None, h_python=None):
     bundle = Path(bundle)
     catalog = json.loads((bundle/"catalog.json").read_text(encoding="utf-8"))
     if catalog.get("schema") != 1:
@@ -32,12 +34,25 @@ def create_app(bundle, raw=None):
     if len(models) != len(catalog["models"]) or any(not re.fullmatch(r"[A-Za-z0-9_-]+", key) for key in models):
         raise ValueError("ID mô hình trùng hoặc ngoài định dạng.")
     app = Flask(__name__, static_folder=str(HERE/"static"))
-    if raw is not None and any(m.get("what_if") for m in models.values()):
+    live = {run for run, model in models.items() if raw is not None and model.get("what_if")
+            and (model["stage"] != "H" or h_python is not None)}
+    h_models = [m for m in catalog["models"] if m["run"] in live and m["stage"] == "H"]
+    h_worker = None
+    if h_models:
+        if not Path(h_python).is_file():
+            raise ValueError(f"Không tìm thấy Python của H: {h_python}.")
+        h_worker = HWorker(h_python, bundle, raw, ids, (catalog["areas"][i] for i in ids), h_models)
+        atexit.register(h_worker.close)
+    if any(models[run]["stage"] != "H" for run in live):
         from importlib.metadata import distribution
+        import torch
+
         version = distribution("neuralhydrology").read_text("direct_url.json")
         installed = json.loads(version or "{}").get("vcs_info", {}).get("commit_id")
         if installed != catalog["library_commit"]:
             raise ValueError("Môi trường chạy trực tiếp cần đúng commit đã chấm qua D2.")
+        threads = max(1, int(os.environ.get("DEMO_THREADS", min(4, os.cpu_count() or 1))))
+        torch.set_num_threads(threads)
 
     @app.errorhandler(HTTPException)
     def api_error(exc):
@@ -47,23 +62,20 @@ def create_app(bundle, raw=None):
 
     @lru_cache(maxsize=2)
     def predictor(run):
-        import torch
-
-        torch.set_num_threads(min(4, os.cpu_count() or 1))
         return DemoForecaster(bundle/"checkpoints"/run, raw, tuple(ids),
                               np.array([catalog["areas"][i] for i in ids]), None, device="cpu")
 
-    @lru_cache(maxsize=72)
+    @lru_cache(maxsize=96)
     def matrix(path):
         result = np.load(bundle/path, mmap_mode="r", allow_pickle=False)
         if result.shape != (len(ids), len(date_index)):
             raise ValueError(f"Sai kích thước dữ liệu phát lại: {path}")
         return result
 
-    @lru_cache(maxsize=24)
+    @lru_cache(maxsize=64)
     def table(filename):
         path = bundle/f"{filename}.csv"
-        return pd.read_csv(path, dtype={"basin_id": str}) if path.is_file() else None
+        return pd.read_csv(path, dtype={"basin_id": str, "origin_date": str}) if path.is_file() else None
 
     def integer_arg(name, default, end):
         try:
@@ -95,7 +107,7 @@ def create_app(bundle, raw=None):
         data = dict(catalog)
         data.pop("flood_m3_s")
         data.pop("areas")
-        data["models"] = [dict(m, what_if=bool(raw is not None and m.get("what_if"))) for m in models.values()]
+        data["models"] = [dict(m, what_if=m["run"] in live) for m in models.values()]
         return jsonify(data)
 
     @app.get("/api/forecast")
@@ -122,21 +134,41 @@ def create_app(bundle, raw=None):
         if not isinstance(body, dict):
             abort(400, "Thiếu dữ liệu cho lần suy luận.")
         run = body.get("run")
-        if raw is None or not isinstance(run, str) or not models.get(run, {}).get("what_if"):
+        if not isinstance(run, str) or run not in live:
             abort(400, "Chưa có bản CPU đã đối chiếu cho cấu hình này.")
+        basin, date = body.get("basin"), body.get("date")
+        if not isinstance(basin, str) or basin not in ids or not isinstance(date, str) or date not in date_index:
+            abort(400, "Chọn lưu vực và ngày phát hành trong kỳ test.")
+        meta = models[run]
         try:
             rain = float(body.get("rain_multiplier", 1))
             temp = float(body.get("temperature_delta", 0))
-            model = predictor(run)
-            baseline = model.predict(body["basin"], body["date"])
-            basin_index = ids[body["basin"]]
-            atol = qmax_m3_s(PRED_ATOL, catalog["areas"][body["basin"]])
+            if not np.isfinite(rain) or rain < 0 or not np.isfinite(temp):
+                raise ValueError("Hệ số mưa cần hữu hạn và không âm. Mức cộng nhiệt cần hữu hạn.")
+            if meta["stage"] == "H":
+                if not meta["origin_start"] <= date <= meta["origin_end"]:
+                    raise ValueError(f"Chọn ngày phát hành H từ {meta['origin_start']} đến {meta['origin_end']}.")
+                series = h_worker.predict(run, basin, date, rain, temp)
+                baseline, changed = series["baseline"], series["changed"]
+            else:
+                model = predictor(run)
+                baseline = model.predict(basin, date)
+                changed = (baseline if (rain, temp) == (1, 0) else
+                           model.predict(basin, date, rain_multiplier=rain, temperature_delta=temp))
+            expected_steps = [(lead, catalog["dates"][date_index[date]+lead-1]) for lead in meta["leads"]]
+            if any([(row["lead"], row["target_date"]) for row in values] != expected_steps
+                   for values in (baseline, changed)):
+                raise ValueError("Lịch suy luận CPU khác ngày phát hành và hạn đã chọn.")
+            basin_index = ids[basin]
+            tolerance = H_PRED_ATOL if meta["stage"] == "H" else PRED_ATOL
+            atol = qmax_m3_s(tolerance, catalog["areas"][basin])
             for item in baseline:
                 target_index = date_index[item["target_date"]]
                 expected = matrix(f"series/{run}_lead{item['lead']}.npy")[basin_index, target_index]
                 if not np.isclose(item["qmax_m3_s"], expected, atol=atol, rtol=PRED_RTOL):
                     raise ValueError("Dự báo gốc CPU khác tệp phát lại tại cửa sổ đã chọn.")
-            changed = model.predict(body["basin"], body["date"], rain_multiplier=rain, temperature_delta=temp)
+        except HWorkerError as exc:
+            return jsonify(error=str(exc)), 503
         except (TypeError, ValueError, KeyError, RuntimeError) as exc:
             return jsonify(error=str(exc)), 422
         return jsonify(baseline=baseline, changed=changed)
@@ -165,8 +197,8 @@ def create_app(bundle, raw=None):
                 b = data[data.run.eq(reference)].set_index("basin_id")["NSE"]
                 a = a.subtract(b) if len(b) else a.iloc[0:0]
             metrics = columns_for_view(a.rename("NSE").reset_index())
-        names = ("C2_config_table", "C2_cost_table", "D2_CPU_benchmark", "c2_scenarios", "D", "D_cost",
-                 *[f"H_summary_lead{k}" for k in range(1, 8)])
+        names = ("C2_config_table", "C2_cost_table", "D2_CPU_benchmark", "c2_scenarios", "D", "D_ensemble", "D_cost",
+                 "D_length_pairs", *[f"H_summary_lead{k}" for k in range(1, 8)])
         tables = {}
         for key in names:
             values = table(key)
@@ -180,9 +212,14 @@ def create_app(bundle, raw=None):
         lead = integer_arg("lead", 1, 7)
         if run not in models or basin not in ids:
             abort(400, "Chọn run và lưu vực.")
+        is_d = models[run].get("stage") == "D"
+        if is_d and lead != 1:
+            return jsonify(events=[], levels=[], event_cases=[])
         result = {}
         for name in ("events", "levels", "event_cases"):
-            key = f"H_{name}_lead{lead}" if uses_h_tables(run, lead) else ("events_by_case" if name=="event_cases" else name)
+            key = (f"H_{name}_lead{lead}" if uses_h_tables(run, lead)
+                   else f"D_{name}" if is_d
+                   else ("events_by_case" if name == "event_cases" else name))
             frame = table(key)
             if frame is None:
                 continue
@@ -211,13 +248,28 @@ def create_app(bundle, raw=None):
         return jsonify(cases=columns_for_view(cases), rows=columns_for_view(selected),
                        basin=basin, origin=origin)
 
+    @app.get("/api/health")
+    def health():
+        return jsonify(ok=True, schema=catalog["schema"], models=len(models), live_what_if=len(live))
+
     return app
 
 
+def from_env():
+    bundle = os.environ.get("DEMO_BUNDLE")
+    if not bundle:
+        raise RuntimeError("Đặt biến môi trường DEMO_BUNDLE trỏ tới thư mục gói dữ liệu demo.")
+    raw = os.environ.get("DEMO_RAW")
+    h_python = os.environ.get("DEMO_H_PYTHON")
+    return create_app(Path(bundle), Path(raw) if raw else None, Path(h_python) if h_python else None)
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Chạy bản demo trên laptop.")
+    parser = argparse.ArgumentParser(description="Chạy bản demo trên laptop hoặc máy chủ CPU.")
     parser.add_argument("--bundle", type=Path, required=True)
     parser.add_argument("--raw", type=Path, help="Thư mục LamaH_extended đã kiểm nguồn để bật nếu…thì…")
+    parser.add_argument("--h-python", type=Path, help="Python riêng cài freeze-H để bật suy luận H cách lai.")
+    parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8050)
     args = parser.parse_args()
-    create_app(args.bundle, args.raw).run(host="127.0.0.1", port=args.port)
+    create_app(args.bundle, args.raw, args.h_python).run(host=args.host, port=args.port)

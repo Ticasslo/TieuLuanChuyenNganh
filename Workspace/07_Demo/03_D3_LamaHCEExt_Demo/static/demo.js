@@ -57,20 +57,28 @@ function table(container, rows, keys = Object.keys(rows[0] ?? {})) {
 const base = {paper_bgcolor: "#fff", plot_bgcolor: "#fff", font: {family: "DM Sans, Segoe UI, sans-serif", color: "#172e29", size: 12}};
 const plotOptions = {responsive: true, displayModeBar: false};
 
-function map(target, scores = null) {
+function map(target, scores = null, isDelta = false) {
   const byBasin = new Map(scores?.map(r => [r.basin_id, r.NSE]));
   const points = scores ? catalog.points.filter(p => Number.isFinite(byBasin.get(p.id))) : catalog.points;
   const graph = $(target);
   const selected = $("basin").value;
+  let bound = 1;
+  if (scores && isDelta && points.length) {
+    const absVals = points.map(p => Math.abs(byBasin.get(p.id))).sort((a, b) => a - b);
+    const p95 = absVals[Math.floor(0.95 * (absVals.length - 1))] || 0.2;
+    bound = Math.min(1, Math.max(0.05, Number(p95.toPrecision(2))));
+  }
+  const labelMetric = isDelta ? "ΔNSE" : "NSE";
   const marker = scores
-    ? {size: 8, color: points.map(p => byBasin.get(p.id)), colorscale: "RdBu", cmid: 0, showscale: true}
+    ? {size: 8, color: points.map(p => byBasin.get(p.id)), colorscale: "RdBu", cmid: 0,
+       cmin: -bound, cmax: bound, showscale: true}
     : {size: points.map(p => p.id === selected ? 10 : 5), color: points.map(p => p.id === selected ? "#c55226" : "#137b67")};
   const regions = (catalog.outline ?? []).map(polygon => ({type: "scatter", mode: "lines", fill: "toself",
     x: polygon.map(p => p[0]), y: polygon.map(p => p[1]), line: {color: "#b7cdbf", width: 1},
     fillcolor: "#edf4ec", hoverinfo: "skip", showlegend: false}));
   Plotly.react(graph, [...regions, {type: "scatter", mode: "markers", x: points.map(p => p.lon), y: points.map(p => p.lat),
     customdata: points.map(p => p.id), marker,
-    text: points.map(p => scores ? `ID ${p.id} · NSE ${number.format(byBasin.get(p.id))}` : `ID ${p.id}`),
+    text: points.map(p => scores ? `ID ${p.id} · ${labelMetric} ${number.format(byBasin.get(p.id))}` : `ID ${p.id}`),
     hovertemplate: "%{text}<extra></extra>"
   }], {...base, showlegend: false, margin: {l: 10, r: 10, t: 6, b: 6}, xaxis: {visible: false},
     yaxis: {visible: false, scaleanchor: "x", scaleratio: 1.5}, dragmode: "pan"}, plotOptions).then(() => {
@@ -82,6 +90,7 @@ function map(target, scores = null) {
       });
     }
   });
+  return bound;
 }
 
 function updateToggles() {
@@ -142,7 +151,8 @@ function changedForecast() {
   run(refreshForecast);
 }
 const tableNames = {C2_config_table: "C2 · Hiệu năng", C2_cost_table: "C2 · Chi phí", D2_CPU_benchmark: "D2 · CPU",
-  c2_scenarios: "C2 · Kịch bản S0–S4", D: "D · 365/730 bước", D_cost: "D · Chi phí"};
+  c2_scenarios: "C2 · Kịch bản S0–S4", D: "D · 365/730 bước", D_ensemble: "D · Tổ hợp 3 seed", D_cost: "D · Chi phí",
+  D_length_pairs: "D · Kiểm định 730–365"};
 function showComparisonTable() {
   table($("comparison-content"), comparisonTables[$("comparison-table").value] ?? []);
 }
@@ -167,11 +177,17 @@ function updateReferences() {
 }
 async function refreshComparison() {
   const serial = ++revision;
+  const reference = $("comparison-ref").value;
+  const isDelta = Boolean(reference);
   const data = await api("/api/comparison" + query({run: $("comparison-run").value,
-    reference: $("comparison-ref").value, lead: $("comparison-lead").value}));
+    reference, lead: $("comparison-lead").value}));
   if (page !== "comparison" || serial !== revision) return;
-  map("nse-map", data.metrics);
-  $("nse-status").textContent = data.metrics.length ? "" : "Chưa có bảng NSE trên giao ngày chung cho lựa chọn này.";
+  const bound = map("nse-map", data.metrics, isDelta);
+  $("nse-status").textContent = !data.metrics.length
+    ? "Chưa có bảng NSE trên giao ngày chung cho lựa chọn này."
+    : isDelta
+      ? `Thang màu đối xứng ±${number.format(bound)} theo P95 |ΔNSE|; rê chuột xem giá trị thực từng lưu vực.`
+      : "Thang màu cố định [-1; 1] cho NSE; rê chuột xem giá trị thực từng lưu vực (kể cả điểm âm lớn).";
   comparisonTables = data.tables;
   options($("comparison-table"), Object.keys(data.tables).map(k => [k, tableNames[k] ?? `H · Hạn ${k.split("lead").at(-1)}`]), $("comparison-table").value);
   showComparisonTable();
@@ -259,17 +275,23 @@ async function start() {
   $("day").min = catalog.dates[0];
   $("day").max = catalog.dates.at(-1);
   $("day").value = catalog.dates[Math.floor(catalog.dates.length / 2)];
-  $("live-day").min = $("day").min;
-  $("live-day").max = $("day").max;
-  $("live-day").value = $("day").value;
   chosen.add(catalog.default_run);
   const live = catalog.models.filter(m => m.what_if);
   options($("live-model"), live.map(m => [m.run, m.name]), catalog.default_run);
   $("run-live").disabled = !live.length;
   $("what-if-form").hidden = !live.length;
-  $("what-if-status").textContent = live.length
-    ? "Thay lượng mưa hoặc nhiệt độ ECMWF HRES tại ngày phát hành."
-    : "Cần checkpoint và kết quả kiểm CPU để bật phần này.";
+  const syncLiveDate = (date = $("live-day").value) => {
+    const selected = live.find(model => model.run === $("live-model").value);
+    const day = $("live-day");
+    day.min = selected?.origin_start ?? $("day").min;
+    day.max = selected?.origin_end ?? $("day").max;
+    day.value = date < day.min ? day.min : date > day.max ? day.max : date;
+    $("what-if-status").textContent = selected?.stage === "H"
+      ? "Thay ECMWF HRES tại ngày phát hành và xem lưu lượng của cả bảy hạn."
+      : selected ? "Thay lượng mưa hoặc nhiệt độ ECMWF HRES tại ngày phát hành."
+                 : "Cần checkpoint và kết quả kiểm CPU để bật phần này.";
+  };
+  syncLiveDate($("day").value);
   const liveInputs = () => ({
     basin: $("basin").value, date: $("live-day").value, run: $("live-model").value,
     rain_multiplier: Number($("rain").value), temperature_delta: Number($("temp").value)
@@ -297,8 +319,9 @@ async function start() {
     });
   });
   for (const id of ["basin", "day", "lead"]) $(id).addEventListener("change", changedForecast);
-  $("day").addEventListener("change", () => { $("live-day").value = $("day").value; });
-  for (const id of ["live-model", "live-day"]) $(id).addEventListener("change", clearLiveResult);
+  $("day").addEventListener("change", () => syncLiveDate($("day").value));
+  $("live-model").addEventListener("change", () => { syncLiveDate(); clearLiveResult(); });
+  $("live-day").addEventListener("change", clearLiveResult);
   for (const id of ["rain", "temp"]) $(id).addEventListener("input", clearLiveResult);
   $("comparison-run").addEventListener("change", () => {
     updateModelLeads("comparison-run", "comparison-lead");

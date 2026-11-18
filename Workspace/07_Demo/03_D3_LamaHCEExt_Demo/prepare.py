@@ -3,6 +3,7 @@ import runpy
 import shutil
 import sys
 from pathlib import Path
+from time import perf_counter
 
 import numpy as np
 import pandas as pd
@@ -15,10 +16,20 @@ from shapely.ops import transform, unary_union
 HERE = Path(__file__).resolve().parent
 DEMO = HERE.parent
 sys.path.insert(0, str(DEMO / "DemoRuntime"))
-from forecast import qmax_m3_s
+from forecast import PRED_RTOL, compare_arrays, qmax_m3_s
+from h_cpu import FREEZE_H, H_CHECKPOINT_FILES, H_PRED_ATOL, HWorker
 
 H_REPORT_TABLES = ("summary", "metrics", "events", "levels", "event_cases")
 H_AUDIT_COLUMNS = ["file", "bytes", "sha256", "passed", "run", "mode", "lead", "library_commit"]
+D_REPORT_FILES = {
+    "D_eval_summary.csv": "Evaluation_D_summary.csv",
+    "D_length_pairs.csv": "Evaluation_D_length_pairs.csv",
+    "D_metrics.csv": "Evaluation_D_metrics.csv",
+    "D_events.csv": "Evaluation_D_events.csv",
+    "D_levels.csv": "Evaluation_D_levels.csv",
+    "D_event_cases.csv": "Evaluation_D_event_cases.csv",
+}
+D_AUDIT_COLUMNS = ["file", "bytes", "sha256", "passed"]
 H_MODE_LABELS = {"past": "Chỉ dữ liệu quá khứ", "hybrid": "ECMWF HRES ngày đầu",
                  "gefs": "ECMWF HRES và GEFS", "perfect": "Thời tiết tái phân tích (tham chiếu lý tưởng)"}
 
@@ -40,7 +51,7 @@ def locate_a2(source):
     return roots.pop()
 
 
-def check_inputs(source, with_live=False, replay_only_cores=(), h_evaluation=None):
+def check_inputs(source, with_live=False, replay_only_cores=(), h_evaluation=None, h_python=None, d_evaluation=None):
     audit = load_audit()
     problems = []
 
@@ -68,7 +79,7 @@ def check_inputs(source, with_live=False, replay_only_cores=(), h_evaluation=Non
         ("A3 V1", "A3_Q_source_window.npz"),
         ("C2 Compare V1", "c2_summary.json"),
     ):
-        check(label, lambda: audit["unique_file"](source, filename))
+        check(label, lambda filename=filename: audit["unique_file"](source, filename))
     check("A2 V2", lambda: locate_a2(source))
     if with_live:
         check("D2 V1", lambda: audit["unique_file"](source, "D2_summary.json"))
@@ -78,10 +89,21 @@ def check_inputs(source, with_live=False, replay_only_cores=(), h_evaluation=Non
             _, compare, records = checked
             check("Checkpoint chạy trực tiếp",
                   lambda: live_c2_sources(source, compare, audit["c2_winners"](records), audit, replay_only_cores))
-    if h_evaluation is not None:
+    if h_evaluation is not None or h_python is not None:
         evaluator = load_evaluator()
         check("H Compare", lambda: require_h_compare(source, audit, evaluator))
+    if h_evaluation is not None:
         check("Evaluation H", lambda: h_report_files(h_evaluation, audit, evaluator))
+    if d_evaluation is not None:
+        d_cmp = check("D Compare", lambda: audit["unique_file"](source, "d_summary.json").parent)
+        if d_cmp is not None:
+            check("Evaluation D", lambda: d_report_files(d_evaluation, d_cmp, audit))
+    g_file = audit["unique_file"](source, "G_IntegratedGradients.csv", required=False)
+    if g_file is not None:
+        evaluator_g = load_evaluator()
+        check("G Integrated Gradients", lambda: read_g_table(g_file, evaluator_g["basin_id"]))
+    if h_python is not None and not h_python.is_file():
+        problems.append(f"Python của H | Không tìm thấy {h_python}")
     if problems:
         print("Đầu vào D3 cần bổ sung hoặc chỉnh:\n" + "\n".join(f"- {line}" for line in problems))
     else:
@@ -163,13 +185,58 @@ def h_report_files(root, audit, evaluator):
     return paths, checked[H_AUDIT_COLUMNS].sort_values("file", ignore_index=True)
 
 
-def prepare(source, output, with_live=False, replay_only_cores=(), h_evaluation=None):
+def d_report_files(root, d_compare_root, audit):
+    summary = audit["read_json"](root / "Evaluation_D_summary.json")
+    d_summary = audit["read_json"](d_compare_root / "d_summary.json")
+    if (summary.get("complete") is not True
+            or summary.get("contracts") != d_summary.get("contracts")
+            or summary.get("configs") != d_summary.get("configs")):
+        raise ValueError("Evaluation D chưa hoàn thành hoặc khác danh sách cấu hình/hợp đồng của D Compare.")
+    paths = {dest: root / src for dest, src in D_REPORT_FILES.items()}
+    for path in paths.values():
+        if not path.is_file() or path.stat().st_size == 0:
+            raise FileNotFoundError(path)
+    checked = pd.read_csv(root / "Evaluation_D_input_check.csv")
+    _, source_checked = audit["verified_manifest"](d_compare_root)
+    if (not set(D_AUDIT_COLUMNS) <= set(checked) or checked["file"].duplicated().any()
+            or not checked["passed"].eq(True).all()
+            or not checked[D_AUDIT_COLUMNS].sort_values("file", ignore_index=True).equals(
+                source_checked[D_AUDIT_COLUMNS].sort_values("file", ignore_index=True))):
+        raise ValueError("Bảng kiểm nguồn Evaluation D khác bộ đầu vào D Compare trên máy.")
+    return paths
+
+
+def read_g_table(path, normalize_basin_id, valid_ids=None):
+    frame = pd.read_csv(path, dtype={"basin_id": str, "origin_date": str})
+    required = {"basin_id", "origin_date", "core", "group", "day_offset", "attribution"}
+    if frame.empty or not required <= set(frame):
+        raise ValueError("Bảng G_IntegratedGradients.csv rỗng hoặc thiếu cột bắt buộc.")
+    frame["basin_id"] = frame["basin_id"].map(lambda v: normalize_basin_id(str(v).strip().removeprefix("ID_")))
+    frame["origin_date"] = frame["origin_date"].astype(str).str.strip()
+    if (valid_ids is not None and not set(frame["basin_id"]).issubset(set(valid_ids))
+            or not np.isfinite(pd.to_numeric(frame["day_offset"], errors="coerce")).all()
+            or not np.isfinite(pd.to_numeric(frame["attribution"], errors="coerce")).all()):
+        raise ValueError("Bảng G_IntegratedGradients.csv có basin_id ngoài danh sách hoặc giá trị không hữu hạn.")
+    return frame
+
+
+def prepare(source, output, with_live=False, replay_only_cores=(), h_evaluation=None, h_python=None, d_evaluation=None):
     evaluator = load_evaluator()
     audit = load_audit()
-    h_source, h_tables, h_checked = source, {}, None
-    if h_evaluation is not None:
+    h_source, h_tables, h_checked, d_tables = source, {}, None, {}
+    if h_evaluation is not None or h_python is not None:
         h_source = require_h_compare(source, audit, evaluator)
+    if h_evaluation is not None:
         h_tables, h_checked = h_report_files(h_evaluation, audit, evaluator)
+    d_summary_file = audit["unique_file"](source, "d_summary.json", required=False)
+    if d_evaluation is None and d_summary_file is not None:
+        auto_d = audit["unique_file"](source, "Evaluation_D_summary.json", required=False)
+        if auto_d is not None:
+            d_evaluation = auto_d.parent
+    if d_evaluation is not None:
+        if d_summary_file is None:
+            raise FileNotFoundError("Cần Output D Compare trong --inputs khi ghép bảng Evaluation D.")
+        d_tables = d_report_files(d_evaluation, d_summary_file.parent, audit)
     context, compare, records = audit["compare_inputs"](source)
     raw = audit["locate_raw"](source)
     output.mkdir(parents=True, exist_ok=True)
@@ -204,17 +271,22 @@ def prepare(source, output, with_live=False, replay_only_cores=(), h_evaluation=
     append_extensions(source, output, context, models, evaluator, audit, h_source=h_source, h_checked=h_checked)
     if with_live:
         package_live_c2(source, output, compare, winners, models, audit, replay_only_cores)
+    if h_python is not None:
+        package_live_h(source, output, h_source, raw, h_python, models, context, audit)
 
     for label, pattern in {
         "metrics": "Evaluation_metrics.csv", "levels": "Evaluation_levels.csv",
         "events": "Evaluation_events.csv", "events_by_case": "Evaluation_event_cases.csv",
         "c2_scenarios": "C2_scenarios_stats.csv",
-        "D": "D_score_stats.csv", "D_cost": "D_cost.csv", "D_basin": "D_basin_scores.csv",
-        "G": "G_IntegratedGradients.csv",
+        "D": "D_score_stats.csv", "D_ensemble": "D_ensemble_scores.csv",
+        "D_cost": "D_cost.csv", "D_basin": "D_basin_scores.csv",
     }.items():
         path = audit["unique_file"](source, pattern, required=False)
         if path is not None:
             shutil.copy2(path, output/f"{label}.csv")
+    g_path = audit["unique_file"](source, "G_IntegratedGradients.csv", required=False)
+    if g_path is not None:
+        read_g_table(g_path, evaluator["basin_id"], valid_ids=ids).to_csv(output/"G.csv", index=False, encoding="utf-8-sig")
     if not h_tables:
         for lead in evaluator["H_LEADS"]:
             for label in H_REPORT_TABLES:
@@ -223,6 +295,8 @@ def prepare(source, output, with_live=False, replay_only_cores=(), h_evaluation=
                 if path is not None:
                     h_tables[name] = path
     for name, path in h_tables.items():
+        shutil.copy2(path, output/name)
+    for name, path in d_tables.items():
         shutil.copy2(path, output/name)
     selected = next(m["run"] for m in models if m["run"] == audit["C2_DEFAULT"])
     audit["write_json"](summary_file, dict(schema=1, test_start=str(context["dates"][0].date()),
@@ -250,11 +324,23 @@ def append_extensions(source, output, context, models, evaluator, audit, *, h_so
                 or any(set(f.seed) != {111,222,333} for _, f in candidates.groupby("configuration"))
                 or not np.isfinite(candidates.validation_NSE).all()):
             raise ValueError("D Compare chưa hoàn thành hoặc không dùng freeze-C.")
+        if {"D_demo_runs.csv", "D_handoff.csv"} <= set(files):
+            demo_tbl = pd.read_csv(files["D_demo_runs.csv"]).set_index("configuration", verify_integrity=True)
+            hand_tbl = pd.read_csv(files["D_handoff.csv"]).set_index(["configuration", "seed"], verify_integrity=True)
+        else:
+            demo_tbl = hand_tbl = None
         for r in winners.itertuples(index=False):
             run = f"SF_{r.configuration}_D_seed{r.seed}"
             f = evaluator["read_contract"](files[f"contracts/{run}_test_S0_lead1.npz"])
             if f.name != run or f.lead != 1 or f.metadata["library_commit"] != audit["FREEZE_C"]:
                 raise ValueError(f"Hợp đồng D sai danh tính: {run}")
+            if demo_tbl is not None:
+                d_sel = demo_tbl.loc[r.configuration]
+                h_sel = hand_tbl.loc[(r.configuration, int(r.seed))]
+                if (int(d_sel["seed"]) != int(r.seed) or d_sel["run"] != run
+                        or h_sel["sha256_config_yml"] != f.metadata.get("config_sha256")
+                        or int(h_sel["selected_epoch"]) != f.metadata.get("selected_epoch")):
+                    raise ValueError(f"Bảng chọn/bàn giao D khác hợp đồng hoặc thứ tự validation: {run}")
             models.append(add_model(output, run, "D", f"{r.configuration} / 730 bước", [(1, f)], context,
                                     configuration=r.configuration, seed=int(r.seed), validation_nse=r.validation_NSE))
     h_source = source if h_source is None else h_source
@@ -441,6 +527,95 @@ def package_live_c2(source, output, compare, winners, models, audit, replay_only
         item["what_if"] = True
 
 
+def package_live_h(source, output, h_source, raw, python, models, context, audit):
+    selected = [m for m in models if m["stage"] == "H" and m["mode"] == "hybrid"]
+    if len(selected) != 2 or {m["core"] for m in selected} != {"lstm", "mamba"}:
+        raise ValueError("Cần hai checkpoint H cách lai được chọn trên validation.")
+    inputs = audit["read_json"](h_source/"environment.json")["inputs"]["H"]
+    env_by_hash = {}
+    for path in source.rglob("h_output/environment.json"):
+        env_by_hash.setdefault(audit["sha256"](path), []).append(path)
+    for m in selected:
+        expected = inputs[f"{m['core']}_hybrid_seed{m['seed']}"]
+        paths = env_by_hash.get(expected["environment_sha256"], [])
+        if len(paths) != 1:
+            raise FileNotFoundError(f"Cần đúng một Output Version 1 của {m['training_notebook']}.")
+        path = paths[0]
+        env = audit["read_json"](path)
+        summary = env["summary"]
+        if (env["notebook"] != m["training_notebook"] or env["notebook"] != expected["notebook"]
+                or env["run_dir"] != m["run_directory"] or env["neuralhydrology_commit"] != FREEZE_H
+                or env["config_sha256"] != m["config_sha256"] or summary["status"] != "xong"
+                or summary["saved_epoch"] != m["selected_epoch"] or summary["n_params"] != m["n_params"]
+                or summary["seed"] != m["seed"] or summary["forecast_input_mode"] != "first_day"):
+            raise ValueError(f"Output H Train khác bàn giao: {m['training_notebook']}.")
+        manifest = pd.read_csv(path.parent/"manifest.csv").set_index("tệp", verify_integrity=True)["sha256"]
+        for filename, key in H_CHECKPOINT_FILES.items():
+            relpath = f"{m['run_directory']}/{filename}"
+            checkpoint = audit["contained_file"](path.parent.parent, relpath)
+            if manifest.get(relpath) != m[key] or audit["sha256"](checkpoint) != m[key]:
+                raise ValueError(f"Checkpoint khác SHA-256 đã bàn giao: {relpath}.")
+            dest = output/"checkpoints"/m["run"]/filename
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(checkpoint, dest)
+
+    worker = HWorker(python, output, raw, context["ids"], context["area"], selected)
+    try:
+        rows = [check_live_h(worker, h_source, m, context) for m in selected]
+    finally:
+        worker.close()
+    pd.DataFrame(rows).to_csv(output/"H_CPU_check.csv", index=False)
+    for m, row in zip(selected, rows):
+        m.update(what_if=True, origin_start=row["origin_start"], origin_end=row["origin_end"])
+
+
+def check_live_h(worker, h_source, model, context):
+    run = model["run"]
+    ledgers = {}
+    for lead in model["leads"]:
+        file = h_source/"contracts"/f"{run}_test_S0_lead{lead}.npz"
+        with np.load(file, allow_pickle=False) as source:
+            days = source["origin_dates"]
+            ledgers[lead] = (days, source["sim_raw_mm_day"], source["sim_mm_day"])
+    first = max(days[0] for days, _, _ in ledgers.values())
+    last = min(days[-1] for days, _, _ in ledgers.values())
+    dates = sorted({str(first), str(last), "2016-02-29", "2016-06-15",
+                    str(first + (last - first)//4), str(last - (last - first)//4)})
+    ids = list(context["ids"])
+    raw_errors, clipped_errors, warm_ms = [], [], []
+    for basin in ("2", "6", "130", "876"):
+        index = ids.index(basin)
+        for number, date in enumerate(dates):
+            before = perf_counter()
+            baseline = worker.predict(run, basin, date)["baseline"]
+            elapsed = (perf_counter() - before)*1000
+            if not raw_errors:
+                first_ms = elapsed
+            if number:
+                warm_ms.append(elapsed)
+            if [row["lead"] for row in baseline] != model["leads"]:
+                raise ValueError(f"CPU thiếu hạn dự báo: {run}, {basin}, {date}.")
+            for row in baseline:
+                lead = row["lead"]
+                day = np.datetime64(date, "D")
+                days, raw, clipped = ledgers[lead]
+                loc = np.searchsorted(days, day)
+                target = str(day + np.timedelta64(lead - 1, "D"))
+                if days[loc] != day or row["origin_date"] != date or row["target_date"] != target:
+                    raise ValueError(f"Lịch CPU khác NPZ: {run}, hạn {lead}.")
+                raw_errors.append(compare_arrays(np.array([row["qmax_raw_mm_day"]]), raw[loc:loc+1, index], H_PRED_ATOL, PRED_RTOL))
+                clipped_errors.append(compare_arrays(np.array([row["qmax_mm_day"]]), clipped[loc:loc+1, index], H_PRED_ATOL, PRED_RTOL))
+    scenario = worker.predict(run, "6", "2016-06-15", rain_multiplier=1.5, temperature_delta=2)
+    if not any(a["qmax_raw_mm_day"] != b["qmax_raw_mm_day"] for a, b in zip(scenario["baseline"], scenario["changed"])):
+        raise ValueError(f"CPU không phản hồi khi thay đổi ECMWF HRES: {run}.")
+    row = dict(run=run, seed=model["seed"], library_commit=FREEZE_H, checkpoint_sha256=model["checkpoint_sha256"],
+               origin_start=str(first), origin_end=str(last), windows=4*len(dates), lead_checks=len(raw_errors),
+               atol_mm_day=H_PRED_ATOL, rtol=PRED_RTOL, max_raw_abs_mm_day=max(raw_errors), max_clipped_abs_mm_day=max(clipped_errors),
+               first_ms=first_ms, warm_p50_ms=float(np.median(warm_ms)), warm_p95_ms=float(np.percentile(warm_ms, 95)))
+    print(f"{run}: {row['lead_checks']} dự báo CPU khớp NPZ, p95 sau nạp lưu vực {row['warm_p95_ms']:.1f} ms.", flush=True)
+    return row
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Đóng gói dự báo và bảng đã lưu cho demo laptop.")
     parser.add_argument("--inputs", type=Path, required=True)
@@ -448,12 +623,17 @@ if __name__ == "__main__":
     parser.add_argument("--check-inputs", action="store_true", help="Liệt kê nguồn còn thiếu trước khi đóng gói.")
     parser.add_argument("--h-evaluation", type=Path,
                         help="Thư mục H/ của Evaluation, yêu cầu kèm H Compare trong --inputs.")
+    parser.add_argument("--d-evaluation", type=Path,
+                        help="Thư mục D/ của Evaluation, yêu cầu kèm D Compare trong --inputs.")
+    parser.add_argument("--h-python", type=Path, help="Python cài freeze-H để kiểm và bật CPU cho hai run H cách lai.")
     parser.add_argument("--with-live", action="store_true")
     parser.add_argument("--replay-only", choices=("lstm", "gru", "transformer", "s4d", "mamba"),
                         action="append", default=[], help="Lõi đã chọn chỉ phát lại sau khi xem thời gian D2.")
     args = parser.parse_args()
     if args.check_inputs:
-        sys.exit(0 if check_inputs(args.inputs, args.with_live, args.replay_only, args.h_evaluation) else 2)
+        sys.exit(0 if check_inputs(args.inputs, args.with_live, args.replay_only,
+                                   args.h_evaluation, args.h_python, args.d_evaluation) else 2)
     if args.output is None:
         parser.error("Cần --output khi đóng gói.")
-    prepare(args.inputs, args.output, args.with_live, args.replay_only, args.h_evaluation)
+    prepare(args.inputs, args.output, args.with_live, args.replay_only,
+            args.h_evaluation, args.h_python, args.d_evaluation)

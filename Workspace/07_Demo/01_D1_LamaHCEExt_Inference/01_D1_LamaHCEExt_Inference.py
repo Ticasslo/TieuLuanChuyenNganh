@@ -139,6 +139,76 @@ def c2_winners(records):
     return list(winners.values())
 
 
+def d_demo_sources(input_root, context, c2_compare_dir):
+    summary_path = unique_file(input_root, "d_summary.json", required=False)
+    if summary_path is None:
+        return None, [], {}
+    d_root = summary_path.parent
+    files, _ = verified_manifest(d_root)
+    required = {"d_summary.json", "D_handoff.csv", "D_demo_runs.csv"}
+    if not required.issubset(files):
+        raise ValueError(f"{D_COMPARE_NOTEBOOK}: thiếu tệp bàn giao {sorted(required - set(files))}.")
+    summary = read_json(files["d_summary.json"])
+    s4d_inc = summary.get("S4D_included")
+    if not isinstance(s4d_inc, bool):
+        raise ValueError("d_summary.json thiếu cờ boolean S4D_included.")
+    expected_confs = list(D_CONFIGS if s4d_inc else D_CONFIGS[:-1])
+    inputs = summary.get("inputs") or {}
+    if (summary.get("complete") is not True or summary.get("notebook") != D_COMPARE_NOTEBOOK
+            or summary.get("step") != "D" or summary.get("library_commit") != FREEZE_C
+            or summary.get("configs") != expected_confs
+            or inputs.get("C2_manifest_sha256") != sha256(Path(c2_compare_dir) / "manifest.csv")):
+        raise ValueError("Bàn giao D Compare chưa hoàn tất hoặc khác C2 Compare / freeze-C.")
+    handoff = pd.read_csv(files["D_handoff.csv"]).set_index(["configuration", "seed"], verify_integrity=True)
+    demo_runs = pd.read_csv(files["D_demo_runs.csv"])
+    if len(demo_runs) != len(expected_confs) or set(demo_runs["configuration"]) != set(expected_confs):
+        raise ValueError("D_demo_runs.csv không khớp danh sách cấu hình D.")
+    env_paths = {}
+    for path in Path(input_root).rglob("environment.json"):
+        if path.parent.name == "c_output":
+            env_paths.setdefault(sha256(path), []).append(path)
+    ref_base = Forecast(name="A3", sim=context["persistence"], raw=context["persistence"], **context).validate()
+    records, sources = [], {}
+    for _, demo_row in demo_runs.iterrows():
+        conf, seed = str(demo_row["configuration"]), int(demo_row["seed"])
+        h_row = handoff.loc[(conf, seed)]
+        run = str(h_row["run"])
+        if run != str(demo_row["run"]) or str(h_row["demo"]).lower() != "true":
+            raise ValueError(f"D_demo_runs.csv lệch D_handoff.csv tại {run}.")
+        rel = str(h_row["contract_npz"])
+        if rel not in files or sha256(files[rel]) != str(h_row["sha256_contract_npz"]):
+            raise ValueError(f"NPZ D thiếu hoặc sai SHA-256: {rel}")
+        ref = read_contract(files[rel])
+        check_same_context(ref_base, ref)
+        ref.obs, ref.persistence, ref.area = context["obs"], context["persistence"], context["area"]
+        candidates = env_paths.get(str(h_row["sha256_environment_json"]), [])
+        if len(candidates) != 1:
+            raise FileNotFoundError(f"Cần gắn đúng một Output huấn luyện của {h_row['notebook']} cho {run}.")
+        env_path = candidates[0]
+        env = read_json(env_path)
+        run_dir = str(h_row["run_dir"])
+        if (env.get("run_dir") != run_dir or env.get("notebook") != str(h_row["notebook"])
+                or env.get("neuralhydrology_commit") != FREEZE_C
+                or env.get("summary", {}).get("status") != "xong"
+                or env.get("summary", {}).get("seq_length") != 730
+                or env.get("summary", {}).get("saved_epoch") != int(h_row["selected_epoch"])
+                or env.get("summary", {}).get("n_params") != int(h_row["n_params"])
+                or env.get("config_sha256") != str(h_row["sha256_config_yml"])):
+            raise ValueError(f"Nguồn huấn luyện D khác D_handoff.csv: {h_row['notebook']}")
+        sha_keys = {"config.yml": "sha256_config_yml", "best_model.pt": "sha256_best_model_pt",
+                    "train_data/train_data_scaler.yml": "sha256_train_data_scaler_yml"}
+        model_files = {name: contained_file(env_path.parent.parent, f"{run_dir}/{name}") for name in MODEL_FILES}
+        if any(sha256(f) != str(h_row[sha_keys[name]]) for name, f in model_files.items()):
+            raise ValueError(f"Checkpoint, config hoặc scaler D sai SHA-256: {h_row['notebook']}")
+        sources[run] = model_files
+        records.append(dict(
+            run=run, conf=conf, core=str(h_row["core"]), seed=seed, epoch=int(h_row["selected_epoch"]),
+            n_params=int(h_row["n_params"]), seq_length=730, contract=files[rel], forecast=ref,
+            notebook=str(h_row["notebook"]),
+        ))
+    return d_root, records, sources
+
+
 def audit_prediction(series, ref, index):
     prediction, observation = align_basin_lead(*series, ref.dates, ref.lead)
     result = dict(days=len(ref.dates),
@@ -166,6 +236,10 @@ C2_CONFIGS = ("lstm_L2_x1_lr1e-3", "gru_L2_x1_lr1e-3", "transformer_L2_x1_lr1e-3
               "mamba_L2_x1_lr1e-3", "mamba_L4_x3_lr1e-3")
 
 C2_SEEDS = (111, 222, 333)
+
+D_CONFIGS = ("lstm_L2_x1_lr1e-3", "mamba_L2_x1_lr1e-3", "s4d_L4_x1_lr1e-3")
+
+D_COMPARE_NOTEBOOK = "17_D_LamaHCEExt_Compare"
 
 LOG_FLOOR_MM_DAY = 1e-6
 
@@ -816,6 +890,43 @@ def run_d1(input_root, output):
         pd.DataFrame(run_rows).to_csv(output / "D1_run_check.csv", index=False)
         print(f"{len(run_rows)}/24 {run}: đạt đối chiếu {len(ref.ids)} lưu vực ({elapsed:.1f}s).", flush=True)
     pd.DataFrame(examples).to_csv(output / "D1_examples.csv", index=False)
+    d_root, d_records, d_sources = d_demo_sources(input_root, context, compare)
+    d_basin_rows, d_run_rows, d_examples = [], [], []
+    for d_rec in d_records:
+        run = d_rec["run"]
+        ref = d_rec["forecast"]
+        started = perf_counter()
+        predictor = DemoForecaster(d_sources[run]["best_model.pt"].parent, raw_dir, ref.ids, ref.area, output,
+                                   n_params=d_rec["n_params"])
+        records_start = len(d_basin_rows)
+        try:
+            for j, basin in enumerate(ref.ids):
+                series = predictor.predict_basin(basin)
+                prediction, audit = audit_prediction(series, ref, j)
+                d_basin_rows.append(dict(run=run, basin_id=basin, passed=True, **audit))
+                if j in (0, len(ref.ids)//2, len(ref.ids)-1):
+                    i = len(ref.dates)//2
+                    day = str(ref.dates[i].date())
+                    actual = predictor.predict(basin, day)[0]
+                    compare_arrays(np.array([actual["qmax_raw_mm_day"]]), prediction[i:i+1], PRED_ATOL, PRED_RTOL)
+                    d_examples.append(dict(run=run, **actual))
+        finally:
+            predictor.close()
+        elapsed = perf_counter() - started
+        d_run_rows.append(dict(run=run, configuration=d_rec["conf"], seed=d_rec["seed"], epoch=d_rec["epoch"],
+                               core=d_rec["core"], n_params=d_rec["n_params"], seq_length=730, horizon=1,
+                               days=len(ref.dates), IDs=len(d_basin_rows)-records_start, seconds=elapsed, passed=True,
+                               source_contract_sha256=sha256(d_rec["contract"]),
+                               **{f"{Path(name).name}_sha256": sha256(file) for name, file in d_sources[run].items()}))
+        del predictor
+        torch.cuda.empty_cache()
+        print(f"D {len(d_run_rows)}/{len(d_records)} {run}: đạt đối chiếu {len(ref.ids)} lưu vực ({elapsed:.1f}s).", flush=True)
+    extra_names = ()
+    if d_run_rows:
+        pd.DataFrame(d_basin_rows).to_csv(output / "D1_D_reproduction.csv", index=False)
+        pd.DataFrame(d_run_rows).to_csv(output / "D1_D_run_check.csv", index=False)
+        pd.DataFrame(d_examples).to_csv(output / "D1_D_examples.csv", index=False)
+        extra_names = ("D1_D_run_check.csv", "D1_D_reproduction.csv", "D1_D_examples.csv")
     summary = dict(complete=True, notebook="01_D1_LamaHCEExt_Inference", library_commit=FREEZE_C,
                    C2_compare_manifest_sha256=sha256(compare/"manifest.csv"), C2_compare_version_expected=1,
                    runs=len(run_rows), checks=len(basin_rows), IDs=len(context["ids"]), days=len(context["dates"]),
@@ -823,15 +934,24 @@ def run_d1(input_root, output):
                    max_raw_abs_error=max(row["max_raw_abs_error"] for row in basin_rows),
                    max_clip_abs_error=max(row["max_clip_abs_error"] for row in basin_rows),
                    default_demo_run=C2_DEFAULT)
+    if d_run_rows:
+        summary.update(
+            D_evaluated=True, D_compare_manifest_sha256=sha256(d_root/"manifest.csv"),
+            D_runs=len(d_run_rows), D_checks=len(d_basin_rows),
+            D_max_raw_abs_error=max(row["max_raw_abs_error"] for row in d_basin_rows),
+            D_max_clip_abs_error=max(row["max_clip_abs_error"] for row in d_basin_rows),
+        )
     write_json(summary_path, summary)
     env = output / "environment.json"
     write_json(env, dict(python=platform.python_version(), numpy=np.__version__, pandas=pd.__version__,
                          torch=torch.__version__, torch_cuda=torch.version.cuda, gpu=torch.cuda.get_device_name(0),
-                         neuralhydrology_commit=FREEZE_C, C2_train_version_expected=1, A3_version_expected=1))
-    names = ("D1_summary.json", "D1_run_check.csv", "D1_reproduction.csv", "D1_examples.csv", "environment.json")
+                         neuralhydrology_commit=FREEZE_C, C2_train_version_expected=1, A3_version_expected=1,
+                         D_evaluated=bool(d_run_rows)))
+    names = ("D1_summary.json", "D1_run_check.csv", "D1_reproduction.csv", "D1_examples.csv", *extra_names, "environment.json")
     export_manifest(output, [output/name for name in names])
     print(json.dumps(summary, ensure_ascii=False, indent=2))
-    print("Gửi D1_summary.json, D1_run_check.csv, D1_reproduction.csv, D1_examples.csv, environment.json, manifest.csv.")
+    print("Gửi D1_summary.json, D1_run_check.csv, D1_reproduction.csv, D1_examples.csv, environment.json, manifest.csv"
+          + (" (kèm D1_D_*.csv)." if d_run_rows else "."))
 
 
 if __name__ == "__main__":

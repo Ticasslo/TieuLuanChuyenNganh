@@ -17,7 +17,7 @@ Nhấn **Run All** sau khi gắn Input. Mỗi cấu hình lấy seed có NSE tru
 
 `complete=true` và `runs=8` xác nhận notebook đã xuất bảng đủ tám cấu hình. `numeric_passed=8` và `checks=36` ở mỗi dòng xác nhận cả 288 phép so nằm trong dung sai. Run lệch hoặc lỗi CPU có trạng thái `replay_only_numeric_or_runtime` và lý do trong cột `error`. Giữ lại bảng kể cả khi có run chỉ phát lại. Số đo p95 dùng để chốt độ trễ trên thiết bị đích.
 
-Gửi số Version, `D2_summary.json`, `D2_CPU_benchmark.csv`, `environment.json`, `manifest.csv` trong `/kaggle/working/d2_output`.
+Gửi số Version, `D2_summary.json`, `D2_CPU_benchmark.csv`, `environment.json`, `manifest.csv` trong `/kaggle/working/d2_output`. Khi gắn thêm Output `17_D_LamaHCEExt_Compare` và các Output huấn luyện đại diện trong `D_demo_runs.csv` (hai hoặc ba run bước D ở `seq_length=730`), D2 đối chiếu 36 lượt mỗi run trên CPU (`mambapy==1.2.0` cho Mamba, FFT cho S4D, PyTorch CPU cho LSTM) trực tiếp với NPZ GPU của D Compare (và kiểm chéo `D1_D_run_check.csv` nếu có), rồi xuất thêm `D2_D_CPU_benchmark.csv` kèm tỉ số độ trễ `p50_ratio_730_vs_365` và `p95_ratio_730_vs_365` so với cấu hình C2 365 bước tương ứng (phục vụ [Pipeline Mục 6.5](../../../Document/01_Plan/02_Pipeline.md#65-chi-phí-tính-toán) và Mục 9.6 mà không tốn giờ GPU).
 
 Đối chiếu triển khai CPU theo [mambapy 1.2.0](https://pypi.org/project/mambapy/1.2.0/) và [Phần 8 của thử nghiệm Mamba](../../04_Setup/01_0_MambaSSM_Build/01_0_MambaSSM_Build.md).
 

@@ -132,6 +132,76 @@ def c2_winners(records):
     return list(winners.values())
 
 
+def d_demo_sources(input_root, context, c2_compare_dir):
+    summary_path = unique_file(input_root, "d_summary.json", required=False)
+    if summary_path is None:
+        return None, [], {}
+    d_root = summary_path.parent
+    files, _ = verified_manifest(d_root)
+    required = {"d_summary.json", "D_handoff.csv", "D_demo_runs.csv"}
+    if not required.issubset(files):
+        raise ValueError(f"{D_COMPARE_NOTEBOOK}: thiếu tệp bàn giao {sorted(required - set(files))}.")
+    summary = read_json(files["d_summary.json"])
+    s4d_inc = summary.get("S4D_included")
+    if not isinstance(s4d_inc, bool):
+        raise ValueError("d_summary.json thiếu cờ boolean S4D_included.")
+    expected_confs = list(D_CONFIGS if s4d_inc else D_CONFIGS[:-1])
+    inputs = summary.get("inputs") or {}
+    if (summary.get("complete") is not True or summary.get("notebook") != D_COMPARE_NOTEBOOK
+            or summary.get("step") != "D" or summary.get("library_commit") != FREEZE_C
+            or summary.get("configs") != expected_confs
+            or inputs.get("C2_manifest_sha256") != sha256(Path(c2_compare_dir) / "manifest.csv")):
+        raise ValueError("Bàn giao D Compare chưa hoàn tất hoặc khác C2 Compare / freeze-C.")
+    handoff = pd.read_csv(files["D_handoff.csv"]).set_index(["configuration", "seed"], verify_integrity=True)
+    demo_runs = pd.read_csv(files["D_demo_runs.csv"])
+    if len(demo_runs) != len(expected_confs) or set(demo_runs["configuration"]) != set(expected_confs):
+        raise ValueError("D_demo_runs.csv không khớp danh sách cấu hình D.")
+    env_paths = {}
+    for path in Path(input_root).rglob("environment.json"):
+        if path.parent.name == "c_output":
+            env_paths.setdefault(sha256(path), []).append(path)
+    ref_base = Forecast(name="A3", sim=context["persistence"], raw=context["persistence"], **context).validate()
+    records, sources = [], {}
+    for _, demo_row in demo_runs.iterrows():
+        conf, seed = str(demo_row["configuration"]), int(demo_row["seed"])
+        h_row = handoff.loc[(conf, seed)]
+        run = str(h_row["run"])
+        if run != str(demo_row["run"]) or str(h_row["demo"]).lower() != "true":
+            raise ValueError(f"D_demo_runs.csv lệch D_handoff.csv tại {run}.")
+        rel = str(h_row["contract_npz"])
+        if rel not in files or sha256(files[rel]) != str(h_row["sha256_contract_npz"]):
+            raise ValueError(f"NPZ D thiếu hoặc sai SHA-256: {rel}")
+        ref = read_contract(files[rel])
+        check_same_context(ref_base, ref)
+        ref.obs, ref.persistence, ref.area = context["obs"], context["persistence"], context["area"]
+        candidates = env_paths.get(str(h_row["sha256_environment_json"]), [])
+        if len(candidates) != 1:
+            raise FileNotFoundError(f"Cần gắn đúng một Output huấn luyện của {h_row['notebook']} cho {run}.")
+        env_path = candidates[0]
+        env = read_json(env_path)
+        run_dir = str(h_row["run_dir"])
+        if (env.get("run_dir") != run_dir or env.get("notebook") != str(h_row["notebook"])
+                or env.get("neuralhydrology_commit") != FREEZE_C
+                or env.get("summary", {}).get("status") != "xong"
+                or env.get("summary", {}).get("seq_length") != 730
+                or env.get("summary", {}).get("saved_epoch") != int(h_row["selected_epoch"])
+                or env.get("summary", {}).get("n_params") != int(h_row["n_params"])
+                or env.get("config_sha256") != str(h_row["sha256_config_yml"])):
+            raise ValueError(f"Nguồn huấn luyện D khác D_handoff.csv: {h_row['notebook']}")
+        sha_keys = {"config.yml": "sha256_config_yml", "best_model.pt": "sha256_best_model_pt",
+                    "train_data/train_data_scaler.yml": "sha256_train_data_scaler_yml"}
+        model_files = {name: contained_file(env_path.parent.parent, f"{run_dir}/{name}") for name in MODEL_FILES}
+        if any(sha256(f) != str(h_row[sha_keys[name]]) for name, f in model_files.items()):
+            raise ValueError(f"Checkpoint, config hoặc scaler D sai SHA-256: {h_row['notebook']}")
+        sources[run] = model_files
+        records.append(dict(
+            run=run, conf=conf, core=str(h_row["core"]), seed=seed, epoch=int(h_row["selected_epoch"]),
+            n_params=int(h_row["n_params"]), seq_length=730, contract=files[rel], forecast=ref,
+            notebook=str(h_row["notebook"]),
+        ))
+    return d_root, records, sources
+
+
 def audit_prediction(series, ref, index):
     prediction, observation = align_basin_lead(*series, ref.dates, ref.lead)
     result = dict(days=len(ref.dates),

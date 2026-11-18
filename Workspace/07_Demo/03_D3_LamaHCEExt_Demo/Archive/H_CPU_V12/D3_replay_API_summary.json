@@ -1,0 +1,20 @@
+{
+  "forecast_api": 3297,
+  "forecast_traces": 33912,
+  "forecast_cells": 2015928,
+  "comparison_api": 144,
+  "comparison_cells": 64944,
+  "flood_api": 360,
+  "flood_rows": 6217,
+  "leads": {
+    "1": 18,
+    "2": 9,
+    "3": 9,
+    "4": 9,
+    "5": 9,
+    "6": 9,
+    "7": 9
+  },
+  "elapsed_seconds": 82.73155860000043,
+  "complete": true
+}

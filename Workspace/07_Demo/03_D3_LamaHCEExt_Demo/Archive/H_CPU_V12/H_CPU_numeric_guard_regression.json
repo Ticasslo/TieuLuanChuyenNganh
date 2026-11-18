@@ -1,0 +1,10 @@
+{
+  "complete": true,
+  "recovered_api_calls": 20,
+  "original_strict_excess": 20,
+  "max_single_window_mm_day": 0.0001068115234375,
+  "old_guard_atol_mm_day": 2e-05,
+  "new_guard_atol_mm_day": 0.0005,
+  "relative_tolerance": 1e-06,
+  "altered_replay_rejected": true
+}
