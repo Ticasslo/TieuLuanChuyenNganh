@@ -737,7 +737,7 @@ def compare(input_root, output_root, *, expected_ids=451):
                              float(d["summary"]["val_nse_median_best_model"]))
         d_cost_info = run_costs(d["summary"])
         handoff_rows.append(dict(
-            configuration=c, seed=s, run=pred.name, notebook=d["env"]["notebook"],
+            configuration=c, core=str(d["summary"]["core"]), seed=s, run=pred.name, notebook=d["env"]["notebook"],
             sessions=d_cost_info["sessions"], run_dir=d["env"]["run_dir"],
             selected_epoch=int(d["summary"]["saved_epoch"]), n_params=int(d["summary"]["n_params"]),
             library_commit=FREEZE_C, seq_length=730,
@@ -746,6 +746,7 @@ def compare(input_root, output_root, *, expected_ids=451):
             validation_NSE=float(d["summary"]["val_nse_median_best_model"]),
             test_NSE_native=float(audit["native_nse_median"]),
             demo=False,
+            sha256_environment_json=sha256(d["env_path"]),
             sha256_best_model_pt=sha256(d["files"]["best_model.pt"]),
             sha256_config_yml=sha256(d["files"]["config.yml"]),
             sha256_train_data_scaler_yml=sha256(d["files"]["train_data/train_data_scaler.yml"]),

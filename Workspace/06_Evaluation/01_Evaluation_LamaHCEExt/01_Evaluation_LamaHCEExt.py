@@ -1259,6 +1259,8 @@ def read_d_compare(root, c2_forecasts, c2_root, context, context_paths):
                         or str(h_row["grad_guard_enabled"]).lower() != str(gg_enabled).lower()
                         or int(h_row["grad_guard_skipped_steps"]) != gg_skips
                         or h_row["notebook"] != meta.get("training_notebook")
+                        or ("sha256_environment_json" in h_row.index
+                            and h_row["sha256_environment_json"] != meta["training_environment_sha256"])
                         or h_row["sha256_best_model_pt"] != meta["checkpoint_sha256"]
                         or h_row["sha256_config_yml"] != meta["config_sha256"]
                         or h_row["sha256_train_data_scaler_yml"] != meta["scaler_sha256"]
