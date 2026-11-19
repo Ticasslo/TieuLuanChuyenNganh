@@ -1,0 +1,39 @@
+{
+  "complete": true,
+  "protocol_version": 3,
+  "compare_notebook": "17_D_LamaHCEExt_Compare",
+  "library_commit": "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1",
+  "configs": [
+    "lstm_L2_x1_lr1e-3",
+    "mamba_L2_x1_lr1e-3",
+    "s4d_L4_x1_lr1e-3"
+  ],
+  "seeds": [
+    111,
+    222,
+    333
+  ],
+  "S4D_included": true,
+  "contracts": 9,
+  "paired_c2_runs": 9,
+  "total_scored_runs": 19,
+  "grad_guard_runs_with_skips": [],
+  "all_pairs_strictly_equivalent": true,
+  "event_tolerance_days": 0,
+  "supplementary_event_tolerance_days": 1,
+  "coverage": [
+    {
+      "period": "test",
+      "scenario": "S0",
+      "lead": 1,
+      "c2_runs": 9,
+      "d_runs": 9,
+      "runs": 19,
+      "days": 1461,
+      "start": "2014-01-01",
+      "end": "2017-12-31",
+      "common_day_IDs": 657347,
+      "IDs_with_days": 451
+    }
+  ]
+}

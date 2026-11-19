@@ -1,6 +1,6 @@
 # D3 • Demo phát lại Extended LamaH-CE
 
-**Demo D3 đã kiểm phát lại và suy luận CPU trên laptop.** Gói `downloads/D3_H_CPU_V12` kết hợp H Compare Version 1 với các bảng chấm H của Evaluation Version 12. Phần “Nếu… thì…” hỗ trợ năm lõi C2 và hai checkpoint H cách lai. Trang Giải thích và phần phát lại D chuỗi 730 bước chờ dữ liệu bàn giao tương ứng.
+**Demo D3 đã kiểm phát lại và suy luận CPU trên laptop cho đủ ba bước C2, H và D.** Gói chính thức `downloads/D3_CHD_CPU_V13` hợp nhất `13_C2` V1, `15_H` V1, `17_D` V1, `01_Evaluation` V13 (bảng S0, H và D), `01_D1` V2 và `02_D2` V2 (`451` lưu vực, `21` đường dự báo: `8` C2 + `8` H + `3` D + `2` mốc; phần “Nếu… thì…” hỗ trợ `7` mô hình gồm năm lõi C2 và hai checkpoint H cách lai; đã kiểm HTTP trực tiếp `/api/health`, `/api/catalog`, `/api/forecast`, `/api/comparison`, `/api/flood` và `/api/what-if` trên cổng `8053`). Trang Giải thích chờ dữ liệu bàn giao bước G (`G_IntegratedGradients.csv`).
 
 Trang Dự báo có bản đồ vùng nghiên cứu, 451 trạm, lịch test, các đường qmax và ngưỡng lũ theo m³/s. C2 giữ tám cấu hình thuộc năm lõi, mỗi cấu hình dùng một seed theo NSE validation. GRU seed 111 bật sẵn. Chức năng “nếu… thì…” dùng một cấu hình đại diện mỗi lõi C2, lấy cấu hình và seed có NSE validation cao nhất của lõi trong số đã kiểm CPU.
 

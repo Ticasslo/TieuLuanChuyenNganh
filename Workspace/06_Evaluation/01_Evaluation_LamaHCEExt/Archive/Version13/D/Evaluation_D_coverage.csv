@@ -1,0 +1,2 @@
+﻿period,scenario,lead,c2_runs,d_runs,runs,days,start,end,common_day_IDs,IDs_with_days
+test,S0,1,9,9,19,1461,2014-01-01,2017-12-31,657347,451

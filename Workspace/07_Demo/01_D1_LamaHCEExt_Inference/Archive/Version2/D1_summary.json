@@ -1,0 +1,23 @@
+{
+  "complete": true,
+  "notebook": "01_D1_LamaHCEExt_Inference",
+  "library_commit": "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1",
+  "C2_compare_manifest_sha256": "50cb35873409a945a3f99bb41f6fb5a29553e2af2b6c387dcfd15b47ed094c08",
+  "C2_compare_version_expected": 1,
+  "runs": 24,
+  "checks": 10824,
+  "IDs": 451,
+  "days": 1461,
+  "atol": 2e-05,
+  "rtol": 1e-06,
+  "optimizer_steps": 0,
+  "max_raw_abs_error": 0.0,
+  "max_clip_abs_error": 0.0,
+  "default_demo_run": "SF_gru_L2_x1_lr1e-3_C2_seed111",
+  "D_evaluated": true,
+  "D_compare_manifest_sha256": "b1ff6006a08fd70d3ec4150902746966cba667ac9f9ebf5250962d7e9c9e9899",
+  "D_runs": 3,
+  "D_checks": 1353,
+  "D_max_raw_abs_error": 0.0,
+  "D_max_clip_abs_error": 0.0
+}

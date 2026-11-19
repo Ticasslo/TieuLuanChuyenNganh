@@ -1,0 +1,12 @@
+{
+  "python": "3.13.15",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3",
+  "torch": "2.11.0+cu128",
+  "torch_cuda": "12.8",
+  "gpu": "Tesla T4",
+  "neuralhydrology_commit": "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1",
+  "C2_train_version_expected": 1,
+  "A3_version_expected": 1,
+  "D_evaluated": true
+}

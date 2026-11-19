@@ -39,3 +39,15 @@ D2 dùng 4 luồng CPU, PyTorch 2.11.0+cpu, mambapy 1.2.0 và `freeze-C`. Cả 8
 RSS đỉnh của tiến trình trong phiên Kaggle là 583,34 MiB. Lần dự báo đầu tiên của GRU, cấu hình chạy đầu notebook, mất 3,33 giây khi chưa nạp dữ liệu lưu vực, bên cạnh 4,58 giây đo riêng khi nạp mô hình. Năm cấu hình đại diện đủ điều kiện về sai số để đóng gói ô “nếu… thì…” cho D3. Đo lại độ trễ trên laptop và VPS trước khi chốt khả năng chạy trực tiếp trên từng máy.
 
 [Bảng benchmark gốc](Archive/Version1/D2_CPU_benchmark.csv), [summary](Archive/Version1/D2_summary.json), [môi trường](Archive/Version1/environment.json) và [manifest](Archive/Version1/manifest.csv).
+
+## Kết quả Kaggle Version 2 (bổ sung bước D 730 bước)
+
+Version 2 (16 Input, 4 luồng CPU, PyTorch 2.11.0+cpu, `mambapy==1.2.0`, `freeze-C`, đối chiếu `01_D1_LamaHCEExt_Inference` Version 2 manifest `7c5b3234...` và `17_D_LamaHCEExt_Compare` Version 1 manifest `b1ff6006...`) đạt trọn **8/8 cấu hình C2** (`288/288` phép kiểm) và **3/3 cấu hình đại diện bước D** (`108/108` phép kiểm, `D_numeric_passed = 3`), toàn bộ `4/4` tệp trong `manifest.csv` khớp SHA-256.
+
+| Run D (`seq_length = 730`) | Seed | Kiểm đạt | Sai số tối đa (mm/ngày) | p50 ấm (ms) | Tỉ số p50 `730/365` | p95 ấm (ms) | Tỉ số p95 `730/365` |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `SF_lstm_L2_x1_lr1e-3_D_seed333` | 333 | 36/36 | 2,2 × 10⁻⁵ | 19,92 | 1,50× | 22,11 | 0,83× |
+| `SF_mamba_L2_x1_lr1e-3_D_seed333` | 333 | 36/36 | 7,0 × 10⁻⁶ | 61,72 | 2,42× | 70,42 | 2,15× |
+| `SF_s4d_L4_x1_lr1e-3_D_seed111` | 111 | 36/36 | 2,2 × 10⁻⁵ | 127,96 | 1,83× | 134,29 | 1,85× |
+
+[Bảng benchmark C2 V2](Archive/Version2/D2_CPU_benchmark.csv) · [Bảng benchmark D V2](Archive/Version2/D2_D_CPU_benchmark.csv) · [summary V2](Archive/Version2/D2_summary.json) · [manifest V2](Archive/Version2/manifest.csv).

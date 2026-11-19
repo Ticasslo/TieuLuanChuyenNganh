@@ -1,0 +1,14 @@
+{
+  "notebook": "17_D_LamaHCEExt_Compare",
+  "source_neuralhydrology_commit": "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1",
+  "python": "3.13.15",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3",
+  "A3_version_expected": 1,
+  "C2_compare_version_expected": 1,
+  "C2_manifest_sha256": "50cb35873409a945a3f99bb41f6fb5a29553e2af2b6c387dcfd15b47ed094c08",
+  "A3": {
+    "A3_persistence_predictions.npz": "b6857136bf82d09e229207bad70ca1d52188f65f16164121befa5951350cdd79",
+    "A3_Q_source_window.npz": "48a4b3ae0d88afef11c27e646c0313ca3cd3375fac0a978787271f023724929a"
+  }
+}

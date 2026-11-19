@@ -1,0 +1,66 @@
+{
+  "complete": true,
+  "notebook": "17_D_LamaHCEExt_Compare",
+  "step": "D",
+  "library_commit": "db6dc1ffcd8c14994cd80be3ed8ff417002c01a1",
+  "configs": [
+    "lstm_L2_x1_lr1e-3",
+    "mamba_L2_x1_lr1e-3",
+    "s4d_L4_x1_lr1e-3"
+  ],
+  "seeds": [
+    111,
+    222,
+    333
+  ],
+  "S4D_included": true,
+  "contracts": 9,
+  "IDs": 451,
+  "forecast_horizon": 1,
+  "b0_noise_sd": 0.007932303438926078,
+  "common_day_IDs": 657347,
+  "IDs_with_days": 451,
+  "train_sample_counts_verified": false,
+  "grad_guard_runs_with_skips": [],
+  "all_pairs_strictly_equivalent": true,
+  "demo_runs": {
+    "lstm_L2_x1_lr1e-3": {
+      "seed": 333,
+      "run": "SF_lstm_L2_x1_lr1e-3_D_seed333",
+      "validation_NSE": 0.7727961332181937,
+      "notebook": "16_D_Train_lstm_L2_x1_lr1e-3_Seed333"
+    },
+    "mamba_L2_x1_lr1e-3": {
+      "seed": 333,
+      "run": "SF_mamba_L2_x1_lr1e-3_D_seed333",
+      "validation_NSE": 0.7683744442572429,
+      "notebook": "16_D_Train_mamba_L2_x1_lr1e-3_Seed333_Cont"
+    },
+    "s4d_L4_x1_lr1e-3": {
+      "seed": 111,
+      "run": "SF_s4d_L4_x1_lr1e-3_D_seed111",
+      "validation_NSE": 0.7486317251343553,
+      "notebook": "16_D_Train_s4d_L4_x1_lr1e-3_Seed111_Cont"
+    }
+  },
+  "scope": "test_S0_common_all_C2_and_D",
+  "inputs": {
+    "C2_compare_version_expected": 1,
+    "C2_manifest_sha256": "50cb35873409a945a3f99bb41f6fb5a29553e2af2b6c387dcfd15b47ed094c08",
+    "A3": {
+      "A3_persistence_predictions.npz": "b6857136bf82d09e229207bad70ca1d52188f65f16164121befa5951350cdd79",
+      "A3_Q_source_window.npz": "48a4b3ae0d88afef11c27e646c0313ca3cd3375fac0a978787271f023724929a"
+    }
+  },
+  "output_contracts": [
+    "contracts/SF_lstm_L2_x1_lr1e-3_D_seed111_test_S0_lead1.npz",
+    "contracts/SF_lstm_L2_x1_lr1e-3_D_seed222_test_S0_lead1.npz",
+    "contracts/SF_lstm_L2_x1_lr1e-3_D_seed333_test_S0_lead1.npz",
+    "contracts/SF_s4d_L4_x1_lr1e-3_D_seed111_test_S0_lead1.npz",
+    "contracts/SF_s4d_L4_x1_lr1e-3_D_seed222_test_S0_lead1.npz",
+    "contracts/SF_s4d_L4_x1_lr1e-3_D_seed333_test_S0_lead1.npz",
+    "contracts/SF_mamba_L2_x1_lr1e-3_D_seed111_test_S0_lead1.npz",
+    "contracts/SF_mamba_L2_x1_lr1e-3_D_seed222_test_S0_lead1.npz",
+    "contracts/SF_mamba_L2_x1_lr1e-3_D_seed333_test_S0_lead1.npz"
+  ]
+}

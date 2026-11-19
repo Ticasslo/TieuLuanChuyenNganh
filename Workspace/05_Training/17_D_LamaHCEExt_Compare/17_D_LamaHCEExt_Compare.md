@@ -63,23 +63,31 @@ Ba lượt `16_D_Train_lstm_L2_x1_lr1e-3_Seed111/222/333` (Version 1, Tesla T4, 
 - **Dòng chảy rất cao, sự kiện lũ và đặc trưng lưu vực:** Recall nhóm lưu lượng rất cao (`> Q98`, 11.871 ngày–lưu vực) tăng nhẹ ở cả ba hạt giống (từ `0,4471–0,4743` lên `0,4562–0,4797`), và sai số tuyệt đối trung bình thời điểm đỉnh lũ USWRC chu kỳ 2 năm giảm từ `0,37–0,57` ngày xuống `0,24–0,39` ngày. Xét hiệu `ΔNSE (730 − 365)` trung bình ba hạt giống theo 451 lưu vực (kiểm định hoán vị hai phía 9.999 lần), cửa sổ hai năm cải thiện có ý nghĩa thống kê tại các lưu vực có băng hà và tuyết tích lũy nhiều năm: `glac_fra` (`ρ = +0,1405`, `p = 0,0026`), `frac_snow` (`ρ = +0,1394`, `p = 0,0034`) và độ cao trung bình `elev_mean` (`ρ = +0,1057`, `p = 0,0251`).
 - **Chi phí huấn luyện và suy luận CPU:** Trên Tesla T4, trung vị thời gian huấn luyện mỗi epoch tăng từ `3,20` phút (C2) lên `6,18` phút (`1,93×`, sát tỉ lệ tuyến tính `730 / 365 = 2,00×`), tổng giờ huấn luyện tăng từ `2,06` lên `3,86` giờ (`1,87×`) và đỉnh bộ nhớ GPU tăng từ `2.381` lên `4.083` MiB (`1,71×`). Kiểm thử suy luận CPU theo giao thức D2 (36 lượt trên ba lưu vực đại diện diện tích nhỏ/trung vị/lớn, 4 luồng CPU) cho hạt giống 333 đạt 36/36 lượt khớp NPZ trong dung sai `2 × 10⁻⁵ + 10⁻⁶|y|` mm/ngày (sai số tuyệt đối lớn nhất `2,19 × 10⁻⁵` mm/ngày), với độ trễ ấm `p50` tăng `2,03×` (`7,15 → 14,53` ms) và `p95 = 32,59` ms.
 
-## 5. Kết quả đã xác minh: toàn bộ 9/9 run Bước D (`LSTM`, `Mamba`, `S4D`)
+## 5. Kết quả đã xác minh: toàn bộ 9/9 run Bước D và `17_D_LamaHCEExt_Compare` Version 1
 
 Toàn bộ **9/9 run Bước D** (`3/3 lstm_L2_x1_lr1e-3`, `3/3 mamba_L2_x1_lr1e-3 _Cont`, `3/3 s4d_L4_x1_lr1e-3 _Cont`) đã hoàn thành đủ 30 epoch huấn luyện và 30 epoch test trên Tesla T4 (`freeze-C`, tắt `grad_guard`, 0 bước cập nhật bị bỏ), khớp 100% SHA-256 `manifest.csv`, `best_model.pt` trùng từng tensor với epoch chọn và `train_data_scaler.yml` trùng byte chuẩn 730 bước `f6d8ffa6...`.
 
-| Cấu hình & hạt giống | Epoch chọn (365 / 730) | NSE val (365 / 730) | NSE test giao 9 cặp (365 / 730) | KGE test giao 9 cặp (365 / 730) | Phút train/ep (730 / tỷ số C2) | Giờ train (730) | VRAM đỉnh (MiB) |
-|---|---|---:|---:|---:|---:|---:|---:|
-| Mamba Seed 111 (`_Cont`) | 25 / 26 | 0,7630 / 0,7617 (−0,0013) | 0,7261 / 0,7230 (−0,0031) | 0,7596 / 0,7543 (−0,0052) | 16,35 (`1,87×`) | 9,75 | 3.065 |
-| Mamba Seed 222 (`_Cont`) | 15 / 23 | 0,7672 / 0,7622 (−0,0050) | 0,7152 / 0,7185 (+0,0033) | 0,7830 / 0,7769 (−0,0062) | 16,95 (`1,94×`) | 10,12 | 3.065 |
-| **Mamba Seed 333 (`_Cont`, Demo)** | 20 / **20** | 0,7588 / **0,7684** (+0,0096) | 0,7197 / 0,7125 (−0,0072) | 0,7494 / 0,7481 (−0,0012) | 17,02 (`1,94×`) | 10,16 | 3.065 |
-| **Mamba TB ± SD (3 hạt giống)** | — | **0,7630 ± 0,0042 / 0,7641 ± 0,0037** | **0,7204 ± 0,0055 / 0,7180 ± 0,0053** | **0,7640 ± 0,0172 / 0,7598 ± 0,0151** | **16,77 (`1,92×`)** | **10,01** | **3.065** |
-| **S4D Seed 111 (`_Cont`, Demo)** | 14 / **19** | 0,7377 / **0,7486** (+0,0109) | 0,6991 / **0,7079** (+0,0088) | 0,7299 / 0,7307 (+0,0009) | 21,12 (`2,05×`) | 13,10 | 4.227 |
-| S4D Seed 222 (`_Cont`) | 22 / 23 | 0,7445 / 0,7396 (−0,0049) | 0,6887 / 0,6890 (+0,0003) | 0,7270 / 0,7251 (−0,0019) | 20,24 (`1,97×`) | 12,82 | 4.227 |
-| S4D Seed 333 (`_Cont`) | 12 / 16 | 0,7381 / 0,7401 (+0,0020) | 0,6921 / 0,6990 (+0,0068) | 0,7277 / 0,7324 (+0,0047) | 20,24 (`1,97×`) | 12,67 | 4.227 |
-| **S4D TB ± SD (3 hạt giống)** | — | **0,7401 ± 0,0038 / 0,7428 ± 0,0051** | **0,6933 ± 0,0053 / 0,6986 ± 0,0095** | **0,7282 ± 0,0015 / 0,7294 ± 0,0038** | **20,53 (`1,99×`)** | **12,86** | **4.227** |
+**Notebook `17_D_LamaHCEExt_Compare` Version 1** (Kaggle CPU, Internet Off, 20 Input) đã hoàn tất (`complete = true`, `S4D_included = true`, `contracts = 9`, `all_pairs_strictly_equivalent = true`, `24/24` tệp trong [manifest.csv](Tables/manifest.csv) khớp SHA-256 và dung lượng, `train_sample_counts_verified = false` do `summary.json` nguồn không ghi khóa `train_samples` như dự kiến ở Mục 2). Toàn bộ bảng nhỏ và hình đã lưu tại [Tables/](Tables/) và [D_Length_Comparison.png](Figures/D_Length_Comparison.png).
 
-- **Tổ hợp 3 hạt giống trên giao chung đủ 9 cặp (657.347 ngày–lưu vực, 451 lưu vực):**
-  - `LSTM`: NSE tổ hợp `0,7351 → 0,7338` (`Δ = −0,0012`, `−0,16×` nhiễu B0), PNSE tổ hợp `0,5591 → 0,5527` (`−0,0064`), KGE tổ hợp `0,7767 → 0,7799` (`+0,0031`). Demo D: **Seed 333** (`val = 0,7728`).
+| Cấu hình & hạt giống | Epoch chọn (365 / 730) | NSE val (365 / 730) | NSE test giao 9 cặp (365 / 730) | KGE test giao 9 cặp (365 / 730) | Phút train/ep (730 / tỷ số cặp C2) | Giờ train (730) | VRAM đỉnh (MiB) |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Mamba Seed 111 (`_Cont`) | 25 / 26 | 0,7630 / 0,7617 (−0,0013) | 0,7261 / 0,7230 (−0,0031) | 0,7596 / 0,7543 (−0,0052) | 16,35 (`1,98×`) | 9,75 | 3.065 |
+| Mamba Seed 222 (`_Cont`) | 15 / 23 | 0,7672 / 0,7622 (−0,0050) | 0,7152 / 0,7185 (+0,0033) | 0,7830 / 0,7769 (−0,0062) | 16,95 (`1,92×`) | 10,12 | 3.065 |
+| **Mamba Seed 333 (`_Cont`, Demo)** | 20 / **20** | 0,7588 / **0,7684** (+0,0096) | 0,7197 / 0,7125 (−0,0072) | 0,7494 / 0,7481 (−0,0012) | 17,02 (`1,94×`) | 10,16 | 3.065 |
+| **Mamba TB ± SD (3 hạt giống)** | — | **0,7630 ± 0,0042 / 0,7641 ± 0,0037** | **0,7204 ± 0,0055 / 0,7180 ± 0,0053** | **0,7640 ± 0,0172 / 0,7598 ± 0,0151** | **16,77 (`1,95×`)** | **10,01** | **3.065** |
+| **S4D Seed 111 (`_Cont`, Demo)** | 14 / **19** | 0,7377 / **0,7486** (+0,0109) | 0,6991 / **0,7079** (+0,0088) | 0,7299 / 0,7307 (+0,0009) | 21,12 (`1,92×`) | 13,10 | 4.227 |
+| S4D Seed 222 (`_Cont`) | 22 / 23 | 0,7445 / 0,7396 (−0,0049) | 0,6887 / 0,6890 (+0,0003) | 0,7270 / 0,7251 (−0,0019) | 20,24 (`1,97×`) | 12,82 | 4.227 |
+| S4D Seed 333 (`_Cont`) | 12 / 16 | 0,7381 / 0,7401 (+0,0020) | 0,6921 / 0,6990 (+0,0068) | 0,7277 / 0,7324 (+0,0047) | 20,24 (`1,99×`) | 12,67 | 4.227 |
+| **S4D TB ± SD (3 hạt giống)** | — | **0,7401 ± 0,0038 / 0,7428 ± 0,0051** | **0,6933 ± 0,0053 / 0,6986 ± 0,0095** | **0,7282 ± 0,0015 / 0,7294 ± 0,0038** | **20,53 (`1,96×`)** | **12,86** | **4.227** |
+
+- **Tỷ số chi phí ghép cặp cùng seed (`D_cost_ratios.csv`, Tesla T4):** khi so từng hạt giống `730 / 365`, tốc độ huấn luyện mỗi epoch tăng đồng đều xấp xỉ hai lần ở cả ba lõi — **LSTM `1,96×`** (`1,84× / 1,93× / 2,11×`; tổng giờ train `1,80× / 1,86× / 2,02×`; VRAM `1,71×`), **Mamba `1,95×`** (`1,98× / 1,92× / 1,94×`; tổng giờ `1,94× / 1,89× / 1,92×`; VRAM `1,69×`), **S4D `1,96×`** (`1,92× / 1,97× / 1,99×`; tổng giờ `1,92× / 2,00× / 1,99×`; VRAM `1,75×`).
+
+![So sánh độ dài chuỗi 730 vs 365 ngày](Figures/D_Length_Comparison.png)
+
+*Hình:* So sánh độ dài chuỗi đầu vào 730 ngày so với 365 ngày trên kỳ test 2014–2017 (`451` lưu vực có ngày chung, hạn dự báo 1 ngày, 3 hạt giống mỗi lõi). (a) Hiệu NSE trung vị giữa cửa sổ 730 và 365 ngày (trung bình ± độ lệch chuẩn mẫu: LSTM `−0,0016 ± 0,0015`; Mamba `−0,0023 ± 0,0053`; S4D `+0,0053 ± 0,0045`). (b) Tỷ số thời gian huấn luyện trung vị mỗi epoch của 730 chia cho 365 ngày theo từng cặp hạt giống (trung bình: LSTM `1,96` lần; Mamba `1,95` lần; S4D `1,96` lần). Nguồn: [D_cost_ratios.csv](Tables/D_cost_ratios.csv), [D_score_stats.csv](Tables/D_score_stats.csv).
+
+- **Tổ hợp 3 hạt giống trên giao chung đủ 9 cặp (`657.347` ngày–lưu vực, `451` lưu vực; [D_ensemble_scores.csv](Tables/D_ensemble_scores.csv)):**
+  - `LSTM`: NSE tổ hợp `0,7351 → 0,7338` (`Δ = −0,0012`, `−0,16×` nhiễu B0), PNSE tổ hợp `0,5591 → 0,5527` (`−0,0064`), KGE tổ hợp `0,7767 → 0,7799` (`+0,0031`). Demo D ([D_demo_runs.csv](Tables/D_demo_runs.csv)): **Seed 333** (`val = 0,7728`).
   - `Mamba`: NSE tổ hợp `0,7330 → 0,7327` (`Δ = −0,0003`, `−0,04×` nhiễu B0), PNSE tổ hợp `0,5545 → 0,5556` (`+0,0012`), KGE tổ hợp `0,7766 → 0,7586` (`−0,0180`). Demo D: **Seed 333 (`_Cont`)** (`val = 0,7684`).
   - `S4D`: NSE tổ hợp `0,7127 → 0,7162` (`Δ = +0,0036`, `+0,45×` nhiễu B0), PNSE tổ hợp `0,5157 → 0,5225` (`+0,0068`), KGE tổ hợp `0,7320 → 0,7333` (`+0,0013`). Demo D: **Seed 111 (`_Cont`)** (`val = 0,7486`, hơn Seed 333 `+0,0085`).
 - **Kiểm định cặp, dòng chảy rất cao (`> Q98`), lũ 2 năm USWRC và đặc trưng lưu vực (đủ 3 lõi × 3 seed):**
@@ -89,6 +97,6 @@ Toàn bộ **9/9 run Bước D** (`3/3 lstm_L2_x1_lr1e-3`, `3/3 mamba_L2_x1_lr1e
 - **Suy luận CPU (giao thức D2, 36 lượt, 4 luồng CPU):**
   - **Mamba Seed 333 (`mambapy`):** đạt **36/36** trong dung sai `2 × 10⁻⁵ + 10⁻⁶|y|` mm/ngày (`max_abs = 5,72 × 10⁻⁶` mm/ngày), độ trễ ấm `p50 = 46,18` ms (`1,29×` bản 365 bước `35,82` ms) và `p95 = 66,61` ms (`1,48×` bản 365 bước `45,02` ms).
   - **S4D Seed 111, 222 và 333 (FFT trên CPU):** đạt độ trễ ấm `p50 = 123,87`, `114,50` và `119,58` ms (`1,64×`, `1,52×` và `1,59×` so với C2 `75,32` ms; `p95 = 148,41`, `122,21` và `160,34` ms); Seed 222 đạt **36/36** (`max_abs = 1,19 × 10⁻⁵`), Seed 333 đạt **36/36** (`max_abs = 2,67 × 10⁻⁵`), còn Seed 111 đạt **35/36** với đúng 1 điểm (`ID 101`, `2017-08-20`, `15,47` mm/ngày) lệch `5,63 × 10⁻⁵` mm/ngày (`3,64 × 10⁻⁶` tương đối) do sai số làm tròn float32 giữa FFT CPU và cuFFT 730 bước.
-- **Triển khai kế tiếp trên Kaggle:** gắn đủ **20 Input** (9 cặp C2 + 9 cặp D + A3 V1 + C2 Compare V1) để chạy `17_D_LamaHCEExt_Compare` → `01_Evaluation_LamaHCEExt` (`evaluation_output/D/`) → `02_Evaluation_LamaHCEExt_ByBasin` → `01_D1_LamaHCEExt_Inference` → `02_D2_LamaHCEExt_CPU`, sau đó đóng gói `03_D3_LamaHCEExt_Demo`.
+- **Triển khai kế tiếp trên Kaggle:** `01_Evaluation_LamaHCEExt` (`evaluation_output/D/`, 12 Input) → `02_Evaluation_LamaHCEExt_ByBasin` (4 Input) → `01_D1_LamaHCEExt_Inference` (T4, 32 Input) → `02_D2_LamaHCEExt_CPU` (CPU), sau đó đóng gói `03_D3_LamaHCEExt_Demo`. Bảng bàn giao: [d_summary.json](Tables/d_summary.json), [D_handoff.csv](Tables/D_handoff.csv).
 
 Nguồn: [Pipeline Mục 7 và 8.3](../../../Document/01_Plan/02_Pipeline.md), [C2 Compare](../13_C2_LamaHCEExt_Compare/13_C2_LamaHCEExt_Compare.md).

@@ -1,0 +1,134 @@
+{
+  "analysis_protocol_version": 4,
+  "step": "D",
+  "scope": "test/S0/lead1/common_source_all_D_partition",
+  "expected_IDs": 451,
+  "configs": [
+    "lstm_L2_x1_lr1e-3",
+    "mamba_L2_x1_lr1e-3",
+    "s4d_L4_x1_lr1e-3"
+  ],
+  "S4D_included": true,
+  "all_pairs_strictly_equivalent": true,
+  "grad_guard_runs_with_skips": [],
+  "contrasts": [
+    {
+      "left": "SF_lstm_L2_x1_lr1e-3_D_seed111",
+      "right": "SF_lstm_L2_x1_lr1e-3_C2_seed111"
+    },
+    {
+      "left": "SF_lstm_L2_x1_lr1e-3_D_seed222",
+      "right": "SF_lstm_L2_x1_lr1e-3_C2_seed222"
+    },
+    {
+      "left": "SF_lstm_L2_x1_lr1e-3_D_seed333",
+      "right": "SF_lstm_L2_x1_lr1e-3_C2_seed333"
+    },
+    {
+      "left": "SF_mamba_L2_x1_lr1e-3_D_seed111",
+      "right": "SF_mamba_L2_x1_lr1e-3_C2_seed111"
+    },
+    {
+      "left": "SF_mamba_L2_x1_lr1e-3_D_seed222",
+      "right": "SF_mamba_L2_x1_lr1e-3_C2_seed222"
+    },
+    {
+      "left": "SF_mamba_L2_x1_lr1e-3_D_seed333",
+      "right": "SF_mamba_L2_x1_lr1e-3_C2_seed333"
+    },
+    {
+      "left": "SF_s4d_L4_x1_lr1e-3_D_seed111",
+      "right": "SF_s4d_L4_x1_lr1e-3_C2_seed111"
+    },
+    {
+      "left": "SF_s4d_L4_x1_lr1e-3_D_seed222",
+      "right": "SF_s4d_L4_x1_lr1e-3_C2_seed222"
+    },
+    {
+      "left": "SF_s4d_L4_x1_lr1e-3_D_seed333",
+      "right": "SF_s4d_L4_x1_lr1e-3_C2_seed333"
+    }
+  ],
+  "seed_families": {
+    "D_lstm_L2_x1_lr1e-3_730_minus_365": [
+      "SF_lstm_L2_x1_lr1e-3_D_seed111",
+      "SF_lstm_L2_x1_lr1e-3_D_seed222",
+      "SF_lstm_L2_x1_lr1e-3_D_seed333"
+    ],
+    "D_mamba_L2_x1_lr1e-3_730_minus_365": [
+      "SF_mamba_L2_x1_lr1e-3_D_seed111",
+      "SF_mamba_L2_x1_lr1e-3_D_seed222",
+      "SF_mamba_L2_x1_lr1e-3_D_seed333"
+    ],
+    "D_s4d_L4_x1_lr1e-3_730_minus_365": [
+      "SF_s4d_L4_x1_lr1e-3_D_seed111",
+      "SF_s4d_L4_x1_lr1e-3_D_seed222",
+      "SF_s4d_L4_x1_lr1e-3_D_seed333"
+    ]
+  },
+  "family_references": {
+    "D_lstm_L2_x1_lr1e-3_730_minus_365": [
+      "SF_lstm_L2_x1_lr1e-3_C2_seed111",
+      "SF_lstm_L2_x1_lr1e-3_C2_seed222",
+      "SF_lstm_L2_x1_lr1e-3_C2_seed333"
+    ],
+    "D_mamba_L2_x1_lr1e-3_730_minus_365": [
+      "SF_mamba_L2_x1_lr1e-3_C2_seed111",
+      "SF_mamba_L2_x1_lr1e-3_C2_seed222",
+      "SF_mamba_L2_x1_lr1e-3_C2_seed333"
+    ],
+    "D_s4d_L4_x1_lr1e-3_730_minus_365": [
+      "SF_s4d_L4_x1_lr1e-3_C2_seed111",
+      "SF_s4d_L4_x1_lr1e-3_C2_seed222",
+      "SF_s4d_L4_x1_lr1e-3_C2_seed333"
+    ]
+  },
+  "static_predictors": [
+    "area_calc",
+    "elev_mean",
+    "elev_med",
+    "elev_std",
+    "elev_ran",
+    "slope_mean",
+    "mvert_dist",
+    "elon_ratio",
+    "strm_dens",
+    "p_mean",
+    "et0_mean",
+    "eta_mean",
+    "arid_1",
+    "arid_2",
+    "p_season",
+    "frac_snow",
+    "hi_prec_fr",
+    "hi_prec_du",
+    "lo_prec_fr",
+    "lo_prec_du",
+    "agr_fra",
+    "bare_fra",
+    "forest_fra",
+    "lake_fra",
+    "urban_fra",
+    "lai_max",
+    "lai_diff",
+    "ndvi_max",
+    "ndvi_min",
+    "gvf_max",
+    "gvf_diff"
+  ],
+  "priority_attributes": [
+    "area_calc",
+    "elev_mean",
+    "frac_snow",
+    "arid_1"
+  ],
+  "outcomes": [
+    "delta_NSE",
+    "delta_PNSE",
+    "delta_POD_T2"
+  ],
+  "permutations": 9999,
+  "seed": 20261023,
+  "holm_family": "31_static_features_per_D_contrast_and_outcome_finite_p_only",
+  "test_used_for_selection": false
+}

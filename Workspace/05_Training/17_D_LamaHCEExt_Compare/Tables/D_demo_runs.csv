@@ -1,0 +1,4 @@
+﻿configuration,seed,run,selected_epoch,validation_NSE,gap_to_second_seed,tie,test_NSE_native,notebook,sessions,run_dir,contract_npz
+lstm_L2_x1_lr1e-3,333,SF_lstm_L2_x1_lr1e-3_D_seed333,28,0.7727961332181937,0.0010557384522359436,False,0.7147726759708051,16_D_Train_lstm_L2_x1_lr1e-3_Seed333,1,c_runs/D_lstm_L2_x1_lr1e-3_seed333_1811_001303,contracts/SF_lstm_L2_x1_lr1e-3_D_seed333_test_S0_lead1.npz
+mamba_L2_x1_lr1e-3,333,SF_mamba_L2_x1_lr1e-3_D_seed333,20,0.7683744442572429,0.006131292220706852,False,0.7125021463857436,16_D_Train_mamba_L2_x1_lr1e-3_Seed333_Cont,2,c_runs/D_mamba_L2_x1_lr1e-3_seed333_1811_015810,contracts/SF_mamba_L2_x1_lr1e-3_D_seed333_test_S0_lead1.npz
+s4d_L4_x1_lr1e-3,111,SF_s4d_L4_x1_lr1e-3_D_seed111,19,0.7486317251343553,0.008499778209792308,False,0.7079375129633956,16_D_Train_s4d_L4_x1_lr1e-3_Seed111_Cont,2,c_runs/D_s4d_L4_x1_lr1e-3_seed111_1811_000625,contracts/SF_s4d_L4_x1_lr1e-3_D_seed111_test_S0_lead1.npz

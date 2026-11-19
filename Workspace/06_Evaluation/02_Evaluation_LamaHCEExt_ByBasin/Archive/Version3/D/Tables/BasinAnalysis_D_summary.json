@@ -1,0 +1,27 @@
+{
+  "complete": true,
+  "analysis_protocol_version": 4,
+  "step": "D",
+  "IDs": 451,
+  "IDs_with_common_days": 451,
+  "common_day_IDs": 657347,
+  "configs": [
+    "lstm_L2_x1_lr1e-3",
+    "mamba_L2_x1_lr1e-3",
+    "s4d_L4_x1_lr1e-3"
+  ],
+  "S4D_included": true,
+  "all_pairs_strictly_equivalent": true,
+  "grad_guard_runs_with_skips": [],
+  "contrasts": 9,
+  "association_rows": 837,
+  "finite_rho": 837,
+  "seed_stability_rows": 279,
+  "topology": {
+    "status": "rho_only_not_spatial_independence_proof",
+    "headwater_IDs": 322,
+    "known_nested_IDs": 129
+  },
+  "figures": 4,
+  "output": "/kaggle/working/basin_analysis_output/D"
+}

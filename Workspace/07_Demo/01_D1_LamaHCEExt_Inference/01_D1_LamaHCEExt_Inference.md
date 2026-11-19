@@ -27,3 +27,15 @@ Nguồn triển khai [Pipeline Mục 9.6](../../../Document/01_Plan/02_Pipeline.
 ## Kết quả Kaggle Version 1
 
 D1 hoàn tất 24 run, 451 lưu vực mỗi run và 1.461 ngày test. Cả 10.824 phép kiểm đạt, với sai số tuyệt đối lớn nhất bằng 0 mm/ngày cả trước và sau chặn âm. Phiên T4 dùng Python 3.13.15, PyTorch 2.11.0+cu128 và CUDA 12.8. C2 Compare Version 1 có SHA-256 manifest `50cb35873409a945a3f99bb41f6fb5a29553e2af2b6c387dcfd15b47ed094c08`. D2 nhận Output D1 đã lưu; SHA-256 của manifest D1 mà D2 kiểm là `484b1f8a03c418c88751a5b28ca7978b25c4d16b31658e3639348b0afb32f7c0`. [Kết quả D2 Version 1](../02_D2_LamaHCEExt_CPU/Archive/Version1/D2_summary.json).
+
+## Kết quả Kaggle Version 2 (bổ sung bước D 730 bước)
+
+Version 2 (32 Input trên Tesla T4, Python 3.13.15, PyTorch 2.11.0+cu128, CUDA 12.8, `freeze-C`) đối chiếu lại nguyên vẹn **24 run C2** (`10.824` phép kiểm trong `127,47` phút, `max_raw_abs_error = 0`, `max_clip_abs_error = 0` mm/ngày) và đối chiếu thêm **3 run đại diện bước D** (`1.353` phép kiểm trên `451` lưu vực × `1.461` ngày trong `16,77` phút, `D_max_raw_abs_error = 0`, `D_max_clip_abs_error = 0` mm/ngày; tổng thời gian `144,24` phút). Cả `8/8` tệp trong `manifest.csv` (`7c5b323403bb6e98c47109198f0a5983dc82722967b4e0f60e9a28e07313336c`) khớp SHA-256 và dung lượng; `D_compare_manifest_sha256` khớp `17_D_LamaHCEExt_Compare` Version 1 (`b1ff6006a08fd70d3ec4150902746966cba667ac9f9ebf5250962d7e9c9e9899`).
+
+| Run D (`seq_length = 730`) | Epoch | Lưu vực | Ngày test | Thời gian T4 (s) | Kết quả |
+|---|---:|---:|---:|---:|---|
+| `SF_lstm_L2_x1_lr1e-3_D_seed333` | 28 | 451 | 1.461 | 229,2 | Đạt (`0` mm/ngày) |
+| `SF_mamba_L2_x1_lr1e-3_D_seed333` | 20 | 451 | 1.461 | 337,3 | Đạt (`0` mm/ngày) |
+| `SF_s4d_L4_x1_lr1e-3_D_seed111` | 19 | 451 | 1.461 | 440,0 | Đạt (`0` mm/ngày) |
+
+[Tóm tắt Version 2](Archive/Version2/D1_summary.json) · [Kiểm run D](Archive/Version2/D1_D_run_check.csv) · [Kiểm run C2](Archive/Version2/D1_run_check.csv) · [Manifest](Archive/Version2/manifest.csv).
