@@ -123,14 +123,23 @@ def run_d2(input_root, output):
                     predictor = DemoForecaster(d_sources[run]["best_model.pt"].parent, raw, ref.ids, ref.area, output,
                                                device="cpu", n_params=d_rec["n_params"])
                     row["load_seconds"] = perf_counter()-before
+                    numeric_error = None
                     for j in np.argsort(ref.area)[[0, len(ref.ids)//2, -1]]:
                         basin = ref.ids[j]
                         for i in np.linspace(0, len(ref.dates)-1, 12, dtype=int):
                             started = perf_counter()
                             prediction = predictor.predict(basin, ref.dates[i])[0]
                             timings.append((perf_counter()-started)*1000)
-                            errors.append(compare_arrays(np.array([prediction["qmax_raw_mm_day"]]), ref.raw[i:i+1, j],
-                                                         PRED_ATOL, PRED_RTOL))
+                            actual = np.array([prediction["qmax_raw_mm_day"]])
+                            ref_slice = ref.raw[i:i+1, j]
+                            errors.append(float(np.abs(actual - ref_slice).max()))
+                            try:
+                                compare_arrays(actual, ref_slice, PRED_ATOL, PRED_RTOL)
+                            except ValueError as exc:
+                                if numeric_error is None:
+                                    numeric_error = str(exc)
+                    if numeric_error is not None:
+                        row.update(status="replay_only_numeric_or_runtime", error=numeric_error)
                 except (ValueError, RuntimeError, ImportError) as exc:
                     row.update(status="replay_only_numeric_or_runtime", error=str(exc))
                 finally:
