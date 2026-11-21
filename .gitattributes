@@ -24,3 +24,7 @@ Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/*.ipynb text eol=lf
 Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/*.py text eol=lf
 Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/*.ipynb text eol=lf
 Workspace/07_Demo/03_D3_LamaHCEExt_Demo/Archive/** -text whitespace=cr-at-eol
+Workspace/05_Training/17_D_LamaHCEExt_Compare/Tables/** -text whitespace=cr-at-eol
+Workspace/07_Demo/01_D1_LamaHCEExt_Inference/Archive/** -text whitespace=cr-at-eol
+Workspace/08_XAI/01_G_C2_XAI/Tables/** -text whitespace=cr-at-eol
+Workspace/08_XAI/02_G_H_XAI/Tables/** -text whitespace=cr-at-eol

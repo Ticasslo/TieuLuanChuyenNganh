@@ -80,7 +80,7 @@ Hai số đầu khớp đúng số tham số đếm từ trọng số tác giả
 |---|---|---|
 | 𝒟FC | 0,39 | 0,3864 (tác giả 0,3867) |
 | 𝒟RA (nhúng đơn giản) | 0,69 | 0,6923 (khớp) |
-| 𝒟FCRA | 0,68 | chưa chạy |
+| 𝒟FCRA | 0,68 | không thuộc 6 run A2 |
 
 - Khoảng 𝒟FC → 𝒟RA (0,30 NSE) là **toàn bộ cái giá** của việc chỉ có dự báo thay vì thời tiết thật. Mọi thí nghiệm sau đo xem lấy lại được bao nhiêu phần khoảng này (tỷ lệ lấp, Phần 2, Mục 2.3).
 - 𝒟FCRA (0,68) **không hơn** 𝒟RA (0,69) dù có thêm 5 biến: khi đã có thời tiết thật của ngày t, dự báo của cùng ngày không mang thêm thông tin. Chênh lệch 0,01 với một hạt giống chưa đủ để nói 𝒟FCRA kém hơn (mức nhiễu giữa các hạt giống do bước A4 đo).

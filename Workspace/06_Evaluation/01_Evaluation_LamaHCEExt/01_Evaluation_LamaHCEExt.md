@@ -520,7 +520,7 @@ Version 12 chấm H Compare Version 1 trên 168 NPZ. Cả 191 mục trong bảng
 
 Ở hạn 7, trung bình qua ba hạt giống của NSE trung vị theo lưu vực là 0,240 với LSTM và 0,225 với Mamba khi dùng GEFS. Với ECMWF HRES ngày đầu, các giá trị tương ứng là 0,082 và 0,062. Với thời tiết tái phân tích của cả bảy ngày, giá trị tham chiếu là 0,644 và 0,646. Các số trên cùng kỳ test và mặt nạ chung. [Bảng chỉ số hạn 7](Archive/Version12/H/Evaluation_H_summary_lead7.csv).
 
-[Archive/Version12](Archive/Version12/) giữ nguyên byte các bảng kiểm, tóm tắt chỉ số và bảng cộng dồn phân mức, sự kiện theo dung sai chính của cả bảy hạn. Bản tải đầy đủ, gồm mặt nạ và các bảng chi tiết D3 cần, nằm tại `downloads/Evaluation_V12/evaluation_output/` trên máy kiểm thử. Output H Compare chứa các NPZ dùng để vẽ đường qmax. Tệp `.ipynb` trong Git là notebook nguồn có thể chạy lại. Bản notebook có đầu ra nằm trong phiên Kaggle Version 12.
+[Archive/Version12](Archive/Version12/) giữ nguyên byte các bảng kiểm, tóm tắt chỉ số và bảng cộng dồn phân mức, sự kiện theo dung sai chính của cả bảy hạn. Bản tải đầy đủ, gồm mặt nạ và các bảng chi tiết D3 cần, nằm tại `downloads/Evaluation_V12/evaluation_output/` trên máy kiểm thử. Output H Compare chứa các NPZ dùng để vẽ đường qmax. Tệp `.ipynb` trong Git là bản Version 13 đã thực thi, có output; bản có đầu ra của Version 12 nằm trong phiên Kaggle Version 12.
 
 ### 13.4. Chấm bước D (cửa sổ 730 bước) trong `evaluation_output/D/`
 

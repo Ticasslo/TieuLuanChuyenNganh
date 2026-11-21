@@ -2,9 +2,9 @@
 
 Các thí nghiệm đã thực hiện xác nhận việc chạy lại trọng số BiasCast, bổ sung mốc persistence và DLinear, đồng thời đánh giá theo mức lưu lượng và sự kiện lũ. Trên cùng giao ngày test, Sequential Forecast LSTM có Q đạt NSE trung vị **0,705259**, DLinear đạt **0,380152 ± 0,002415** giữa ba hạt giống, còn persistence qmax đạt **0,350031**. DLinear cải thiện theo NSE/PNSE nhưng thấp hơn persistence theo KGE; đánh giá theo mức còn cho thấy khả năng nhận diện ngày lưu lượng rất cao thấp hơn Sequential Forecast LSTM.
 
-Ba lần huấn luyện lại Sequential Forecast LSTM ở A4 đạt NSE trung vị **0,695242 / 0,703778 / 0,705890**, tương đối sát mốc trọng số tác giả. Cùng DLinear, các bước B0/B1a/B1b/B2 mỗi bước ba seed và B3 hai mức che mỗi mức ba seed, nhóm đã thực hiện 24 lần huấn luyện mới từ đầu. A4 đo biến thiên của mô hình nền; kết quả các thay đổi Q và nhúng theo nguồn ở B1/B2 được trình bày tại Mục 6.6.
+Ba lần huấn luyện lại Sequential Forecast LSTM ở A4 đạt NSE trung vị **0,695242 / 0,703778 / 0,705890**, tương đối sát mốc trọng số tác giả. Tổng cộng đề tài đã huấn luyện mới **120 lần**: A 6 (DLinear và LSTM A4, mỗi mô hình ba seed), B 18 (B0, B1a, B1b, B2 mỗi bước ba seed, B3 hai mức che × ba seed), C1 39, C2 24, H 24 và D 9. A4 đo biến thiên của mô hình nền; các thay đổi Q và nhúng theo nguồn ở B1/B2, che dữ liệu ở B3 và luật chọn B* được trình bày tại Mục 6.6.1–6.6.9; năm lõi ở C1/C2 tại Mục 6.6.10–6.6.12; dự báo 1–7 ngày (H) tại Mục 6.6.13; cửa sổ 730 ngày (D) tại Mục 6.6.14; giải thích mô hình (G) tại Mục 6.12.
 
-Phạm vi thực nghiệm của chương bao phủ đầy đủ các bước từ tái lập và mốc nền (A2–A4), chuỗi cải tiến đầu vào và cơ chế che dữ liệu (B0–B3, chọn B\* = B3 P10S12), so sánh năm lõi thời gian và bảy kịch bản vận hành S0–S4 (C2, Evaluation Version 10), dự báo nhiều hạn 1–7 ngày theo bốn cách cấp thời tiết (H, Evaluation Version 12), mở rộng độ dài chuỗi lên 730 bước (D, Evaluation Version 13), phân tích tương quan theo 31 thuộc tính lưu vực (ByBasin Version 3), kiểm chứng suy luận GPU/CPU và demo (D1–D3), cùng giải thích mô hình bằng Integrated Gradients và dò trạng thái ẩn (bước G Version 1). **S0** là không che thêm đầu vào theo kịch bản, dù dữ liệu gốc vẫn có thể thiếu; **hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Dữ liệu, độ phủ và ngưỡng trước test được trình bày tại [Chương 4](04_Data.md).
+Phạm vi thực nghiệm của chương bao phủ đầy đủ các bước từ tái lập và mốc nền (A2–A4), chuỗi cải tiến đầu vào và cơ chế che dữ liệu (B0–B3, chọn B\* = B3 P10S12), tinh chỉnh tám cấu hình mỗi lõi (C1) rồi so sánh năm lõi thời gian và bảy kịch bản vận hành S0–S4 (C2, Evaluation Version 10), dự báo nhiều hạn 1–7 ngày theo bốn cách cấp thời tiết (H, Evaluation Version 12), mở rộng độ dài chuỗi lên 730 bước (D, Evaluation Version 13), phân tích tương quan theo 31 thuộc tính lưu vực (ByBasin Version 3), kiểm chứng suy luận GPU/CPU và demo (D1–D3), cùng giải thích mô hình bằng Integrated Gradients và dò trạng thái ẩn (bước G Version 1). **S0** là không che thêm đầu vào theo kịch bản, dù dữ liệu gốc vẫn có thể thiếu; **hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Validation S0–S4 cho B1b/B2/hai mức B3 trình bày ở Mục 6.6.9. Dữ liệu, độ phủ và ngưỡng trước test được trình bày tại [Chương 4](04_Data.md).
 
 ## 6.1. Câu hỏi thực nghiệm và các cấu hình
 
@@ -244,7 +244,7 @@ Tổng 54 kiểm hiển thị của ba run đều đạt: đủ epoch, checkpoin
 
 Output Compare có năm CSV, một JSON và một PNG đã kiểm 48 mục nhất quán, khớp kích thước/tiền tố hash trong log. Cả ba hợp đồng báo đạt, mỗi seed có 658911 dự báo hữu hạn trên 1461 ngày × 451 ID. Số dự báo thô âm trước chặn là 1789/2021/1681; sai lệch NSE tính lại lớn nhất so với thư viện khoảng 7,22×10⁻⁷, dưới ngưỡng 10⁻⁵. Obs canonical A3 và obs riêng của run có cùng mặt nạ, khác nhỏ do float32; hai loại NSE được ghi riêng. [Bảng seed Compare](../../Workspace/05_Training/07_B2_LamaHCEExt_Compare/Tables/B2_seed_table.csv), [kiểm hợp đồng](../../Workspace/05_Training/07_B2_LamaHCEExt_Compare/Tables/B2_contract_check.csv), [phạm vi kiểm Compare](../../Workspace/05_Training/07_B2_LamaHCEExt_Compare/Tables/B2_received_Compare_review.json).
 
-Loss train tiếp tục giảm trong khi NSE validation đạt đỉnh ở epoch 7–13 rồi thấp hơn về cuối, phù hợp dấu hiệu quá khớp. Checkpoint giữ nguyên theo validation; không chọn lại theo cực đại test hay KGE. Trung bình NSE validation B2 thấp hơn số báo cáo B1b khoảng 0,004079, nhỏ hơn mốc nhiễu B0 0,007932. B2 có 451 ID có NSE test, còn B1b có 450; vì tập hợp lệ khác nhau, chưa quy chênh lệch giữa các median thành tác dụng của masked mean. Compare đã xuất ba NPZ; bộ đánh giá hiện có đã bổ sung B2 cho tổng 26 run và qua 179 kiểm/luồng dữ liệu giả, và đã có output Version 7 đạt, trình bày ở mục tiếp theo. Còn B3 và các kịch bản validation S1–S4 trước chọn B*.
+Loss train tiếp tục giảm trong khi NSE validation đạt đỉnh ở epoch 7–13 rồi thấp hơn về cuối, phù hợp dấu hiệu quá khớp. Checkpoint giữ nguyên theo validation; không chọn lại theo cực đại test hay KGE. Trung bình NSE validation B2 thấp hơn số báo cáo B1b khoảng 0,004079, nhỏ hơn mốc nhiễu B0 0,007932. B2 có 451 ID có NSE test, còn B1b có 450; vì tập hợp lệ khác nhau, chưa quy chênh lệch giữa các median thành tác dụng của masked mean. Compare đã xuất ba NPZ; bộ đánh giá hiện có đã bổ sung B2 cho tổng 26 run và qua 179 kiểm/luồng dữ liệu giả, và đã có output Version 7 đạt, trình bày ở mục tiếp theo.
 
 ### 6.6.6. B0–B2 trên giao ngày chung, Evaluation Version 7
 
@@ -287,7 +287,7 @@ Compare B3 **Version 1** đã kiểm manifest, nguồn B2/A3, preflight và NSE 
 | P10S12 | 0,766905 ± 0,005010 | 0,717190 ± 0,003067 | 0,768010 ± 0,013383 |
 | P05S05 | 0,770519 ± 0,006731 | 0,716523 ± 0,004225 | 0,775022 ± 0,009868 |
 
-Delta validation so B2 là khoảng −0,00356045 ở P10S12 và +0,00005362 ở P05S05; chưa chọn mức che hoặc B*. Bộ đánh giá đã chấm B3 thật trong Evaluation Version 8, đủ 32 run và 1395 phép so; kết quả tại Mục 6.6.8. Version 7 giữ riêng 26 run trong archive. Còn validation S0–S4 trước khi người phụ trách B* áp dụng luật lựa chọn. [Nguồn Compare B3](../../Workspace/05_Training/09_B3_LamaHCEExt_Compare/Tables/b3_summary.json), [audit](../../Workspace/05_Training/09_B3_LamaHCEExt_Compare/Tables/B3_contract_check.csv).
+Delta validation so B2 là khoảng −0,00356045 ở P10S12 và +0,00005362 ở P05S05. Bộ đánh giá đã chấm B3 thật trong Evaluation Version 8, đủ 32 run và 1395 phép so; kết quả tại Mục 6.6.8. Version 7 giữ riêng 26 run trong archive. Validation S0–S4 và luật chọn B* ở Mục 6.6.9. [Nguồn Compare B3](../../Workspace/05_Training/09_B3_LamaHCEExt_Compare/Tables/b3_summary.json), [audit](../../Workspace/05_Training/09_B3_LamaHCEExt_Compare/Tables/B3_contract_check.csv).
 
 ### 6.6.8. B3 trên giao chung - Evaluation Version 8
 
@@ -322,7 +322,7 @@ Hướng hiệu là B3 − B2 cùng seed trên 450 cặp; p Holm dùng toàn h�
 | B3 P10S12 | 155 / 172 / 155 | 65,86 / 68,27 / 69,25 |
 | B3 P05S05 | 172 / 182 / 173 | 67,05 / 67,15 / 66,98 |
 
-Ở ngưỡng hai năm/USWRC, cùng ngày khởi phát có 1066 cụm thật. B3 bắt đúng ít cụm hơn B2 ở cả sáu cặp; P05S05 đồng thời giảm FAR ở cả ba seed. Cần đọc sự đánh đổi POD/FAR thay vì suy lợi ích sự kiện từ NSE. Đây chỉ là test/S0/hạn 1; validation S0–S4 trình bày riêng ở Mục 6.6.9, chưa ghi quyết định B*. [Mức](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_levels_pooled.csv), [sự kiện chính](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_events_pooled.csv), [summary](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_summary.csv).
+Ở ngưỡng hai năm/USWRC, cùng ngày khởi phát có 1066 cụm thật. B3 bắt đúng ít cụm hơn B2 ở cả sáu cặp; P05S05 đồng thời giảm FAR ở cả ba seed. Cần đọc sự đánh đổi POD/FAR thay vì suy lợi ích sự kiện từ NSE. Đây chỉ là test/S0/hạn 1; validation S0–S4 và B* trình bày ở Mục 6.6.9. [Mức](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_levels_pooled.csv), [sự kiện chính](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_events_pooled.csv), [summary](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Evaluation_summary.csv).
 
 ### 6.6.9. Validation S0–S4 cho bước B*
 
@@ -337,15 +337,44 @@ Cổng S0 dùng trung bình ba median NSE nguồn và ngưỡng SD giữa seed c
 | B3 P05S05 | 0,77052 ± 0,00673 | 0,00403 | 0,66941 ± 0,01114 |
 | B3 P10S12 | 0,76690 ± 0,00501 | 0,00764 | 0,70230 ± 0,00567 |
 
-Cả bốn cấu hình đạt điều kiện S0. B3 P10S12 hụt 0,0076391 so với S0 tốt nhất, trong ngưỡng B0 0,0079323, và đứng đầu điểm S1–S4 ở cả ba seed. P10S12 là cấu hình đứng đầu theo luật hiện tại để người phụ trách B* xác nhận trước `freeze-C`; chưa ghi quyết định chọn B* vào output. B1b dùng mốc điền nhân quả cố định (giá trị quá khứ còn nhìn thấy, rồi khí hậu tháng-ngày train và trung bình feature train); do đó kết luận độ bền gắn với chính sách này. [Cổng S0](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/B_validation_S0_gate.csv), [điểm từng seed](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/B_validation_robustness_by_seed.csv), [đối chiếu số liệu](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/B_validation_V1_output_review.json).
+Cả bốn cấu hình đạt điều kiện S0. B3 P10S12 hụt 0,0076391 so với S0 tốt nhất, trong ngưỡng B0 0,0079323, và đứng đầu điểm S1–S4 ở cả ba seed. Theo luật chọn ghi sẵn ([Pipeline Mục 6.3](../01_Plan/02_Pipeline.md)), **B* = B3 P10S12**; cấu hình này là nền của bước C (mốc thư viện `freeze-C`). B1b dùng mốc điền nhân quả cố định (giá trị quá khứ còn nhìn thấy, rồi khí hậu tháng-ngày train và trung bình feature train); do đó kết luận độ bền gắn với chính sách này. [Cổng S0](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/B_validation_S0_gate.csv), [điểm từng seed](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/B_validation_robustness_by_seed.csv), [đối chiếu số liệu](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/B_validation_V1_output_review.json).
 
 ![Độ bền validation của các cấu hình B](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Figures/B_validation_Scenarios.png)
 
-Hình: cùng mặt nạ ngày–ID cho cả 84 dự báo; các thanh là SD mẫu qua ba seed. B2 suy giảm mạnh khi mất Q, trong khi che nguồn lúc huấn luyện ở B3 cải thiện độ bền trong các kịch bản đã xét. Kết quả trên validation phục vụ chọn cấu hình; kết quả test/S0 ở Mục 6.6.8 vẫn được báo riêng. Chưa chấm sự kiện/mức lưu lượng trên validation bằng ngưỡng có dùng dữ liệu 2010–2013, và chưa có kết quả test/S1–S4 hoặc năm lõi C từ notebook này.
+Hình: cùng mặt nạ ngày–ID cho cả 84 dự báo; các thanh là SD mẫu qua ba seed. B2 suy giảm mạnh khi mất Q, trong khi che nguồn lúc huấn luyện ở B3 cải thiện độ bền trong các kịch bản đã xét. Kết quả trên validation phục vụ chọn cấu hình; kết quả test/S0 ở Mục 6.6.8 vẫn được báo riêng. Chưa chấm sự kiện/mức lưu lượng trên validation bằng ngưỡng có dùng dữ liệu 2010–2013, kết quả test/S1–S4 của năm lõi C2 ở Mục 6.6.12.
 
 Hồ sơ nguồn gồm [environment](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/environment.json) và [manifest SHA-256 đầy đủ](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/Tables/manifest.csv), đã đối chiếu đúng fingerprint của các kết quả khoa học. Bảng thời gian từ lần thực thi khác được lưu riêng, không dùng cho kết luận B*.
 
-### 6.6.10. Năm lõi C2 trên giao chung 56 run
+### 6.6.10. Năm lõi ở C1 và C2 trên validation
+
+Bước C thay lõi LSTM của B* bằng một trong năm lõi (LSTM, GRU, Transformer, S4D, Mamba) trong cùng mô hình Sequential Forecast, giữ nguyên lớp nhúng, đầu ra, dữ liệu, che P10S12 và giao thức 30 epoch. Mỗi lõi có hai mức dung lượng: **x1** cùng số tham số với B* (khoảng 85 nghìn, lệch dưới 1%) và **x3** gấp khoảng ba lần.
+
+**C1 (tinh chỉnh, hạt giống 111):** mỗi lõi 8 cấu hình = 2 mức × 2 độ sâu × 2 learning rate (10⁻³, 5 × 10⁻⁴); 39 notebook chạy tới epoch 15 rồi 23 cấu hình chạy tiếp tới epoch 30 theo luật loại sớm ghi sẵn; tổng 239,5 giờ GPU T4. C1 chỉ chấm validation. Cấu hình tốt nhất mỗi lõi: Mamba 0,7728 (4 khối x3), GRU 0,7707 (2 lớp x1), LSTM 0,7679 (2 lớp x1), S4D 0,7410 (4 khối x3), Transformer 0,7408 (2 lớp x3). Ba lõi đầu cách nhau 0,0049, dưới ngưỡng nhiễu hạt giống 0,0079 của B0, nên một hạt giống chưa phân biệt được chúng; S4D và Transformer thấp hơn khoảng 0,03. [Báo cáo C1](../../Workspace/05_Training/11_C1_LamaHCEExt_Compare/11_C1_LamaHCEExt_Compare.md).
+
+![NSE validation tốt nhất của các cấu hình C1](../../Workspace/05_Training/11_C1_LamaHCEExt_Compare/Figures/C1_Best_All.png)
+
+*Hình. NSE trung vị validation tốt nhất của các cấu hình C1, mỗi lõi một khối; dải xám là khoảng 0,0079 dưới cấu hình tốt nhất của lõi.*
+
+**C2 (chạy chính thức):** 8 cấu hình (mỗi lõi cấu hình tốt nhất mức x1, cộng cấu hình tốt nhất cả 8 khi khác) × 3 hạt giống, 30 epoch, 178,4 giờ GPU. Bảng dưới là NSE trung vị validation, trung bình ± độ lệch chuẩn ba hạt giống; cột cuối là hiệu với B* (0,7669) chia cho ngưỡng nhiễu 0,0079.
+
+| Cấu hình C2 | Tham số | NSE validation | Hiệu với B* / nhiễu |
+|---|---:|---:|---:|
+| GRU 2 lớp x1, lr 10⁻³ | 84.503 | 0,7686 ± 0,0031 | +0,22 |
+| LSTM 2 lớp x1, lr 10⁻³ | 84.106 | 0,7677 ± 0,0005 | +0,10 |
+| Mamba 4 khối x3, lr 10⁻³ | 254.677 | 0,7662 ± 0,0022 | −0,09 |
+| Mamba 2 khối x1, lr 10⁻³ | 85.039 | 0,7630 ± 0,0042 | −0,49 |
+| S4D 4 khối x3, lr 10⁻³ | 255.833 | 0,7415 ± 0,0008 | −3,20 |
+| S4D 4 khối x1, lr 10⁻³ | 84.449 | 0,7401 ± 0,0038 | −3,38 |
+| Transformer 2 lớp x3, lr 5 × 10⁻⁴ | 254.425 | 0,7395 ± 0,0087 | −3,45 |
+| Transformer 2 lớp x1, lr 10⁻³ | 84.823 | 0,7394 ± 0,0074 | −3,47 |
+
+Các lõi chia thành hai nhóm: GRU, LSTM và hai cấu hình Mamba nằm trong một lần nhiễu hạt giống của B*; S4D và Transformer thấp hơn khoảng 3,2–3,5 lần nhiễu, cùng chiều ở test (Mục 6.6.11). Trong nhóm đầu, thứ tự validation và test không trùng nhau, nên C2 không xếp hạng được bốn cấu hình này. Mức x3 không hơn mức x1 rõ ở lõi nào. Tổ hợp (trung bình dự báo của ba hạt giống) tăng NSE test 0,009–0,023 ở mọi cấu hình, lớn hơn khoảng cách giữa các cấu hình nhóm đầu. Chạy lại cùng hạt giống (C1 so với C2) cho trọng số trùng từng bit ở LSTM, GRU, S4D; Transformer và Mamba lệch vì phép tính GPU không tất định, NSE validation của epoch được chọn lệch tới 0,011. [Báo cáo C2](../../Workspace/05_Training/13_C2_LamaHCEExt_Compare/13_C2_LamaHCEExt_Compare.md), [bảng theo run](../../Workspace/05_Training/13_C2_LamaHCEExt_Compare/Tables/C2_seed_table.csv).
+
+![NSE validation C2 so với B*](../../Workspace/05_Training/13_C2_LamaHCEExt_Compare/Figures/C2_Bstar_Validation.png)
+
+*Hình. NSE trung vị validation của 8 cấu hình C2; điểm đậm và thanh ngang là trung bình ± độ lệch chuẩn ba hạt giống, chấm mờ là từng hạt giống; vạch đen là B*, dải xám là B* ± 0,0079.*
+
+### 6.6.11. Năm lõi C2 trên giao chung 56 run
 
 Notebook `01_Evaluation_LamaHCEExt` **Version 9** chấm thêm 24 dự báo C2 từ `13_C2_LamaHCEExt_Compare` Version 1. Tám cấu hình của năm lõi được chấm với ba seed mỗi cấu hình, cùng 32 run A–B trên test 2014–2017, S0, hạn 1. Giao chung có **652.628 cặp ngày–lưu vực trên 450 lưu vực**. Cả 24 NPZ khớp ngữ cảnh A3 và danh tính checkpoint ghi trong bảng bàn giao. [Bảng giao chấm](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_coverage.csv), [kiểm hợp đồng C2](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_C2_contract_check.csv).
 
@@ -366,19 +395,19 @@ Mỗi ô là trung bình ± độ lệch chuẩn mẫu của ba trung vị theo 
 
 *Hình. Phân phối NSE, PNSE và KGE theo lưu vực. Mỗi đường biểu diễn một run và giữ toàn bộ điểm hữu hạn, gồm cả điểm âm.*
 
-### 6.6.11. C2 dưới bảy kịch bản vận hành
+### 6.6.12. C2 dưới bảy kịch bản vận hành
 
 Evaluation Version 10 giữ nguyên bảng S0 của 56 run và chấm riêng 24 C2 qua bảy kịch bản. Giao riêng có **657.347 ngày–lưu vực trên 451 ID**. Mỗi mức S1_Q1, S1_Q3 và S1_Q7 được báo cáo riêng. Cả 24 checkpoint và scaler giữ nguyên giữa các kịch bản. [Coverage kịch bản C2](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version10/C2_scenarios/Evaluation_C2_scenarios_coverage.csv), [bảng C2 theo seed](../../Workspace/06_Evaluation/04_C2_LamaHCEExt_Scenarios/Archive/Version1/C2_scenarios_seed_scores.csv).
 
 Trên cùng giao C2, trung bình qua ba seed của NSE trung vị theo lưu vực cao nhất ở S0 là **0,72036** (Mamba L2 x1). Ở S2, LSTM L2 x1 đạt **0,60322**, giảm **0,11458** so với S0 của cùng cấu hình. Ở S4, Mamba L4 x3 đạt **0,66623**, giảm **0,04539** so với S0 của chính nó. Các giá trị này thuộc kỳ test và được dùng để báo cáo độ nhạy. [Bảng đầy đủ theo cấu hình và kịch bản](../../Workspace/06_Evaluation/04_C2_LamaHCEExt_Scenarios/Archive/Version1/C2_scenarios_stats.csv).
 
-### 6.6.12. Dự báo nhiều hạn 1–7 ngày (bước H, Evaluation Version 12)
+### 6.6.13. Dự báo nhiều hạn 1–7 ngày (bước H, Evaluation Version 12)
 
 Bước H mở rộng dự báo sang bảy hạn (1–7 ngày) ở mức cùng ngân sách tham số (`lstm_L2_x1_lr1e-3` và `mamba_L2_x1_lr1e-3`, ba hạt giống mỗi cấu hình) dưới bốn cách cấp thông tin thời tiết: chỉ quá khứ (`past`), lai ECMWF HRES ngày đầu (`hybrid`), dự báo GEFSv12 7 ngày (`gefs`) và tái phân tích hoàn hảo (`perfect`). Evaluation **Version 12** chấm đủ **168 NPZ** từ `15_H_LamaHCEExt_Compare` Version 1 (24 run ở mỗi hạn) trên giao chung **651.841 cặp ngày–lưu vực và 451 lưu vực**, giữ nguyên SHA-256 bốn bảng S0 56 run. [Tóm tắt Version 12](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version12/Tables/Evaluation_summary.json), [báo cáo H Compare](../../Workspace/05_Training/15_H_LamaHCEExt_Compare/15_H_LamaHCEExt_Compare.md).
 
 Trên cùng mặt nạ chung, trung bình qua ba hạt giống của NSE trung vị theo lưu vực từ hạn 1 đến hạn 7 giảm mạnh khi thiếu thông tin thời tiết tương lai: ở hạn 7, cách dùng **GEFS** đạt **0,240** (LSTM) và **0,225** (Mamba), vượt rõ cách lai ECMWF HRES ngày đầu (**0,082** và **0,062**), trong khi cận trên tái phân tích hoàn hảo đạt **0,644** và **0,646**. [Bảng chỉ số hạn 7](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version12/H/Evaluation_H_summary_lead7.csv).
 
-### 6.6.13. Kéo dài cửa sổ quá khứ 730 so với 365 ngày (bước D, Compare Version 3 & Evaluation Version 13)
+### 6.6.14. Kéo dài cửa sổ quá khứ 730 so với 365 ngày (bước D, Compare Version 3 & Evaluation Version 13)
 
 Bước D kiểm định câu hỏi RQ5 bằng cách kéo dài `seq_length` từ 365 lên 730 ngày (`729` bước quá khứ + `1` ngày ECMWF HRES) trên ba lõi ở mức cùng tham số (`lstm_L2_x1_lr1e-3` 84.106 tham số, `mamba_L2_x1_lr1e-3` 85.039 tham số, `s4d_L4_x1_lr1e-3` 84.449 tham số; ba hạt giống `111, 222, 333`, cùng `freeze-C`, 30 epoch, tắt `grad_guard`, 0 bước cập nhật bị bỏ). `17_D_LamaHCEExt_Compare` **Version 3** (20 Input, `34/34` manifest, giữ trùng từng byte 9 NPZ và 11 bảng cốt lõi của Version 1, bổ sung bộ 9 hình trực quan đa tiêu chí và `D_curves.csv`) cùng Evaluation **Version 13** (212/212 kiểm thử đạt, giữ nguyên SHA-256 bốn bảng S0 56 run) chấm đủ 19 chuỗi (9 D + 9 C2 + `Persistence_qmax`) trên giao chung **657.347 cặp ngày–lưu vực và 451 lưu vực**. [Tóm tắt D Compare](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/Tables/d_summary.json), [tóm tắt Evaluation D](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version13/D/Evaluation_D_summary.json).
 
@@ -637,6 +666,10 @@ Bảng dưới tóm tắt độ dài nhớ hiệu dụng (`L50`, `L90`: số ng�
 
 *Hình. Độ dài nhớ hiệu dụng L50 và L90 của năm lõi C2 theo bốn mức lưu lượng; mỗi điểm biểu diễn một hạt giống.*
 
+![Tỉ phần |IG| theo ngày trễ](../../Workspace/08_XAI/01_G_C2_XAI/Figures/G_Lag_Share.png)
+
+*Hình. Tỉ phần |IG| theo ngày trễ (trục log) của năm lõi C2; dải là ba hạt giống. LSTM, GRU và Mamba dồn ảnh hưởng vào vài ngày gần nhất, S4D và Transformer trải ảnh hưởng gần cả cửa sổ 365 ngày.*
+
 ![Tỉ phần IG theo nhóm nguồn và mức lưu lượng của 5 lõi C2](../../Workspace/08_XAI/01_G_C2_XAI/Figures/G_Group_Share.png)
 
 *Hình. Tỉ phần `|IG|` theo bảy nhóm đầu vào và bốn mức lưu lượng của năm lõi C2.*
@@ -684,6 +717,7 @@ Bộ đánh giá `01_Evaluation_LamaHCEExt` đã hoàn tất tới **Version 13*
 | Persistence, huấn luyện DLinear, chẩn đoán | [Thuyết minh A3](../../Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md#report-part-10) |
 | Huấn luyện lại LSTM và kết quả 14 run | [Thiết lập A4](../../Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md), [đánh giá A4 trên giao chung](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#10-kết-quả-tham-chiếu-version-4) |
 | B0–B3 và chọn B* | [B0](../../Workspace/05_Training/01_B0_LamaHCEExt_Train/01_B0_LamaHCEExt_Train.md), [B2](../../Workspace/05_Training/06_B2_LamaHCEExt_Train/06_B2_LamaHCEExt_Train.md), [B3](../../Workspace/05_Training/08_B3_LamaHCEExt_Train/08_B3_LamaHCEExt_Train.md), [Validation bước B V1](../../Workspace/06_Evaluation/03_B_LamaHCEExt_Validation/03_B_LamaHCEExt_Validation.md#9-kết-quả-validation-version-1) |
+| Tinh chỉnh C1 | [C1 Compare V6](../../Workspace/05_Training/11_C1_LamaHCEExt_Compare/11_C1_LamaHCEExt_Compare.md) |
 | Năm lõi C2 và kịch bản S0–S4 | [C2 Compare V1](../../Workspace/05_Training/13_C2_LamaHCEExt_Compare/13_C2_LamaHCEExt_Compare.md), [C2 Scenarios V1](../../Workspace/06_Evaluation/04_C2_LamaHCEExt_Scenarios/04_C2_LamaHCEExt_Scenarios.md), [Evaluation V10](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#132-kịch-bản-c2) |
 | Dự báo nhiều hạn 1–7 ngày (bước H) | [H Compare V1](../../Workspace/05_Training/15_H_LamaHCEExt_Compare/15_H_LamaHCEExt_Compare.md), [Evaluation V12](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#kết-quả-kaggle-version-12) |
 | Cửa sổ 730 so với 365 ngày (bước D) | [D Compare V3](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/17_D_LamaHCEExt_Compare.md), [Evaluation V13](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#kết-quả-kaggle-version-13) |
