@@ -1,0 +1,226 @@
+core,seed,fraction of cells,cells,set,median removed share
+lstm,111,0.001,12,top |IG|,0.79816645
+lstm,111,0.001,12,random,0.00035913003
+lstm,111,0.001,12,"random, same lags",0.20338306
+lstm,111,0.005,60,top |IG|,0.9064727
+lstm,111,0.005,60,random,0.002558337
+lstm,111,0.005,60,"random, same lags",0.5569167
+lstm,111,0.01,120,top |IG|,0.9304249
+lstm,111,0.01,120,random,0.00611481
+lstm,111,0.01,120,"random, same lags",0.6946153
+lstm,111,0.02,240,top |IG|,0.94688994
+lstm,111,0.02,240,random,0.0149453115
+lstm,111,0.02,240,"random, same lags",0.79384613
+lstm,111,0.05,601,top |IG|,0.95965576
+lstm,111,0.05,601,random,0.04344155
+lstm,111,0.05,601,"random, same lags",0.8848701
+lstm,222,0.001,12,top |IG|,0.84636945
+lstm,222,0.001,12,random,0.00033857086
+lstm,222,0.001,12,"random, same lags",0.2332648
+lstm,222,0.005,60,top |IG|,0.9489378
+lstm,222,0.005,60,random,0.0028295605
+lstm,222,0.005,60,"random, same lags",0.599895
+lstm,222,0.01,120,top |IG|,0.9699246
+lstm,222,0.01,120,random,0.006739907
+lstm,222,0.01,120,"random, same lags",0.7550726
+lstm,222,0.02,240,top |IG|,0.97344184
+lstm,222,0.02,240,random,0.014315472
+lstm,222,0.02,240,"random, same lags",0.86501956
+lstm,222,0.05,601,top |IG|,0.9788795
+lstm,222,0.05,601,random,0.04291436
+lstm,222,0.05,601,"random, same lags",0.92719644
+lstm,333,0.001,12,top |IG|,0.8176695
+lstm,333,0.001,12,random,0.00034697365
+lstm,333,0.001,12,"random, same lags",0.21663345
+lstm,333,0.005,60,top |IG|,0.9253764
+lstm,333,0.005,60,random,0.0026750313
+lstm,333,0.005,60,"random, same lags",0.55429673
+lstm,333,0.01,120,top |IG|,0.9352066
+lstm,333,0.01,120,random,0.006029362
+lstm,333,0.01,120,"random, same lags",0.6968496
+lstm,333,0.02,240,top |IG|,0.9470277
+lstm,333,0.02,240,random,0.01408802
+lstm,333,0.02,240,"random, same lags",0.8058311
+lstm,333,0.05,601,top |IG|,0.96287227
+lstm,333,0.05,601,random,0.03906477
+lstm,333,0.05,601,"random, same lags",0.87364614
+gru,111,0.001,12,top |IG|,0.82590413
+gru,111,0.001,12,random,0.00050046307
+gru,111,0.001,12,"random, same lags",0.18563199
+gru,111,0.005,60,top |IG|,0.9400462
+gru,111,0.005,60,random,0.004092959
+gru,111,0.005,60,"random, same lags",0.5078343
+gru,111,0.01,120,top |IG|,0.9627447
+gru,111,0.01,120,random,0.009465374
+gru,111,0.01,120,"random, same lags",0.65586555
+gru,111,0.02,240,top |IG|,0.9726119
+gru,111,0.02,240,random,0.019014742
+gru,111,0.02,240,"random, same lags",0.8047215
+gru,111,0.05,601,top |IG|,0.9827393
+gru,111,0.05,601,random,0.04878881
+gru,111,0.05,601,"random, same lags",0.9088824
+gru,222,0.001,12,top |IG|,0.8061682
+gru,222,0.001,12,random,0.0004992946
+gru,222,0.001,12,"random, same lags",0.20881194
+gru,222,0.005,60,top |IG|,0.9391676
+gru,222,0.005,60,random,0.0033533904
+gru,222,0.005,60,"random, same lags",0.5340942
+gru,222,0.01,120,top |IG|,0.95114696
+gru,222,0.01,120,random,0.008278912
+gru,222,0.01,120,"random, same lags",0.6715629
+gru,222,0.02,240,top |IG|,0.957445
+gru,222,0.02,240,random,0.01870975
+gru,222,0.02,240,"random, same lags",0.7925886
+gru,222,0.05,601,top |IG|,0.9677358
+gru,222,0.05,601,random,0.047341246
+gru,222,0.05,601,"random, same lags",0.8953825
+gru,333,0.001,12,top |IG|,0.85126126
+gru,333,0.001,12,random,0.0005984985
+gru,333,0.001,12,"random, same lags",0.20116492
+gru,333,0.005,60,top |IG|,0.95088685
+gru,333,0.005,60,random,0.004201606
+gru,333,0.005,60,"random, same lags",0.5560405
+gru,333,0.01,120,top |IG|,0.96064544
+gru,333,0.01,120,random,0.008905822
+gru,333,0.01,120,"random, same lags",0.72387975
+gru,333,0.02,240,top |IG|,0.97059125
+gru,333,0.02,240,random,0.018474739
+gru,333,0.02,240,"random, same lags",0.8483814
+gru,333,0.05,601,top |IG|,0.98367727
+gru,333,0.05,601,random,0.050721373
+gru,333,0.05,601,"random, same lags",0.92721194
+transformer,111,0.001,12,top |IG|,0.74179256
+transformer,111,0.001,12,random,0.0007961898
+transformer,111,0.001,12,"random, same lags",0.18746921
+transformer,111,0.005,60,top |IG|,0.9108316
+transformer,111,0.005,60,random,0.0041760365
+transformer,111,0.005,60,"random, same lags",0.51720464
+transformer,111,0.01,120,top |IG|,0.94142324
+transformer,111,0.01,120,random,0.007879689
+transformer,111,0.01,120,"random, same lags",0.6336088
+transformer,111,0.02,240,top |IG|,0.9543965
+transformer,111,0.02,240,random,0.016461398
+transformer,111,0.02,240,"random, same lags",0.72952974
+transformer,111,0.05,601,top |IG|,0.9635283
+transformer,111,0.05,601,random,0.041439053
+transformer,111,0.05,601,"random, same lags",0.82916963
+transformer,222,0.001,12,top |IG|,0.73682135
+transformer,222,0.001,12,random,0.00087767176
+transformer,222,0.001,12,"random, same lags",0.14875343
+transformer,222,0.005,60,top |IG|,0.9156354
+transformer,222,0.005,60,random,0.0043496666
+transformer,222,0.005,60,"random, same lags",0.47817695
+transformer,222,0.01,120,top |IG|,0.9408157
+transformer,222,0.01,120,random,0.008038294
+transformer,222,0.01,120,"random, same lags",0.62820446
+transformer,222,0.02,240,top |IG|,0.9622475
+transformer,222,0.02,240,random,0.017048292
+transformer,222,0.02,240,"random, same lags",0.719648
+transformer,222,0.05,601,top |IG|,0.985346
+transformer,222,0.05,601,random,0.04244739
+transformer,222,0.05,601,"random, same lags",0.80869424
+transformer,333,0.001,12,top |IG|,0.7786802
+transformer,333,0.001,12,random,0.0009642567
+transformer,333,0.001,12,"random, same lags",0.1714365
+transformer,333,0.005,60,top |IG|,0.91901004
+transformer,333,0.005,60,random,0.004751846
+transformer,333,0.005,60,"random, same lags",0.45700687
+transformer,333,0.01,120,top |IG|,0.94521487
+transformer,333,0.01,120,random,0.009521278
+transformer,333,0.01,120,"random, same lags",0.6063287
+transformer,333,0.02,240,top |IG|,0.968112
+transformer,333,0.02,240,random,0.017541397
+transformer,333,0.02,240,"random, same lags",0.71261287
+transformer,333,0.05,601,top |IG|,0.9831096
+transformer,333,0.05,601,random,0.043932058
+transformer,333,0.05,601,"random, same lags",0.82542425
+s4d,111,0.001,12,top |IG|,0.7311249
+s4d,111,0.001,12,random,0.0014388696
+s4d,111,0.001,12,"random, same lags",0.18654652
+s4d,111,0.005,60,top |IG|,0.9275359
+s4d,111,0.005,60,random,0.005803177
+s4d,111,0.005,60,"random, same lags",0.47630596
+s4d,111,0.01,120,top |IG|,0.94662285
+s4d,111,0.01,120,random,0.010834626
+s4d,111,0.01,120,"random, same lags",0.59050906
+s4d,111,0.02,240,top |IG|,0.9506465
+s4d,111,0.02,240,random,0.020186713
+s4d,111,0.02,240,"random, same lags",0.6686448
+s4d,111,0.05,601,top |IG|,0.9450703
+s4d,111,0.05,601,random,0.051094696
+s4d,111,0.05,601,"random, same lags",0.7777695
+s4d,222,0.001,12,top |IG|,0.68663895
+s4d,222,0.001,12,random,0.0013123911
+s4d,222,0.001,12,"random, same lags",0.14722231
+s4d,222,0.005,60,top |IG|,0.89733326
+s4d,222,0.005,60,random,0.005342247
+s4d,222,0.005,60,"random, same lags",0.39727646
+s4d,222,0.01,120,top |IG|,0.93716156
+s4d,222,0.01,120,random,0.00927398
+s4d,222,0.01,120,"random, same lags",0.5152621
+s4d,222,0.02,240,top |IG|,0.9679743
+s4d,222,0.02,240,random,0.01821443
+s4d,222,0.02,240,"random, same lags",0.6075078
+s4d,222,0.05,601,top |IG|,0.9847101
+s4d,222,0.05,601,random,0.04258698
+s4d,222,0.05,601,"random, same lags",0.720674
+s4d,333,0.001,12,top |IG|,0.7076835
+s4d,333,0.001,12,random,0.001265145
+s4d,333,0.001,12,"random, same lags",0.1556754
+s4d,333,0.005,60,top |IG|,0.89025015
+s4d,333,0.005,60,random,0.005583646
+s4d,333,0.005,60,"random, same lags",0.42605257
+s4d,333,0.01,120,top |IG|,0.9329779
+s4d,333,0.01,120,random,0.009712789
+s4d,333,0.01,120,"random, same lags",0.52292764
+s4d,333,0.02,240,top |IG|,0.95721173
+s4d,333,0.02,240,random,0.018107105
+s4d,333,0.02,240,"random, same lags",0.6401827
+s4d,333,0.05,601,top |IG|,0.9785026
+s4d,333,0.05,601,random,0.046540525
+s4d,333,0.05,601,"random, same lags",0.75088865
+mamba,111,0.001,12,top |IG|,0.8511983
+mamba,111,0.001,12,random,0.00092562917
+mamba,111,0.001,12,"random, same lags",0.24128793
+mamba,111,0.005,60,top |IG|,0.9396653
+mamba,111,0.005,60,random,0.0054982416
+mamba,111,0.005,60,"random, same lags",0.6077
+mamba,111,0.01,120,top |IG|,0.95959353
+mamba,111,0.01,120,random,0.01217884
+mamba,111,0.01,120,"random, same lags",0.7500175
+mamba,111,0.02,240,top |IG|,0.97292435
+mamba,111,0.02,240,random,0.023627039
+mamba,111,0.02,240,"random, same lags",0.8473518
+mamba,111,0.05,601,top |IG|,0.9894203
+mamba,111,0.05,601,random,0.06612123
+mamba,111,0.05,601,"random, same lags",0.9286337
+mamba,222,0.001,12,top |IG|,0.7887511
+mamba,222,0.001,12,random,0.00047008204
+mamba,222,0.001,12,"random, same lags",0.22517303
+mamba,222,0.005,60,top |IG|,0.93851227
+mamba,222,0.005,60,random,0.003696032
+mamba,222,0.005,60,"random, same lags",0.6133951
+mamba,222,0.01,120,top |IG|,0.96140695
+mamba,222,0.01,120,random,0.008225029
+mamba,222,0.01,120,"random, same lags",0.779534
+mamba,222,0.02,240,top |IG|,0.9685079
+mamba,222,0.02,240,random,0.017442234
+mamba,222,0.02,240,"random, same lags",0.87426925
+mamba,222,0.05,601,top |IG|,0.9714776
+mamba,222,0.05,601,random,0.04553469
+mamba,222,0.05,601,"random, same lags",0.93050385
+mamba,333,0.001,12,top |IG|,0.8232395
+mamba,333,0.001,12,random,0.00060445536
+mamba,333,0.001,12,"random, same lags",0.28296113
+mamba,333,0.005,60,top |IG|,0.9624596
+mamba,333,0.005,60,random,0.004380167
+mamba,333,0.005,60,"random, same lags",0.6479515
+mamba,333,0.01,120,top |IG|,0.9768052
+mamba,333,0.01,120,random,0.010887897
+mamba,333,0.01,120,"random, same lags",0.81677663
+mamba,333,0.02,240,top |IG|,0.98490995
+mamba,333,0.02,240,random,0.0212803
+mamba,333,0.02,240,"random, same lags",0.9147204
+mamba,333,0.05,601,top |IG|,0.9868537
+mamba,333,0.05,601,random,0.05436608
+mamba,333,0.05,601,"random, same lags",0.9597444

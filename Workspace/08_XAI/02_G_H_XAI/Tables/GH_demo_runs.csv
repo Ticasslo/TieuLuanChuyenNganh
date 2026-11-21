@@ -1,0 +1,9 @@
+core,mode,seed,notebook
+lstm,past,333,14_H_Train_lstm_L2_x1_lr1e-3_past_Seed333
+mamba,past,333,14_H_Train_mamba_L2_x1_lr1e-3_past_Seed333
+lstm,hybrid,333,14_H_Train_lstm_L2_x1_lr1e-3_hybrid_Seed333
+mamba,hybrid,222,14_H_Train_mamba_L2_x1_lr1e-3_hybrid_Seed222
+lstm,gefs,222,14_H_Train_lstm_L2_x1_lr1e-3_gefs_Seed222
+mamba,gefs,111,14_H_Train_mamba_L2_x1_lr1e-3_gefs_Seed111
+lstm,perfect,222,14_H_Train_lstm_L2_x1_lr1e-3_perfect_Seed222
+mamba,perfect,333,14_H_Train_mamba_L2_x1_lr1e-3_perfect_Seed333

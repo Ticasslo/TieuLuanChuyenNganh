@@ -278,7 +278,14 @@ Với từng hạn 1–7 ngày: NSE, KGE, tính trên cùng tập ngày đích c
 
 ### 6.7. Giải thích mô hình
 
-Dò trạng thái ẩn (ý tưởng Y4): hồi quy tuyến tính từ trạng thái của LSTM và Mamba sang lượng nước tuyết `ERA5L_swe` và ẩm đất, chỉ cần suy luận (cách của Hu và cs., Environmental Modelling & Software 2025, cho LSTM). Tuyết và ẩm đất cũng là biến đầu vào nên kết quả dò một phần là hiển nhiên; báo cáo nêu rõ hạn chế này. Integrated Gradients (Captum) cho LSTM cải tiến và Mamba tốt nhất: mức ảnh hưởng theo ngày trong cửa sổ (độ dài nhớ hiệu dụng của từng lõi) và theo nhóm nguồn (tái phân tích, dự báo ECMWF HRES, Q). Khác Demiray & Demir (SHAP, Iowa): tách đóng góp của dự báo thời tiết thật và Q quan trắc, so sánh độ dài nhớ giữa hai lõi.
+Bước G giải thích hai nhóm mô hình đã huấn luyện, không huấn luyện thêm: 15 run C2 mức cùng tham số (5 lõi × 3 hạt giống, dự báo một ngày) và 24 run H (LSTM, Mamba × 4 cách × 3 hạt giống, riêng từng hạn 1–7).
+
+- **Integrated Gradients** (Sundararajan và cs., ICML 2017; Captum, Kokhlikyan và cs., arXiv 2009.07896), đường gốc là trung bình kỳ train, kiểm completeness từng mẫu và kiểm độ tin cậy bằng phép xóa ô (deletion test) với hai đối chứng ngẫu nhiên. Mẫu kỳ test phân tầng theo 4 mức lưu lượng (Mục 6.2) để đủ ngày lũ.
+- Chỉ số: tỉ phần ảnh hưởng theo ngày trong cửa sổ và độ dài nhớ hiệu dụng (số ngày chứa 50%, 90% ảnh hưởng của pha quá khứ); theo nhóm nguồn (ERA5-Land, E-OBS, MSWEP, GLEAM, Q quan trắc, ECMWF HRES, thuộc tính tĩnh; ở H thêm GEFS và tái phân tích tương lai); theo mức lưu lượng, mùa, thuộc tính lưu vực; ở H theo từng hạn. So các lõi bằng hiệu so với nhiễu 3 hạt giống; S4D là đối chứng SSM không chọn lọc cho Mamba.
+- **Dò trạng thái ẩn** (ý tưởng Y4; cách của Hu và cs., Environmental Modelling & Software 2025): ridge từ trạng thái lõi ngày t−1 sang tuyết, ẩm đất, mưa cộng dồn 30/90/180 ngày, có hai đối chứng (đầu vào thô t−1, mô hình khởi tạo ngẫu nhiên). Tuyết và ẩm đất cũng là đầu vào nên dò không kiểm được hai đích này.
+- Khác Demiray & Demir (SHAP, Iowa): tách đóng góp của dự báo thời tiết thật (ECMWF HRES, GEFS) và Q quan trắc theo hạn, so độ dài nhớ của 5 lõi với nhiễu hạt giống.
+
+Kết quả chính (báo cáo `Workspace/08_XAI/01_G_C2_XAI/01_G_C2_XAI.md`): LSTM, GRU, Mamba dồn khoảng một nửa ảnh hưởng vào ngày t và t−1, 90% ảnh hưởng quá khứ trong 1–2 tháng; Transformer, S4D trải gần cả cửa sổ (khác LSTM 10–20 × nhiễu); độ dài nhớ Mamba không phân biệt được với LSTM. Ở H, tỉ phần thông tin tương lai của cách GEFS tăng theo hạn gần bằng cách hoàn hảo nên khoảng cách kỹ năng giữa hai cách đến từ chất lượng dự báo thời tiết; cách lai không có gì để dùng thêm sau ngày đầu; độ dài nhớ tăng theo hạn ở mọi tổ hợp. Kết quả tổng hợp theo lưu vực cấp cho trang Giải thích của demo (Mục 9.6).
 
 ---
 
@@ -307,7 +314,7 @@ Số lần huấn luyện ghi dạng "cấu hình × hạt giống". Mỗi bư�
 | H | Dự báo 1–7 ngày cho LSTM cải tiến và lõi SSM tốt nhất: cách (a), (b), (c), (d) | 2 × 4 × 3 | Làm ngay sau C; ưu tiên hơn E. Cấu hình (Mục 4.4): `lstm_L2_x1_lr1e-3` và `mamba_L2_x1_lr1e-3` |
 | GV | Thí nghiệm kiểm chứng gợi ý GVHD: lấy mẫu nhiều ngày mức cao (Y7) trên mô hình tốt nhất, đánh giá bằng Mục 6.2 | 0 ở tiểu luận | Chuyển sang khóa luận (Mục 11). Bằng chứng trái chiều (Martel 2025) nên trình bày là kiểm chứng |
 | Đánh giá | Mục 6.1–6.6 cho mọi cấu hình chính thức | 0 | |
-| G | Giải thích mô hình, demo (tô màu theo ngưỡng lũ tính ở A1) | 0 | |
+| G | Giải thích mô hình (Mục 6.7): Integrated Gradients cho 15 run C2 mức cùng tham số và 24 run H theo hạn, dò trạng thái ẩn cho C2; demo (tô màu theo ngưỡng lũ tính ở A1) | 0 | Deletion test đạt; kết quả tổng hợp theo lưu vực bàn giao cho trang Giải thích của demo |
 
 Tổng tối đa 127 lần huấn luyện ở tiểu luận (A: 6; B: 18 gồm B0, B1a, B1b, B2, B3; C: 40 + 30; D, H: 9 + 24); dự kiến 120 lần, đã chạy 87 lần ở A–C (C1 39 lần, B* dùng lại cho cấu hình LSTM 1 lớp; C2 8 × 3 = 24 vì cấu hình tốt nhất của LSTM, GRU trùng mức cùng tham số). Bước E, F, GV (15 lần) chuyển sang khóa luận vì báo cáo tiểu luận dự kiến 07/12–14/12/2026 (Mục 9.7, 11).
 
@@ -448,8 +455,8 @@ Hai luồng chạy song song; bước sau của một luồng chỉ bắt đầu
 | 2 | Xong 31/10/2026 | Chấm B0; B2 trọn gói: bộ nạp (nhóm theo nguồn, sửa bộ lọc, cách (b) của bước H) và mô hình (nhúng theo nguồn, masked mean), kiểm thử đơn vị | Đo tốc độ bộ nạp, để sẵn dữ liệu trên GPU (bước 0, xong); B0, B1a, B1b 30 epoch (xong); song song: mô hình chung nhận lõi bất kỳ, các lõi GRU, Transformer, S4D, Mamba, kiểm thử đơn vị (Mục 9.2) — xong | B0, B1a, B1b: 9 lần, đo thật 22,4 giờ (B0 7,4; B1a 7,5; B1b 7,5) |
 | 3 | Xong 01/11/2026 | Huấn luyện B2, B3 (3 hạt giống); đánh giá bước B, gồm kịch bản S0–S4 trên validation cho B* | B* khi B1b–B3 đã chấm, gắn mốc `freeze-C` | B2, B3: 9 lần, khoảng 23 giờ |
 | 4 | Xong 13/11/2026 | Đánh giá bước C (chấm C2 khi có tệp dự báo); demo D1, D2 (Mục 9.6) | C1 tinh chỉnh (vòng 1 và vòng 2 có mở rộng), C2 chạy chính thức 8 cấu hình × 3 hạt giống | Đo thật (huấn luyện + validation): C1 239,5 giờ, C2 178,4 giờ |
-| 5 | 16/11 – 28/11/2026 | D trọn gói (Mục 7); đánh giá bước C, H, D; demo D1, D2 (một hàm dự báo cho mọi run), D3 bản tối thiểu (Mục 9.6) | H 24 lần (18 lần ba cách và 6 lần cách GEFS) và so sánh H (xuất tệp dự báo 7 hạn cho đánh giá và demo); giải thích mô hình (Mục 6.7) | H 24 lần, đo thật 98,1 giờ huấn luyện (LSTM 29,7; Mamba 68,4), 125,3 giờ phiên kể cả dựng dữ liệu và chấm test mọi epoch; D 9 lần, đo khi tới bước |
-| 6 | 29/11 – 06/12/2026 | Hoàn thiện đánh giá; demo D3 đủ 5 trang (thêm H, D, so sánh, cảnh báo lũ, giải thích), bàn giao | Kết quả giải thích mô hình cho trang 4; demo D4 trên VPS nếu kịp; bản laptop (D3) là bản dùng khi bảo vệ | – |
+| 5 | 16/11 – 28/11/2026 | D trọn gói (Mục 7); đánh giá bước C, H, D; demo D1, D2 (một hàm dự báo cho mọi run), D3 bản tối thiểu (Mục 9.6) | H 24 lần (18 lần ba cách và 6 lần cách GEFS) và so sánh H (xuất tệp dự báo 7 hạn cho đánh giá và demo); giải thích mô hình (Mục 6.7): 2 notebook, 5,9 giờ GPU | H 24 lần, đo thật 98,1 giờ huấn luyện (LSTM 29,7; Mamba 68,4), 125,3 giờ phiên kể cả dựng dữ liệu và chấm test mọi epoch; D 9 lần, đo khi tới bước |
+| 6 | 29/11 – 06/12/2026 | Hoàn thiện đánh giá; demo D3 đủ 5 trang (thêm H, D, so sánh, cảnh báo lũ, giải thích), bàn giao | Nối kết quả giải thích mô hình vào trang 4; demo D4 trên VPS nếu kịp; bản laptop (D3) là bản dùng khi bảo vệ | – |
 | 7 | Song song từ bước 4, bảo vệ dự kiến 07/12 – 14/12/2026 | Báo cáo, slide (Mục 9.8) | Báo cáo, slide (Mục 9.8) | – |
 
 Học song song với làm: mỗi nội dung học xong trước bước dùng tới nó; ghi chú đặt ở `06_Theory/`, mỗi phần một tệp, có ví dụ số và câu hỏi tự kiểm tra.
