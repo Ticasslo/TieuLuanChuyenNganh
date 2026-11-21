@@ -82,10 +82,25 @@
       </div>
     </section>
     <section id="explanation" class="page" hidden>
-      <div class="heading"><h1>Giải thích mô hình</h1><p>Integrated Gradients theo nhóm nguồn và ngày trong cửa sổ.</p></div>
+      <div class="heading"><h1>Giải thích mô hình (XAI · Bước G)</h1><p>Integrated Gradients theo pha, nhóm nguồn đầu vào, độ dài nhớ L50/L90 và hạn dự báo 1–7 ngày trên 451 lưu vực.</p></div>
       <div class="panel detail">
+        <div class="fields" id="xai-controls">
+          <label>Phạm vi <select id="xai-scope"></select></label>
+          <label>Lưu vực <select id="xai-basin"></select></label>
+          <label id="xai-mode-wrap">Cách cấp thời tiết <select id="xai-mode"></select></label>
+          <label id="xai-lead-wrap">Hạn <select id="xai-lead"></select></label>
+          <label id="xai-core-wrap" hidden>Lõi (bản đồ nhiệt) <select id="xai-core"></select></label>
+        </div>
         <label id="explanation-picker" hidden>Cửa sổ giải thích <select id="explanation-case"></select></label>
-        <div id="explanation-plot" aria-label="Integrated Gradients theo ngày và nhóm nguồn"></div>
+        <p id="xai-status"></p>
+        <div id="xai-kpis" class="kpi-row" hidden></div>
+        <div id="xai-charts" class="xai-grid" hidden>
+          <div class="xai-card"><div id="xai-plot-1"></div></div>
+          <div class="xai-card"><div id="xai-plot-2"></div></div>
+          <div class="xai-card xai-wide"><div id="xai-plot-3"></div></div>
+        </div>
+        <div id="explanation-plot" aria-label="Integrated Gradients theo ngày và nhóm nguồn" hidden></div>
+        <label id="xai-table-wrap" hidden>Bảng tổng hợp bước G <select id="xai-table"></select></label>
         <div id="explanation-content"></div>
       </div>
     </section>

@@ -4,7 +4,7 @@ Các thí nghiệm đã thực hiện xác nhận việc chạy lại trọng s�
 
 Ba lần huấn luyện lại Sequential Forecast LSTM ở A4 đạt NSE trung vị **0,695242 / 0,703778 / 0,705890**, tương đối sát mốc trọng số tác giả. Cùng DLinear, các bước B0/B1a/B1b/B2 mỗi bước ba seed và B3 hai mức che mỗi mức ba seed, nhóm đã thực hiện 24 lần huấn luyện mới từ đầu. A4 đo biến thiên của mô hình nền; kết quả các thay đổi Q và nhúng theo nguồn ở B1/B2 được trình bày tại Mục 6.6.
 
-Phạm vi thực nghiệm của chương gồm A2, A3, A4 và B0–B3. Kết quả chấm chung mới nhất là Evaluation Version 8 (32 run), trình bày ở Mục 6.6.8; Version 7 tại Mục 6.6.6 và Version 4 được giữ nguồn riêng trong archive. Bộ đánh giá Version 4 đã chấm A2/A3/A4 trên **test 2014–2017, kịch bản S0, hạn một ngày**. **S0** là không che thêm đầu vào theo kịch bản, dù dữ liệu gốc vẫn có thể thiếu; **hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Validation S0–S4 cho B1b/B2/hai mức B3 đã hoàn thành, trình bày ở Mục 6.6.9. Các kết quả năm lõi thời gian, test/S1–S4 và nhiều hạn sẽ được bổ sung khi các thí nghiệm tương ứng hoàn thành. Dữ liệu, độ phủ và ngưỡng trước test được trình bày tại [Chương 4](04_Data.md).
+Phạm vi thực nghiệm của chương bao phủ đầy đủ các bước từ tái lập và mốc nền (A2–A4), chuỗi cải tiến đầu vào và cơ chế che dữ liệu (B0–B3, chọn B\* = B3 P10S12), so sánh năm lõi thời gian và bảy kịch bản vận hành S0–S4 (C2, Evaluation Version 10), dự báo nhiều hạn 1–7 ngày theo bốn cách cấp thời tiết (H, Evaluation Version 12), mở rộng độ dài chuỗi lên 730 bước (D, Evaluation Version 13), phân tích tương quan theo 31 thuộc tính lưu vực (ByBasin Version 3), kiểm chứng suy luận GPU/CPU và demo (D1–D3), cùng giải thích mô hình bằng Integrated Gradients và dò trạng thái ẩn (bước G Version 1). **S0** là không che thêm đầu vào theo kịch bản, dù dữ liệu gốc vẫn có thể thiếu; **hạn một ngày** là dự báo ngày kế tiếp sau ngày cuối của lịch sử quan trắc. Dữ liệu, độ phủ và ngưỡng trước test được trình bày tại [Chương 4](04_Data.md).
 
 ## 6.1. Câu hỏi thực nghiệm và các cấu hình
 
@@ -603,13 +603,80 @@ Notebook `02_Evaluation_LamaHCEExt_ByBasin` **Version 3** (giao thức 4, `84/84
 
 *Hình. Bản đồ nhiệt hệ số tương quan Spearman giữa hiệu NSE (`730 − 365` bước, cùng hạt giống) của ba lõi LSTM, Mamba, S4D với 31 thuộc tính tĩnh trên 451 lưu vực.*
 
-## 6.12. Khả năng đối chiếu và giới hạn của kết quả hiện tại
+## 6.12. Giải thích mô hình bằng Integrated Gradients và dò trạng thái ẩn (bước G)
 
-Bộ đánh giá `01_Evaluation_LamaHCEExt` đã hoàn tất tới **Version 13** (giao thức 3, Python 3.13.15, NumPy 2.1.3, pandas 2.3.3, SciPy 1.16.3) với **212/212 kiểm thử đạt**, giữ nguyên 100% SHA-256 bốn bảng S0 56 run qua các bản Version 10, 12 và 13, đồng thời bao phủ đủ kịch bản vận hành S0–S4 (144 NPZ C2), dự báo nhiều hạn 1–7 ngày (168 NPZ H) và độ dài chuỗi 730 bước (9 NPZ D). Phân tích thuộc tính `02_Evaluation_LamaHCEExt_ByBasin` **Version 3** đạt **84/84 kiểm thử** cho cả 56 run C2 lẫn 9 cặp D. Ở khâu kiểm chứng triển khai, `01_D1_LamaHCEExt_Inference` **Version 2** tái lập chính xác tuyệt đối (`0` mm/ngày trên Tesla T4) cả `24` run C2 (`10.824` cặp lưu vực) lẫn `3` run đại diện D (`1.353` cặp lưu vực); `02_D2_LamaHCEExt_CPU` **Version 2** xác nhận suy luận CPU 4 luồng đạt `288/288` lượt C2 và `108/108` lượt D (`mambapy==1.2.0` và FFT); gói demo laptop `D3_CHD_CPU_V13` hợp nhất đủ 21 đường dự báo (C2, H, D, mốc) và 7 mô hình chạy trực tiếp “Nếu… thì…” trên CPU.
+Hai notebook chính thức bước G (**Version 1**, dùng fork `freeze-H2` tại `840450f`, Captum 0.9.0 với cầu phương Gauss–Legendre) không huấn luyện lại mà thực hiện suy luận, tính đạo hàm Integrated Gradients (IG) và kiểm chứng trên đúng các checkpoint đã bàn giao: `01_G_C2_XAI` (15 run C2 mức cùng tham số × 3 hạt giống; 1,47 giờ GPU T4, đỉnh bộ nhớ 5,38 GB; `38/38` tệp khớp manifest) và `02_G_H_XAI` (24 run H: LSTM, Mamba × 4 cách × 3 hạt giống, tính IG riêng cho từng hạn 1–7; 4,45 giờ T4, đỉnh 4,31 GB; `44/44` tệp khớp manifest). [Báo cáo chung bước G](../../Workspace/08_XAI/01_G_C2_XAI/01_G_C2_XAI.md), [tóm tắt C2 XAI](../../Workspace/08_XAI/01_G_C2_XAI/Tables/g_summary.json), [tóm tắt H XAI](../../Workspace/08_XAI/02_G_H_XAI/Tables/gh_summary.json).
 
-Ảnh hưởng của một thuộc tính lưu vực hoặc một nhóm đầu vào cần được phân biệt với ảnh hưởng kiến trúc. Các kết quả phân tích thuộc tính cung cấp bằng chứng mô tả theo thứ hạng, không thay thế kiểm định nhân quả hay bằng chứng giải thích bên trong mạng (bước G — Integrated Gradients và dò trạng thái ẩn). Các kết luận trong chương áp dụng cho Extended LamaH-CE, cấu hình ở quy mô ~85 nghìn (và ~255 nghìn) tham số cùng phần cứng đã đo.
+### 6.12.1. Kiểm tra tính toàn vẹn, completeness và deletion test
 
-## 6.13. Nguồn kết quả
+- **Khớp dự báo gốc:** toàn bộ dự báo của 15 run C2 và 24 run H × 7 hạn trên GPU tái lập đúng NPZ đã bàn giao trong dung sai `2 × 10⁻⁵ + 10⁻⁶ × |giá trị NPZ|`.
+- **Lấy mẫu phân tầng và completeness:** kỳ test 2014–2017 trên 451 lưu vực được rút phân tầng theo 4 mức lưu lượng (ngưỡng riêng từng lưu vực 1981–2013) để bảo đảm đủ ca lũ. Đường gốc của IG là `0` trong không gian chuẩn hóa (trung bình kỳ train); ô trống (NaN) giữ IG bằng 0 đúng theo mặt nạ masked mean. C2 giữ **10.511/10.696 mẫu** đạt completeness trên cả 15 run (bỏ 185 mẫu chưa hội tụ sau 1.024 bước ở LSTM 111/222 và GRU 222/333; Mamba và S4D đạt hết ngay ở 64 bước). H giữ **36.905/37.653 lượt mẫu–hạn** (5.379 lần phát; Mamba đạt hết, 793 lượt chưa đạt sau 2.048 bước đều ở LSTM). Kiểm tra độ nhạy khi bỏ mẫu cho thấy các chỉ số lệch tối đa khoảng **0,22 × độ lệch chuẩn 3 hạt giống**, không thay đổi kết luận ([C2](../../Workspace/08_XAI/01_G_C2_XAI/Tables/G_drop_sensitivity.csv), [H](../../Workspace/08_XAI/02_G_H_XAI/Tables/GH_drop_sensitivity.csv)).
+- **Deletion test đạt 100% trường hợp:** thay 0,1% ô (12 ô) bằng đường gốc ở C2 (2.000 mẫu), chọn theo `|IG|` lớn nhất làm mất **0,708–0,828** tín hiệu `|f(x) − f(gốc)|`, cao hơn rõ rệt so với chọn ngẫu nhiên cùng ngày trễ (**0,163–0,250**) và chọn ngẫu nhiên toàn cửa sổ (**≈ 0,001**). Ở H (hạn 1, 4, 7; 0,1% ô), xóa theo `|IG|` làm mất **0,21–0,55** so với **0,04–0,21** (ngẫu nhiên cùng ngày) và **≈ 0,001** (ngẫu nhiên), thắng cả hai đối chứng ở **360/360 trường hợp** ([C2](../../Workspace/08_XAI/01_G_C2_XAI/Tables/G_deletion.csv), [H](../../Workspace/08_XAI/02_G_H_XAI/Tables/GH_deletion.csv)). Điều này xác nhận IG xác định đúng cả thời điểm lẫn nhóm biến nhạy cảm.
+
+![Kiểm chứng deletion test cho 5 lõi C2](../../Workspace/08_XAI/01_G_C2_XAI/Figures/G_Deletion.png)
+
+*Hình. Deletion test trên 5 lõi C2: phần tín hiệu `|f(x) − f(gốc)|` mất đi khi thay một tỉ lệ ô đầu vào bằng đường gốc theo ba cách chọn ô; dải thể hiện 3 hạt giống.*
+
+### 6.12.2. Độ dài nhớ, đóng góp nhóm nguồn và dò trạng thái ẩn ở C2
+
+Bảng dưới tóm tắt độ dài nhớ hiệu dụng (`L50`, `L90`: số ngày quá khứ tích lũy 50% và 90% `|IG|` của pha quá khứ) và tỉ phần `|IG|` theo 7 nhóm nguồn (trung bình ± độ lệch chuẩn 3 hạt giống trên 10.511 mẫu; [G_run_metrics.csv](../../Workspace/08_XAI/01_G_C2_XAI/Tables/G_run_metrics.csv), [G_core_diffs.csv](../../Workspace/08_XAI/01_G_C2_XAI/Tables/G_core_diffs.csv)):
+
+| Lõi (C2 x1) | Tỉ phần trễ 0–1 | L50 (ngày) | L90 (ngày) | L90 so LSTM | ERA5L | EOBS | MSWEP | GLEAM | Q | ECMWF | Tĩnh |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| LSTM | 0,563 | 1,7 ± 0,6 | 34,0 ± 8,2 | — | 0,192 | 0,145 | 0,020 | 0,039 | 0,278 | 0,097 | 0,229 |
+| GRU | 0,485 | 2,0 ± 0,0 | 44,7 ± 7,4 | +1,30 × nhiễu | 0,226 | 0,147 | 0,021 | 0,035 | 0,291 | 0,078 | 0,204 |
+| Mamba | 0,547 | 1,3 ± 0,6 | 65,3 ± 36,7 | +0,86 × nhiễu | 0,239 | 0,154 | 0,018 | 0,037 | 0,299 | 0,065 | 0,189 |
+| S4D | 0,245 | 27,3 ± 3,5 | 200,3 ± 1,2 | +20,3 × nhiễu | 0,303 | 0,177 | 0,027 | 0,061 | 0,228 | 0,040 | 0,166 |
+| Transformer | 0,366 | 6,3 ± 0,6 | 265,7 ± 23,5 | +9,9 × nhiễu | 0,305 | 0,172 | 0,020 | 0,040 | 0,247 | 0,050 | 0,166 |
+
+- **Hai nhóm hành vi nhớ rõ rệt:** ba lõi hồi quy có cổng hoặc chọn lọc (LSTM, GRU, Mamba) dồn khoảng một nửa ảnh hưởng vào ngày `t` và `t−1` (ECMWF HRES ngày `t` và Q quan trắc hôm qua) và giữ 90% pha quá khứ trong 1–2 tháng; trong khi S4D và Transformer trải ảnh hưởng ra gần cả cửa sổ (`L90 = 200–266` ngày, vượt LSTM 9,9–20,3 × nhiễu), dựa nhiều hơn vào ERA5L (`+10,6` và `+10,8 ×` nhiễu) và ít hơn vào ECMWF HRES (`−4,7` và `−3,9 ×` nhiễu). Khác biệt `L90` giữa Mamba và LSTM (+31,3 ngày) chỉ bằng **0,86 × nhiễu** do độ lệch chuẩn 3 hạt giống của Mamba lớn (36,7 ngày), nên **không phân biệt được độ dài nhớ của Mamba với LSTM**. Ngược lại, đối chứng SSM không chọn lọc S4D nhớ dài hơn hẳn, nhất quán với giả thuyết cơ chế chọn lọc đưa Mamba hành xử gần với LSTM hơn S4D (IG không cô lập nhân quả cơ chế này).
+- **Nhóm nguồn và phân tầng theo mức lưu lượng:** Q quan trắc là nhóm lớn nhất ở LSTM, GRU và Mamba (`0,278–0,299`), khớp trực tiếp phát hiện bước ablation B1b. Mamba dựa vào ERA5L nhiều hơn LSTM (`+4,5 ×` nhiễu) và vào thuộc tính tĩnh (`−4,7 ×`), ECMWF HRES (`−2,7 ×`) ít hơn. MSWEP chỉ chiếm ~2% ở mọi lõi do thông tin mưa trùng lặp với E-OBS và ERA5L. Khi chuyển từ dòng chảy thấp sang lũ (mức rất cao; [G_strata.csv](../../Workspace/08_XAI/01_G_C2_XAI/Tables/G_strata.csv)), mọi lõi đều kéo dài bộ nhớ (`L90`: LSTM `28,3 → 41,3`, GRU `34,3 → 62,7`, Mamba `54,0 → 80,7` ngày) và giảm phụ thuộc vào Q hôm qua (LSTM `0,36 → 0,20`, GRU `0,37 → 0,22`, Mamba `0,36 → 0,25`). Tương quan Spearman giữa `L90` theo lưu vực và lượng mưa trung bình `p_mean` dương ở GRU (`0,53`), Transformer (`0,59`), S4D (`0,55`), Mamba (`0,39`) và gần 0 ở LSTM (`−0,01`), trong khi với diện tích `area_calc` lại mang dấu âm (`−0,12` đến `−0,43`; [G_spearman_L90.csv](../../Workspace/08_XAI/01_G_C2_XAI/Tables/G_spearman_L90.csv)).
+- **Dò trạng thái ẩn (ý tưởng Y4):** hồi quy ridge từ đầu ra lõi ngày `t−1` (riêng LSTM thêm ô nhớ `c`, huấn luyện trên 9.020 mẫu train 2003–2009 và chấm R² trên 10.511 mẫu test) được so với hai đối chứng: đầu vào thô ngày `t−1` và cùng kiến trúc khởi tạo ngẫu nhiên ([G_probe_gain.csv](../../Workspace/08_XAI/01_G_C2_XAI/Tables/G_probe_gain.csv)). Với tuyết `ERA5L_swe` và ẩm đất `ERA5L_volsw_123/4`, đầu vào thô vốn đã đạt `R² = 1` nên phép dò không bổ sung bằng chứng; riêng GRU khởi tạo ngẫu nhiên vẫn đạt `R² = 0,82–0,88`, khẳng định tính bắt buộc của đối chứng ngẫu nhiên. Với mưa MSWEP cộng dồn 30/90/180 ngày (đầu vào thô đạt `0,53 / 0,53 / 0,48`), **chỉ ô nhớ `c` của LSTM** vượt đồng thời cả hai đối chứng với mức vượt nhỏ (`+0,023 ± 0,022`, `+0,056 ± 0,032`, `+0,045 ± 0,034`); đầu ra các lõi khác (kể cả Mamba) không vượt.
+
+![Độ dài nhớ hiệu dụng L50 và L90 của 5 lõi C2](../../Workspace/08_XAI/01_G_C2_XAI/Figures/G_Memory_Length.png)
+
+*Hình. Độ dài nhớ hiệu dụng L50 và L90 của năm lõi C2 theo bốn mức lưu lượng; mỗi điểm biểu diễn một hạt giống.*
+
+![Tỉ phần IG theo nhóm nguồn và mức lưu lượng của 5 lõi C2](../../Workspace/08_XAI/01_G_C2_XAI/Figures/G_Group_Share.png)
+
+*Hình. Tỉ phần `|IG|` theo bảy nhóm đầu vào và bốn mức lưu lượng của năm lõi C2.*
+
+![Kết quả dò trạng thái ẩn Y4 trên 5 lõi C2](../../Workspace/08_XAI/01_G_C2_XAI/Figures/G_Probe.png)
+
+*Hình. R² dò trạng thái ẩn của năm lõi (thêm ô nhớ `c` của LSTM) so với hai đối chứng đầu vào thô ngày `t−1` và mô hình khởi tạo ngẫu nhiên trên sáu đích thủy văn.*
+
+### 6.12.3. Vai trò thông tin tương lai ở bước H (hạn 1–7) và so sánh Mamba với LSTM
+
+Phân tích `|IG|` riêng cho từng hạn 1–7 ở bốn cách cấp thông tin thời tiết (`GH_lead_summary.csv`, `GH_core_diffs.csv`, `GH_strata_level.csv`) lý giải trực tiếp diễn biến sai số của bước H (Mục 6.9):
+
+| Cách cấp thời tiết (H) | Tỉ phần pha dự báo LSTM (hạn 1 → 7) | Tỉ phần pha dự báo Mamba (hạn 1 → 7) | L90 LSTM hạn 1 → 7 (ngày) | L90 Mamba hạn 1 → 7 (ngày) |
+|---|---:|---:|---:|---:|
+| Chỉ quá khứ (`past`) | 0% | 0% | 61,7 → 77,0 | 89,7 → 121,7 |
+| Lai (`hybrid`) | 9,6% → đỉnh 14,5% (hạn 2) → 9,9% | 5,5% → 8,1% → 4,9% | 57,7 → 74,7 | 66,3 → 92,7 |
+| GEFS (`gefs`) | 8,7% → 30,1% | 5,1% → 19,3% | 99,3 → 125,3 | 106,3 → 148,3 |
+| Hoàn hảo (`perfect`) | 7,8% → 24,6% | 6,2% → 22,7% | 107,0 → 133,0 | 104,7 → 157,3 |
+
+- **Cách lai vs. GEFS vs. hoàn hảo:** ở cách lai, tỉ phần pha dự báo đạt đỉnh ở hạn 2 rồi quay về mức hạn 1, khớp trực tiếp việc ECMWF HRES ngày đầu chỉ hỗ trợ hạn 1–2. Ở cách GEFS, tỉ phần pha dự báo tăng đều theo hạn tới **30,1%** ở LSTM (nhóm GEFS tăng `4,5% → 27,9%`, còn ECMWF ngày đầu giảm `4,3% → 2,2%`) và **19,3%** ở Mamba, tiệm cận cách hoàn hảo (`24,6%` và `22,7%`). Tỉ phần dựa vào thông tin tương lai tương đương nhưng NSE hạn 7 của GEFS chỉ còn `0,24` so với `0,64` ở cách hoàn hảo cho thấy **nút thắt nằm ở chất lượng dự báo thời tiết ở hạn xa**, không phải do mạng bỏ qua GEFS. Khảo sát từng ngày trong pha dự báo ([GH_Forecast_Days.png](../../Workspace/08_XAI/02_G_H_XAI/Figures/GH_Forecast_Days.png)) củng cố điều này: tại hạn 7, cách hoàn hảo dồn trọng số vào ngày dự báo thứ 7 gấp `2,1×` (LSTM: `5,7%` so với `2,7%`) và `2,6×` (Mamba) ngày thứ 1, còn GEFS phân bố gần đều (`1,2×` và `0,9×`).
+- **Phân tầng theo mức lưu lượng ở hạn 7:** chỉ cách hoàn hảo tăng rõ tỉ phần pha dự báo vào ngày lũ so với ngày dòng chảy thấp (LSTM `33%` so với `20%`, `+13,0` điểm %; Mamba `30%` so với `18%`), trong khi cách lai (`10%` vs `10%`; `5%` vs `5%`) và GEFS (LSTM `30%` vs `31%`; Mamba `21%` vs `18%`) gần như không đổi. Điều này gợi ý dự báo GEFS ở hạn xa ít phân biệt được mưa cực đoan hơn tái phân tích (cần đánh giá riêng sai số mưa GEFS ở hướng khóa luận).
+- **Độ dài nhớ theo hạn và Mamba so với LSTM:** ở cả 8/8 tổ hợp lõi × cách, `L90` tăng đều theo hạn trong khi tỉ phần Q quá khứ giảm đều (ví dụ GEFS LSTM `15,7% → 9,4%`, hoàn hảo Mamba `21,2% → 15,0%`). Đáng chú ý, **Mamba dựa vào pha dự báo ít hơn LSTM** rõ rệt ở cách lai (`−3,0` tới `−19,6 ×` nhiễu) và GEFS (`−1,6` tới `−2,8 ×` nhiễu) đồng thời dồn nhiều hơn sang pha quá khứ (tới `+3,7 ×` nhiễu ở `past` hạn 7); riêng cách hoàn hảo chênh lệch dưới `1 ×` nhiễu. Khác biệt này khớp chiều với việc Mamba kém LSTM `2,9–4,2 ×` nhiễu tại hạn 7 ở ba cách vận hành được (Mục 6.9), dù IG chỉ cho biết độ nhạy của dự báo chứ không chứng minh quan hệ nhân quả.
+
+![Tỉ phần thông tin tương lai theo hạn ở bước H](../../Workspace/08_XAI/02_G_H_XAI/Figures/GH_Future_Share.png)
+
+*Hình. Tỉ phần `|IG|` của pha dự báo theo hạn 1–7 ở bốn cách cấp thông tin thời tiết của LSTM và Mamba; dải thể hiện 3 hạt giống.*
+
+![Tỉ phần pha dự báo và độ dài nhớ L90 theo mức lưu lượng ở bước H](../../Workspace/08_XAI/02_G_H_XAI/Figures/GH_Flood_Level.png)
+
+*Hình. Tỉ phần pha dự báo và độ dài nhớ L90 theo hạn 1–7 tách theo bốn mức lưu lượng của ngày đích.*
+
+**Giới hạn diễn giải của bước G:** tập mẫu phân tầng 4 mức cố ý tăng tỉ trọng ngày lũ nên tỉ phần trung bình toàn tập không đại diện cho phân phối ngày tự nhiên; IG phụ thuộc vào đường gốc (trung bình kỳ train, nên tỉ phần thuộc tính tĩnh chỉ dùng để so sánh giữa các lõi chứ không đọc như tầm quan trọng tuyệt đối); IG đo độ nhạy đầu vào (không chứng minh quan hệ nhân quả) và chia đều hay lệch thông tin trùng lặp giữa các biến tương quan (như mưa MSWEP, E-OBS, ERA5L) tùy cấu trúc mạng; hồi quy ridge trong phép dò Y4 chỉ bắt quan hệ tuyến tính.
+
+## 6.13. Khả năng đối chiếu và giới hạn của kết quả hiện tại
+
+Bộ đánh giá `01_Evaluation_LamaHCEExt` đã hoàn tất tới **Version 13** (giao thức 3, Python 3.13.15, NumPy 2.1.3, pandas 2.3.3, SciPy 1.16.3) với **212/212 kiểm thử đạt**, giữ nguyên 100% SHA-256 bốn bảng S0 56 run qua các bản Version 10, 12 và 13, đồng thời bao phủ đủ kịch bản vận hành S0–S4 (144 NPZ C2), dự báo nhiều hạn 1–7 ngày (168 NPZ H) và độ dài chuỗi 730 bước (9 NPZ D). Phân tích thuộc tính `02_Evaluation_LamaHCEExt_ByBasin` **Version 3** đạt **84/84 kiểm thử** cho cả 56 run C2 lẫn 9 cặp D. Bước giải thích `01_G_C2_XAI` và `02_G_H_XAI` (**Version 1**) hoàn tất `38/38` và `44/44` mục manifest với deletion test đạt `100%` các trường hợp. Ở khâu kiểm chứng triển khai, `01_D1_LamaHCEExt_Inference` **Version 2** tái lập chính xác tuyệt đối (`0` mm/ngày trên Tesla T4) cả `24` run C2 (`10.824` cặp lưu vực) lẫn `3` run đại diện D (`1.353` cặp lưu vực); `02_D2_LamaHCEExt_CPU` **Version 2** xác nhận suy luận CPU 4 luồng đạt `288/288` lượt C2 và `108/108` lượt D (`mambapy==1.2.0` và FFT); gói demo laptop `D3_CHDG_CPU_V13` hợp nhất đủ 21 đường dự báo (C2, H, D, mốc), 7 mô hình chạy trực tiếp “Nếu… thì…” trên CPU và trang Giải thích (XAI) nối trực tiếp kết quả bước G trên cả 451 lưu vực.
+
+Ảnh hưởng của một thuộc tính lưu vực hoặc một nhóm đầu vào cần được phân biệt với ảnh hưởng kiến trúc. Các kết quả tương quan thuộc tính và Integrated Gradients cung cấp bằng chứng mô tả theo thứ hạng và độ nhạy đầu vào, không thay thế kiểm định nhân quả có can thiệp. Các kết luận trong chương áp dụng cho Extended LamaH-CE, cấu hình ở quy mô ~85 nghìn (và ~255 nghìn) tham số cùng phần cứng đã đo.
+
+## 6.14. Nguồn kết quả
 
 | Nội dung | Nguồn đối chiếu |
 |---|---|
@@ -621,6 +688,7 @@ Bộ đánh giá `01_Evaluation_LamaHCEExt` đã hoàn tất tới **Version 13*
 | Dự báo nhiều hạn 1–7 ngày (bước H) | [H Compare V1](../../Workspace/05_Training/15_H_LamaHCEExt_Compare/15_H_LamaHCEExt_Compare.md), [Evaluation V12](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#kết-quả-kaggle-version-12) |
 | Cửa sổ 730 so với 365 ngày (bước D) | [D Compare V3](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/17_D_LamaHCEExt_Compare.md), [Evaluation V13](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#kết-quả-kaggle-version-13) |
 | Đặc điểm lưu vực (C2 56 run & bước D) | [ByBasin V3](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#133-kết-quả-kaggle-version-3-56-run-c2-và-phân-vùng-d) |
+| Giải thích mô hình (Integrated Gradients & dò Y4, bước G) | [Báo cáo chung bước G (C2 & H V1)](../../Workspace/08_XAI/01_G_C2_XAI/01_G_C2_XAI.md), [02_G_H_XAI V1](../../Workspace/08_XAI/02_G_H_XAI/02_G_H_XAI.md) |
 | Kiểm chứng suy luận và Demo D1–D3 | [Bàn giao Demo](../../Workspace/07_Demo/README.md), [D1 V2](../../Workspace/07_Demo/01_D1_LamaHCEExt_Inference/01_D1_LamaHCEExt_Inference.md), [D2 V2](../../Workspace/07_Demo/02_D2_LamaHCEExt_CPU/02_D2_LamaHCEExt_CPU.md), [D3](../../Workspace/07_Demo/03_D3_LamaHCEExt_Demo/03_D3_LamaHCEExt_Demo.md) |
 
 Repo giữ nguyên byte các bảng tổng hợp, JSON và hình từ Output chính thức của các notebook đã đối chiếu; chuỗi dự báo và CSV chi tiết theo từng ID nằm trong Output Kaggle. Giá trị băm của đầu vào gốc là thông tin do phiên Kaggle ghi lại. Những dãy số ghi “ví dụ minh họa” chỉ dùng giải thích công thức và không được tính vào kết quả thực nghiệm.

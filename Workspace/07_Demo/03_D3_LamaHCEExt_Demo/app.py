@@ -75,7 +75,19 @@ def create_app(bundle, raw=None, h_python=None):
     @lru_cache(maxsize=64)
     def table(filename):
         path = bundle/f"{filename}.csv"
-        return pd.read_csv(path, dtype={"basin_id": str, "origin_date": str}) if path.is_file() else None
+        return pd.read_csv(path, dtype={"basin_id": str, "origin_date": str, "basin": str}) if path.is_file() else None
+
+    @lru_cache(maxsize=8)
+    def npz_data(filename):
+        path = bundle/filename
+        if not path.is_file():
+            return None
+        with np.load(path, allow_pickle=False) as archive:
+            return {k: np.array(archive[k]) for k in archive.files}
+
+    def finite_or_none(value):
+        v = float(value)
+        return v if np.isfinite(v) else None
 
     def integer_arg(name, default, end):
         try:
@@ -232,25 +244,181 @@ def create_app(bundle, raw=None, h_python=None):
 
     @app.get("/api/explanation")
     def explanation():
-        found = table("G")
-        if found is None:
-            return jsonify(cases=[], rows=[])
+        gh_npz = npz_data("G_H_demo.npz")
+        gc2_npz = npz_data("G_C2_demo.npz")
+        g_metrics = table("G_run_metrics")
+        g_legacy = table("G")
+        available = dict(
+            h_basin=gh_npz is not None,
+            c2_basin=gc2_npz is not None,
+            c2_summary=g_metrics is not None,
+            legacy=g_legacy is not None,
+        )
+        req_scope = request.args.get("scope", "").strip().lower()
+        if not req_scope:
+            if available["h_basin"]:
+                req_scope = "h"
+            elif available["c2_basin"] or available["c2_summary"]:
+                req_scope = "c2"
+            elif available["legacy"]:
+                req_scope = "legacy"
+            else:
+                return jsonify(scope="none", available=available, cases=[], rows=[])
+        basin = request.args.get("basin") or catalog["ids"][0]
+        if basin not in ids:
+            abort(400, "Chọn lưu vực trong danh sách 451 lưu vực.")
+        b_idx = ids[basin]
+
+        if req_scope == "h":
+            if gh_npz is None:
+                return jsonify(scope="h", available=available, error="Gói demo chưa có G_H_demo.npz."), 404
+            mode = request.args.get("mode", "gefs").strip().lower()
+            valid_modes = ("gefs", "hybrid", "past", "perfect")
+            if mode not in valid_modes:
+                abort(400, "Cách cấp thời tiết phải thuộc gefs, hybrid, past hoặc perfect.")
+            lead = integer_arg("lead", 7, 7)
+            runs_list = [str(x) for x in gh_npz["runs"]]
+            run_idx = {r: i for i, r in enumerate(runs_list)}
+            demo_runs = [str(x) for x in gh_npz["demo_runs"]]
+            phases = [str(x) for x in gh_npz["phases"]]
+            groups = [str(x) for x in gh_npz["groups"]]
+            cores_out = {}
+            for core in ("lstm", "mamba"):
+                match = next((r for r in demo_runs if r.startswith(f"{core}_{mode}_seed")), None)
+                if match is None:
+                    match = next((r for r in runs_list if r.startswith(f"{core}_{mode}_seed")), None)
+                if match is None:
+                    continue
+                ri = run_idx[match]
+                p_mat = gh_npz["phase_share"][ri, b_idx]
+                g_vec = gh_npz["group_share"][ri, b_idx, lead - 1]
+                f_mat = gh_npz["fore_day_share"][ri, b_idx]
+                cores_out[core] = dict(
+                    run=match,
+                    phase_by_lead={ph: [finite_or_none(p_mat[k, pi]) for k in range(7)] for pi, ph in enumerate(phases)},
+                    memory_L50=[finite_or_none(x) for x in gh_npz["memory_L50"][ri, b_idx]],
+                    memory_L90=[finite_or_none(x) for x in gh_npz["memory_L90"][ri, b_idx]],
+                    group_share_lead={g: finite_or_none(g_vec[gi]) for gi, g in enumerate(groups)},
+                    fore_day_share=[[finite_or_none(f_mat[k, d]) for d in range(7)] for k in range(7)],
+                )
+            tables = {}
+            for tname, cols in (
+                ("GH_lead_summary", ["mode", "core", "lead", "share past mean", "share fore mean",
+                                     "share static mean", "share fore:ECMWF mean", "share fore:GEFS mean",
+                                     "L50 median mean", "L90 median mean"]),
+                ("GH_strata_level", None),
+                ("GH_core_diffs", None),
+            ):
+                df = table(tname)
+                if df is not None:
+                    keep = [c for c in cols if c in df] if cols else list(df.columns)
+                    tables[tname] = columns_for_view(df[keep])
+            return jsonify(
+                scope="h", available=available, basin=basin, mode=mode, lead=lead,
+                modes=list(valid_modes), leads=list(range(1, 8)), phases=phases, groups=groups,
+                n_samples_by_lead=[int(x) for x in gh_npz["n_samples"][b_idx]],
+                n_samples_all=int(gh_npz["n_samples_all"][b_idx]),
+                cores=cores_out, tables=tables,
+            )
+
+        if req_scope == "c2":
+            if gc2_npz is None and g_metrics is None:
+                return jsonify(scope="c2", available=available, error="Gói demo chưa có dữ liệu giải thích C2."), 404
+            cores_order = ["lstm", "gru", "mamba", "s4d", "transformer"]
+            req_core = request.args.get("core", "lstm").strip().lower()
+            if req_core not in cores_order:
+                abort(400, "Lõi phải thuộc lstm, gru, mamba, s4d hoặc transformer.")
+            groups = ["ERA5L", "EOBS", "MSWEP", "GLEAM", "Q", "ECMWF", "static"]
+            group_share, lag_cum_60, memory, heatmap = {}, {}, [], None
+            if gc2_npz is not None:
+                runs_list = [str(x) for x in gc2_npz["runs"]]
+                run_idx = {r: i for i, r in enumerate(runs_list)}
+                demo_runs = [str(x) for x in gc2_npz["demo_runs"]]
+                groups = [str(x) for x in gc2_npz["groups"]]
+                src_groups = [str(x) for x in gc2_npz["source_groups"]]
+                n_samp = int(gc2_npz["n_samples"][b_idx])
+                for core in cores_order:
+                    match = next((r for r in demo_runs if r.startswith(f"{core}_")), None)
+                    if match is None:
+                        continue
+                    ri = run_idx[match]
+                    g_vec = gc2_npz["group_share"][ri, b_idx]
+                    group_share[core] = {g: finite_or_none(g_vec[gi]) for gi, g in enumerate(groups)}
+                    l_vec = gc2_npz["lag_share"][ri, b_idx]
+                    cum = np.cumsum(np.nan_to_num(l_vec, nan=0.0))[:61] if np.isfinite(l_vec).any() else np.full(61, np.nan)
+                    lag_cum_60[core] = [finite_or_none(v) for v in cum]
+                    memory.append(dict(core=core, run=match,
+                                       L50=finite_or_none(gc2_npz["memory_L50"][ri, b_idx]),
+                                       L90=finite_or_none(gc2_npz["memory_L90"][ri, b_idx]),
+                                       n_samples=n_samp))
+                    if core == req_core:
+                        gl = gc2_npz["group_lag_0_60"][ri, b_idx, :31, :]
+                        heatmap = dict(core=core, run=match, lags=list(range(31)), source_groups=src_groups,
+                                       z=[[finite_or_none(gl[lg, si]) for lg in range(31)] for si in range(len(src_groups))])
+            else:
+                # Dự phòng từ bảng tổng hợp C2 XAI (trong repo) khi chưa tải tệp G_demo_basin.npz
+                basin_l90_df = table("G_basin_L90")
+                b_l90_row = None
+                if basin_l90_df is not None:
+                    hit = basin_l90_df[basin_l90_df["basin"].astype(str).eq(basin)]
+                    b_l90_row = hit.iloc[0] if not hit.empty else None
+                lag_npz = npz_data("G_lag_share.npz")
+                for core in cores_order:
+                    sub = g_metrics[g_metrics["core"].eq(core)]
+                    if sub.empty:
+                        continue
+                    group_share[core] = {g: finite_or_none(sub[f"share {g}"].mean()) for g in groups if f"share {g}" in sub}
+                    if lag_npz is not None:
+                        arrs = [lag_npz[k] for k in lag_npz if k.startswith(f"{core}_")]
+                        if arrs:
+                            cum = np.cumsum(np.mean(arrs, axis=0))[:61]
+                            lag_cum_60[core] = [finite_or_none(v) for v in cum]
+                    memory.append(dict(
+                        core=core, run=f"{core} (TB 3 seed)",
+                        L50=finite_or_none(sub["L50 median"].mean()),
+                        L90=finite_or_none(b_l90_row[core]) if b_l90_row is not None and core in b_l90_row else finite_or_none(sub["L90 median"].mean()),
+                        L90_global=finite_or_none(sub["L90 median"].mean()),
+                        n_samples=None,
+                    ))
+            tables = {}
+            for tname, cols in (
+                ("G_run_metrics", ["core", "seed", "L50 median", "L90 median", "share ERA5L", "share EOBS",
+                                   "share MSWEP", "share GLEAM", "share Q", "share ECMWF", "share static"]),
+                ("G_strata", None),
+                ("G_core_diffs", None),
+                ("G_probe_gain", None),
+            ):
+                df = table(tname)
+                if df is not None:
+                    keep = [c for c in cols if c in df] if cols else list(df.columns)
+                    tables[tname] = columns_for_view(df[keep])
+            return jsonify(
+                scope="c2", available=available, basin=basin, core=req_core, cores_order=cores_order,
+                c2_basin=gc2_npz is not None, groups=groups, group_share=group_share,
+                lag_cum_60=lag_cum_60, memory=memory, heatmap=heatmap, tables=tables,
+            )
+
+        if g_legacy is None:
+            return jsonify(scope="none", available=available, cases=[], rows=[])
         keys = ["basin_id", "origin_date"]
         required = {*keys, "core", "group", "day_offset", "attribution"}
-        if not required <= set(found):
+        if not required <= set(g_legacy):
             return jsonify(error="Bảng Integrated Gradients chưa khớp các cột đã bàn giao."), 422
-        cases = found[keys].drop_duplicates()
-        basin, origin = request.args.get("basin"), request.args.get("origin")
-        if basin is None or origin is None:
+        cases = g_legacy[keys].drop_duplicates()
+        origin = request.args.get("origin")
+        if request.args.get("basin") is None or origin is None:
             first = cases.iloc[0] if not cases.empty else None
-            basin, origin = (first.basin_id, first.origin_date) if first is not None else (None,None)
-        selected = found[found.basin_id.eq(basin) & found.origin_date.eq(origin)]
-        return jsonify(cases=columns_for_view(cases), rows=columns_for_view(selected),
-                       basin=basin, origin=origin)
+            basin, origin = (first.basin_id, first.origin_date) if first is not None else (None, None)
+        selected = g_legacy[g_legacy.basin_id.eq(basin) & g_legacy.origin_date.eq(origin)]
+        return jsonify(scope="legacy", available=available, cases=columns_for_view(cases),
+                       rows=columns_for_view(selected), basin=basin, origin=origin)
 
     @app.get("/api/health")
     def health():
-        return jsonify(ok=True, schema=catalog["schema"], models=len(models), live_what_if=len(live))
+        return jsonify(ok=True, schema=catalog["schema"], models=len(models), live_what_if=len(live),
+                       xai_h=npz_data("G_H_demo.npz") is not None,
+                       xai_c2_basin=npz_data("G_C2_demo.npz") is not None,
+                       xai_c2_summary=table("G_run_metrics") is not None)
 
     return app
 

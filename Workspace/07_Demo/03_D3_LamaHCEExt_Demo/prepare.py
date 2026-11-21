@@ -32,6 +32,10 @@ D_REPORT_FILES = {
 D_AUDIT_COLUMNS = ["file", "bytes", "sha256", "passed"]
 H_MODE_LABELS = {"past": "Chỉ dữ liệu quá khứ", "hybrid": "ECMWF HRES ngày đầu",
                  "gefs": "ECMWF HRES và GEFS", "perfect": "Thời tiết tái phân tích (tham chiếu lý tưởng)"}
+G_C2_TABLES = ("G_demo_runs.csv", "G_run_metrics.csv", "G_core_diffs.csv", "G_strata.csv",
+               "G_basin_L90.csv", "G_probe_gain.csv", "G_deletion.csv", "G_lag_share.npz", "g_summary.json")
+G_H_TABLES = ("GH_demo_runs.csv", "GH_lead_summary.csv", "GH_core_diffs.csv", "GH_strata_level.csv",
+              "GH_deletion.csv", "gh_summary.json")
 
 
 def load_audit():
@@ -102,6 +106,14 @@ def check_inputs(source, with_live=False, replay_only_cores=(), h_evaluation=Non
     if g_file is not None:
         evaluator_g = load_evaluator()
         check("G Integrated Gradients", lambda: read_g_table(g_file, evaluator_g["basin_id"]))
+    g_c2_npz = audit["unique_file"](source, "G_demo_basin.npz", required=False)
+    g_h_npz = audit["unique_file"](source, "GH_demo_basin.npz", required=False)
+    if (g_c2_npz is not None or g_h_npz is not None) and not problems:
+        ctx_g, _, _ = audit["compare_inputs"](source)
+        if g_c2_npz is not None:
+            check("G C2 XAI (G_demo_basin.npz)", lambda: validate_g_c2_demo(g_c2_npz, ctx_g["ids"], audit))
+        if g_h_npz is not None:
+            check("G H XAI (GH_demo_basin.npz)", lambda: validate_g_h_demo(g_h_npz, ctx_g["ids"], audit))
     if h_python is not None and not h_python.is_file():
         problems.append(f"Python của H | Không tìm thấy {h_python}")
     if problems:
@@ -206,6 +218,143 @@ def d_report_files(root, d_compare_root, audit):
     return paths
 
 
+def verify_g_manifest_entry(path, audit):
+    # Kiểm riêng tệp demo/G*_demo_basin.npz với manifest.csv của g_output/ (không bắt buộc giải nén 1,8 GB ig/*.npz).
+    g_root = path.parent.parent
+    manifest_path = g_root / "manifest.csv"
+    if not manifest_path.is_file():
+        return
+    man = pd.read_csv(manifest_path, dtype={"sha256": str})
+    col = "file" if "file" in man else "tệp"
+    rel = path.relative_to(g_root).as_posix()
+    hit = man[man[col].eq(rel)]
+    if len(hit) != 1:
+        raise ValueError(f"Manifest {manifest_path} thiếu mục {rel}.")
+    row = hit.iloc[0]
+    if audit["sha256"](path) != row["sha256"] or ("bytes" in row and int(row["bytes"]) != path.stat().st_size):
+        raise ValueError(f"SHA-256 hoặc dung lượng không khớp manifest: {rel}.")
+
+
+def validate_g_c2_demo(path, expected_ids, audit):
+    verify_g_manifest_entry(path, audit)
+    with np.load(path, allow_pickle=False) as d:
+        needed = {"runs", "basin_ids", "groups", "source_groups", "lag_share", "group_share",
+                  "memory_L50", "memory_L90", "group_lag_0_60", "n_samples", "demo_runs"}
+        if not needed <= set(d.files):
+            raise ValueError(f"G_demo_basin.npz thiếu mảng: {sorted(needed - set(d.files))}.")
+        bids = tuple(str(int(str(x).strip())) for x in d["basin_ids"])
+        if bids != tuple(expected_ids):
+            raise ValueError("G_demo_basin.npz khác danh sách hoặc thứ tự 451 lưu vực A3.")
+        runs = [str(x) for x in d["runs"]]
+        demo_runs = [str(x) for x in d["demo_runs"]]
+        if not demo_runs or not set(demo_runs) <= set(runs):
+            raise ValueError("G_demo_basin.npz có demo_runs ngoài danh sách runs.")
+        nr, nb, ng, ns = len(runs), len(bids), len(d["groups"]), len(d["source_groups"])
+        if (d["lag_share"].shape != (nr, nb, 365) or d["group_share"].shape != (nr, nb, ng)
+                or d["group_lag_0_60"].shape != (nr, nb, 61, ns)
+                or d["memory_L50"].shape != (nr, nb) or d["memory_L90"].shape != (nr, nb)):
+            raise ValueError("G_demo_basin.npz sai kích thước mảng.")
+        has = d["n_samples"] > 0
+        if not has.any():
+            raise ValueError("G_demo_basin.npz không có lưu vực nào có mẫu.")
+        gs, ls = d["group_share"][:, has], d["lag_share"][:, has]
+        if (not np.isfinite(gs).all() or not np.isfinite(ls).all()
+                or not np.isfinite(d["group_lag_0_60"]).all()
+                or not np.allclose(gs.sum(-1), 1.0, atol=1e-3)
+                or not np.allclose(ls.sum(-1), 1.0, atol=1e-3)):
+            raise ValueError("G_demo_basin.npz có giá trị không hữu hạn hoặc tỉ phần không cộng bằng 1.")
+    return dict(runs=runs, demo_runs=demo_runs, sha256=audit["sha256"](path))
+
+
+def validate_g_h_demo(path, expected_ids, audit):
+    verify_g_manifest_entry(path, audit)
+    with np.load(path, allow_pickle=False) as d:
+        needed = {"runs", "basin_ids", "leads", "phases", "groups", "phase_share", "group_share",
+                  "fore_day_share", "memory_L50", "memory_L90", "n_samples", "n_samples_all", "demo_runs"}
+        if not needed <= set(d.files):
+            raise ValueError(f"GH_demo_basin.npz thiếu mảng: {sorted(needed - set(d.files))}.")
+        bids = tuple(str(int(str(x).strip())) for x in d["basin_ids"])
+        if bids != tuple(expected_ids):
+            raise ValueError("GH_demo_basin.npz khác danh sách hoặc thứ tự 451 lưu vực A3.")
+        leads = [int(x) for x in d["leads"]]
+        phases = [str(x) for x in d["phases"]]
+        if leads != list(range(1, 8)) or phases != ["past", "fore", "static"]:
+            raise ValueError("GH_demo_basin.npz sai trục hạn 1–7 hoặc thứ tự 3 pha.")
+        runs = [str(x) for x in d["runs"]]
+        demo_runs = [str(x) for x in d["demo_runs"]]
+        if not demo_runs or not set(demo_runs) <= set(runs):
+            raise ValueError("GH_demo_basin.npz có demo_runs ngoài danh sách runs.")
+        nr, nb, ng = len(runs), len(bids), len(d["groups"])
+        if (d["phase_share"].shape != (nr, nb, 7, 3) or d["group_share"].shape != (nr, nb, 7, ng)
+                or d["fore_day_share"].shape != (nr, nb, 7, 7)
+                or d["memory_L50"].shape != (nr, nb, 7) or d["memory_L90"].shape != (nr, nb, 7)
+                or d["n_samples"].shape != (nb, 7) or d["n_samples_all"].shape != (nb,)):
+            raise ValueError("GH_demo_basin.npz sai kích thước mảng.")
+        has = d["n_samples"] > 0
+        if not has.any():
+            raise ValueError("GH_demo_basin.npz không có ô (lưu vực, hạn) nào có mẫu.")
+        ps, gs = d["phase_share"][:, has], d["group_share"][:, has]
+        ds = d["fore_day_share"][:, has].sum(-1) - ps[..., 1]
+        if (not np.isfinite(ps).all() or not np.isfinite(gs).all()
+                or not np.isfinite(d["memory_L90"][:, has]).all()
+                or not np.allclose(ps.sum(-1), 1.0, atol=1e-3)
+                or not np.allclose(gs.sum(-1), 1.0, atol=1e-3)
+                or float(np.max(np.abs(ds))) > 1e-3):
+            raise ValueError("GH_demo_basin.npz có giá trị không hữu hạn hoặc sai tổng tỉ phần.")
+    return dict(runs=runs, demo_runs=demo_runs, sha256=audit["sha256"](path))
+
+
+def copy_optional_xai_files(names, search_roots, output):
+    out_res = output.resolve()
+    copied = []
+    for filename in names:
+        found = None
+        for root in search_roots:
+            if root is None or not root.exists():
+                continue
+            hits = [
+                p for p in sorted(root.rglob(filename))
+                if not p.resolve().is_relative_to(out_res)
+                and not any(part.startswith("D3_") for part in p.relative_to(root).parts)
+            ]
+            if hits:
+                found = hits[0]
+                break
+        if found is not None:
+            shutil.copy2(found, output / filename)
+            copied.append(filename)
+    return copied
+
+
+def package_xai(source, output, ids, evaluator, audit):
+    repo_xai = DEMO.parent / "08_XAI"
+    xai_meta = dict(c2_basin=False, c2_summary=False, h_basin=False, h_summary=False, legacy=False,
+                    c2_demo_runs=[], h_demo_runs=[])
+    g_path = audit["unique_file"](source, "G_IntegratedGradients.csv", required=False)
+    if g_path is not None:
+        read_g_table(g_path, evaluator["basin_id"], valid_ids=ids).to_csv(output / "G.csv", index=False, encoding="utf-8-sig")
+        xai_meta["legacy"] = True
+    g_c2 = audit["unique_file"](source, "G_demo_basin.npz", required=False)
+    if g_c2 is not None:
+        info = validate_g_c2_demo(g_c2, ids, audit)
+        shutil.copy2(g_c2, output / "G_C2_demo.npz")
+        xai_meta.update(c2_basin=True, c2_demo_runs=info["demo_runs"], c2_sha256=info["sha256"])
+    g_h = audit["unique_file"](source, "GH_demo_basin.npz", required=False)
+    if g_h is not None:
+        info = validate_g_h_demo(g_h, ids, audit)
+        shutil.copy2(g_h, output / "G_H_demo.npz")
+        xai_meta.update(h_basin=True, h_demo_runs=info["demo_runs"], h_sha256=info["sha256"])
+    c2_roots = [g_c2.parent.parent if g_c2 is not None else None, repo_xai / "01_G_C2_XAI" / "Tables", source]
+    h_roots = [g_h.parent.parent if g_h is not None else None, repo_xai / "02_G_H_XAI" / "Tables", source]
+    c2_copied = copy_optional_xai_files(G_C2_TABLES, c2_roots, output)
+    h_copied = copy_optional_xai_files(G_H_TABLES, h_roots, output)
+    if "G_run_metrics.csv" in c2_copied:
+        xai_meta["c2_summary"] = True
+    if "GH_lead_summary.csv" in h_copied:
+        xai_meta["h_summary"] = True
+    return xai_meta
+
+
 def read_g_table(path, normalize_basin_id, valid_ids=None):
     frame = pd.read_csv(path, dtype={"basin_id": str, "origin_date": str})
     required = {"basin_id", "origin_date", "core", "group", "day_offset", "attribution"}
@@ -278,15 +427,19 @@ def prepare(source, output, with_live=False, replay_only_cores=(), h_evaluation=
         "metrics": "Evaluation_metrics.csv", "levels": "Evaluation_levels.csv",
         "events": "Evaluation_events.csv", "events_by_case": "Evaluation_event_cases.csv",
         "c2_scenarios": "C2_scenarios_stats.csv",
-        "D": "D_score_stats.csv", "D_ensemble": "D_ensemble_scores.csv",
-        "D_cost": "D_cost.csv", "D_basin": "D_basin_scores.csv",
     }.items():
         path = audit["unique_file"](source, pattern, required=False)
         if path is not None:
             shutil.copy2(path, output/f"{label}.csv")
-    g_path = audit["unique_file"](source, "G_IntegratedGradients.csv", required=False)
-    if g_path is not None:
-        read_g_table(g_path, evaluator["basin_id"], valid_ids=ids).to_csv(output/"G.csv", index=False, encoding="utf-8-sig")
+    d_search = d_summary_file.parent if d_summary_file is not None else source
+    for label, pattern in {
+        "D": "D_score_stats.csv", "D_ensemble": "D_ensemble_scores.csv",
+        "D_cost": "D_cost.csv", "D_basin": "D_basin_scores.csv",
+    }.items():
+        path = audit["unique_file"](d_search, pattern, required=False)
+        if path is not None:
+            shutil.copy2(path, output/f"{label}.csv")
+    xai_meta = package_xai(source, output, ids, evaluator, audit)
     if not h_tables:
         for lead in evaluator["H_LEADS"]:
             for label in H_REPORT_TABLES:
@@ -305,7 +458,7 @@ def prepare(source, output, with_live=False, replay_only_cores=(), h_evaluation=
                                         outline=study_outline(raw, ids, evaluator["basin_id"]),
                                         flood_m3_s={i: {str(k):float(v) for k,v in levels.loc[i].items()} for i in ids},
                                         models=models, default_run=selected, library_commit=audit["FREEZE_C"],
-                                        C2_manifest_sha256=audit["sha256"](compare/"manifest.csv")))
+                                        C2_manifest_sha256=audit["sha256"](compare/"manifest.csv"), xai=xai_meta))
     print(f"Gói demo: {output} – {len(ids)} lưu vực, {len(models)} đường dự báo theo cấu hình.")
 
 
