@@ -38,13 +38,25 @@ Compare dùng cấu trúc Output huấn luyện từ `Tools/C_Notebooks_Build.py
 
 Phần 2 đối chiếu hai config đã lưu, loại các khóa đường dẫn và quản lý phiên, kiểm phần khác biệt khoa học đúng `seq_length` (`365` so với `730`). Mỗi run phải có checkpoint chọn bằng validation, đủ 30 epoch, bảng đường học `curve_<experiment>.csv` khớp `summary.json` và test hoàn thành. Hash scaler của từng run và thông tin `grad_guard` được giữ trong audit. Nếu Output huấn luyện có trường `train_samples`, kiểm số mẫu cùng mốc 1.112.307 theo audit B2; khi thiếu số từ Output, audit ghi rõ chưa xác nhận số mẫu từng run.
 
-Phần 3 đọc kết quả đã kiểm byte, đối chiếu quan trắc A3, dựng NPZ theo hợp đồng Evaluation và tính lại NSE nguồn với quan trắc native. Phần 4 chấm NSE, PNSE và KGE trên giao ngày của các run D và C2 cùng cấu hình; kết quả giữ từng seed, từng lưu vực và tổ hợp 3 hạt giống (`D_ensemble_scores.csv`, chỉ tính trong notebook, không xuất NPZ), ghi riêng hiệu hai trung vị, trung vị hiệu ghép cặp và bội ngưỡng nhiễu B0 (`noise_sd`). Bảng bàn giao `D_handoff.csv` và bảng chọn mô hình demo theo validation `D_demo_runs.csv` ghi đủ mã băm SHA-256 của `environment.json`, `best_model.pt`, `config.yml`, `train_data_scaler.yml` và NPZ. Hình `D_Length_Comparison.png` đặt chú giải ngoài vùng vẽ, hiển thị trực tiếp bằng `plt.show()` và in chú thích tiếng Việt từ số liệu thực ngay bên dưới. Chi phí gộp cả phiên 1 (`previous_session`) khi run chạy qua hai phiên (`_Cont`), kể cả khi phiên 2 chỉ chấm test (`SKIP_TRAIN`), rồi so trung vị phút/epoch train, phút validation/test, tổng giờ train và đỉnh bộ nhớ GPU theo cặp C2/D. Nếu GPU hai phía khác nhau, cần đọc cột GPU trước khi diễn giải tỷ số thời gian.
+Phần 3 đọc kết quả đã kiểm byte, đối chiếu quan trắc A3, dựng NPZ theo hợp đồng Evaluation và tính lại NSE nguồn với quan trắc native. Phần 4 chấm NSE, PNSE và KGE trên giao ngày của các run D và C2 cùng cấu hình; kết quả giữ từng seed, từng lưu vực, bảng đường học 30 epoch (`D_curves.csv`), chẩn đoán từng lưu vực của tổ hợp 3 hạt giống (`D_ensemble_basin_scores.csv`: `NSE`, `PNSE`, `KGE`, `r`, `alpha`, `beta`, `%BiasFHV`, thiên lệch đỉnh `>= Q98` và dòng chảy thấp `<= Q30` kèm `area_gov_km2`) và bảng tóm tắt tổ hợp 3 hạt giống (`D_ensemble_scores.csv`, chỉ tính trong notebook, không xuất NPZ), ghi riêng hiệu hai trung vị, trung vị hiệu ghép cặp và bội ngưỡng nhiễu B0 (`noise_sd`). Bảng bàn giao `D_handoff.csv` và bảng chọn mô hình demo theo validation `D_demo_runs.csv` ghi đủ mã băm SHA-256 của `environment.json`, `best_model.pt`, `config.yml`, `train_data_scaler.yml` và NPZ. Chi phí gộp cả phiên 1 (`previous_session`) khi run chạy qua hai phiên (`_Cont`), kể cả khi phiên 2 chỉ chấm test (`SKIP_TRAIN`), rồi so trung vị phút/epoch train, phút validation/test, tổng giờ train và đỉnh bộ nhớ GPU theo cặp C2/D. Nếu GPU hai phía khác nhau, cần đọc cột GPU trước khi diễn giải tỷ số thời gian.
+
+Phần 5 xuất **bộ 9 hình trực quan hóa đa tiêu chí** (Version 3, dùng nguyên 20 Input của Version 1; tự rút gọn sạch khi bỏ S4D) theo phong cách tối giản chuẩn tạp chí HESS/Nature (bảng màu thống nhất với C2/H/XAI: `LSTM = C0`, `Mamba = C4`, `S4D = C3`; chú giải đặt ngoài vùng vẽ; chữ trong hình tiếng Anh 200 dpi; không chèn hộp ghi chú rậm lên vùng dữ liệu; mỗi hình gọi `plt.show()` và in chú thích tiếng Việt tính động từ số liệu thực ngay bên dưới), sắp xếp tuần tự từ **đơn giản (tổng quan)** đến **nâng cao (chẩn đoán lưu vực và vật lý thủy văn)**:
+
+1. `D_Overview_Accuracy.png` *(Tổng quan đơn giản)*: đồ thị điểm Cleveland cho NSE trung vị validation (2010–2013) và test (2014–2017) của 365 vs 730 ngày kèm hạt giống, tổ hợp 3 hạt giống, mốc `B*` và dải nhiễu `B0`.
+2. `D_Length_Comparison.png` *(Cốt lõi RQ5 — tên tệp bắt buộc cho Evaluation)*: hiệu `ΔNSE (730 − 365)` kèm dải nhiễu `±B0` đặt cạnh tỷ số thời gian huấn luyện mỗi epoch `730 / 365` và vạch tỉ lệ tuyến tính `2,0×`.
+3. `D_MultiMetric_Ensemble.png` *(Đa tiêu chí)*: cặp điểm nối `365 → 730` cho đồng thời ba chỉ số chuẩn thủy văn **NSE, PNSE, KGE** (trung bình ± SD hạt giống và tổ hợp 3 hạt giống).
+4. `D_Cost_Tradeoff.png` *(Đánh đổi hiệu năng – chi phí)*: quỹ đạo `365 → 730` theo NSE tổ hợp vs phút/epoch (thang log), đặt cạnh hai biểu đồ cột gốc 0 cho tổng giờ huấn luyện 30 epoch và đỉnh bộ nhớ GPU VRAM (`GiB`).
+5. `D_Curves_365_vs_730.png` *(Động học huấn luyện 30 epoch)*: đường học NSE validation và test theo epoch (trung bình + dải min–max 3 hạt giống) kèm dấu `best_model.pt` của hai độ dài chuỗi.
+6. `D_Basin_CDF_And_Thresholds.png` *(Phân phối không gian 451 lưu vực — chuẩn HESS)*: đường phân phối tích lũy thực nghiệm (ECDF) của NSE tổ hợp và biểu đồ thanh chồng 4 bậc chất lượng Moriasi và cs. (2007) (`≥ 0,70`, `0,50–0,70`, `0,00–0,50`, `< 0`).
+7. `D_Basin_Paired_Delta.png` *(Chẩn đoán ghép cặp từng lưu vực)*: đồ thị tán xạ `1:1` (`NSE_365` vs `NSE_730`) phía trên và phân phối mật độ `ΔNSE` (histogram + KDE + thanh hộp `IQR` & `P5–P95` kiểu Raincloud chung trục tung) phía dưới.
+8. `D_Basin_Stratification.png` *(Phân tầng theo đặc trưng lưu vực)*: trung vị `ΔNSE` và khoảng tin cậy bootstrap 95% theo 4 tứ phân vị diện tích `area_gov` và 4 tứ phân vị kỹ năng nền `NSE_365`.
+9. `D_Hydrograph_Diagnostics.png` *(Chẩn đoán vật lý đường quá trình)*: biểu đồ quả tạ có hướng `365 → 730` cho ba thành phần KGE (`r`, `α`, `β`, mốc `1,0`) và sai số thiên lệch theo chế độ dòng chảy (`%BiasFHV` top 2%, ngày đỉnh `≥ Q98`, ngày kiệt `≤ Q30`, mốc `0%`).
 
 ## 3. Đầu ra và nối tiếp
 
 Thư mục `/kaggle/working/d_compare`. Hợp đồng dự báo tên `contracts/SF_<cấu hình>_D_seed<N>_test_S0_lead1.npz`. Output của notebook này được gắn tiếp vào `01_Evaluation_LamaHCEExt` để chấm riêng phân vùng `evaluation_output/D/` (sáu chỉ số thủy văn, mức lưu lượng và sự kiện lũ USWRC trên giao chung giữa D, C2 cùng cấu hình/seed và `Persistence_qmax`), sau đó nối vào trang **So sánh** và **Cảnh báo lũ** của `03_D3_LamaHCEExt_Demo`.
 
-Gửi lại `d_summary.json`, `D_config_check.csv`, `D_contract_check.csv`, `D_seed_scores.csv`, `D_score_stats.csv`, `D_ensemble_scores.csv`, `D_cost.csv`, `D_cost_ratios.csv`, `D_demo_runs.csv`, `D_handoff.csv`, `D_Length_Comparison.png`, `manifest.csv`. Giữ `D_input_sources.csv`, `D_basin_scores.csv`, `D_common_mask.npz` và toàn bộ contracts trong Output.
+Gửi lại `d_summary.json`, `D_config_check.csv`, `D_contract_check.csv`, `D_seed_scores.csv`, `D_score_stats.csv`, `D_ensemble_scores.csv`, `D_curves.csv`, `D_cost.csv`, `D_cost_ratios.csv`, `D_demo_runs.csv`, `D_handoff.csv`, toàn bộ 9 hình `D_*.png` và `manifest.csv`. Giữ `D_input_sources.csv`, `D_basin_scores.csv`, `D_ensemble_basin_scores.csv`, `D_common_mask.npz` và toàn bộ contracts trong Output Kaggle.
 
 ## 4. Kết quả đã xác minh: `lstm_L2_x1_lr1e-3` (Version 1, 3 hạt giống)
 
@@ -63,11 +75,11 @@ Ba lượt `16_D_Train_lstm_L2_x1_lr1e-3_Seed111/222/333` (Version 1, Tesla T4, 
 - **Dòng chảy rất cao, sự kiện lũ và đặc trưng lưu vực:** Recall nhóm lưu lượng rất cao (`> Q98`, 11.871 ngày–lưu vực) tăng nhẹ ở cả ba hạt giống (từ `0,4471–0,4743` lên `0,4562–0,4797`), và sai số tuyệt đối trung bình thời điểm đỉnh lũ USWRC chu kỳ 2 năm giảm từ `0,37–0,57` ngày xuống `0,24–0,39` ngày. Xét hiệu `ΔNSE (730 − 365)` trung bình ba hạt giống theo 451 lưu vực (kiểm định hoán vị hai phía 9.999 lần), cửa sổ hai năm cải thiện có ý nghĩa thống kê tại các lưu vực có băng hà và tuyết tích lũy nhiều năm: `glac_fra` (`ρ = +0,1405`, `p = 0,0026`), `frac_snow` (`ρ = +0,1394`, `p = 0,0034`) và độ cao trung bình `elev_mean` (`ρ = +0,1057`, `p = 0,0251`).
 - **Chi phí huấn luyện và suy luận CPU:** Trên Tesla T4, trung vị thời gian huấn luyện mỗi epoch tăng từ `3,20` phút (C2) lên `6,18` phút (`1,93×`, sát tỉ lệ tuyến tính `730 / 365 = 2,00×`), tổng giờ huấn luyện tăng từ `2,06` lên `3,86` giờ (`1,87×`) và đỉnh bộ nhớ GPU tăng từ `2.381` lên `4.083` MiB (`1,71×`). Kiểm thử suy luận CPU theo giao thức D2 (36 lượt trên ba lưu vực đại diện diện tích nhỏ/trung vị/lớn, 4 luồng CPU) cho hạt giống 333 đạt 36/36 lượt khớp NPZ trong dung sai `2 × 10⁻⁵ + 10⁻⁶|y|` mm/ngày (sai số tuyệt đối lớn nhất `2,19 × 10⁻⁵` mm/ngày), với độ trễ ấm `p50` tăng `2,03×` (`7,15 → 14,53` ms) và `p95 = 32,59` ms.
 
-## 5. Kết quả đã xác minh: toàn bộ 9/9 run Bước D và `17_D_LamaHCEExt_Compare` Version 1
+## 5. Kết quả đã xác minh: toàn bộ 9/9 run Bước D và `17_D_LamaHCEExt_Compare` Version 3
 
 Toàn bộ **9/9 run Bước D** (`3/3 lstm_L2_x1_lr1e-3`, `3/3 mamba_L2_x1_lr1e-3 _Cont`, `3/3 s4d_L4_x1_lr1e-3 _Cont`) đã hoàn thành đủ 30 epoch huấn luyện và 30 epoch test trên Tesla T4 (`freeze-C`, tắt `grad_guard`, 0 bước cập nhật bị bỏ), khớp 100% SHA-256 `manifest.csv`, `best_model.pt` trùng từng tensor với epoch chọn và `train_data_scaler.yml` trùng byte chuẩn 730 bước `f6d8ffa6...`.
 
-**Notebook `17_D_LamaHCEExt_Compare` Version 1** (Kaggle CPU, Internet Off, 20 Input) đã hoàn tất (`complete = true`, `S4D_included = true`, `contracts = 9`, `all_pairs_strictly_equivalent = true`, `24/24` tệp trong [manifest.csv](Tables/manifest.csv) khớp SHA-256 và dung lượng, `train_sample_counts_verified = false` do `summary.json` nguồn không ghi khóa `train_samples` như dự kiến ở Mục 2). Toàn bộ bảng nhỏ và hình đã lưu tại [Tables/](Tables/) và [D_Length_Comparison.png](Figures/D_Length_Comparison.png).
+**Notebook `17_D_LamaHCEExt_Compare` Version 3** (Kaggle CPU, Internet Off, giữ nguyên 20 Input) đã hoàn tất (`complete = true`, `S4D_included = true`, `contracts = 9`, `all_pairs_strictly_equivalent = true`, **`34/34` tệp** trong [manifest.csv](Tables/manifest.csv) khớp SHA-256 và dung lượng; toàn bộ 9 NPZ dự báo và 11 bảng cốt lõi **trùng từng byte** với Version 1 nên không cần chạy lại `01_Evaluation_LamaHCEExt`, `02_Evaluation_LamaHCEExt_ByBasin`, `01_D1` hay `02_D2`). Bảng tổng hợp và đường học (`D_curves.csv`: 540 dòng đủ 18 run × 30 epoch, 0 NaN) lưu tại [Tables/](Tables/); trọn bộ **9 hình chính thức** lưu tại [Figures/](Figures/).
 
 | Cấu hình & hạt giống | Epoch chọn (365 / 730) | NSE val (365 / 730) | NSE test giao 9 cặp (365 / 730) | KGE test giao 9 cặp (365 / 730) | Phút train/ep (730 / tỷ số cặp C2) | Giờ train (730) | VRAM đỉnh (MiB) |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -82,9 +94,43 @@ Toàn bộ **9/9 run Bước D** (`3/3 lstm_L2_x1_lr1e-3`, `3/3 mamba_L2_x1_lr1e
 
 - **Tỷ số chi phí ghép cặp cùng seed (`D_cost_ratios.csv`, Tesla T4):** khi so từng hạt giống `730 / 365`, tốc độ huấn luyện mỗi epoch tăng đồng đều xấp xỉ hai lần ở cả ba lõi — **LSTM `1,96×`** (`1,84× / 1,93× / 2,11×`; tổng giờ train `1,80× / 1,86× / 2,02×`; VRAM `1,71×`), **Mamba `1,95×`** (`1,98× / 1,92× / 1,94×`; tổng giờ `1,94× / 1,89× / 1,92×`; VRAM `1,69×`), **S4D `1,96×`** (`1,92× / 1,97× / 1,99×`; tổng giờ `1,92× / 2,00× / 1,99×`; VRAM `1,75×`).
 
-![So sánh độ dài chuỗi 730 vs 365 ngày](Figures/D_Length_Comparison.png)
+### Bộ 9 hình trực quan chính thức (Version 3 — từ tổng quan đến chẩn đoán nâng cao)
 
-*Hình:* So sánh độ dài chuỗi đầu vào 730 ngày so với 365 ngày trên kỳ test 2014–2017 (`451` lưu vực có ngày chung, hạn dự báo 1 ngày, 3 hạt giống mỗi lõi). (a) Hiệu NSE trung vị giữa cửa sổ 730 và 365 ngày (trung bình ± độ lệch chuẩn mẫu: LSTM `−0,0016 ± 0,0015`; Mamba `−0,0023 ± 0,0053`; S4D `+0,0053 ± 0,0045`). (b) Tỷ số thời gian huấn luyện trung vị mỗi epoch của 730 chia cho 365 ngày theo từng cặp hạt giống (trung bình: LSTM `1,96` lần; Mamba `1,95` lần; S4D `1,96` lần). Nguồn: [D_cost_ratios.csv](Tables/D_cost_ratios.csv), [D_score_stats.csv](Tables/D_score_stats.csv).
+![Tổng quan NSE validation và test 365 vs 730 ngày](Figures/D_Overview_Accuracy.png)
+
+*Hình 1 (Tổng quan):* NSE trung vị trên kỳ validation 2010–2013 (a) và test 2014–2017 (b, 451 lưu vực) của 365 ngày (rỗng) và 730 ngày (đặc) cùng tổ hợp 3 hạt giống (sao), mốc `B*` và dải nhiễu `B0` (`±0,0079`).
+
+![So sánh cốt lõi độ dài chuỗi 730 vs 365 ngày](Figures/D_Length_Comparison.png)
+
+*Hình 2 (Cốt lõi RQ5):* (a) Hiệu NSE trung vị test `730 − 365` (LSTM `−0,0016 ± 0,0015`, tổ hợp `−0,0012`; Mamba `−0,0023 ± 0,0053`, tổ hợp `−0,0003`; S4D `+0,0053 ± 0,0045`, tổ hợp `+0,0036`; dải xám `±0,0079`) và (b) tỷ số thời gian huấn luyện mỗi epoch `730 / 365` (`1,96×`, `1,95×`, `1,96×`, sát mốc tuyến tính `2,0×`).
+
+![So sánh đa tiêu chí NSE, PNSE và KGE](Figures/D_MultiMetric_Ensemble.png)
+
+*Hình 3 (Đa tiêu chí):* Chuyển dịch `365 → 730` trên NSE, PNSE và KGE (trung bình ± SD hạt giống và tổ hợp 3 hạt giống). Tổ hợp vượt trung bình hạt giống đơn trên NSE/PNSE; Mamba giảm rõ ở KGE tổ hợp (`−0,0180`) trong khi LSTM (`+0,0031`) và S4D (`+0,0013`) tăng nhẹ.
+
+![Đánh đổi hiệu năng và chi phí trên Tesla T4](Figures/D_Cost_Tradeoff.png)
+
+*Hình 4 (Hiệu năng – chi phí):* (a) Quỹ đạo `365 → 730` theo phút/epoch (thang log) và NSE tổ hợp test; (b) tổng giờ huấn luyện 30 epoch (`1,89×`, `1,92×`, `1,97×`); (c) đỉnh VRAM Tesla T4 (`1,71×`, `1,69×`, `1,75×`).
+
+![Đường học 30 epoch 365 vs 730 ngày](Figures/D_Curves_365_vs_730.png)
+
+*Hình 5 (Động học 30 epoch):* Đường học NSE trung vị validation và test của đủ 18 run (`9 C2` nét đứt xám + `9 D` nét liền màu lõi, dải min–max 3 hạt giống, dấu `best_model.pt`). Epoch chọn `365d / 730d`: LSTM `20/22/24` vs `16/20/28`; Mamba `15/20/25` vs `20/23/26`; S4D `12/14/22` vs `16/19/23`. Nguồn: [D_curves.csv](Tables/D_curves.csv).
+
+![Phân phối không gian ECDF và bậc chất lượng Moriasi](Figures/D_Basin_CDF_And_Thresholds.png)
+
+*Hình 6 (Phân phối 451 lưu vực):* (a) Đường phân phối tích lũy thực nghiệm (ECDF) NSE tổ hợp test; (b) số lưu vực đạt các bậc Moriasi và cs. (2007) — tỷ lệ đạt `NSE ≥ 0,5` nhích nhẹ ở cả ba lõi (`LSTM 404 → 407`, `Mamba 405 → 406`, `S4D 394 → 397/451`).
+
+![Chẩn đoán ghép cặp từng lưu vực](Figures/D_Basin_Paired_Delta.png)
+
+*Hình 7 (Ghép cặp 451 lưu vực):* Scatter `1:1` (hàng trên) và mật độ ghép cặp `ΔNSE` kèm thanh hộp `IQR` & `P5–P95` chung trục tung (hàng dưới). S4D cải thiện **59,0%** lưu vực (`266/451`, trung vị `+0,0035`, `80` lưu vực tăng `> 0,02` so với `26` giảm), còn LSTM (`45,9%`, `−0,0016`) và Mamba (`46,8%`, `−0,0010`) cân bằng quanh 0.
+
+![Phân tầng ΔNSE theo diện tích và kỹ năng nền](Figures/D_Basin_Stratification.png)
+
+*Hình 8 (Phân tầng chế độ):* Trung vị ghép cặp `ΔNSE` (± KTC bootstrap 95%) theo 4 tứ phân vị diện tích `area_gov` (a) và 4 tứ phân vị kỹ năng nền `NSE_365` (b): S4D hưởng lợi mạnh nhất ở lưu vực lớn (`Q4 +0,0055`) và nhóm lưu vực khó nhất (`Q1 +0,0109`), còn nhóm lưu vực vốn tốt (`Q3–Q4`) hầu như bất biến.
+
+![Chẩn đoán thành phần KGE và thiên lệch theo chế độ dòng chảy](Figures/D_Hydrograph_Diagnostics.png)
+
+*Hình 9 (Vật lý đường quá trình):* Quả tạ có hướng `365 → 730` cho (a) thành phần KGE (`r`, `α`, `β`, mốc `1,0`) và (b) thiên lệch theo chế độ dòng chảy (`%BiasFHV` top 2%, ngày đỉnh `≥ Q98`, ngày kiệt `≤ Q30`, mốc `0%`). Lý giải trực tiếp KGE giảm của Mamba 730 (`α: 0,834 → 0,816`, `β: 0,990 → 0,961`, `FHV: −16,3% → −19,4%`), đối lập với LSTM cải thiện đỉnh (`FHV: −16,6% → −15,8%`) và S4D cải thiện đồng đều (`r, α, β, FHV`).
 
 - **Tổ hợp 3 hạt giống trên giao chung đủ 9 cặp (`657.347` ngày–lưu vực, `451` lưu vực; [D_ensemble_scores.csv](Tables/D_ensemble_scores.csv)):**
   - `LSTM`: NSE tổ hợp `0,7351 → 0,7338` (`Δ = −0,0012`, `−0,16×` nhiễu B0), PNSE tổ hợp `0,5591 → 0,5527` (`−0,0064`), KGE tổ hợp `0,7767 → 0,7799` (`+0,0031`). Demo D ([D_demo_runs.csv](Tables/D_demo_runs.csv)): **Seed 333** (`val = 0,7728`).

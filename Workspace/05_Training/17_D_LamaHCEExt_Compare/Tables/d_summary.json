@@ -43,6 +43,17 @@
       "notebook": "16_D_Train_s4d_L4_x1_lr1e-3_Seed111_Cont"
     }
   },
+  "figures": [
+    "D_Overview_Accuracy.png",
+    "D_Length_Comparison.png",
+    "D_MultiMetric_Ensemble.png",
+    "D_Cost_Tradeoff.png",
+    "D_Curves_365_vs_730.png",
+    "D_Basin_CDF_And_Thresholds.png",
+    "D_Basin_Paired_Delta.png",
+    "D_Basin_Stratification.png",
+    "D_Hydrograph_Diagnostics.png"
+  ],
   "scope": "test_S0_common_all_C2_and_D",
   "inputs": {
     "C2_compare_version_expected": 1,
