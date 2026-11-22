@@ -478,6 +478,43 @@ Các chữ ký đường duy trì bổ sung bằng chứng về dải lưu lư�
 
 %BiasFLV dùng log ở 30% ngày thấp nhất; các giá trị không dương sau chính sách chặn được dùng sàn log 10⁻⁶ mm/ngày riêng cho phép tính này. Ba DLinear có trị tuyệt đối FLV trung vị khoảng **597–754%**, với **9.197/12.134/13.218** ngày sim dưới sàn trên giao chấm. Giá trị này nhạy với hình dạng đuôi log và số lần chặn về 0; không được diễn giải như phần trăm sai tổng thể tích nước. Quy tắc FDC được cố định trong [protocol đánh giá](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version4/Tables/Evaluation_protocol.json).
 
+### 6.8.1. Bốn mức ở các bước B và năm lõi C2 (Evaluation Version 9)
+
+Bảng dưới dùng cùng ngưỡng q30/q80/q98 và cùng giao 56 run của Evaluation Version 9 (11.759 ngày–ID mức rất cao). Mỗi ô là trung bình ± độ lệch chuẩn mẫu qua ba hạt giống của tỷ lệ cộng dồn (%); run một hạt giống chỉ có một giá trị. F1 rất cao là trung bình điều hòa của recall và precision mức rất cao.
+
+| Run | Recall thấp (%) | Recall rất cao (%) | Precision rất cao (%) | F1 rất cao (%) |
+|---|---:|---:|---:|---:|
+| SeqLSTM_Q (trọng số tác giả) | 66,93 | 47,58 | 67,58 | 55,84 |
+| LSTM A4 | 73,66 ± 2,42 | 46,67 ± 2,47 | 67,28 ± 2,08 | 55,05 ± 1,14 |
+| B0 | 74,85 ± 1,57 | 47,39 ± 1,25 | 67,13 ± 1,83 | 55,54 ± 0,43 |
+| B1a | 77,82 ± 3,89 | 47,45 ± 0,16 | 68,84 ± 0,56 | 56,17 ± 0,22 |
+| B1b | 80,63 ± 5,22 | 48,64 ± 2,38 | 70,91 ± 1,92 | 57,65 ± 1,22 |
+| B2 | 79,90 ± 0,92 | 48,64 ± 0,86 | 70,26 ± 1,30 | 57,47 ± 0,22 |
+| B3 P10S12 (B*) | 75,05 ± 0,11 | 46,35 ± 1,19 | 70,17 ± 1,54 | 55,81 ± 0,50 |
+| B3 P05S05 | 75,22 ± 2,45 | 46,90 ± 1,55 | 69,81 ± 0,68 | 56,09 ± 0,90 |
+| C2 LSTM L2 x1 | 79,17 ± 3,84 | 45,94 ± 1,38 | 69,96 ± 1,11 | 55,45 ± 0,66 |
+| C2 GRU L2 x1 | 76,47 ± 3,01 | 48,39 ± 2,62 | 68,18 ± 1,62 | 56,55 ± 1,38 |
+| C2 Transformer L2 x1 | 80,36 ± 1,13 | 48,41 ± 1,36 | 64,44 ± 1,01 | 55,27 ± 0,56 |
+| C2 Transformer L2 x3 | 81,66 ± 3,23 | 45,38 ± 2,22 | 67,06 ± 1,81 | 54,08 ± 1,02 |
+| C2 S4D L4 x1 | 76,76 ± 2,19 | 41,06 ± 1,09 | 69,99 ± 1,74 | 51,73 ± 0,46 |
+| C2 S4D L4 x3 | 77,53 ± 3,18 | 43,27 ± 1,84 | 68,31 ± 2,93 | 52,92 ± 0,45 |
+| C2 Mamba L2 x1 | 73,11 ± 6,92 | 47,12 ± 4,24 | 69,01 ± 3,52 | 55,83 ± 1,80 |
+| C2 Mamba L4 x3 | 73,83 ± 4,06 | 47,47 ± 2,69 | 68,15 ± 1,23 | 55,92 ± 1,60 |
+| Persistence qmax | 88,07 | 40,11 | 40,28 | 40,19 |
+
+Nguồn: [bảng bốn mức cộng dồn Version 9](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_levels_pooled.csv).
+
+![Ma trận nhầm lẫn bốn mức của năm lõi C2 và persistence](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Figures/Classification_Confusion_C2.png)
+
+*Hình. Ma trận nhầm lẫn bốn mức (test 2014–2017, hạn một ngày, cộng dồn 451 lưu vực và ba hạt giống) của năm lõi C2 mức cùng tham số và persistence qmax. Mỗi hàng là mức quan trắc, cộng lại 100%; ô đậm trên đường chéo là tỷ lệ ngày dự báo đúng mức (recall). Ở hàng "Very high", các mô hình học sâu xếp 41–48% số ngày rất cao đúng mức và gần một nửa (47–53%) xuống mức cao, chỉ khoảng 5–6% xuống mức trung bình; persistence chỉ đúng 40% và đẩy 19% xuống mức trung bình. Lỗi của mô hình học sâu vì vậy chủ yếu là hụt đỉnh một bậc chứ không bỏ lỡ hẳn ngày lũ. Bảng gộp: [Classification_confusion_pooled.csv](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Tables/Classification_confusion_pooled.csv).*
+
+![Recall và precision mức rất cao](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Figures/Classification_VeryHigh_Level.png)
+
+*Hình. Recall (a) và precision (b) mức rất cao (trên q98 từng lưu vực) của năm lõi C2 mức cùng tham số, B* và persistence; thanh là trung bình ba hạt giống, vạch là độ lệch chuẩn hạt giống. Các mô hình học sâu chênh nhau ít ở cả hai chỉ số (trừ recall thấp hơn của S4D và precision thấp hơn của Transformer), còn khoảng cách với persistence lớn nhất ở precision (khoảng 30 điểm phần trăm).*
+
+
+Ở mức rất cao, các mô hình học sâu có precision 64,4–70,9%, cao xa persistence qmax (40,3%): khi mô hình báo một ngày rất cao thì khoảng hai phần ba trường hợp đúng là rất cao. Recall rất cao chỉ 41,1–48,6%, nghĩa là hơn một nửa số ngày rất cao thật bị dự báo xuống mức thấp hơn, phù hợp với %BiasFHV trung vị âm ở mọi run C2 (−11,7 đến −22,2%, mô hình hụt đỉnh). Trong các bước B, B1b có F1 rất cao lớn nhất (57,65%). Trong C2, GRU, hai cấu hình Mamba, LSTM và Transformer x1 có F1 rất cao 55,3–56,6%, chênh nhau nhỏ hơn độ lệch chuẩn ba hạt giống của Mamba L2 x1 (1,80 điểm phần trăm); S4D thấp nhất (51,7–52,9%) do recall rất cao thấp. Recall thấp của persistence cao nhất (88,07%) vì dòng chảy kiệt thay đổi chậm, chép mức hôm qua hầu như luôn đúng.
+
 ## 6.9. Đánh giá sự kiện lũ
 
 ### 6.9.1. Ngưỡng, gộp cụm và ghép một–một
@@ -536,6 +573,85 @@ Trên cùng 1.066 cụm USWRC tại ngưỡng hai năm, A4 đạt kết quả sa
 | Seed 333 | 191 | 875 | 446 | 17,92 | 70,02 |
 
 Seed 333 có NSE trung vị cao nhất, còn seed 222 có POD cao nhất. Mức NSE gần mốc tác giả chưa đồng nghĩa bắt tốt ngày khởi phát lũ: cả ba seed vẫn bỏ sót 850–886 trận và có FAR khoảng 67–70%. Ở bảng phụ ±1 ngày, POD tăng lên **28,71/34,05/31,24%**. [Bảng chính](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version4/Tables/Evaluation_events_pooled.csv), [bảng phụ](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version4/Tables/Evaluation_events_pooled_tolerance1.csv).
+
+### 6.9.5. Bắt lũ ở các bước B và năm lõi C2
+
+Cùng 1.066 cụm USWRC ở ngưỡng hai năm như Mục 6.9.2 (Evaluation Version 9). Số trận là trung bình qua ba hạt giống; POD, FAR, CSI tính trên từng hạt giống rồi lấy trung bình ± độ lệch chuẩn. CSI = h/(h+m+f) phạt cả bỏ sót lẫn báo nhầm.
+
+| Run | Bắt được | Báo nhầm | POD (%) | FAR (%) | CSI (%) | POD ±1 (%) | FAR ±1 (%) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| LSTM A4 | 195,7 | 421,3 | 18,4 ± 1,7 | 68,3 ± 1,5 | 13,1 ± 1,0 | 31,3 | 45,8 |
+| B0 | 193,0 | 418,7 | 18,1 ± 2,1 | 68,4 ± 1,4 | 13,0 ± 1,2 | 31,3 | 45,3 |
+| B1a | 193,3 | 428,3 | 18,1 ± 0,8 | 68,9 ± 1,7 | 12,9 ± 0,6 | 32,1 | 45,0 |
+| B1b | 203,0 | 435,0 | 19,0 ± 0,5 | 68,2 ± 0,5 | 13,5 ± 0,3 | 35,8 | 40,2 |
+| B2 | 193,0 | 442,7 | 18,1 ± 0,7 | 69,6 ± 1,4 | 12,8 ± 0,5 | 36,0 | 39,6 |
+| B3 P10S12 (B*) | 160,7 | 339,3 | 15,1 ± 0,9 | 67,8 ± 1,7 | 11,4 ± 0,5 | 29,9 | 36,1 |
+| B3 P05S05 | 175,7 | 357,7 | 16,5 ± 0,5 | 67,1 ± 0,1 | 12,3 ± 0,3 | 30,7 | 38,7 |
+| C2 LSTM L2 x1 | 163,7 | 319,0 | 15,4 ± 1,4 | 66,1 ± 1,6 | 11,8 ± 1,0 | 29,8 | 34,2 |
+| C2 GRU L2 x1 | 161,7 | 331,0 | 15,2 ± 1,7 | 67,1 ± 1,1 | 11,6 ± 0,9 | 28,8 | 37,5 |
+| C2 Transformer L2 x1 | 155,3 | 344,0 | 14,6 ± 1,2 | 68,9 ± 1,9 | 11,0 ± 0,8 | 26,6 | 43,1 |
+| C2 Transformer L2 x3 | 116,7 | 267,3 | 10,9 ± 0,8 | 69,5 ± 2,4 | 8,7 ± 0,6 | 21,5 | 40,4 |
+| C2 S4D L4 x1 | 101,3 | 196,3 | 9,5 ± 1,6 | 66,0 ± 5,0 | 8,0 ± 1,4 | 19,3 | 30,8 |
+| C2 S4D L4 x3 | 121,7 | 251,7 | 11,4 ± 2,4 | 67,4 ± 1,8 | 9,2 ± 1,6 | 23,0 | 33,7 |
+| C2 Mamba L2 x1 | 144,3 | 303,3 | 13,5 ± 1,7 | 67,6 ± 2,1 | 10,5 ± 0,9 | 27,8 | 33,5 |
+| C2 Mamba L4 x3 | 136,7 | 301,7 | 12,8 ± 1,9 | 68,9 ± 2,0 | 10,0 ± 1,3 | 26,9 | 34,7 |
+| Persistence qmax | 0,0 | 1.066,0 | 0,0 | 100,0 | 0,0 | 100,0 | 0,0 |
+
+Nguồn: [bảng sự kiện chính](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_events_pooled.csv), [bảng phụ ±1](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/Evaluation_events_pooled_tolerance1.csv).
+
+![POD và FAR lũ chu kỳ hai năm](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Figures/Classification_Flood_Events.png)
+
+*Hình. POD (a, cao hơn là tốt) và FAR (b, thấp hơn là tốt) của 1.066 trận lũ vượt ngưỡng hai năm trên kỳ test, cho năm lõi C2 mức cùng tham số và B*; thanh đậm là ghép cùng ngày khởi phát (kết quả chính), thanh nhạt là cho lệch ±1 ngày. Nới dung sai một ngày làm POD gần gấp đôi và FAR giảm từ 66–69% xuống 31–43% ở mọi mô hình, nên phần lớn trận bỏ sót là lệch ngày khởi phát chứ không phải không thấy lũ.*
+
+
+Khi bắt buộc cùng ngày bắt đầu, mọi mô hình chỉ bắt được 9,5–19,0% số trận. B1b có POD cao nhất (19,0%). B* (B3 P10S12) bắt ít hơn B1b khoảng 42 trận và báo nhầm ít hơn khoảng 96 trận: che dữ liệu khi huấn luyện làm mô hình thận trọng hơn ở đỉnh. Năm lõi C2 dùng cấu hình dữ liệu của B* nên có POD cùng tầm với B* (LSTM 15,4%, GRU 15,2%, Mamba L2 x1 13,5%, S4D L4 x1 9,5%) dù NSE trung vị test cao hơn (Mục 6.6.11): NSE thưởng việc khớp cả chuỗi, không thưởng riêng việc vượt ngưỡng đúng ngày khởi phát. Trong C2, LSTM và GRU bắt nhiều trận nhất; Mamba L2 x1 bắt ít hơn LSTM khoảng 19 trận, S4D L4 x1 ít hơn khoảng 62 trận; FAR các lõi gần nhau (66–70%). Với dung sai ±1 ngày, POD tăng lên 19,3–36,0% và FAR giảm còn 30,8–45,8%: một phần lớn trận bỏ sót là lệch ngày khởi phát một ngày chứ không phải không thấy lũ. Bài toán ưu tiên tránh bỏ sót hơn tránh báo nhầm (Mục 6.2), nên POD là chỉ số đọc trước; không mô hình nào trong tiểu luận đạt POD cùng ngày trên 20%.
+
+### 6.9.6. Bốn mức và bắt lũ theo hạn (bước H, Evaluation Version 12)
+
+Bảng dưới lấy trung bình ba hạt giống trên giao chung 651.841 ngày–ID (11.763 ngày–ID rất cao, 1.068 cụm USWRC ở ngưỡng hai năm). Dung sai ghép trận ở hạn h là ±⌊h/3⌋ ngày: hạn 1–2 phải cùng ngày, hạn 3–5 cho lệch một ngày, hạn 6–7 cho lệch hai ngày.
+
+| Cách | Recall rất cao hạn 1 / 3 / 7 (%) | Precision rất cao hạn 1 / 3 / 7 (%) | POD hạn 1 / 3 / 7 (%) | FAR hạn 1 / 3 / 7 (%) |
+|---|---|---|---|---|
+| LSTM chỉ quá khứ | 20,0 / 2,4 / 0,7 | 62,9 / 47,5 / 40,6 | 2,3 / 0,1 / 0,0 | 83,9 / 85,9 / 100,0 |
+| Mamba chỉ quá khứ | 22,5 / 3,1 / 1,3 | 61,1 / 37,9 / 30,0 | 2,7 / 0,2 / 0,0 | 86,4 / 94,7 / 100,0 |
+| LSTM lai | 30,4 / 4,1 / 1,2 | 64,3 / 44,0 / 39,8 | 6,8 / 0,2 / 0,0 | 74,1 / 90,7 / 95,8 |
+| Mamba lai | 31,0 / 5,1 / 1,6 | 62,0 / 34,4 / 26,4 | 8,1 / 0,4 / 0,0 | 77,7 / 94,2 / 99,3 |
+| LSTM GEFS | 32,5 / 16,8 / 6,0 | 66,4 / 47,9 / 38,5 | 8,3 / 3,2 / 2,1 | 67,1 / 71,6 / 61,4 |
+| Mamba GEFS | 36,0 / 18,8 / 5,3 | 64,8 / 47,3 / 35,9 | 10,8 / 5,2 / 2,1 | 66,0 / 69,0 / 68,8 |
+| LSTM hoàn hảo | 49,0 / 43,8 / 42,0 | 64,3 / 58,4 / 57,6 | 18,4 / 23,0 / 22,8 | 63,2 / 54,5 / 54,4 |
+| Mamba hoàn hảo | 50,3 / 45,2 / 44,4 | 65,8 / 58,6 / 56,7 | 19,7 / 23,1 / 24,4 | 63,6 / 55,4 / 53,5 |
+| Persistence qmax | 40,2 / 12,8 / 7,6 | 40,1 / 12,8 / 7,6 | 0,0 / 0,0 / 1,1 | 100,0 / 100,0 / 98,9 |
+
+Nguồn: [bảng bốn mức hạn 7](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version12/H/Evaluation_H_levels_pooled_lead7.csv) và [bảng sự kiện hạn 7](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version12/H/Evaluation_H_events_pooled_lead7.csv); các hạn khác ở tệp `_lead1` … `_lead6` cùng thư mục.
+
+![Recall rất cao và POD theo hạn ở bước H](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Figures/Classification_H_by_Lead.png)
+
+*Hình. Recall mức rất cao (a, b) và POD lũ chu kỳ hai năm (c, d) theo hạn 1–7 ngày cho LSTM và Mamba ở bốn cách dùng thông tin thời tiết; đường là trung bình ba hạt giống, dải mờ là độ lệch chuẩn hạt giống, đường chấm là persistence. Cách chỉ quá khứ và cách lai (chỉ có ECMWF HRES ngày đầu) gần như mất khả năng bắt lũ từ hạn 2; GEFS giữ được một phần tới hạn 5–6; tái phân tích hoàn hảo là cận trên gần như không đổi theo hạn. POD hạn 1–2 của mọi cách dùng ghép cùng ngày, từ hạn 3 cho lệch ±⌊h/3⌋ ngày nên đường POD cách hoàn hảo nhảy lên ở hạn 3.*
+
+
+Khả năng cảnh báo lũ giảm nhanh hơn NSE khi thiếu thông tin thời tiết tương lai. Cách chỉ quá khứ và cách lai gần như không bắt được trận nào từ hạn 3 (POD tối đa 0,4%), dù precision rất cao vẫn 26–48%: mô hình hiếm khi báo mức rất cao, nên báo ít mà vẫn trượt gần hết. Cách GEFS giữ recall rất cao 16,8–18,8% và POD 3,2–5,2% ở hạn 3, rõ hơn hai cách trên nhưng xa cận trên tái phân tích hoàn hảo (recall rất cao 42–50%, POD 18–24% ở mọi hạn). Ở hạn 1, POD của các cách vận hành được (2,3–10,8%) thấp hơn C2 (13,5–15,4%), cùng chiều với NSE hạn 1 của bước H thấp hơn C2 ([báo cáo H Compare](../../Workspace/05_Training/15_H_LamaHCEExt_Compare/15_H_LamaHCEExt_Compare.md)). Với GEFS, Mamba bắt nhiều trận hơn LSTM ở hạn 1 và 3 (10,8 so với 8,3%; 5,2 so với 3,2%) nhưng bằng LSTM ở hạn 7 (2,1%). Persistence có precision bằng recall theo cấu trúc (chép mức hôm qua) và POD gần 0 ở mọi hạn.
+
+### 6.9.7. Bốn mức và bắt lũ khi kéo dài cửa sổ 730 ngày (bước D, Evaluation Version 13)
+
+Mỗi cấu hình 730 ngày so với chính nó ở 365 ngày (run C2 cùng hạt giống) trên giao riêng của bước D (657.347 ngày–ID, 11.871 ngày–ID rất cao, 1.073 cụm USWRC ở ngưỡng hai năm, ghép cùng ngày). Mỗi ô là trung bình ± độ lệch chuẩn ba hạt giống.
+
+| Cấu hình | Cửa sổ (ngày) | Recall rất cao (%) | Precision rất cao (%) | Bắt được | Báo nhầm | POD (%) | FAR (%) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| LSTM L2 x1 | 365 | 45,9 ± 1,4 | 70,0 ± 1,1 | 165,0 | 320,7 | 15,4 ± 1,4 | 66,1 ± 1,6 |
+| LSTM L2 x1 | 730 | 46,8 ± 1,2 | 69,2 ± 0,6 | 173,3 | 359,7 | 16,2 ± 1,6 | 67,4 ± 1,5 |
+| Mamba L2 x1 | 365 | 47,1 ± 4,2 | 69,0 ± 3,5 | 145,0 | 304,3 | 13,5 ± 1,7 | 67,5 ± 2,1 |
+| Mamba L2 x1 | 730 | 44,3 ± 1,6 | 71,6 ± 1,4 | 116,3 | 236,3 | 10,8 ± 1,2 | 66,9 ± 1,0 |
+| S4D L4 x1 | 365 | 40,9 ± 1,1 | 70,0 ± 1,7 | 101,3 | 197,3 | 9,4 ± 1,6 | 66,1 ± 4,9 |
+| S4D L4 x1 | 730 | 40,7 ± 1,5 | 70,5 ± 0,3 | 112,0 | 200,7 | 10,4 ± 1,8 | 64,3 ± 2,2 |
+
+Nguồn: [bảng bốn mức D](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version13/D/Evaluation_D_levels_pooled.csv), [bảng sự kiện D](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version13/D/Evaluation_D_events_pooled.csv), [bảng phụ ±1](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version13/D/Evaluation_D_events_pooled_tolerance1.csv).
+
+![Recall rất cao và POD khi kéo dài cửa sổ 730 ngày](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Figures/Classification_D_Window.png)
+
+*Hình. Recall mức rất cao (a) và POD lũ chu kỳ hai năm ghép cùng ngày (b) của ba cấu hình bước D với cửa sổ 365 ngày (nhạt) và 730 ngày (đậm), trung bình ba hạt giống, vạch là độ lệch chuẩn hạt giống. Mọi chênh lệch giữa hai cửa sổ nằm trong khoảng một tới hai độ lệch chuẩn hạt giống; Mamba giảm nhẹ ở cả hai chỉ số, LSTM và S4D gần như không đổi.*
+
+
+Cửa sổ 730 ngày làm LSTM bắt thêm khoảng 8 trận và báo nhầm thêm khoảng 39 trận; Mamba bắt ít hơn khoảng 29 trận và báo nhầm ít hơn khoảng 68 trận (recall rất cao giảm, precision rất cao tăng: thận trọng hơn); S4D bắt thêm khoảng 11 trận, báo nhầm gần như không đổi. Mọi thay đổi POD dưới 3 điểm phần trăm, cùng tầm độ lệch chuẩn ba hạt giống, phù hợp kết luận của Mục 6.6.14 rằng kéo dài cửa sổ không cải thiện rõ hai lõi dẫn đầu.
 
 ## 6.10. Kết quả kiểm định ghép cặp
 
@@ -721,6 +837,7 @@ Bộ đánh giá `01_Evaluation_LamaHCEExt` đã hoàn tất tới **Version 13*
 | Năm lõi C2 và kịch bản S0–S4 | [C2 Compare V1](../../Workspace/05_Training/13_C2_LamaHCEExt_Compare/13_C2_LamaHCEExt_Compare.md), [C2 Scenarios V1](../../Workspace/06_Evaluation/04_C2_LamaHCEExt_Scenarios/04_C2_LamaHCEExt_Scenarios.md), [Evaluation V10](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#132-kịch-bản-c2) |
 | Dự báo nhiều hạn 1–7 ngày (bước H) | [H Compare V1](../../Workspace/05_Training/15_H_LamaHCEExt_Compare/15_H_LamaHCEExt_Compare.md), [Evaluation V12](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#kết-quả-kaggle-version-12) |
 | Cửa sổ 730 so với 365 ngày (bước D) | [D Compare V3](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/17_D_LamaHCEExt_Compare.md), [Evaluation V13](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md#kết-quả-kaggle-version-13) |
+| Bốn mức và sự kiện lũ (B, C2, H, D) | [Evaluation V9](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version9/Tables/), [Evaluation V12 H](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version12/H/), [Evaluation V13 D](../../Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/Archive/Version13/D/) |
 | Đặc điểm lưu vực (C2 56 run & bước D) | [ByBasin V3](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md#133-kết-quả-kaggle-version-3-56-run-c2-và-phân-vùng-d) |
 | Giải thích mô hình (Integrated Gradients & dò Y4, bước G) | [Báo cáo chung bước G (C2 & H V1)](../../Workspace/08_XAI/01_G_C2_XAI/01_G_C2_XAI.md), [02_G_H_XAI V1](../../Workspace/08_XAI/02_G_H_XAI/02_G_H_XAI.md) |
 | Kiểm chứng suy luận và Demo D1–D3 | [Bàn giao Demo](../../Workspace/07_Demo/README.md), [D1 V2](../../Workspace/07_Demo/01_D1_LamaHCEExt_Inference/01_D1_LamaHCEExt_Inference.md), [D2 V2](../../Workspace/07_Demo/02_D2_LamaHCEExt_CPU/02_D2_LamaHCEExt_CPU.md), [D3](../../Workspace/07_Demo/03_D3_LamaHCEExt_Demo/03_D3_LamaHCEExt_Demo.md) |
