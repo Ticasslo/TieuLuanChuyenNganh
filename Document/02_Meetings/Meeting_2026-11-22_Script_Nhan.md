@@ -49,115 +49,120 @@
 
 ---
 
-## Bước 3 (`02:45 – 06:00`) · Trọng tâm: Bước D (tăng cửa sổ 365 → 730 ngày) qua bộ biểu đồ V3
+## Bước 3 (`02:45 – 06:00`) · Trọng tâm: Bước D (tăng cửa sổ 365 → 730 ngày) — Vì sao làm, làm thế nào và kết quả
 
-### 3.1. (`02:45 – 03:45`) Độ chính xác tổng quan: kéo dài 2 năm có tốt hơn 1 năm không?
+### 3.1. (`02:45 – 03:55`) Vì sao làm bước D, làm thế nào và kết quả tổng quan?
 
 - **Thao tác màn hình:**
   - **Mở ảnh:** [D_Overview_Accuracy.png](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/Figures/D_Overview_Accuracy.png)
   - **Thuộc notebook:** `17_D_LamaHCEExt_Compare` (**Version 3**, [notebook chính thức](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/17_D_LamaHCEExt_Compare.ipynb) · [báo cáo](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/17_D_LamaHCEExt_Compare.md))
 - **Lời nói chi tiết:**
-  > "Sang mảng thứ hai là **bước D**, em phụ trách trọn gói từ khâu huấn luyện 9 run trên Kaggle đến so sánh và đánh giá. Câu hỏi nghiên cứu ở đây rất rõ: *mô hình ở bước C2 đang nhìn quá khứ 365 ngày (tức 1 năm); nếu ta cho mô hình nhìn xa gấp đôi — **730 ngày (tức 2 năm)** — thì các lõi tuần tự như LSTM, Mamba và S4D có học được chu kỳ dài hơn để dự báo chính xác hơn không?*
+  > "Sang mảng thứ hai là **bước D — thí nghiệm mở rộng độ dài chuỗi lịch sử từ 365 ngày lên 730 ngày**.
   >
-  > Em đã huấn luyện hoàn tất **9 trên 9 run** (3 lõi × 3 hạt giống, cùng quy mô tham số và cùng 30 epoch như C2, không bị tràn gradient ở bước nào), rồi tổng hợp trong notebook **`17_D_LamaHCEExt_Compare` Version 3** với bộ 9 biểu đồ đa tiêu chí.
+  > **Trước hết, vì sao nhóm phải làm bước D?** Ở bước C2, mọi mô hình chỉ nhìn quá khứ **365 ngày (1 năm)** để dự báo ngày tiếp theo. Nhưng trong thủy văn, nhiều quá trình chậm như tích–tan tuyết ở vùng núi cao hay trữ lượng nước ngầm ở vùng khô hạn có thể kéo dài hơn một năm. Hơn nữa, Mamba và S4D thuộc họ **State Space Model**, vốn nổi tiếng với kỳ vọng xử lý chuỗi dài tốt hơn LSTM. Nếu không thử kéo dài cửa sổ lên **2 năm (730 ngày)** thì mình chưa trả lời được câu hỏi: *liệu cho nhìn xa gấp đôi, các mô hình SSM có vượt lên rõ rệt so với LSTM hay không?*
   >
-  > *(Chỉ vào hai khung biểu đồ trên ảnh `D_Overview_Accuracy.png`)*
+  > **Về cách làm và nguồn gốc dữ liệu để so sánh công bằng:** Em chọn đúng **3 lõi đại diện ở mức cùng quy mô tham số (~85 nghìn tham số)** từ C2 là **LSTM, Mamba và S4D**. Em giữ nguyên 100% mã thư viện `freeze-C`, giữ nguyên siêu tham số, giữ nguyên 30 epoch và 3 hạt giống `111, 222, 333` — **chỉ đổi duy nhất `seq_length` từ 365 sang 730 ngày** (gồm 729 ngày quá khứ + 1 ngày dự báo). Đặc biệt, nhờ bộ lọc mẫu đã sửa từ bước B2, cả bản 365 ngày (lấy từ 9 run C2 của Thắng) và bản 730 ngày (9 run em huấn luyện mới trong thư mục `16_D_Train/`) đều được chấm trên **đúng cùng một tập `657.347` cặp ngày–lưu vực của cả 451 lưu vực**, tránh hoàn toàn sai lệch do khác tập mẫu. Vì Mamba và S4D chạy 730 ngày vượt giới hạn 12 giờ một phiên của Kaggle, em dùng cơ chế lưu và nối trạng thái huấn luyện (`_Cont`) để chạy liền mạch qua 2 phiên; cả **9/9 run** đều hoàn tất với `0` bước bị tràn gradient.
   >
-  > Nhìn vào ảnh tổng quan này, kết quả thực nghiệm rất trung thực: khi tăng từ 365 lên 730 ngày, điểm NSE trên tập kiểm tra thay đổi rất nhỏ, đều nằm trong biên nhiễu giữa các hạt giống (`0,0079`). Cụ thể:
-  > - **LSTM** gần như giữ nguyên (`0,7178` sang `0,7162`, lệch `−0,0016`).
-  > - **Mamba** cũng gần như đi ngang (`0,7204` sang `0,7180`, lệch `−0,0023`).
-  > - Riêng **S4D** — là mô hình không gian trạng thái không chọn lọc — là lõi **duy nhất tăng nhất quán** trên cả NSE (`+0,0053`, tức `0,6933 → 0,6986`) lẫn PNSE (`+0,0117`).
+  > **Bây giờ nhìn vào ảnh `D_Overview_Accuracy.png`** *(thuộc notebook `17_D_LamaHCEExt_Compare` Version 3 — đã kiểm khớp `34/34` tệp manifest)*:
+  > - *(Chỉ vào khung bên trái)* Đây là **NSE trung vị trên tập test** của từng lõi khi đặt cặp 365 ngày (cột nhạt) cạnh 730 ngày (cột đậm), chấm tròn là từng hạt giống.
+  > - *(Chỉ vào khung bên phải)* Đây là **mức chênh `730 − 365`** đặt cạnh **dải nhiễu hạt giống (`±0,0079`)** đo từ bước B0 để biết sự chênh lệch có lớn hơn nhiễu ngẫu nhiên hay không.
   >
-  > Điều này khớp rất đẹp với kết quả giải thích mô hình ở bước G sau này: LSTM và Mamba vốn dồn 90% sự chú ý vào 1–2 tháng gần nhất nên 1 năm lịch sử là đã đủ bão hòa; còn S4D trải bộ nhớ rộng ra khoảng 200 ngày nên khi nới cửa sổ lên 2 năm, S4D là lõi hưởng lợi rõ nhất."
+  > Kết quả thực nghiệm rất rõ và trung thực: cả ba lõi đều có biến động NSE nằm **trong dải nhiễu hạt giống**:
+  > - **LSTM** giảm nhẹ `−0,0016` (`0,7178 → 0,7162`).
+  > - **Mamba** giảm nhẹ `−0,0023` (`0,7204 → 0,7180`).
+  > - Riêng **S4D** là lõi **duy nhất cải thiện nhất quán** ở cả NSE (`+0,0053`, tức `0,6933 → 0,6986`, đạt `+0,67 ×` nhiễu) lẫn PNSE (`+0,0117`).
+  >
+  > **Vì sao lại có sự khác biệt này?** Điều này khớp độc lập với kết quả giải thích mô hình ở bước G: **LSTM và Mamba** có cơ chế chọn lọc nên đã dồn 90% sự chú ý vào **1–2 tháng gần nhất**, thành ra 365 ngày là đã bão hòa; còn **S4D** là mô hình không chọn lọc, trải bộ nhớ rộng tới **~200 ngày**, nên khi nới cửa sổ lên 730 ngày thì S4D là lõi tận dụng được thêm ngữ cảnh xa."
 
-### 3.2. (`03:45 – 04:30`) Đánh đổi chi phí GPU/VRAM so với lợi ích
+### 3.2. (`03:55 – 04:40`) Chi phí tính toán tăng bao nhiêu so với lợi ích thu về?
 
 - **Thao tác màn hình:**
   - **Mở ảnh:** [D_Cost_Tradeoff.png](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/Figures/D_Cost_Tradeoff.png)
   - **Thuộc notebook:** `17_D_LamaHCEExt_Compare` (**Version 3**)
-  - *(Nếu thầy hỏi thêm về quá trình hội tụ 30 epoch, mở dự phòng ảnh [D_Curves_365_vs_730.png](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/Figures/D_Curves_365_vs_730.png) từ cùng notebook.)*
+  - *(Ảnh dự phòng nếu thầy hỏi quá trình hội tụ qua 30 epoch: [D_Curves_365_vs_730.png](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/Figures/D_Curves_365_vs_730.png) — cùng notebook `17_D_LamaHCEExt_Compare` V3.)*
 - **Lời nói chi tiết:**
-  > "Bây giờ nếu đặt độ chính xác cạnh chi phí tính toán — như trên ảnh **`D_Cost_Tradeoff.png`** thuộc cùng notebook `17_D_Compare` Version 3 — ta thấy bức tranh rất rõ.
+  > "Tiếp theo, để biết có đáng đánh đổi tài nguyên hay không, em mời thầy xem ảnh **`D_Cost_Tradeoff.png`** *(cùng notebook `17_D_LamaHCEExt_Compare` Version 3)*.
   >
-  > *(Chỉ vào mũi tên dịch chuyển từ chấm 365 sang chấm 730 của từng lõi)*
+  > *(Chỉ trục ngang là tổng giờ huấn luyện GPU T4, trục dọc là NSE test, nhãn là VRAM đỉnh, và mũi tên nối từ 365 sang 730)*
   >
-  > Khi tăng độ dài chuỗi gấp đôi, thời gian huấn luyện và bộ nhớ GPU gần như **tăng gấp đôi theo**:
-  > - **LSTM** từ khoảng `2 giờ` lên `3,9 giờ`.
-  > - **Mamba** từ `5,2 giờ` lên `10 giờ`.
-  > - **S4D** từ `6,5 giờ` lên gần `13 giờ` (phải chia 2 phiên Kaggle nối tiếp nhau).
+  > Toàn bộ các mũi tên đều **đi ngang sang phải rất dài nhưng hầu như không đi lên**:
+  > - **LSTM** tăng thời gian từ `2,0` lên `3,9` giờ, VRAM từ `2,4` lên `4,1` GB.
+  > - **Mamba** tăng từ `5,2` lên `10,0` giờ, VRAM từ `1,8` lên `3,1` GB.
+  > - **S4D** tăng từ `6,5` lên `12,9` giờ, VRAM từ `2,4` lên `4,2` GB.
   >
-  > Trong khi đó trục dọc — tức độ chính xác NSE — gần như đi ngang. Từ đây nhóm rút ra **khuyến nghị thực tiễn rất dứt khoát**: với bài toán dự báo 1 ngày trên bộ Extended LamaH-CE, **cửa sổ 365 ngày đã là điểm tối ưu về hiệu năng trên chi phí**; không cần tốn gấp đôi tài nguyên cho 730 ngày."
+  > **Ý nghĩa rút ra rất dứt khoát:** tăng độ dài chuỗi lên gấp đôi làm **chi phí huấn luyện và bộ nhớ tăng gần gấp đôi**, trong khi độ chính xác trung vị không vượt nổi nhiễu hạt giống. Do đó với bài toán dự báo hạn 1 ngày trên Extended LamaH-CE, **cửa sổ 365 ngày là lựa chọn tối ưu nhất để triển khai thực tế**."
 
-### 3.3. (`04:30 – 05:20`) Tại sao trung vị đi ngang nhưng từng nhóm lưu vực lại tách hai hướng?
+### 3.3. (`04:40 – 05:25`) Mổ xẻ theo 451 lưu vực: vì sao trung vị đứng yên nhưng từng vùng lại tách 2 hướng?
 
 - **Thao tác màn hình:**
   - **Mở ảnh:** [BasinAnalysis_D_static_delta_NSE_rho.png](../../Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/Archive/Version3/D/Figures/BasinAnalysis_D_static_delta_NSE_rho.png)
   - **Thuộc notebook:** `02_Evaluation_LamaHCEExt_ByBasin` (**Version 3**, phân vùng `D/`)
 - **Lời nói chi tiết:**
-  > "Tuy nhiên, em không dừng ở điểm trung vị mà tiếp tục mổ xẻ hiệu `730 − 365` theo từng lưu vực trong phân vùng D của notebook **`02_Evaluation_LamaHCEExt_ByBasin` Version 3**.
+  > "Nhưng nếu chỉ nhìn trung vị toàn tập thì có thể bỏ sót tác động theo vùng. Vì vậy em chạy thêm phân vùng `D/` trong notebook **`02_Evaluation_LamaHCEExt_ByBasin` Version 3**, tính hệ số tương quan hạng Spearman giữa hiệu `ΔNSE (730 − 365)` của từng lưu vực với 31 thuộc tính tĩnh trên cả 451 trạm.
   >
-  > *(Chỉ cột `S4D` đối chiếu với cột `LSTM` trên ảnh `BasinAnalysis_D_static_delta_NSE_rho.png`)*
+  > *(Chỉ cột `S4D` rồi so sang cột `LSTM` trên ảnh `BasinAnalysis_D_static_delta_NSE_rho.png` — màu xanh là 730 tốt hơn khi thuộc tính đó cao, màu đỏ là ngược lại)*
   >
-  > Ảnh này cho thấy một phát hiện khá thú vị: khi tăng lên 2 năm, 3 lõi tách thành **hai hướng trái ngược nhau** theo đặc trưng thủy văn:
-  > - **S4D** (và Mamba nghiêng nhẹ cùng chiều) lại cải thiện rõ hơn ở các **lưu vực khô hạn, bốc thoát hơi cao và diện tích lớn** (`arid_1` tương quan `+0,208`, `et0_mean +0,197`) — tức nơi cần nhớ cân bằng nước dài hạn.
-  > - Ngược lại, **LSTM** lại cải thiện ở các **lưu vực có băng hà và tuyết** (`glac_fra +0,141`, `frac_snow +0,139`), nơi có chu kỳ tích–tan tuyết theo mùa dài.
+  > Ta thấy 3 lõi **tách hẳn thành 2 hướng đối lập nhau**:
+  > - **S4D** (giữ dấu đồng nhất trên cả 3 seed, và Mamba nghiêng nhẹ cùng chiều) cải thiện mạnh hơn ở các **lưu vực khô hạn, bốc thoát hơi cao và diện tích lớn** (`arid_1 ρ = +0,208`, `et0_mean +0,197`), nhưng giảm tương đối ở vùng núi cao/nhiều tuyết.
+  > - Ngược lại, **LSTM** lại cải thiện rõ ở các **lưu vực có băng hà và tỷ phần tuyết cao** (`glac_fra +0,141`, `frac_snow +0,139`).
   >
-  > Nhờ phân tích này, mình hiểu được rằng cửa sổ 730 ngày không vô nghĩa hoàn toàn, mà tác động của nó phân hóa theo từng chế độ thủy văn."
+  > Như vậy, cửa sổ 730 ngày không phải hoàn toàn vô tác dụng, mà nó **phân hóa theo chế độ thủy văn và cơ chế nhớ của từng kiến trúc**."
 
-### 3.4. (`05:20 – 06:00`) Nhìn trực quan vào đường quá trình dòng chảy (Hydrograph)
+### 3.4. (`05:25 – 06:00`) Kiểm chứng trực quan bằng đường quá trình dòng chảy (Hydrograph)
 
 - **Thao tác màn hình:**
   - **Mở ảnh:** [D_Hydrograph_Diagnostics.png](../../Workspace/05_Training/17_D_LamaHCEExt_Compare/Figures/D_Hydrograph_Diagnostics.png)
   - **Thuộc notebook:** `17_D_LamaHCEExt_Compare` (**Version 3**)
 - **Lời nói chi tiết:**
-  > "Và để người đọc dễ hình dung sự khác biệt ngoài thực tế chứ không chỉ qua con số, trong bộ 9 hình của `17_D_Compare` Version 3 em vẽ thêm ảnh **`D_Hydrograph_Diagnostics.png`** — so sánh trực tiếp đường lưu lượng quan trắc (màu đen) với dự báo 365 ngày và 730 ngày tại những lưu vực cải thiện mạnh nhất và suy giảm mạnh nhất.
+  > "Cuối cùng của phần bước D, em mở ảnh **`D_Hydrograph_Diagnostics.png`** *(cùng notebook `17_D_LamaHCEExt_Compare` Version 3)*. Ảnh này lấy thẳng các lưu vực cải thiện nhiều nhất và suy giảm nhiều nhất để vẽ chồng đường **lưu lượng quan trắc thật** với đường dự báo **365 ngày** và **730 ngày** theo từng ngày.
   >
-  > *(Chỉ nhanh vào đỉnh lũ ở các ô trên cùng)*
+  > *(Chỉ nhanh vào các đỉnh lũ và phần chân lũ)*
   >
-  > Nhìn vào đây người xem thấy ngay mô hình 730 ngày thay đổi cách bám đỉnh lũ và chân lũ như thế nào trên từng trạm cụ thể."
+  > Nhìn vào đây người nghe thấy ngay bằng mắt thường sự khác biệt giữa 365 và 730 ngày nằm ở những đợt đỉnh lũ cụ thể chứ không phải con số trừu tượng."
 
 ---
 
-## Bước 4 (`06:00 – 09:00`) · Kiểm chứng suy luận D1–D2 và chạy trực tiếp Demo D3
+## Bước 4 (`06:00 – 09:00`) · Từ mô hình nghiên cứu ra Demo chạy thật (D1 → D2 → D3)
 
-### 4.1. (`06:00 – 06:40`) Kiểm chứng suy luận GPU/CPU trước khi làm Demo
+### 4.1. (`06:00 – 07:05`) Vì sao phải qua 2 bước kiểm chứng D1, D2 trước khi làm web D3? Làm bằng cách nào?
 
-- **Thao tác màn hình:** Nói ngắn gọn (chỉ cần mở [01_D1_LamaHCEExt_Inference.md](../../Workspace/07_Demo/01_D1_LamaHCEExt_Inference/01_D1_LamaHCEExt_Inference.md) hoặc [02_D2_LamaHCEExt_CPU.md](../../Workspace/07_Demo/02_D2_LamaHCEExt_CPU/02_D2_LamaHCEExt_CPU.md) nếu thầy muốn xem bảng số).
+- **Thao tác màn hình:** Nói rõ mạch logic 3 bài toán kỹ thuật (nếu thầy hỏi số chi tiết thì mở nhanh [01_D1_LamaHCEExt_Inference.md](../../Workspace/07_Demo/01_D1_LamaHCEExt_Inference/01_D1_LamaHCEExt_Inference.md) và [02_D2_LamaHCEExt_CPU.md](../../Workspace/07_Demo/02_D2_LamaHCEExt_CPU/02_D2_LamaHCEExt_CPU.md)).
 - **Lời nói chi tiết:**
-  > "Sang mảng thứ ba là **Demo**, trước khi làm giao diện web, em đã kiểm chứng rất chặt khâu suy luận độc lập qua hai notebook:
-  > - **`01_D1_LamaHCEExt_Inference` Version 2 (trên GPU T4):** hàm suy luận tách rời tái lập chính xác tuyệt đối **`0` mm/ngày** cho cả 24 run C2 lẫn 3 run đại diện bước D.
-  > - **`02_D2_LamaHCEExt_CPU` Version 2 (trên CPU 4 luồng):** vì máy chủ web sau này chỉ có CPU chứ không có GPU, em chuyển Mamba sang thư viện `mambapy` thuần PyTorch và kiểm chứng đạt trọn **288/288 lượt C2** và **108/108 lượt D**, độ trễ cho 1 lần dự báo chuỗi 730 bước chỉ từ `20 ms` (LSTM) đến `62 ms` (Mamba) và `128 ms` (S4D). Riêng hai mô hình **bước H cách lai**, em đã kiểm toàn bộ kỳ test trên laptop đủ **9,15 triệu điểm** với `0` lỗi."
+  > "Sang mảng thứ ba là **xây dựng Demo D1–D3**. Thay vì làm web ngay từ đầu, em bắt buộc phải giải quyết tuần tự **3 bài toán kỹ thuật** để bảo đảm Demo chạy đúng số liệu thật và chạy mượt trên máy không có GPU:
+  >
+  > 1. **Bài toán 1 — Tách hàm dự báo khỏi mã huấn luyện (`01_D1_LamaHCEExt_Inference` V2 trên GPU T4):** Trong thư viện NeuralHydrology gốc, code dự báo dính chặt vào quy trình huấn luyện rất cồng kềnh. Em viết lại một mô-đun dự báo độc lập trong `DemoRuntime/forecast.py` dùng chung cho mọi lõi C2, H và D. Để chắc chắn không viết sai bước chuẩn hóa hay nạp dữ liệu, em chạy đối chiếu trên GPU T4 và xác nhận sai số tuyệt đối bằng **`0` mm/ngày** cho cả **24 run C2** (`10.824` cặp lưu vực) lẫn **3 run đại diện D** (`1.353` cặp).
+  > 2. **Bài toán 2 — Đưa Mamba và S4D từ GPU xuống chạy trên CPU (`02_D2_LamaHCEExt_CPU` V2 trên CPU 4 luồng):** Máy chủ VPS và laptop không có GPU, trong khi thư viện `mamba-ssm` dùng lúc huấn luyện **bắt buộc cần CUDA GPU**. Cách em giải quyết là thay backend suy luận bằng **`mambapy==1.2.0`** (thuần PyTorch, nạp trực tiếp đúng file trọng số `best_model.pt` đã train từ GPU mà **không phải huấn luyện lại**), còn S4D dùng phép biến đổi FFT trên CPU. Kết quả kiểm thử đạt **288/288 lượt C2** và **108/108 lượt D**, độ trễ cho 1 lần dự báo chuỗi 730 bước chỉ **`19,9 ms` (LSTM), `61,7 ms` (Mamba) và `128,0 ms` (S4D)**. Riêng hai mô hình **bước H cách lai** em đã kiểm toàn bộ kỳ test trên laptop đủ **9.148.986 điểm** với `0` lỗi.
+  > 3. **Bài toán 3 — Kiến trúc lai của Demo D3 (`prepare.py` + `app.py`):** Nếu người dùng bấm đổi trạm mà chạy cả 21 mô hình mỗi lần thì web sẽ rất chậm. Vì vậy em viết script **`prepare.py`** gom toàn bộ kết quả đã kiểm SHA-256 (từ C2, H, D, A1, A2, A3, Evaluation V13 và XAI bước G) đóng gói sẵn thành một thư mục độc lập **`downloads/D3_CHDG_CPU_V13`** (`169` tệp, `852 MB`) để **phát lại tức thì**; **chỉ riêng chức năng “Nếu… thì…”** (khi người dùng tự thay đổi lượng mưa/nhiệt độ chưa từng có) thì máy chủ mới nạp checkpoint `best_model.pt` cùng dữ liệu gốc `LamaH_extended` để **chạy PyTorch thật trên CPU**. Vì C2 dùng thư viện `freeze-C` còn H dùng `freeze-H`, em tách riêng tiến trình con `.venv-h` cho mô hình H để không xung đột phiên bản thư viện."
 
-### 4.2. (`06:40 – 09:00`) Trình diễn trực tiếp Demo D3 trên trình duyệt (`http://127.0.0.1:8053`)
+### 4.2. (`07:05 – 09:00`) Trình diễn trực tiếp 4 tính năng trên trình duyệt (`http://127.0.0.1:8053`)
 
-- **Thao tác màn hình:** Chuyển sang cửa sổ trình duyệt đang mở `http://127.0.0.1:8053/` (gói hoàn chỉnh `downloads/D3_CHDG_CPU_V13`: **451 lưu vực, 21 đường dự báo, 7 mô hình chạy trực tiếp CPU, trọn bộ XAI bước G**). Thực hiện tuần tự đúng **4 thao tác**:
+- **Thao tác màn hình:** Chuyển sang cửa sổ trình duyệt đang mở `http://127.0.0.1:8053/` và thao tác tuần tự 4 tab:
 
-1. **Tab `Dự báo` (`06:40 – 07:30` · 50 giây):**
-   - **Thao tác:** Chỉ vào bản đồ 451 trạm → chọn **ID 6**, ngày **15/06/2016** → bật thêm `LSTM D (730)` và `Persistence` cạnh `GRU C2` → kéo xuống mục **“Nếu… thì…”**, chọn **LSTM (ECMWF HRES ngày đầu — 7 hạn)**, nhập mưa **`1,5`**, nhiệt **`2`**, bấm **Chạy thử**.
+1. **Tab `Dự báo` (`07:05 – 07:50` · 45 giây):**
+   - **Thao tác:** Chỉ bản đồ 451 trạm → chọn **ID 6**, ngày **15/06/2016** → bật `LSTM D (730)` và `Persistence` cạnh `GRU C2` → kéo xuống **“Nếu… thì…”**, chọn **LSTM (ECMWF HRES ngày đầu — 7 hạn)**, nhập mưa **`1,5`**, nhiệt **`2`**, bấm **Chạy thử**.
    - **Lời nói:**
-     > "Đây là ứng dụng Demo D3 chạy trực tiếp trên laptop với gói hợp nhất mới nhất **`D3_CHDG_CPU_V13`**. Trên trang **Dự báo**, người dùng chọn bất kỳ trạm nào trong **451 lưu vực** — ví dụ ID 6 ngày 15/06/2016 — và bật so sánh cùng lúc các mô hình C2, H, D và mốc persistence kèm **4 ngưỡng lũ** theo chu kỳ lặp lại 1,5 / 2 / 5 / 10 năm quy đổi ra **m³/s**.
-     >
-     > Điểm đặc biệt là khung **“Nếu… thì…”** ở dưới đây: em chọn **LSTM dự báo 7 ngày**, giả sử lượng mưa tăng gấp **1,5 lần** và nhiệt độ tăng **+2 °C**, rồi bấm **Chạy thử**. *(Đợi 1 giây bảng hiện ra)*
-     >
-     > Máy vừa chạy **mô hình PyTorch thật trên CPU laptop**, tự đối chiếu kết quả gốc khớp với NPZ rồi mới trả bảng dự báo cho đủ 7 ngày tới — thầy thấy ở hạn 1 lưu lượng tăng ngay từ **`19,89` lên `21,55 m³/s`**."
+     > "Bây giờ em xin demo trực tiếp ứng dụng đang chạy trên laptop.
+     > - Ở trang **Dự báo**, dữ liệu chuỗi được đóng gói từ 21 mô hình (C2, H, D, BiasCast A2 và persistence), còn **4 đường ngưỡng lũ 1,5 / 2 / 5 / 10 năm** lấy từ bảng ngưỡng `A1` và quy đổi theo diện tích lưu vực sang đơn vị **m³/s** cho trực quan. Em chọn **ID 6 ngày 15/06/2016** và bật so sánh đồng thời GRU C2, LSTM D 730 ngày và mốc persistence.
+     > - Kéo xuống khung **“Nếu… thì…”**: đây là phần **chạy suy luận thật trên CPU**. Em chọn **LSTM dự báo 7 ngày**, giả sử lượng mưa tăng **1,5 lần** và nhiệt độ tăng **+2 °C**, bấm **Chạy thử**. *(Đợi 1 giây bảng hiện ra)*
+     > - Trước khi in bảng này, máy chủ tự chạy lại dự báo gốc trên CPU, đối chiếu khớp với tệp NPZ gốc để bảo đảm không sai số, rồi mới tính kịch bản mưa/nhiệt mới cho đủ 7 ngày tới — thầy thấy ở hạn 1 lưu lượng tăng từ **`19,89` lên `21,55 m³/s`**."
 
-2. **Tab `So sánh mô hình` (`07:30 – 07:55` · 25 giây):**
-   - **Thao tác:** Bấm tab **So sánh mô hình** → chọn `LSTM D (730)` so với `C2 cùng seed` (hoặc `Mamba C2` so với `Persistence`).
+2. **Tab `So sánh mô hình` (`07:50 – 08:10` · 20 giây):**
+   - **Thao tác:** Bấm tab **So sánh mô hình** → chọn `LSTM D (730)` so với `C2 cùng seed`.
    - **Lời nói:**
-     > "Sang trang **So sánh mô hình**, bản đồ hiển thị trực quan mức chênh NSE giữa hai mô hình trên cả 451 trạm — em đã khóa thang màu đối xứng quanh 0 để không bị vài trạm ngoại lệ kéo nhạt màu bản đồ — kèm đầy đủ các bảng điểm kịch bản S0–S4 và tốc độ CPU ở bên dưới."
+     > "Trang **So sánh mô hình** đọc trực tiếp điểm NSE 451 lưu vực từ `Evaluation` V10–V13 và `D_basin_scores.csv`. Em đã khóa thang màu đối xứng `±P95` quanh 0 để vài trạm ngoại lệ có NSE âm sâu không làm nhạt màu 448 trạm còn lại; bên dưới có đủ bảng kịch bản S0–S4 và tốc độ CPU D2."
 
-3. **Tab `Cảnh báo lũ` (`07:55 – 08:15` · 20 giây):**
+3. **Tab `Cảnh báo lũ` (`08:10 – 08:25` · 15 giây):**
    - **Thao tác:** Bấm tab **Cảnh báo lũ** → chọn `LSTM H GEFS`, **ID 6**, **hạn 7**.
    - **Lời nói:**
-     > "Ở trang **Cảnh báo lũ**, ứng dụng nối trực tiếp kết quả từ `Evaluation` V13 để thống kê theo **4 mức lưu lượng** và các **trận lũ độc lập theo chuẩn USWRC**: trận nào bắt đúng, trận nào bỏ sót, trận nào báo động nhầm."
+     > "Trang **Cảnh báo lũ** đọc các bảng sự kiện từ `Evaluation` V10/V12/V13, cho thấy theo từng trạm và từng hạn dự báo: phân bố 4 mức lưu lượng và từng trận lũ độc lập theo chuẩn USWRC — trận nào bắt trúng, bỏ sót hay báo nhầm."
 
-4. **Tab `Giải thích` (`08:15 – 09:00` · 45 giây):**
-   - **Thao tác:** Bấm tab **Giải thích** → để mặc định **H · GEFS · hạn 7** (rê chuột qua 3 biểu đồ) → sau đó đổi mục chọn sang **C2 (hạn 1 ngày)** và đổi lõi sang **Mamba** hoặc **LSTM** để hiện bản đồ nhiệt 0–30 ngày.
+4. **Tab `Giải thích` (`08:25 – 09:00` · 35 giây):**
+   - **Thao tác:** Bấm tab **Giải thích** → giữ mặc định **H · GEFS · hạn 7** (rê chuột qua 3 biểu đồ) → đổi sang **C2 (hạn 1 ngày)** và chọn lõi **Mamba** (hoặc **LSTM**).
    - **Lời nói:**
-     > "Cuối cùng là trang **Giải thích (XAI)** mà em vừa hoàn thiện tối qua, ghép trọn bộ hai tệp kết quả bước G của Thắng (`GH_demo_basin.npz` và `G_demo_basin.npz`, đều kiểm SHA-256) trên cả **451 lưu vực**:
-     > - Ở chế độ **bước H (GEFS, hạn 7)**, thầy thấy ngay tỉ phần đóng góp của thông tin thời tiết tương lai tăng dần từ hạn 1 lên hạn 7, phân rã theo 9 nhóm nguồn, và bên dưới là **bản đồ nhiệt 7×7 so sánh LSTM và Mamba** — thấy rất rõ Mamba dùng thông tin GEFS ít hơn LSTM.
-     > - Khi chuyển sang **bước C2 (hạn 1 ngày)** *(chuyển dropdown)*, giao diện hiển thị 7 nhóm nguồn của 5 lõi, đường cong tích lũy độ trễ 0–60 ngày — thấy ngay LSTM/GRU/Mamba dồn vào vài ngày gần nhất còn S4D/Transformer trải dài — và ở dưới là **bản đồ nhiệt ngày trễ 0–30 × 6 nhóm nguồn trực tiếp của đúng lưu vực đang chọn**.
-     > - Ngoài ra trang **Giới thiệu** đã ghi đầy đủ bản quyền dữ liệu và miễn trừ phục vụ nghiên cứu phi thương mại."
+     > "Cuối cùng là trang **Giải thích (XAI)** em vừa ghép trọn bộ tối qua, đọc trực tiếp 2 tệp tổng hợp theo lưu vực từ bước G Version 1 của Thắng (`GH_demo_basin.npz` cho bước H và `G_demo_basin.npz` cho bước C2, đều đã kiểm SHA-256 theo `manifest.csv`):
+     > - Ở chế độ **bước H (GEFS, hạn 7)**, người xem thấy ngay với đúng lưu vực đang chọn: tỉ phần thông tin tương lai tăng dần theo hạn 1–7, đóng góp 9 nhóm nguồn, và **bản đồ nhiệt 7×7 giữa LSTM và Mamba** giải thích trực quan vì sao Mamba khai thác GEFS ít hơn LSTM.
+     > - Khi chuyển sang **bước C2 (hạn 1 ngày)** *(đổi dropdown)*, giao diện vẽ 7 nhóm nguồn của 5 lõi, đường cong tích lũy độ trễ 0–60 ngày và **bản đồ nhiệt 0–30 ngày × 6 nhóm nguồn của riêng lưu vực đó** — thấy rõ mô hình dựa mạnh nhất vào ngày nào và nguồn dữ liệu nào.
+     > - Còn trang **Giới thiệu** đã ghi đủ bản quyền LamaH-CE / BiasCast và miễn trừ nghiên cứu phi thương mại để sẵn sàng đưa lên VPS."
 
 ---
 
