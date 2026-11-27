@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dự báo lưu lượng dòng chảy</title>
+  <meta name="description" content="Dự báo lưu lượng sông cho 451 lưu vực Trung Âu bằng các mô hình học sâu LSTM, GRU, Transformer, S4D, Mamba.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 20c4-6 8 6 12 0s8 6 12 0' fill='none' stroke='%230f6f8c' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="/static/vendor/maplibre/maplibre-gl.css">
+  <link rel="stylesheet" href="/static/css/site.css">
+  <script src="/plotly.js" defer></script>
+  <script src="/static/vendor/pmtiles/pmtiles.js" defer></script>
+  <script src="/static/vendor/basemaps/basemaps.js" defer></script>
+  <script type="module" src="/static/js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 20c4-6 8 6 12 0s8 6 12 0"/><path d="M4 12c4-6 8 6 12 0s8 6 12 0" opacity=".45"/></svg>
+      <span data-i18n="brand">Dự báo lưu lượng dòng chảy</span>
+    </a>
+    <nav class="nav" aria-label="Mục lục">
+      <a href="#explore" data-i18n="nav.explore">Xem dự báo</a>
+      <a href="#how" data-i18n="nav.how">Mô hình</a>
+      <a href="#results" data-i18n="nav.results">Kết quả nghiên cứu</a>
+      <a href="#about" data-i18n="nav.about">Về dự án</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Ngôn ngữ / Language">
+      <button type="button" data-lang="vi" aria-pressed="true">VI</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Phần 1: công cụ xem dự báo -->
+    <section id="explore" class="explore">
+      <header class="intro">
+        <h1 data-i18n="intro.title">Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy</h1>
+        <p class="lede" id="lede"></p>
+      </header>
+
+      <div class="dash">
+        <aside class="panel" id="panel" aria-label="Lựa chọn">
+          <section class="block">
+            <h2 class="block-title" data-i18n="step.place">Trạm đo</h2>
+            <p class="station-name" id="station-name"></p>
+            <p class="station-river" id="station-river"></p>
+            <p class="station-meta" id="station-meta"></p>
+            <div class="place-row">
+              <div class="search">
+                <label class="sr-only" for="station-search" data-i18n="card.search">Tìm trạm</label>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+                <input id="station-search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="station-list" autocomplete="off" spellcheck="false" data-i18n-placeholder="card.searchHint" placeholder="Tìm trạm, sông hoặc mã…">
+                <ul id="station-list" class="combo-list" role="listbox" hidden></ul>
+              </div>
+              <button type="button" class="toggle" id="region-btn" aria-pressed="false" data-i18n="card.region">Cả vùng</button>
+            </div>
+          </section>
+
+          <section class="block">
+            <h2 class="block-title" id="status-title"></h2>
+            <div class="readout" id="status"></div>
+          </section>
+
+          <section class="block">
+            <h2 class="block-title" data-i18n="step.model">Bài toán và mô hình</h2>
+            <div class="tabs task-tabs" id="task-tabs" role="group"></div>
+            <p class="task-note" id="task-note"></p>
+            <label class="field lead-field" id="lead-field" hidden>
+              <span class="field-label"><span data-i18n="card.lead">Dự báo trước</span> <strong id="lead-value"></strong></span>
+              <input type="range" id="lead" min="1" max="7" value="1">
+            </label>
+            <label class="field">
+              <span class="field-label" data-i18n="card.main">Mô hình chính</span>
+              <span class="select-swatch"><i id="main-swatch"></i><select id="model"></select></span>
+            </label>
+            <div class="field">
+              <span class="field-label" data-i18n="card.add">So sánh trên biểu đồ (tối đa 3)</span>
+              <ul class="lines" id="chips"></ul>
+              <select id="add-model" aria-label="Thêm mô hình để so sánh"></select>
+            </div>
+            <label class="check" id="ensemble-row">
+              <input type="checkbox" id="ensemble">
+              <span data-i18n="card.ensemble">Thêm đường trung bình các mô hình đang chọn</span>
+            </label>
+          </section>
+
+          <p class="panel-by"><span data-i18n="intro.by"></span> · <a href="#about" data-i18n="intro.about">Về dự án</a></p>
+        </aside>
+
+        <div class="stage">
+          <div class="map-pane">
+            <div id="map" class="map" role="region" aria-label="Bản đồ trạm đo"></div>
+            <div class="map-colorby" role="group" id="colorby">
+              <span data-i18n="map.colorBy">Màu chấm theo</span>
+              <button type="button" data-colorby="observed" aria-pressed="true" data-i18n="map.observed">Thực đo</button>
+              <button type="button" data-colorby="predicted" aria-pressed="false" data-i18n="map.predicted">Dự báo</button>
+            </div>
+            <div class="map-legend" id="map-legend"></div>
+            <div class="minimap-box" aria-hidden="true">
+              <div id="minimap" class="minimap"></div>
+              <span data-i18n="map.where">Vùng nghiên cứu ở Trung Âu</span>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <div class="transport">
+              <button type="button" class="icon-btn" id="prev-day" data-i18n-aria="time.prev" aria-label="Ngày trước">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+              </button>
+              <button type="button" class="icon-btn play" id="play" data-i18n-aria="time.play" aria-label="Chạy thời gian">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="i-play"><path d="M8 5l11 7-11 7z"/></svg>
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="i-pause"><path d="M8 5v14M16 5v14"/></svg>
+              </button>
+              <button type="button" class="icon-btn" id="next-day" data-i18n-aria="time.next" aria-label="Ngày sau">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <div class="speed" id="speed" role="group" data-i18n-aria="time.speed" aria-label="Tốc độ chạy">
+              <button type="button" data-speed="1" aria-pressed="true">×1</button>
+              <button type="button" data-speed="2" aria-pressed="false">×2</button>
+              <button type="button" data-speed="5" aria-pressed="false">×5</button>
+              <button type="button" data-speed="10" aria-pressed="false">×10</button>
+            </div>
+            <label class="timeline-track">
+              <span class="sr-only" data-i18n="time.label">Ngày đang xem</span>
+              <input type="range" id="day-slider" min="0" max="0" value="0">
+              <span class="years" id="years"></span>
+            </label>
+            <output id="day-label" class="day-label" for="day-slider"></output>
+          </div>
+
+          <section class="figure-band" aria-labelledby="chart-title">
+            <div class="fig-tabs" role="tablist">
+              <button type="button" role="tab" id="tab-flow" aria-selected="true" aria-controls="pane-flow" data-i18n="tab.flow">Lưu lượng</button>
+              <button type="button" role="tab" id="tab-whatif" aria-selected="false" aria-controls="pane-whatif" data-i18n="tab.whatif" hidden>Thử kịch bản thời tiết</button>
+            </div>
+
+            <div id="pane-flow" role="tabpanel" aria-labelledby="tab-flow">
+              <header class="fig-head">
+                <h2 class="fig-title" id="chart-title"></h2>
+                <p class="fig-sub" id="chart-sub"></p>
+                <div class="legend-html" id="chart-legend"></div>
+              </header>
+              <div class="chart-wrap"><div id="hydrograph" class="chart tall"></div><div id="dayline" class="dayline" hidden></div></div>
+              <p class="foot" id="chart-note"></p>
+            </div>
+
+            <div id="pane-whatif" role="tabpanel" aria-labelledby="tab-whatif" hidden>
+              <header class="fig-head">
+                <h2 class="fig-title" id="wi-title"></h2>
+                <p class="fig-sub" data-i18n="wi.lede"></p>
+              </header>
+              <form class="wi" id="wi-form">
+                <div class="wi-controls">
+                  <label class="field"><span class="field-label" data-i18n="card.model">Mô hình</span><select id="wi-model"></select></label>
+                  <label class="field"><span class="field-label"><span data-i18n="wi.rain">Hệ số mưa</span> <strong id="wi-rain-v"></strong></span><input type="range" id="wi-rain" min="0" max="3" step="0.1" value="1"></label>
+                  <label class="field"><span class="field-label"><span data-i18n="wi.temp">Cộng nhiệt độ</span> <strong id="wi-temp-v"></strong></span><input type="range" id="wi-temp" min="-5" max="5" step="0.5" value="0"></label>
+                  <button type="submit" class="primary" id="wi-run" data-i18n="wi.run">Chạy mô hình</button>
+                  <p class="foot" id="wi-status"></p>
+                </div>
+                <div id="wi-chart" class="chart mid"></div>
+              </form>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- Phần 1 (tiếp): mô hình dự báo thế nào - sơ đồ kiến trúc chung và cách chia dữ liệu -->
+    <section id="how" class="band how">
+      <header class="band-head">
+        <h2 data-i18n="how.title">Mô hình dự báo thế nào?</h2>
+        <p data-i18n="how.lede"></p>
+      </header>
+      <figure class="arch-fig">
+        <figcaption class="fig-title" data-i18n="how.fig">Hình 1.3. Kiến trúc chung của mọi mô hình học sâu trên trang</figcaption>
+        <p class="swipe-hint" data-i18n="how.swipe">Vuốt ngang để xem hết hình.</p>
+        <div class="arch-scroll">
+          <svg class="arch" viewBox="0 0 1120 380" role="img" aria-labelledby="arch-desc">
+            <desc id="arch-desc">Hindcast sources and the ECMWF HRES forecast pass through embedding layers, form one sequence of 364 plus 1 days, go through an exchangeable core (LSTM, GRU, Transformer, S4D or Mamba) and a linear head that outputs Qmax of day t.</desc>
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arr-head"/></marker>
+            </defs>
+            <text class="h" x="0" y="16">Past days t−364 … t−1</text>
+            <g class="src">
+              <rect x="0" y="28" width="210" height="34" rx="5"/><text x="12" y="50">ERA5-Land reanalysis · 21</text>
+              <rect x="0" y="70" width="210" height="34" rx="5"/><text x="12" y="92">E-OBS gridded obs. · 7</text>
+              <rect x="0" y="112" width="210" height="34" rx="5"/><text x="12" y="134">MSWEP precipitation · 1</text>
+              <rect x="0" y="154" width="210" height="34" rx="5"/><text x="12" y="176">GLEAM evaporation · 2</text>
+              <rect x="0" y="196" width="210" height="34" rx="5"/><text x="12" y="218">Observed discharge Q · 2</text>
+            </g>
+            <text class="h" x="0" y="262">Forecast for day t</text>
+            <g class="src fc"><rect x="0" y="272" width="210" height="34" rx="5"/><text x="12" y="294">ECMWF HRES forecast</text></g>
+            <g class="src st"><rect x="0" y="330" width="210" height="34" rx="5"/><text x="12" y="352">Basin attributes · 33 (static)</text></g>
+
+            <g class="lines">
+              <path d="M210 45H262"/><path d="M210 87H262"/><path d="M210 129H262"/><path d="M210 171H262"/><path d="M210 213H262"/>
+              <path d="M262 45V213"/><path d="M262 129H282" marker-end="url(#arr)"/>
+              <path d="M210 289H282" marker-end="url(#arr)"/>
+              <path d="M210 347H468V289"/><path d="M468 347V129"/>
+            </g>
+            <g class="box">
+              <rect x="284" y="74" width="168" height="110" rx="6"/>
+              <text x="368" y="102" text-anchor="middle">One embedding</text>
+              <text x="368" y="120" text-anchor="middle">layer per source</text>
+              <text x="368" y="146" text-anchor="middle" class="b">Masked mean</text>
+              <text x="368" y="164" text-anchor="middle" class="m">skips missing sources</text>
+              <rect x="284" y="266" width="168" height="46" rx="6"/>
+              <text x="368" y="294" text-anchor="middle">Embedding layer</text>
+            </g>
+            <circle class="join" cx="468" cy="129" r="4"/><circle class="join" cx="468" cy="289" r="4"/>
+            <text class="m" x="226" y="340">appended to every day</text>
+            <g class="lines">
+              <path d="M452 129H520" marker-end="url(#arr)"/>
+              <path d="M452 289H602V206" marker-end="url(#arr)"/>
+            </g>
+
+            <text class="h" x="524" y="96">Input sequence</text>
+            <g class="seq">
+              <rect x="524" y="112" width="12" height="90"/><rect x="538" y="112" width="12" height="90"/><rect x="552" y="112" width="12" height="90"/>
+              <rect x="566" y="112" width="12" height="90"/><rect x="580" y="112" width="12" height="90"/>
+              <rect class="f" x="596" y="112" width="12" height="90"/>
+            </g>
+            <text class="m" x="616" y="300">Next day: 364 past + 1 forecast</text>
+            <text class="m" x="616" y="318">7 days: 364 + 7</text>
+            <text class="m" x="616" y="336">2-year lookback: 729 + 1</text>
+            <g class="lines"><path d="M612 157H676" marker-end="url(#arr)"/></g>
+
+            <g class="core">
+              <rect x="678" y="58" width="206" height="208" rx="8"/>
+              <text x="781" y="86" text-anchor="middle" class="b">Exchangeable core</text>
+              <text x="781" y="114" text-anchor="middle">LSTM</text>
+              <text x="781" y="136" text-anchor="middle">GRU</text>
+              <text x="781" y="158" text-anchor="middle">Transformer</text>
+              <text x="781" y="180" text-anchor="middle">S4D</text>
+              <text x="781" y="202" text-anchor="middle">Mamba</text>
+              <text x="781" y="232" text-anchor="middle" class="m">causal: day k sees days ≤ k</text>
+              <text x="781" y="250" text-anchor="middle" class="m">≈ 84.8k or 254k parameters</text>
+            </g>
+            <g class="lines"><path d="M884 157H908" marker-end="url(#arr)"/></g>
+            <g class="box"><rect x="910" y="134" width="70" height="46" rx="6"/><text x="945" y="162" text-anchor="middle">Linear</text></g>
+            <g class="lines"><path d="M980 157H1000" marker-end="url(#arr)"/></g>
+            <g class="out">
+              <rect x="1002" y="124" width="118" height="66" rx="6"/>
+              <text x="1061" y="152" text-anchor="middle" class="b">Qmax, day t</text>
+              <text x="1061" y="172" text-anchor="middle" class="m">mm/day → m³/s</text>
+            </g>
+          </svg>
+        </div>
+        <p class="foot wide" data-i18n="how.figNote"></p>
+      </figure>
+
+      <figure class="arch-fig">
+        <figcaption class="fig-title" data-i18n="how.split">Hình 1.4. Cách chia dữ liệu theo thời gian</figcaption>
+        <p class="swipe-hint" data-i18n="how.swipe">Vuốt ngang để xem hết hình.</p>
+        <div class="arch-scroll">
+          <svg class="arch split" viewBox="0 0 1120 112" role="img" aria-labelledby="split-desc">
+            <desc id="split-desc">Flow levels and flood thresholds use 1981 to 2013. Training 2003 to 2009, validation 2010 to 2013, test 2014 to 2017. ECMWF HRES forecasts exist from 2002.</desc>
+            <g class="axis">
+              <path d="M20 84H1100"/>
+              <text x="20" y="104">1981</text><text x="313" y="104" text-anchor="middle">1991</text><text x="605" y="104" text-anchor="middle">2001</text>
+              <text x="664" y="104" text-anchor="middle">2003</text><text x="868" y="104" text-anchor="middle">2010</text><text x="985" y="104" text-anchor="middle">2014</text><text x="1100" y="104" text-anchor="end">2017</text>
+            </g>
+            <rect class="ref" x="20" y="8" width="963" height="20" rx="3"/><text class="m" x="28" y="23">Flow levels and flood thresholds: 1981–2013</text>
+            <rect class="train" x="664" y="40" width="204" height="30" rx="3"/><text class="w" x="766" y="60" text-anchor="middle">Training 2003–2009</text>
+            <rect class="val" x="868" y="40" width="117" height="30" rx="3"/><text class="w" x="926" y="60" text-anchor="middle">Validation</text>
+            <rect class="test" x="985" y="40" width="115" height="30" rx="3"/><text class="w" x="1042" y="60" text-anchor="middle">Test</text>
+            <path class="tick" d="M634 34V84"/><text class="m" x="628" y="62" text-anchor="end">ECMWF HRES from 2002</text>
+          </svg>
+        </div>
+        <p class="foot wide" data-i18n="how.splitNote"></p>
+      </figure>
+
+      <div class="cores">
+        <h3 data-i18n="how.coresTitle">Năm lõi được so sánh</h3>
+        <dl>
+          <dt>LSTM</dt><dd data-i18n="how.lstm"></dd>
+          <dt>GRU</dt><dd data-i18n="how.gru"></dd>
+          <dt>Transformer</dt><dd data-i18n="how.transformer"></dd>
+          <dt>S4D</dt><dd data-i18n="how.s4d"></dd>
+          <dt>Mamba</dt><dd data-i18n="how.mamba"></dd>
+        </dl>
+      </div>
+    </section>
+
+    <!-- Phần 2: kết quả nghiên cứu -->
+    <section id="results" class="results">
+      <header class="results-head">
+        <h2 data-i18n="part2.title">Kết quả nghiên cứu</h2>
+        <p data-i18n="part2.lede"></p>
+      </header>
+      <nav class="subnav" id="subnav" aria-label="Kết quả">
+        <a href="#compare" data-i18n="sub.compare">2.1 Xếp hạng</a>
+        <a href="#leads" data-i18n="sub.leads">2.2 Theo số ngày dự báo trước</a>
+        <a href="#memory" data-i18n="sub.memory">2.3 Nhìn lại 1 hay 2 năm</a>
+        <a href="#flood" data-i18n="sub.flood">2.4 Cảnh báo lũ</a>
+        <a href="#levels" data-i18n="sub.levels">2.5 Bốn mức lưu lượng</a>
+        <a href="#xai" data-i18n="sub.xai">2.6 Giải thích mô hình</a>
+      </nav>
+
+      <section class="band" id="compare">
+        <header class="band-head">
+          <h2 data-i18n="cmp.title">2.1 Xếp hạng mô hình</h2>
+          <p data-i18n="cmp.lede"></p>
+        </header>
+        <div class="toolbar">
+          <div class="tabs light" id="cmp-task" role="group"></div>
+          <label class="field inline" id="cmp-lead-field" hidden>
+            <span data-i18n="card.lead">Dự báo trước</span>
+            <select id="cmp-lead"></select>
+          </label>
+        </div>
+        <div class="band-body two">
+          <figure>
+            <figcaption class="fig-title" id="rank-title"></figcaption>
+            <div class="table-scroll"><table class="rank" id="rank"></table></div>
+            <p class="foot" id="cmp-foot"></p>
+          </figure>
+          <figure class="nse-map-wrap">
+            <figcaption class="fig-title" id="nse-title"></figcaption>
+            <label class="field inline">
+              <span data-i18n="cmp.versus">So với</span>
+              <select id="nse-ref"></select>
+            </label>
+            <div id="nse-map" class="map small"></div>
+            <div class="map-legend static" id="nse-legend"></div>
+          </figure>
+        </div>
+      </section>
+
+      <section class="band" id="leads">
+        <header class="band-head">
+          <h2 data-i18n="leads.title"></h2>
+          <p data-i18n="leads.lede"></p>
+        </header>
+        <figure class="band-body">
+          <figcaption class="fig-title" data-i18n="leads.fig"></figcaption>
+          <div class="legend-html" id="leads-legend"></div>
+          <div id="leads-chart" class="chart big"></div>
+          <p class="foot" id="leads-foot"></p>
+        </figure>
+      </section>
+
+      <section class="band" id="memory">
+        <header class="band-head">
+          <h2 data-i18n="mem.title"></h2>
+          <p data-i18n="mem.lede"></p>
+        </header>
+        <div class="band-body two">
+          <figure>
+            <figcaption class="fig-title" data-i18n="mem.fig"></figcaption>
+            <div id="mem-chart" class="chart big"></div>
+          </figure>
+          <figure>
+            <figcaption class="fig-title" data-i18n="mem.tab"></figcaption>
+            <div class="table-scroll"><table class="rank plain" id="mem-table"></table></div>
+            <p class="foot" id="mem-foot"></p>
+          </figure>
+        </div>
+      </section>
+
+      <section class="band" id="flood">
+        <header class="band-head">
+          <h2 data-i18n="flood.title"></h2>
+          <p data-i18n="flood.lede"></p>
+        </header>
+        <div class="toolbar" id="flood-pick"></div>
+        <div class="band-body two">
+          <figure>
+            <figcaption class="fig-title" id="flood-all-title"></figcaption>
+            <div class="legend-html" id="flood-legend"></div>
+            <div id="flood-chart" class="chart big"></div>
+            <p class="foot" id="flood-sentence"></p>
+          </figure>
+          <figure>
+            <figcaption class="fig-title" id="flood-basin-title"></figcaption>
+            <div class="table-scroll"><table class="events" id="flood-events"></table></div>
+            <p class="foot" data-i18n="flood.tableHint"></p>
+          </figure>
+        </div>
+      </section>
+
+      <section class="band" id="levels">
+        <header class="band-head">
+          <h2 data-i18n="lvl.title"></h2>
+          <p data-i18n="lvl.lede"></p>
+        </header>
+        <div class="toolbar" id="lvl-pick"></div>
+        <div class="band-body two">
+          <figure>
+            <figcaption class="fig-title" id="lvl-title"></figcaption>
+            <div class="table-scroll"><table class="confusion" id="confusion"></table></div>
+            <p class="foot" data-i18n="lvl.key"></p>
+          </figure>
+          <figure>
+            <figcaption class="fig-title" id="lvl-recall-title"></figcaption>
+            <div id="lvl-chart" class="chart big"></div>
+            <p class="foot" id="lvl-foot"></p>
+          </figure>
+        </div>
+      </section>
+
+      <section class="band" id="xai">
+        <header class="band-head">
+          <h2 data-i18n="xai.title"></h2>
+          <p data-i18n="xai.lede"></p>
+        </header>
+        <div class="band-body">
+          <p class="xai-status" id="xai-status"></p>
+          <div class="legend-html" id="xai-key"></div>
+          <div class="two">
+            <figure><figcaption class="fig-title" id="xai-1-title"></figcaption><div id="xai-1" class="chart big"></div></figure>
+            <figure><figcaption class="fig-title" id="xai-2-title"></figcaption><div id="xai-2" class="chart big"></div></figure>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="about" id="about">
+      <div class="about-inner">
+        <h2 data-i18n="about.title">Về dự án</h2>
+        <dl class="team">
+          <div><dt data-i18n="intro.team">Nhóm thực hiện</dt><dd>Huỳnh Ngọc Thắng · 23110327<br>Huỳnh Thanh Nhân · 23110280</dd></div>
+          <div><dt data-i18n="intro.advisor">Giảng viên hướng dẫn</dt><dd>Lê Minh Tân</dd></div>
+          <div><dt data-i18n="intro.school">Đơn vị</dt><dd data-i18n="intro.schoolName">Khoa Công nghệ Thông tin, Trường ĐH Công nghệ Kỹ thuật TP.HCM (HCM-UTE)</dd></div>
+        </dl>
+        <div class="prose" id="about-body"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot-bar">
+    <span>© 2026 Huỳnh Ngọc Thắng, Huỳnh Thanh Nhân</span>
+    <span data-i18n="foot.data">Dữ liệu: Extended LamaH-CE (CC BY-NC 4.0) · Bản đồ nền © OpenStreetMap, Protomaps</span>
+  </footer>
+  <div class="toast" id="toast" role="alert" hidden></div>
+</body>
+</html>
