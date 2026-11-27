@@ -40,7 +40,7 @@ const cache = new Map();
 async function api(path, options) {
   const res = await fetch(path, options);
   const body = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(body?.error ?? `HTTP ${res.status}`);
+  if (!res.ok) throw Object.assign(new Error(body?.error ?? `HTTP ${res.status}`), {status: res.status, code: body?.code, retryAfter: body?.retry_after, limit: body?.limit});
   return body;
 }
 async function cached(path) {
@@ -664,6 +664,8 @@ async function playStep() {
 }
 function togglePlay() {
   if (playTimer) return stopPlay();
+  // Đang ở ngày cuối kỳ => chạy lại từ đầu kỳ thay vì bấm mà không có gì xảy ra
+  if (state.day >= state.dates.length - 1) setDay(0);
   $("play").classList.add("on");
   resetWhatIf();
   playTimer = setTimeout(playStep, 0);
@@ -1246,6 +1248,7 @@ function initWhatIf() {
     const date = wiDate(m);
     stopPlay();
     run(async () => {
+      let wait = 0;
       try {
         const res = await api("/api/what-if", {method: "POST", headers: {"Content-Type": "application/json"},
           body: JSON.stringify({run: m.run, basin: state.basin, date, rain_multiplier: Number($("wi-rain").value), temperature_delta: Number($("wi-temp").value)})});
@@ -1261,9 +1264,36 @@ function initWhatIf() {
             xaxis: {type: "category", title: {text: t("wi.x")}}, yaxis: {title: {text: t("chart.y")}, rangemode: "tozero", gridcolor: css("--grid")}}), plotConfig);
         state.wiDone = true;
         $("wi-title").textContent = t("wi.title", {s: state.site.stations[state.basin].name, d: fmtDate(date)});
-      } finally { btn.disabled = isRegion(); btn.textContent = t("wi.run"); }
+      } catch (error) {
+        // Máy chủ giới hạn số lần chạy (CPU) => báo ngay trong thẻ, đếm ngược trên nút, không bảo tải lại trang
+        if (error.code === "rate_limited" || error.code === "busy") {
+          wait = error.retryAfter ?? 5;
+          $("wi-status").textContent = t(error.code === "busy" ? "wi.busy" : "wi.limit", {n: error.limit ?? "", s: wait});
+        } else $("wi-status").textContent = t("wi.fail", {msg: error.message});
+      } finally {
+        if (wait) wiCooldown(btn, wait);
+        else { btn.disabled = isRegion(); btn.textContent = t("wi.run"); }
+      }
     });
   });
+}
+
+function wiCooldown(btn, sec) {
+  clearInterval(wiCooldown.timer);
+  const end = Date.now() + sec * 1000;
+  const tick = () => {
+    const left = Math.ceil((end - Date.now()) / 1000);
+    if (left <= 0) {
+      clearInterval(wiCooldown.timer);
+      btn.disabled = isRegion();
+      btn.textContent = t("wi.run");
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = t("wi.retryIn", {s: left});
+  };
+  tick();
+  wiCooldown.timer = setInterval(tick, 1000);
 }
 
 // ---------- làm mới theo lựa chọn ----------
@@ -1293,6 +1323,32 @@ function initResultsLazy() {
     run(refreshXai);
   }, {rootMargin: "600px 0px"});
   io.observe($("results"));
+}
+function initPanelWheel() {
+  // Chrome giữ cả một lượt lăn chuột cho panel (scroll latching): panel chạm đầu/cuối giữa lượt thì trang đứng yên
+  // => khi panel không cuộn thêm được theo hướng đang lăn, tự chuyển phần lăn sang trang
+  const panel = $("panel");
+  let pending = 0, frame = 0;
+  const flush = () => {
+    const step = Math.abs(pending) < 2 ? pending : pending * 0.35;
+    window.scrollBy({top: step, behavior: "instant"});
+    pending -= step;
+    frame = pending ? requestAnimationFrame(flush) : 0;
+  };
+  panel.addEventListener("wheel", e => {
+    if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY) || !e.deltaY) return;
+    if (getComputedStyle(panel).overflowY !== "auto" || panel.scrollHeight <= panel.clientHeight) return;
+    // Danh sách gợi ý trạm còn cuộn được thì để nó cuộn
+    const list = e.target.closest(".combo-list");
+    if (list && (e.deltaY > 0 ? list.scrollTop + list.clientHeight < list.scrollHeight - 1 : list.scrollTop > 0)) return;
+    const atEnd = e.deltaY > 0 ? panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1 : panel.scrollTop <= 0;
+    if (!atEnd) return;
+    if (e.cancelable) e.preventDefault();
+    const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1);
+    if (reduceMotion()) { window.scrollBy({top: dy, behavior: "instant"}); return; }
+    pending += dy;
+    if (!frame) frame = requestAnimationFrame(flush);
+  }, {passive: false});
 }
 function initScrollSpy() {
   // Tô mục đang xem trên thanh mục lục Phần 2 và thanh trên cùng
@@ -1363,6 +1419,7 @@ async function start() {
   initMiniMap();
   initResultsLazy();
   initScrollSpy();
+  initPanelWheel();
   initHighlights();
   $("tour-btn").addEventListener("click", startTour);
   $("tour-next").addEventListener("click", () => tourGo(tour.k + 1, 1));

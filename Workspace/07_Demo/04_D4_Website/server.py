@@ -6,6 +6,7 @@
 
 import argparse
 import json
+import math
 import mimetypes
 import os
 import sys
@@ -32,7 +33,7 @@ SCOPE, SCENARIO = "common_source_all", "S0"
 RETURN_PERIODS = (1.5, 2.0, 5.0, 10.0)
 
 
-def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, what_if_per_minute=6):
+def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, what_if_per_minute=12):
     bundle = Path(bundle).resolve()
     pmtiles = Path(pmtiles).resolve() if pmtiles else None
     app = create_d3_app(bundle, raw, h_python)
@@ -400,10 +401,11 @@ def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, w
             while calls and now - calls[0] > 60:
                 calls.popleft()
             if len(calls) >= what_if_per_minute:
-                return jsonify(error="Bạn thử nhanh quá, đợi một phút rồi thử lại."), 429
+                wait = max(1, math.ceil(60 - (now - calls[0])))
+                return jsonify(error="rate_limited", code="rate_limited", retry_after=wait, limit=what_if_per_minute), 429, {"Retry-After": str(wait)}
             calls.append(now)
         if not slots.acquire(timeout=20):
-            return jsonify(error="Máy chủ đang bận chạy mô hình, thử lại sau ít giây."), 503
+            return jsonify(error="busy", code="busy", retry_after=5), 503, {"Retry-After": "5"}
         try:
             return original_what_if()
         finally:

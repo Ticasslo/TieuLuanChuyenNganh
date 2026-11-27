@@ -233,6 +233,10 @@ export const DICT = {
     "tour.how.text": "Sơ đồ kiến trúc chung của các mô hình, cách chia dữ liệu theo thời gian và 5 lõi được so sánh.",
     "tour.results.title": "Kết quả trên cả kỳ kiểm tra",
     "tour.results.text": "Xếp hạng mô hình, độ chính xác theo số ngày dự báo trước, khả năng báo lũ, bốn mức lưu lượng và giải thích mô hình, tính trên 451 lưu vực. Hết phần hướng dẫn: bấm \"Xong\" để tự xem tiếp.",
+    "wi.limit": "Mỗi người chạy mô hình tối đa {n} lần mỗi phút vì máy chủ chỉ có CPU; nút sẽ mở lại khi hết đếm ngược.",
+    "wi.busy": "Máy chủ đang chạy mô hình cho người khác; nút sẽ mở lại sau ít giây.",
+    "wi.fail": "Chưa chạy được mô hình ({msg}).",
+    "wi.retryIn": "Thử lại sau {s} giây",
     "pick.model": "Mô hình cho mục này",
   },
   en: {
@@ -468,6 +472,10 @@ export const DICT = {
     "tour.how.text": "The shared architecture of the models, how the data is split in time, and the 5 cores compared.",
     "tour.results.title": "Results over the whole test period",
     "tour.results.text": "Model ranking, accuracy by lead time, flood detection, the four flow levels and model explanations, computed over 451 basins. That is the end of the tour: press \"Done\" to explore on your own.",
+    "wi.limit": "Each visitor can run the model at most {n} times a minute because the server has only a CPU; the button reopens when the countdown ends.",
+    "wi.busy": "The server is running the model for someone else; the button reopens in a few seconds.",
+    "wi.fail": "Could not run the model ({msg}).",
+    "wi.retryIn": "Try again in {s} s",
     "pick.model": "Model for this section",
   },
 };
