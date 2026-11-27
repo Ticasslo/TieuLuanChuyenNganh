@@ -101,6 +101,42 @@ def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, w
                                   observed_m3_s=values([matrix("observed.npy")[row, col]])[0]))
         return jsonify(basin=basin, run=run, origin=date, steps=steps)
 
+    @lru_cache(maxsize=1)
+    def flood_highlights():
+        # Đợt lũ lớn trong kỳ test theo quan trắc: ngày-trạm có Qmax vượt ngưỡng chu kỳ lặp lại 10 năm của trạm,
+        # gom các ngày cách nhau không quá 3 ngày thành một đợt; mỗi đợt lấy trạm vượt ngưỡng nhiều lần nhất làm đại diện
+        obs = np.asarray(matrix("observed.npy"), dtype=float)
+        t10 = np.array([float((catalog["flood_m3_s"].get(bid) or {}).get("10.0", np.nan)) for bid in catalog["ids"]])
+        with np.errstate(invalid="ignore", divide="ignore"):
+            ratio = obs / t10[:, None]
+        over = np.isfinite(ratio) & (ratio >= 1.0)
+        days_over = np.flatnonzero(over.any(axis=0))
+        groups, current = [], []
+        for col in days_over:
+            if current and col - current[-1] > 3:
+                groups.append(current)
+                current = []
+            current.append(int(col))
+        if current:
+            groups.append(current)
+        out = []
+        for cols in groups:
+            block = np.where(over[:, cols], ratio[:, cols], np.nan)
+            gauges = np.flatnonzero(np.isfinite(block).any(axis=1))
+            row, j = np.unravel_index(np.nanargmax(block), block.shape)
+            bid = catalog["ids"][row]
+            stn = site["stations"][bid]
+            out.append(dict(basin=bid, name=stn["name"], river=stn["river"], country=stn["country"],
+                            date=catalog["dates"][cols[j]], start=catalog["dates"][cols[0]], end=catalog["dates"][cols[-1]],
+                            gauges=int(len(gauges)), ratio=round(float(block[row, j]), 2),
+                            qmax_m3_s=round(float(obs[row, cols[j]]), 1), t10_m3_s=round(float(t10[row]), 1)))
+        out.sort(key=lambda e: (-e["gauges"], -e["ratio"]))
+        return out
+
+    @app.get("/api/highlights")
+    def get_highlights():
+        return jsonify(events=flood_highlights()[:8])
+
     @app.get("/api/basins")
     def get_basins():
         return send_file(bundle / "basins.geojson", mimetype="application/geo+json", max_age=86400)

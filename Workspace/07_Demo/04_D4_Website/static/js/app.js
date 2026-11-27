@@ -204,7 +204,15 @@ function barImage(lo, lp) {
   g.fillStyle = css("--ink"); g.fillRect(1.5, h - 3, 21, 1.5);
   return {width: w * r, height: h * r, data: g.getImageData(0, 0, w * r, h * r).data};
 }
+function addBarImages() {
+  // Nạp sẵn 36 hình cột (6 mức thực đo × 6 mức dự báo, gồm "không có số liệu") => lớp cột không phải chờ ảnh khi vẽ
+  for (let lo = -1; lo <= 4; lo += 1) for (let lp = -1; lp <= 4; lp += 1) {
+    const id = `bar_${lo}_${lp}`;
+    if (!map.hasImage(id)) map.addImage(id, barImage(lo, lp), {pixelRatio: 2});
+  }
+}
 function addMainLayers() {
+  addBarImages();
   map.addSource("basins", {type: "geojson", data: "/api/basins"});
   map.addLayer({id: "study-fill", type: "fill", source: "basins", paint: {"fill-color": css("--accent"), "fill-opacity": isRegion() ? 0.1 : 0.04}});
   map.addLayer({id: "basin-all", type: "line", source: "basins", minzoom: 7, paint: {"line-color": css("--accent-ink"), "line-width": 0.5, "line-opacity": 0.35}});
@@ -507,6 +515,7 @@ async function refreshChart({keepRange = false} = {}) {
   const data = await cached(`/api/chart${qs({basin, lead, run: [main, ...extra], ...(ensemble ? {ensemble: 1} : {})})}`);
   const fan = state.task === "h" && !isRegion() ? await cached(`/api/fan${qs({basin, run: main, date: state.dates[state.day]})}`).catch(() => null) : null;
   if (basin !== state.basin || main !== activeRun()) return;
+  state.chartData = data;
   const region = data.unit === "mm/day", unit = region ? t("unit.mmday") : "m³/s";
   const traces = [{x: data.dates, y: data.observed, name: t("chart.obs"), line: {color: css("--c-obs"), width: 2.4}}];
   const keys = [legendKey(css("--c-obs"), t("chart.obs"))];
@@ -593,6 +602,7 @@ function fitY() {
 function renderDayLabel() {
   $("day-label").textContent = fmtDate(state.dates[state.day], true);
   $("day-slider").value = state.day;
+  markHighlights();
 }
 let dayFrame = null;
 function placeDayLine() {
@@ -669,6 +679,7 @@ function applySelection() {
   map?.getLayer("study-fill") && map.setPaintProperty("study-fill", "fill-opacity", isRegion() ? 0.1 : 0.04);
   renderStation();
   renderStatus();
+  markHighlights();
   run(() => refreshChart());
   if (state.resultsReady) { run(refreshFloodBasin); run(refreshXai); }
   resetWhatIf(true);
@@ -732,6 +743,139 @@ function bindSearch() {
     } else if (e.key === "Enter" && active >= 0 && shown[active]) { e.preventDefault(); pick(shown[active]); }
     else if (e.key === "Escape") { close(); input.value = ""; input.blur(); }
   });
+}
+
+// ---------- đợt lũ lớn trong kỳ kiểm tra (nút nhảy nhanh dưới lời giới thiệu) ----------
+async function initHighlights() {
+  try { state.highlights = (await api("/api/highlights")).events.slice(0, 6); }
+  catch (e) { console.error(e); state.highlights = []; }
+  renderHighlights();
+}
+function renderHighlights() {
+  const list = state.highlights ?? [];
+  $("highlights").hidden = !list.length;
+  $("hl-list").replaceChildren(...list.map(ev => el("li", {}, el("button", {type: "button", class: "hl", "data-basin": ev.basin, "data-date": ev.date,
+    title: t("hl.title", {s: ev.name, r: ev.river, q: fmtQ(ev.qmax_m3_s), x: fmt(ev.ratio, 1), t: fmtQ(ev.t10_m3_s)}),
+    onclick: () => goToEvent(ev)},
+    el("b", {}, `${fmtDate(ev.date)} · ${ev.river}`), el("span", {}, t("hl.count", {n: ev.gauges}))))));
+  markHighlights();
+}
+function markHighlights() {
+  const day = state.dates[state.day];
+  document.querySelectorAll("#hl-list .hl").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.basin === state.basin && b.dataset.date === day)));
+}
+function goToEvent(ev, {scroll = true} = {}) {
+  // Đặt ngày trước rồi mới chọn trạm => biểu đồ dựng một lần, cửa sổ thời gian quanh ngày lũ
+  const idx = state.dates.indexOf(ev.date);
+  if (idx < 0) return;
+  setDay(idx);
+  showTab("flow");
+  selectBasin(ev.basin);
+  if (scroll) scrollToDash();
+}
+
+// ---------- tải số liệu của Hình 1.1 ----------
+function downloadChartCsv() {
+  const d = state.chartData;
+  if (!d) return;
+  const unit = d.unit === "mm/day" ? "mm_day" : "m3_s";
+  const cols = [["observed", d.observed], ...d.predictions.map(p => [p.run, p.values]), ...(d.ensemble ? [["ensemble_mean", d.ensemble.values]] : [])];
+  const rows = [["date", ...cols.map(([k]) => `${k}_${unit}`)].join(",")];
+  d.dates.forEach((day, i) => rows.push([day, ...cols.map(([, v]) => v[i] ?? "")].join(",")));
+  const name = `qmax_${d.basin === "all" ? "region" : `basin${d.basin}`}_${state.task}_lead${d.lead}.csv`;
+  const url = URL.createObjectURL(new Blob(["﻿" + rows.join("\r\n") + "\r\n"], {type: "text/csv;charset=utf-8"}));
+  const a = el("a", {href: url, download: name});
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast(t("csv.done", {f: name}));
+}
+
+// ---------- hướng dẫn xem nhanh: làm nổi từng vùng và giải thích ----------
+const TOUR = [
+  {sel: "#highlights", key: "hl", before: () => state.highlights?.length && goToEvent(state.highlights[0], {scroll: false})},
+  {sel: ".map-pane", key: "map"},
+  {sel: "#panel", key: "panel"},
+  {sel: "#task-tabs", key: "task"},
+  {sel: ".timeline", key: "time"},
+  {sel: "#pane-flow", key: "chart", before: () => showTab("flow")},
+  {sel: "#tab-whatif", key: "whatif"},
+  {sel: "#how .arch-fig", key: "how"},
+  {sel: ".results-head", key: "results"},
+];
+const tour = {steps: [], k: -1, target: null};
+const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const topbarH = () => document.querySelector(".topbar").offsetHeight;
+const isShown = node => node && !node.closest("[hidden]") && node.getClientRects().length > 0;
+function startTour() {
+  stopPlay();
+  tour.steps = TOUR.filter(st => st.key === "hl" ? (state.highlights?.length ?? 0) > 0 : true);
+  $("tour-spot").hidden = false;
+  $("tour-card").hidden = false;
+  document.addEventListener("keydown", tourKeys, true);
+  window.addEventListener("scroll", placeTour, {passive: true});
+  window.addEventListener("resize", placeTour);
+  tourGo(0, 1);
+}
+function endTour() {
+  tour.k = -1;
+  tour.target = null;
+  $("tour-spot").hidden = true;
+  $("tour-card").hidden = true;
+  document.removeEventListener("keydown", tourKeys, true);
+  window.removeEventListener("scroll", placeTour);
+  window.removeEventListener("resize", placeTour);
+  $("tour-btn").focus({preventScroll: true});
+}
+function tourGo(k, dir = 1) {
+  if (k >= tour.steps.length) return endTour();
+  if (k < 0) return;
+  const step = tour.steps[k];
+  step.before?.();
+  const target = document.querySelector(step.sel);
+  // Vùng đang ẩn (VD thẻ thử kịch bản khi mô hình không chạy được trực tiếp) => bỏ qua theo hướng đang đi
+  if (!isShown(target)) return tourGo(k + dir, dir);
+  tour.k = k;
+  tour.target = target;
+  renderTour();
+  const r = target.getBoundingClientRect(), top0 = topbarH();
+  const room = innerHeight - top0;
+  const y = r.height + 220 < room ? scrollY + r.top - top0 - (room - r.height) / 2 + 60 : scrollY + r.top - top0 - 12;
+  window.scrollTo({top: Math.max(0, y), behavior: reduceMotion() ? "auto" : "smooth"});
+  placeTour();
+  [250, 600, 1000].forEach(ms => setTimeout(placeTour, ms));
+  $("tour-next").focus({preventScroll: true});
+}
+function renderTour() {
+  if (tour.k < 0) return;
+  const step = tour.steps[tour.k];
+  $("tour-step").textContent = t("tour.step", {i: tour.k + 1, n: tour.steps.length});
+  $("tour-title").textContent = t(`tour.${step.key}.title`);
+  $("tour-text").textContent = t(`tour.${step.key}.text`);
+  $("tour-prev").disabled = tour.k === 0;
+  $("tour-next").textContent = t(tour.k === tour.steps.length - 1 ? "tour.done" : "tour.next");
+}
+function placeTour() {
+  if (tour.k < 0 || !tour.target) return;
+  const pad = 6, m = 12, top0 = topbarH();
+  const r = tour.target.getBoundingClientRect(), spot = $("tour-spot"), card = $("tour-card");
+  const top = Math.max(r.top - pad, top0), bottom = Math.min(r.bottom + pad, innerHeight);
+  Object.assign(spot.style, {left: `${r.left - pad}px`, top: `${top}px`, width: `${r.width + 2 * pad}px`, height: `${Math.max(0, bottom - top)}px`});
+  const cw = card.offsetWidth, ch = card.offsetHeight;
+  let x = r.left, y;
+  if (innerHeight - bottom >= ch + 2 * m) y = bottom + m;
+  else if (top - top0 >= ch + 2 * m) y = top - ch - m;
+  else if (innerWidth - r.right >= cw + 2 * m) { x = r.right + m; y = top + m; }
+  else if (r.left >= cw + 2 * m) { x = r.left - cw - m; y = top + m; }
+  else { x = innerWidth - cw - 2 * m; y = innerHeight - ch - 2 * m; }
+  card.style.left = `${Math.max(m, Math.min(x, innerWidth - cw - m))}px`;
+  card.style.top = `${Math.max(top0 + m, Math.min(y, innerHeight - ch - m))}px`;
+}
+function tourKeys(e) {
+  if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); endTour(); }
+  else if (e.key === "ArrowRight" && !e.target.closest("input, select, textarea")) { e.preventDefault(); e.stopImmediatePropagation(); tourGo(tour.k + 1, 1); }
+  else if (e.key === "ArrowLeft" && !e.target.closest("input, select, textarea")) { e.preventDefault(); e.stopImmediatePropagation(); tourGo(tour.k - 1, -1); }
 }
 
 // ---------- 2.1 xếp hạng mô hình ----------
@@ -1184,6 +1328,8 @@ function renderTexts() {
   renderSectionPickers();
   initWhatIf.fill?.();
   resetWhatIf();
+  renderHighlights();
+  renderTour();
 }
 
 async function start() {
@@ -1217,6 +1363,12 @@ async function start() {
   initMiniMap();
   initResultsLazy();
   initScrollSpy();
+  initHighlights();
+  $("tour-btn").addEventListener("click", startTour);
+  $("tour-next").addEventListener("click", () => tourGo(tour.k + 1, 1));
+  $("tour-prev").addEventListener("click", () => tourGo(tour.k - 1, -1));
+  $("tour-close").addEventListener("click", endTour);
+  $("chart-csv").addEventListener("click", downloadChartCsv);
 
   $("day-slider").addEventListener("input", e => setDay(Number(e.target.value), {fromSlider: true}));
   $("prev-day").addEventListener("click", () => setDay(state.day - 1));

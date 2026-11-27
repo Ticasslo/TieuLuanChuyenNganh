@@ -36,8 +36,18 @@
     <!-- Phần 1: công cụ xem dự báo -->
     <section id="explore" class="explore">
       <header class="intro">
-        <h1 data-i18n="intro.title">Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy</h1>
-        <p class="lede" id="lede"></p>
+        <div class="intro-text">
+          <h1 data-i18n="intro.title">Ứng dụng mô hình học sâu trong bài toán dự báo lưu lượng dòng chảy</h1>
+          <p class="lede" id="lede"></p>
+        </div>
+        <button type="button" class="tour-btn" id="tour-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></svg>
+          <span data-i18n="tour.start">Dẫn tôi xem</span>
+        </button>
+        <div class="highlights" id="highlights" hidden>
+          <p class="hl-label" id="hl-label" data-i18n="hl.label">Đợt lũ lớn trong kỳ kiểm tra</p>
+          <ul class="hl-list" id="hl-list" aria-labelledby="hl-label"></ul>
+        </div>
       </header>
 
       <div class="dash">
@@ -139,7 +149,13 @@
 
             <div id="pane-flow" role="tabpanel" aria-labelledby="tab-flow">
               <header class="fig-head">
-                <h2 class="fig-title" id="chart-title"></h2>
+                <div class="fig-head-row">
+                  <h2 class="fig-title" id="chart-title"></h2>
+                  <button type="button" class="ghost-btn" id="chart-csv" data-i18n-title="csv.hint">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"/></svg>
+                    <span data-i18n="csv.btn">Tải số liệu (CSV)</span>
+                  </button>
+                </div>
                 <p class="fig-sub" id="chart-sub"></p>
                 <div class="legend-html" id="chart-legend"></div>
               </header>
@@ -435,6 +451,17 @@
     <span>© 2026 Huỳnh Ngọc Thắng, Huỳnh Thanh Nhân</span>
     <span data-i18n="foot.data">Dữ liệu: Extended LamaH-CE (CC BY-NC 4.0) · Bản đồ nền © OpenStreetMap, Protomaps</span>
   </footer>
+  <div class="tour-spot" id="tour-spot" hidden></div>
+  <div class="tour-card" id="tour-card" role="dialog" aria-labelledby="tour-title" aria-describedby="tour-text" hidden>
+    <p class="tour-step" id="tour-step"></p>
+    <h2 id="tour-title"></h2>
+    <p id="tour-text"></p>
+    <div class="tour-actions">
+      <button type="button" class="tour-close" id="tour-close" data-i18n="tour.close">Thoát</button>
+      <button type="button" class="tour-prev" id="tour-prev" data-i18n="tour.prev">Trước</button>
+      <button type="button" class="primary" id="tour-next" data-i18n="tour.next">Tiếp</button>
+    </div>
+  </div>
   <div class="toast" id="toast" role="alert" hidden></div>
 </body>
 </html>
