@@ -1,0 +1,41 @@
+# Caddy đứng trước app: HTTPS tự động (Let's Encrypt/ZeroSSL) cho DEMO_DOMAIN, HTTP => HTTPS, nén văn bản.
+# DEMO_DOMAIN chưa đặt => compose truyền ":80", chỉ phục vụ HTTP (dùng khi chạy thử bằng IP).
+{
+	admin off
+	servers {
+		# Chỉ TCP (HTTP/1.1, HTTP/2): VPS không mở UDP 443 cho HTTP/3
+		protocols h1 h2
+	}
+}
+
+{$DEMO_DOMAIN} {
+	# Chỉ nén văn bản; nền bản đồ PMTiles đọc theo Range nên không nén
+	encode {
+		zstd
+		gzip
+		match {
+			header Content-Type text/*
+			header Content-Type application/json*
+			header Content-Type application/javascript*
+			header Content-Type image/svg+xml*
+		}
+	}
+	# Yêu cầu "nếu... thì..." chỉ vài chục byte
+	request_body {
+		max_size 16KB
+	}
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		# Mọi thư viện tự lưu ở /static/vendor; MapLibre tạo worker từ blob:, Plotly chèn thẻ <style> => 'unsafe-inline' chỉ cho style
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+	}
+	reverse_proxy app:8000 {
+		transport http {
+			response_header_timeout 150s
+		}
+	}
+}

@@ -2,7 +2,7 @@
 # thay giao diện bằng thư mục static/ của website, thêm API cho bản đồ, chuỗi cả kỳ test, bảng xếp hạng,
 # tóm tắt cảnh báo lũ toàn miền, phục vụ nền bản đồ PMTiles tự lưu và chặn quá tải phần "nếu... thì...".
 # Chạy thử: python server.py --bundle <gói website> --pmtiles <cee_z11.pmtiles>
-# Chạy thật (Linux): gunicorn -w 1 --threads 8 "server:from_env()" với DEMO_BUNDLE, DEMO_PMTILES, DEMO_RAW, DEMO_H_PYTHON
+# Chạy thật (VPS): Docker Compose trong deploy/ (gunicorn 1 tiến trình, 4 luồng, "server:from_env()"), hướng dẫn ở deploy/DEPLOY.md
 
 import argparse
 import json
@@ -33,7 +33,7 @@ SCOPE, SCENARIO = "common_source_all", "S0"
 RETURN_PERIODS = (1.5, 2.0, 5.0, 10.0)
 
 
-def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, what_if_per_minute=12):
+def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, what_if_per_minute=12, client_ip_header=None):
     bundle = Path(bundle).resolve()
     pmtiles = Path(pmtiles).resolve() if pmtiles else None
     app = create_d3_app(bundle, raw, h_python)
@@ -388,13 +388,15 @@ def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, w
         return jsonify(rows=[{k: (v.item() if hasattr(v, "item") else v) for k, v in row.items()} for row in frame[cols].to_dict("records")])
 
     # Chặn quá tải phần chạy mô hình trên CPU: tối đa what_if_slots lần cùng lúc, mỗi IP what_if_per_minute lần/phút
-    # (sau Caddy, IP thật là mục cuối của X-Forwarded-For vì Caddy nối thêm vào cuối)
+    # (sau Caddy, IP thật là mục cuối của X-Forwarded-For vì Caddy nối thêm vào cuối; sau Cloudflare Tunnel, Caddy
+    # chỉ thấy IP của cloudflared => đọc header client_ip_header do Cloudflare đặt, VD CF-Connecting-IP)
     slots = BoundedSemaphore(what_if_slots)
     recent, recent_lock = defaultdict(deque), Lock()
     original_what_if = app.view_functions["what_if"]
 
     def guarded_what_if():
-        client = request.headers.get("X-Forwarded-For", request.remote_addr or "").split(",")[-1].strip()
+        client = (client_ip_header and request.headers.get(client_ip_header, "").strip()) or \
+            request.headers.get("X-Forwarded-For", request.remote_addr or "").split(",")[-1].strip()
         now = time.monotonic()
         with recent_lock:
             calls = recent[client]
@@ -430,7 +432,7 @@ def from_env():
         raise RuntimeError("Đặt DEMO_BUNDLE trỏ tới gói dữ liệu website.")
     path = lambda key: Path(env[key]) if env.get(key) else None  # noqa: E731
     return create_app(Path(env["DEMO_BUNDLE"]), path("DEMO_RAW"), path("DEMO_H_PYTHON"), path("DEMO_PMTILES"),
-                      int(env.get("DEMO_WHAT_IF_SLOTS", 1)), int(env.get("DEMO_WHAT_IF_PER_MINUTE", 6)))
+                      int(env.get("DEMO_WHAT_IF_SLOTS", 1)), int(env.get("DEMO_WHAT_IF_PER_MINUTE", 12)), env.get("DEMO_CLIENT_IP_HEADER") or None)
 
 
 if __name__ == "__main__":

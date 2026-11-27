@@ -1,0 +1,80 @@
+# Website demo trên VPS: app (gunicorn, chỉ mở trong mạng Docker) + Caddy + Cloudflare Tunnel (tùy chọn).
+# Dữ liệu (gói website, dữ liệu thô 451 lưu vực, nền bản đồ) ở /srv/demo/data, gắn chỉ đọc.
+# Cấu hình đặt trong tệp .env cạnh tệp này (quyền 600, không đưa lên git):
+#   - Chạy qua Cloudflare Tunnel: COMPOSE_PROFILES=tunnel, TUNNEL_TOKEN=<token>, DEMO_BIND=127.0.0.1,
+#     DEMO_CLIENT_IP_HEADER=CF-Connecting-IP => không mở cổng 80/443 ra Internet, Caddy chỉ nhận từ cloudflared.
+#   - Chạy thẳng bằng IP/tên miền: bỏ trống => Caddy mở cổng 80 (và 443 khi đặt DEMO_DOMAIN để Caddy tự xin HTTPS).
+# Chạy: docker compose up -d --build
+
+name: demo
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: 04_D4_Website/deploy/Dockerfile
+    image: demo-app:local
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m
+    volumes:
+      - /srv/demo/data:/data:ro
+    environment:
+      DEMO_CLIENT_IP_HEADER: ${DEMO_CLIENT_IP_HEADER:-}
+    expose:
+      - "8000"
+    mem_limit: 8g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=10).status == 200 else 1)"]
+      interval: 30s
+      timeout: 15s
+      start_period: 120s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  caddy:
+    image: caddy:2.11.9-alpine
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    # Cổng Docker mở đi vòng qua iptables INPUT => muốn đóng phải đổi DEMO_BIND về 127.0.0.1, không chỉ chặn tường lửa
+    ports:
+      - "${DEMO_BIND:-0.0.0.0}:80:80"
+      - "${DEMO_BIND:-0.0.0.0}:443:443"
+    environment:
+      DEMO_DOMAIN: ${DEMO_DOMAIN:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  tunnel:
+    image: cloudflare/cloudflared:2026.11.2
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    depends_on:
+      - caddy
+    # Tunnel tạo trên Cloudflare Zero Trust, Public Hostname trỏ dịch vụ http://caddy:80
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  caddy_data:
+  caddy_config:
