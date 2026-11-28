@@ -33,7 +33,7 @@ PDF trong `PaperResearch/PaperResearchPDF/` để nhóm tham khảo. Giấy phé
 
 ## Trạng thái
 
-Mọi bước thí nghiệm của tiểu luận đã xong (120 lần huấn luyện trên Kaggle T4); còn đưa demo lên VPS (D4). Kết quả chính:
+Mọi bước thí nghiệm của tiểu luận đã xong (120 lần huấn luyện trên Kaggle T4), demo chạy công khai tại https://ticasslo.dev, bản thảo báo cáo đủ 8 chương. Kết quả chính:
 
 - **A — tái lập và mốc:** chạy lại trọng số BiasCast khớp NSE trung vị cả 6 run ([A2](Workspace/03_Baseline/01_A2_LamaHCEExt_Reproduce/01_A2_LamaHCEExt_Reproduce.md)); trên giao chung 450 lưu vực, SeqLSTM có Q 0,705, DLinear 0,380 ± 0,002, persistence 0,350 ([A3](Workspace/03_Baseline/02_A3_LamaHCEExt_Benchmarks/02_A3_LamaHCEExt_Benchmarks.md)); huấn luyện lại ba hạt giống 0,6952–0,7059 ([A4](Workspace/03_Baseline/03_A4_LamaHCEExt_Retrain/03_A4_LamaHCEExt_Retrain.md)).
 - **B — cải tiến LSTM, 30 epoch, mỗi bước một thay đổi:** B0 cho ngưỡng nhiễu hạt giống 0,0079; Q cùng đơn vị (B1a) +0,0045, thêm `qmax` quá khứ (B1b) +0,0188 ở validation; B2 nhúng theo nguồn, masked mean, sửa bộ lọc mẫu; B3 che dữ liệu khi huấn luyện; **B\* = B3 P10S12** theo luật ghi trước (validation S0–S4).
@@ -42,13 +42,19 @@ Mọi bước thí nghiệm của tiểu luận đã xong (120 lần huấn luy�
 - **D — chuỗi quá khứ 730 ngày:** [không nâng NSE](Workspace/05_Training/17_D_LamaHCEExt_Compare/17_D_LamaHCEExt_Compare.md) của LSTM, Mamba (hiệu dưới 0,2 lần nhiễu), S4D +0,0036 ở tổ hợp; thời gian huấn luyện gần gấp đôi.
 - **Đánh giá:** [Evaluation Version 13](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md) chấm 56 run test/S0, C2 qua 7 kịch bản vận hành, 168 tệp H 7 hạn và 9 cặp D (chỉ số liên tục, 4 mức lưu lượng, sự kiện lũ, kiểm định ghép cặp); [phân tích theo lưu vực](Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md) Version 3.
 - **G — giải thích mô hình:** [Integrated Gradients, dò trạng thái ẩn](Workspace/08_XAI/01_G_C2_XAI/01_G_C2_XAI.md) cho 15 run C2 và 24 run H; LSTM, GRU, Mamba dồn khoảng một nửa ảnh hưởng vào ngày t, t−1, Transformer, S4D trải gần cả cửa sổ; ở H, mô hình dùng GEFSv12 tăng dần theo hạn gần như cách dự báo hoàn hảo.
-- **Demo:** [D1–D3](Workspace/07_Demo/README.md) — hàm dự báo chung trùng tệp dự báo trên GPU và CPU, ứng dụng 5 trang chạy trên laptop cho C2, H, D.
+- **Demo:** [D1–D3](Workspace/07_Demo/README.md) — hàm dự báo chung trùng tệp dự báo trên GPU và CPU, ứng dụng 5 trang chạy trên laptop cho C2, H, D; [D4](Workspace/07_Demo/04_D4_Website/deploy/DEPLOY.md) đưa demo lên VPS Oracle Always Free qua Cloudflare Tunnel (Docker Compose: Flask, Caddy, cloudflared), tự chạy lại sau khi máy khởi động.
 
 Thư viện: fork `Ticasslo/neuralhydrology`, mốc `freeze-C` = `db6dc1f` (bước C, D), `freeze-H` = `6f68f47`, `freeze-H2` = `840450f` (bước H, G).
 
 ## Tài liệu báo cáo
 
+- [Chương 1 — Mở đầu](Document/07_Report/01_Introduction.md): bối cảnh, bài toán, câu hỏi nghiên cứu RQ1–RQ6, đóng góp, phạm vi.
+- [Chương 2 — Cơ sở lý thuyết](Document/07_Report/02_Theory.md): khái niệm thủy văn, LSTM, GRU, Transformer, S4D, Mamba, Integrated Gradients, chỉ số.
+- [Chương 3 — Công trình liên quan](Document/07_Report/03_RelatedWork.md): LSTM mốc, BiasCast, dữ liệu thiếu, SSM/Mamba, dự báo nhiều ngày.
 - [Chương 4 — Dữ liệu](Document/07_Report/04_Data.md): nguồn theo năm, đơn vị, độ phủ, cửa sổ và ngưỡng.
+- [Chương 5 — Phương pháp](Document/07_Report/05_Method.md): kiến trúc giữ và sửa so với BiasCast, giao thức cùng tham số, các bước B, C, H, D, kịch bản, XAI.
 - [Chương 6 — Thí nghiệm và kết quả](Document/07_Report/06_ExperimentsAndResults.md): giao thức, các kết quả đã chạy và diễn giải.
+- [Chương 7 — Demo](Document/07_Report/07_Demo.md): kiến trúc website, các trang, mô hình chạy trên CPU.
+- [Chương 8 — Kết luận](Document/07_Report/08_Conclusion.md): trả lời RQ1–RQ6, hạn chế, hướng khóa luận.
 - [Bộ đánh giá và bằng chứng thực nghiệm](Workspace/06_Evaluation/01_Evaluation_LamaHCEExt/01_Evaluation_LamaHCEExt.md): mã, notebook, bảng kết quả và kiểm tra.
 - [Phân tích kết quả theo đặc điểm lưu vực](Workspace/06_Evaluation/02_Evaluation_LamaHCEExt_ByBasin/02_Evaluation_LamaHCEExt_ByBasin.md): phương pháp, kết quả Kaggle, năm hình và kiểm thử Kaggle.
