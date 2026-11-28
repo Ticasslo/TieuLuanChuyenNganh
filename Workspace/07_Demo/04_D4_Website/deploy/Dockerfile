@@ -32,7 +32,7 @@ ENV PATH=/opt/venv-c/bin:$PATH PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTH
     OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 OMP_WAIT_POLICY=PASSIVE DEMO_THREADS=2 \
     HOME=/tmp MPLCONFIGDIR=/tmp NUMBA_CACHE_DIR=/tmp \
     DEMO_BUNDLE=/data/bundle DEMO_RAW=/data/raw/LamaH_extended DEMO_PMTILES=/data/basemap.pmtiles \
-    DEMO_H_PYTHON=/opt/venv-h/bin/python
+    DEMO_TERRAIN=/data/terrain.pmtiles DEMO_H_PYTHON=/opt/venv-h/bin/python
 USER demo
 WORKDIR /app/04_D4_Website
 EXPOSE 8000

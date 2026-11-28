@@ -1,7 +1,8 @@
-# Gom dữ liệu chạy website lên VPS vào một thư mục: gói website, nền bản đồ, dữ liệu thô LamaH chỉ 451 lưu vực của gói
+# Gom dữ liệu chạy website lên VPS vào một thư mục: gói website, nền bản đồ, địa hình (Mapterhorn), dữ liệu thô LamaH chỉ 451 lưu vực của gói
 # (thuộc tính lưu vực và trạm giữ đủ, chuỗi ngày chỉ lấy ID có trong catalog.json) và tệp SHA256SUMS
 # để kiểm trên VPS bằng "sha256sum -c SHA256SUMS".
-# Chạy: python pack_vps.py --bundle <gói website> --raw <LamaH_extended> --pmtiles <cee_z11.pmtiles> --out <thư mục đích>
+# Chạy: python pack_vps.py --bundle <gói website> --raw <LamaH_extended> --pmtiles <cee_z11.pmtiles>
+#       --terrain <terrain_z11.pmtiles> --out <thư mục đích>
 
 import argparse
 import hashlib
@@ -35,6 +36,7 @@ def main():
     parser.add_argument("--bundle", type=Path, required=True)
     parser.add_argument("--raw", type=Path, required=True)
     parser.add_argument("--pmtiles", type=Path, required=True)
+    parser.add_argument("--terrain", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
 
@@ -60,6 +62,7 @@ def main():
                 raise SystemExit(f"Thiếu chuỗi ngày của lưu vực {bid}: {src}")
             plan.append((src, out / "raw/LamaH_extended" / sub / src.name))
     plan.append((args.pmtiles, out / "basemap.pmtiles"))
+    plan.append((args.terrain, out / "terrain.pmtiles"))
 
     for i, (src, dst) in enumerate(plan, 1):
         copy(src, dst)

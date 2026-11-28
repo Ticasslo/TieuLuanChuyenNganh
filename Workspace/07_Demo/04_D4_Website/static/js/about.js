@@ -44,7 +44,7 @@ const TEXT = {
     <h3>Nguồn và giấy phép</h3>
     <ul>
       <li>Dữ liệu và mã gốc: BiasCast, github.com/conestone/biascast; NeuralHydrology.</li>
-      <li>Bản đồ nền © OpenStreetMap (ODbL), Protomaps; thư viện MapLibre GL JS, Plotly.</li>
+      <li>Bản đồ nền © OpenStreetMap (ODbL), Protomaps; địa hình © Mapterhorn (mô hình độ cao mở của Áo, Thụy Sĩ, Đức, Séc và Copernicus, mapterhorn.com/attribution); thư viện MapLibre GL JS, Plotly.</li>
       <li>Dữ liệu dùng cho mục đích học tập, phi thương mại (CC BY-NC 4.0).</li>
     </ul>
   </div>
@@ -93,7 +93,7 @@ const TEXT = {
     <h3>Sources and licences</h3>
     <ul>
       <li>Data and original code: BiasCast, github.com/conestone/biascast; NeuralHydrology.</li>
-      <li>Basemap © OpenStreetMap (ODbL), Protomaps; MapLibre GL JS and Plotly libraries.</li>
+      <li>Basemap © OpenStreetMap (ODbL), Protomaps; terrain © Mapterhorn (open elevation models from Austria, Switzerland, Germany, Czechia and Copernicus, mapterhorn.com/attribution); MapLibre GL JS and Plotly libraries.</li>
       <li>Data used for non-commercial, educational purposes (CC BY-NC 4.0).</li>
     </ul>
   </div>

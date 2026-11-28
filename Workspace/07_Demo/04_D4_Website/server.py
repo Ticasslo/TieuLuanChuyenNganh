@@ -1,7 +1,8 @@
 # Máy chủ website: dùng lại create_app của D3 (API và phép tính đã đối chiếu D1/D2, không sửa),
 # thay giao diện bằng thư mục static/ của website, thêm API cho bản đồ, chuỗi cả kỳ test, bảng xếp hạng,
-# tóm tắt cảnh báo lũ toàn miền, phục vụ nền bản đồ PMTiles tự lưu và chặn quá tải phần "nếu... thì...".
-# Chạy thử: python server.py --bundle <gói website> --pmtiles <cee_z11.pmtiles>
+# tóm tắt cảnh báo lũ toàn miền, lớp bản đồ khí tượng/đất/thực vật (env.json, env/), phục vụ nền bản đồ và địa hình
+# PMTiles tự lưu, chặn quá tải phần "nếu... thì...".
+# Chạy thử: python server.py --bundle <gói website> --pmtiles <cee_z11.pmtiles> --terrain <terrain_z11.pmtiles>
 # Chạy thật (VPS): Docker Compose trong deploy/ (gunicorn 1 tiến trình, 4 luồng, "server:from_env()"), hướng dẫn ở deploy/DEPLOY.md
 
 import argparse
@@ -33,9 +34,11 @@ SCOPE, SCENARIO = "common_source_all", "S0"
 RETURN_PERIODS = (1.5, 2.0, 5.0, 10.0)
 
 
-def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, what_if_per_minute=12, client_ip_header=None):
+def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, what_if_per_minute=12, client_ip_header=None,
+               terrain=None):
     bundle = Path(bundle).resolve()
     pmtiles = Path(pmtiles).resolve() if pmtiles else None
+    terrain = Path(terrain).resolve() if terrain else None
     app = create_d3_app(bundle, raw, h_python)
     app.static_folder = str(HERE / "static")
     app.view_functions["home"] = lambda: app.send_static_file("index.html")
@@ -148,6 +151,48 @@ def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, w
             abort(404, "Máy chủ chưa có nền bản đồ.")
         # conditional=True => trả 206 theo Range, PMTiles đọc từng đoạn tệp
         return send_file(pmtiles, mimetype="application/octet-stream", conditional=True, max_age=86400)
+
+    @app.get("/tiles/terrain.pmtiles")
+    def get_terrain():
+        # Mô hình độ cao Mapterhorn (terrarium, webp) cắt theo vùng nghiên cứu => bóng núi và địa hình 3D
+        if terrain is None:
+            abort(404, "Máy chủ chưa có dữ liệu địa hình.")
+        return send_file(terrain, mimetype="application/octet-stream", conditional=True, max_age=86400)
+
+    env_path = bundle / "env.json"
+    env_meta = json.loads(env_path.read_text(encoding="utf-8")) if env_path.is_file() else None
+    if env_meta is not None and (env_meta["ids"] != catalog["ids"] or env_meta["start"] != catalog["dates"][0]
+                                 or env_meta["days"] != len(catalog["dates"])):
+        raise ValueError("env.json không cùng lưu vực, ngày với catalog.json.")
+    env_daily = {layer["key"] for layer in env_meta["layers"] if layer["kind"] == "daily"} if env_meta else set()
+
+    @app.get("/api/env")
+    def get_env():
+        # Danh sách lớp bản đồ (đơn vị, ngưỡng màu) và giá trị thuộc tính tĩnh của mọi lưu vực
+        if env_meta is None:
+            return jsonify(layers=[])
+        return send_file(env_path, mimetype="application/json", max_age=86400)
+
+    @app.get("/api/env-days")
+    def get_env_days():
+        # Giá trị trung bình lưu vực của một lớp theo ngày (tối đa 90 ngày một lần gọi, như /api/days);
+        # lớp gió kèm thành phần đông (u), bắc (v) để vẽ mũi tên hướng gió
+        layer = request.args.get("layer")
+        if layer not in env_daily:
+            abort(400, "Chọn lớp bản đồ theo ngày.")
+        start = request.args.get("start")
+        if start not in date_index:
+            abort(400, "Chọn ngày bắt đầu trong kỳ test 2014-2017.")
+        try:
+            n = int(request.args.get("n", 60))
+        except ValueError:
+            abort(400, "Số ngày phải là số nguyên.")
+        a = date_index[start]
+        b = min(len(date_index), a + max(1, min(90, n)))
+        out = dict(layer=layer, ids=catalog["ids"], dates=catalog["dates"][a:b], values=block(matrix(f"env/{layer}.npy")[:, a:b]))
+        if layer == "wind":
+            out.update(u=block(matrix("env/wind_u.npy")[:, a:b]), v=block(matrix("env/wind_v.npy")[:, a:b]))
+        return jsonify(out)
 
     @app.get("/api/day")
     def get_day():
@@ -417,9 +462,15 @@ def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, w
 
     @app.after_request
     def headers(response):
+        # Thư viện, phông chữ không đổi giữa các lần triển khai => lưu 7 ngày; mã trang (js, css) đổi mỗi lần
+        # triển khai mà không đổi tên tệp => no-cache (trình duyệt, Cloudflare hỏi lại bằng ETag), tránh HTML mới chạy JS cũ
         if request.path.startswith("/static/vendor/") or request.path == "/plotly.js":
+            response.cache_control.no_cache = None
             response.cache_control.max_age = 604800
             response.cache_control.public = True
+        elif request.path.startswith("/static/"):
+            response.cache_control.max_age = None
+            response.cache_control.no_cache = True
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         return response
 
@@ -432,16 +483,18 @@ def from_env():
         raise RuntimeError("Đặt DEMO_BUNDLE trỏ tới gói dữ liệu website.")
     path = lambda key: Path(env[key]) if env.get(key) else None  # noqa: E731
     return create_app(Path(env["DEMO_BUNDLE"]), path("DEMO_RAW"), path("DEMO_H_PYTHON"), path("DEMO_PMTILES"),
-                      int(env.get("DEMO_WHAT_IF_SLOTS", 1)), int(env.get("DEMO_WHAT_IF_PER_MINUTE", 12)), env.get("DEMO_CLIENT_IP_HEADER") or None)
+                      int(env.get("DEMO_WHAT_IF_SLOTS", 1)), int(env.get("DEMO_WHAT_IF_PER_MINUTE", 12)), env.get("DEMO_CLIENT_IP_HEADER") or None,
+                      path("DEMO_TERRAIN"))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chạy website trên laptop (máy chủ thử của Flask).")
     parser.add_argument("--bundle", type=Path, required=True)
     parser.add_argument("--pmtiles", type=Path)
+    parser.add_argument("--terrain", type=Path)
     parser.add_argument("--raw", type=Path)
     parser.add_argument("--h-python", type=Path)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8060)
     args = parser.parse_args()
-    create_app(args.bundle, args.raw, args.h_python, args.pmtiles).run(host=args.host, port=args.port, threaded=True)
+    create_app(args.bundle, args.raw, args.h_python, args.pmtiles, terrain=args.terrain).run(host=args.host, port=args.port, threaded=True)

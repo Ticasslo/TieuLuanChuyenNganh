@@ -14,7 +14,7 @@ import urllib.request
 from urllib.parse import urlencode
 
 READ_ONLY = ("/api/catalog", "/api/site", "/api/basins", "/api/highlights", "/api/leaderboard", "/api/by-lead",
-             "/api/c2-seeds", "/api/d-pairs")
+             "/api/c2-seeds", "/api/d-pairs", "/api/env")
 
 
 def read_only_paths(catalog):
@@ -23,7 +23,8 @@ def read_only_paths(catalog):
     with_args = {"/api/flood-summary": dict(run=run, lead=1), "/api/confusion": dict(run=run, lead=1),
                  "/api/basin-scores": dict(run=run, lead=1), "/api/day": dict(date=date, run=run, lead=1),
                  "/api/days": dict(run=run, lead=1, start=date, n=60), "/api/flood": dict(run=run, basin=basin, lead=1),
-                 "/api/chart": dict(basin=basin, lead=1, run=run), "/api/fan": dict(basin=basin, run=run, date=date)}
+                 "/api/chart": dict(basin=basin, lead=1, run=run), "/api/fan": dict(basin=basin, run=run, date=date),
+                 "/api/env-days": dict(layer="wind", start=date, n=60)}
     return list(READ_ONLY) + [f"{path}?{urlencode(args)}" for path, args in with_args.items()]
 
 

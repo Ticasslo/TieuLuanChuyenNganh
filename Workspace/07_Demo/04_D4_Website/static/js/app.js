@@ -30,7 +30,7 @@ const state = {
   legendOpen: (() => { try { const v = localStorage.getItem("legendOpen"); if (v) return v === "1"; } catch { /* bỏ qua */ } return window.innerWidth > 700; })(),
   task: "c2", main: {c2: null, h: null, d: null}, lead: 1,
   compare: {c2: ["SeqLSTM_Q"], h: ["Persistence_qmax"], d: ["SeqLSTM_Q"]}, ensemble: false,
-  colorBy: "observed", cmpTask: "c2", cmpLead: 1, cmpRun: null, nseRef: "",
+  colorBy: "observed", layer: "", relief: true, d3: false, env: null, cmpTask: "c2", cmpLead: 1, cmpRun: null, nseRef: "",
   sec: {flood: {run: null, lead: 1}, levels: {run: null, lead: 1}},
   leaderboard: [], seeds: null, dayData: null, levelsNow: null, speed: 1, resultsReady: false, wiDone: false,
 };
@@ -91,7 +91,9 @@ const testYears = () => `${state.dates[0].slice(0, 4)}–${state.dates.at(-1).sl
 const chartFont = () => ({family: FONT, size: window.innerWidth < 640 ? 12 : 14, color: css("--ink")});
 function baseLayout(extra = {}) {
   return {font: chartFont(), separators: separators(), paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
-    margin: {l: 64, r: 16, t: 12, b: 52}, showlegend: false, hoverlabel: {font: {family: FONT, size: 14}}, ...extra};
+    margin: {l: 64, r: 16, t: 12, b: 52}, showlegend: false, // Nền chú thích khi rê chuột phải đặc: với hovermode "x unified" Plotly lấy màu nền theo paper_bgcolor (trong suốt)
+    hoverlabel: {bgcolor: css("--surface"), bordercolor: css("--line"), font: {family: FONT, size: 14, color: css("--ink")}},
+    ...extra};
 }
 const plotConfig = {responsive: true, displaylogo: false, displayModeBar: false};
 
@@ -147,17 +149,38 @@ const levelText = k => (k < 0 ? t("lv.none") : t("lv." + k));
 
 // ---------- bản đồ ----------
 let map, nseMap, miniMap;
-function baseStyle(withLabels = true) {
+// Mô hình độ cao Mapterhorn (terrarium, ô 512 px, tới mức 11) tự lưu trên máy chủ; hai nguồn riêng cho địa hình 3D
+// và bóng núi như ví dụ "3D Terrain" của MapLibre (vẽ đẹp hơn dùng chung một nguồn)
+const TERRAIN_EXAGGERATION = 1.6;
+const SKY = {"sky-color": "#bcd3e6", "horizon-color": "#eef2f4", "fog-color": "#eef2f4", "sky-horizon-blend": 0.6, "horizon-fog-blend": 0.6, "fog-ground-blend": 0.3};
+const demSource = origin => ({type: "raster-dem", url: `pmtiles://${origin}/tiles/terrain.pmtiles`, encoding: "terrarium", tileSize: 512,
+  attribution: '<a href="https://mapterhorn.com/attribution">© Mapterhorn</a>'});
+function baseStyle(withLabels = true, main = false) {
   const origin = location.origin;
-  const layers = basemaps.layers("protomaps", basemaps.namedFlavor("light"), {lang: getLang()});
-  return {
+  let layers = basemaps.layers("protomaps", basemaps.namedFlavor("light"), {lang: getLang()});
+  if (!withLabels) layers = layers.filter(l => l.type !== "symbol");
+  const style = {
     version: 8,
     glyphs: `${origin}/static/vendor/basemap/fonts/{fontstack}/{range}.pbf`,
     sprite: `${origin}/static/vendor/basemap/sprites/v4/light`,
     sources: {protomaps: {type: "vector", url: `pmtiles://${origin}/tiles/basemap.pmtiles`,
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://protomaps.com">Protomaps</a>'}},
-    layers: withLabels ? layers : layers.filter(l => l.type !== "symbol"),
+    layers,
   };
+  if (!main) return style;
+  style.sources.dem = demSource(origin);
+  style.sources.hillshade = demSource(origin);
+  // Bóng núi nằm dưới đường, nhãn của nền => không làm mờ chữ
+  const at = layers.findIndex(l => l.type === "line" || l.type === "symbol");
+  const cut = at < 0 ? layers.length : at;
+  const shade = {id: "hillshade", type: "hillshade", source: "hillshade", layout: {visibility: state.relief ? "visible" : "none"},
+    paint: {"hillshade-exaggeration": 0.45, "hillshade-shadow-color": "#5b5446", "hillshade-highlight-color": "#ffffff", "hillshade-accent-color": "#6f6758"}};
+  style.layers = [...layers.slice(0, cut), shade, ...layers.slice(cut)];
+  if (state.d3) {
+    style.terrain = {source: "dem", exaggeration: TERRAIN_EXAGGERATION};
+    style.sky = SKY;
+  }
+  return style;
 }
 function studyBounds() {
   const lons = state.catalog.points.map(p => p.lon), lats = state.catalog.points.map(p => p.lat);
@@ -170,12 +193,17 @@ function gaugeGeoJSON(props) {
     type: "Feature", geometry: {type: "Point", coordinates: [p.lon, p.lat]},
     properties: {id: p.id, ...props(p.id)}}))};
 }
-function newMap(container) {
-  const m = new maplibregl.Map({container, style: baseStyle(), bounds: studyBounds(), fitBoundsOptions: {padding: 30},
-    maxBounds: [[5.5, 44.5], [20, 52.5]], minZoom: 5, maxZoom: 14, attributionControl: {compact: true}, dragRotate: false, pitchWithRotate: false});
-  m.addControl(new maplibregl.NavigationControl({showCompass: false}), "bottom-right");
-  m.touchZoomRotate.disableRotation();
+function newMap(container, main = false) {
+  const m = new maplibregl.Map({container, style: baseStyle(true, main), bounds: studyBounds(), fitBoundsOptions: {padding: 30},
+    maxBounds: [[5.5, 44.5], [20, 52.5]], minZoom: 5, maxZoom: 14, maxPitch: 70, attributionControl: {compact: true}});
+  m.addControl(new maplibregl.NavigationControl({showCompass: main, visualizePitch: true}), "bottom-right");
+  setRotate(m, false);
   return m;
+}
+function setRotate(m, on) {
+  // 2D: khóa xoay, nghiêng như trước; 3D: kéo chuột phải hoặc hai ngón tay để xoay và nghiêng
+  for (const h of [m.dragRotate, m.touchPitch]) on ? h.enable() : h.disable();
+  on ? m.touchZoomRotate.enableRotation() : m.touchZoomRotate.disableRotation();
 }
 const selFilter = () => ["==", ["get", "id"], isRegion() ? "__none__" : state.basin];
 function addOutline(m, width = 2.2) {
@@ -213,8 +241,9 @@ function addBarImages() {
 }
 function addMainLayers() {
   addBarImages();
-  map.addSource("basins", {type: "geojson", data: "/api/basins"});
+  map.addSource("basins", {type: "geojson", data: "/api/basins", promoteId: "id"});
   map.addLayer({id: "study-fill", type: "fill", source: "basins", paint: {"fill-color": css("--accent"), "fill-opacity": isRegion() ? 0.1 : 0.04}});
+  addEnvFill();
   map.addLayer({id: "basin-all", type: "line", source: "basins", minzoom: 7, paint: {"line-color": css("--accent-ink"), "line-width": 0.5, "line-opacity": 0.35}});
   map.addLayer({id: "basin-fill", type: "fill", source: "basins", filter: selFilter(), paint: {"fill-color": css("--sel"), "fill-opacity": 0.2}});
   map.addLayer({id: "basin-line", type: "line", source: "basins", filter: selFilter(), paint: {"line-color": css("--sel"), "line-width": 3}});
@@ -231,8 +260,9 @@ function addMainLayers() {
     "icon-image": ["concat", "bar_", ["to-string", ["get", "lo"]], "_", ["to-string", ["get", "lp"]]],
     "icon-anchor": "bottom", "icon-overlap": "always", "icon-ignore-placement": true,
     "icon-size": ["interpolate", ["linear"], ["zoom"], BAR_ZOOM, 0.85, 12, 1.25]}});
+  addEnvMarks();
 }
-const MAIN_LAYERS = ["study-fill", "basin-all", "basin-fill", "basin-line", "study-line", "gauges", "gauge-sel", "bars"];
+const MAIN_LAYERS = ["study-fill", "env-fill", "basin-all", "basin-fill", "basin-line", "study-line", "gauges", "gauge-sel", "bars", "env-cols", "env-wind"];
 const barsVisible = () => map && map.getZoom() >= BAR_ZOOM - 0.3;
 function updateBars() {
   // Cột chỉ cần khi phóng to; xa thì để nguồn rỗng cho nhẹ
@@ -243,13 +273,15 @@ function updateBars() {
   updateBars.filled = true;
 }
 function initMainMap() {
-  map = newMap("map");
+  map = newMap("map", true);
   map.on("styleimagemissing", e => {
+    if (e.id === "wind-arrow") { if (!map.hasImage(e.id)) map.addImage(e.id, arrowImage(), {pixelRatio: 2}); return; }
     const m = /^bar_(-?\d)_(-?\d)$/.exec(e.id);
     if (m && !map.hasImage(e.id)) map.addImage(e.id, barImage(Number(m[1]), Number(m[2])), {pixelRatio: 2});
   });
   map.on("load", () => {
     addMainLayers();
+    run(loadEnv);
     run(refreshDay);
     updateMiniView();
     const popup = new maplibregl.Popup({closeButton: false, closeOnClick: false, offset: 12});
@@ -260,7 +292,8 @@ function initMainMap() {
       const name = shortName(model(activeRun()));
       popup.setLngLat(f.geometry.coordinates).setDOMContent(el("div", {}, el("b", {}, s.name), `${t("card.river", {r: s.river})} · ID ${id}`,
         el("div", {class: "pair"}, el("span", {}, t("card.observed")), el("span", {}, `${fmtQ(d?.observed[i])} m³/s`),
-          el("span", {}, `${t("card.forecast")} (${name})`), el("span", {}, `${fmtQ(d?.predicted[i])} m³/s`)))).addTo(map);
+          el("span", {}, `${t("card.forecast")} (${name})`), el("span", {}, `${fmtQ(d?.predicted[i])} m³/s`),
+          ...envPopupRows(id)))).addTo(map);
     };
     for (const layer of ["gauges", "bars"]) {
       map.on("mousemove", layer, hover);
@@ -295,8 +328,8 @@ function initMiniMap() {
 }
 function updateMiniView() { if (map?.loaded()) miniMap?.getSource("view")?.setData(viewBox()); }
 function relabelMap(m, keepIds, withLabels = true) {
-  // Đổi ngôn ngữ nhãn nền, giữ nguyên các lớp của trang
-  m.setStyle(baseStyle(withLabels), {transformStyle: (prev, next) => ({...next,
+  // Đổi ngôn ngữ nhãn nền, giữ nguyên các lớp của trang (bản đồ chính giữ cả bóng núi, địa hình 3D)
+  m.setStyle(baseStyle(withLabels, m === map), {transformStyle: (prev, next) => ({...next,
     sources: {...next.sources, ...Object.fromEntries(Object.entries(prev.sources).filter(([k]) => k !== "protomaps"))},
     layers: [...next.layers, ...prev.layers.filter(l => keepIds.includes(l.id))]})});
 }
@@ -327,7 +360,7 @@ function renderLegend() {
     ...[4, 3, 2, 1, 0, -1].map(k => el("span", {class: "swatch"}, el("i", {style: `background:${levelColor(k)}`}), levelText(k))),
     el("span", {class: "swatch"}, el("i", {class: "sel"}), t("map.sel")),
     el("span", {class: "swatch"}, el("i", {class: "ring"}), t("map.outline")),
-    el("span", {class: "bars-note"}, barsIcon(), t(bars ? "map.barsOn" : "map.bars"))] : []));
+    el("span", {class: "bars-note"}, barsIcon(), t(bars ? "map.barsOn" : "map.bars")), ...envLegend()] : []));
   box.title = opened ? t("lv.note") : "";
 }
 const dayUrl = (date, runId = activeRun(), lead = activeLead()) => `/api/day${qs({date, run: runId, lead})}`;
@@ -369,6 +402,186 @@ async function refreshDay() {
     updateBars();
   }
   renderStatus();
+  await refreshEnv();
+}
+
+// ---------- lớp bản đồ: khí tượng, đất, thực vật, đặc điểm lưu vực (env.json), địa hình ----------
+// Giá trị là trung bình cả lưu vực (Extended LamaH-CE), cùng các biến mô hình nhận làm đầu vào. Tô màu đa giác lưu vực
+// (lưu vực nhỏ vẽ đè lên lưu vực lớn chứa nó, thứ tự của basins.geojson); chế độ 3D thêm cột tại trạm cao theo giá trị;
+// lớp gió vẽ thêm mũi tên hướng gió tại trạm.
+const ENV_CHUNK = 60;
+const COL_HALF_DEG = 0.03;
+// Cột 3D chỉ để so cả vùng; phóng gần hơn mức này thì tắt cột để thấy địa hình
+const COL_MAXZOOM = 8;
+const COL_MAX_M = 14000;
+const envLayer = () => state.env?.layers.find(l => l.key === state.layer) ?? null;
+const envUnit = u => (u === "mm/day" ? t("unit.mmday") : u);
+const envChunkUrl = (key, start) => `/api/env-days${qs({layer: key, start: state.dates[start], n: ENV_CHUNK})}`;
+function envColor(L) {
+  // Nội suy tuyến tính giữa các ngưỡng phân vị; ô không có số liệu thì trong suốt
+  return ["case", ["==", ["typeof", ["feature-state", "v"]], "number"],
+    ["interpolate", ["linear"], ["feature-state", "v"], ...L.stops.flatMap((v, i) => [v, L.colors[i]])], "rgba(0,0,0,0)"];
+}
+function envHeight(L) {
+  const n = L.stops.length - 1;
+  return ["case", ["==", ["typeof", ["feature-state", "v"]], "number"],
+    ["interpolate", ["linear"], ["feature-state", "v"], ...L.stops.flatMap((v, i) => [v, 800 + COL_MAX_M * i / n])], 0];
+}
+function arrowImage() {
+  // Mũi tên chỉ lên (hướng bắc), viền trắng để nổi trên mọi màu nền; MapLibre xoay theo hướng gió
+  const r = 2, w = 18, h = 34, g = document.createElement("canvas").getContext("2d", {willReadFrequently: true});
+  g.canvas.width = w * r; g.canvas.height = h * r; g.scale(r, r);
+  const draw = (color, width) => {
+    g.strokeStyle = color; g.fillStyle = color; g.lineWidth = width; g.lineCap = "round"; g.lineJoin = "round";
+    g.beginPath(); g.moveTo(w / 2, h - 3); g.lineTo(w / 2, 9); g.stroke();
+    g.beginPath(); g.moveTo(w / 2, 2); g.lineTo(w / 2 + 6, 12); g.lineTo(w / 2 - 6, 12); g.closePath(); g.fill(); g.stroke();
+  };
+  draw("#ffffff", 5);
+  draw("#1f2a33", 2);
+  return {width: w * r, height: h * r, data: g.getImageData(0, 0, w * r, h * r).data};
+}
+function colGeo() {
+  // Ô vuông nhỏ quanh mỗi trạm cho cột 3D (fill-extrusion cần đa giác)
+  return {type: "FeatureCollection", features: state.catalog.points.map(p => {
+    const dx = COL_HALF_DEG / Math.cos(p.lat * Math.PI / 180) * 0.7, dy = COL_HALF_DEG * 0.7;
+    return {type: "Feature", properties: {id: p.id}, geometry: {type: "Polygon", coordinates: [[
+      [p.lon - dx, p.lat - dy], [p.lon + dx, p.lat - dy], [p.lon + dx, p.lat + dy], [p.lon - dx, p.lat + dy], [p.lon - dx, p.lat - dy]]]}};
+  })};
+}
+function addEnvFill() {
+  map.addLayer({id: "env-fill", type: "fill", source: "basins", layout: {visibility: "none"},
+    paint: {"fill-color": "rgba(0,0,0,0)", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0.8, 9, 0.55],
+      "fill-outline-color": "rgba(255,255,255,0.35)"}});
+}
+function addEnvMarks() {
+  map.addSource("cols", {type: "geojson", data: colGeo(), promoteId: "id"});
+  map.addLayer({id: "env-cols", type: "fill-extrusion", source: "cols", maxzoom: COL_MAXZOOM, layout: {visibility: "none"},
+    paint: {"fill-extrusion-color": "rgba(0,0,0,0)", "fill-extrusion-height": 0, "fill-extrusion-opacity": 0.92}});
+  map.addSource("wind", {type: "geojson", data: {type: "FeatureCollection", features: []}});
+  if (!map.hasImage("wind-arrow")) map.addImage("wind-arrow", arrowImage(), {pixelRatio: 2});
+  map.addLayer({id: "env-wind", type: "symbol", source: "wind", layout: {visibility: "none",
+    "icon-image": "wind-arrow", "icon-rotate": ["get", "dir"], "icon-rotation-alignment": "map", "icon-pitch-alignment": "map",
+    "icon-allow-overlap": true, "icon-ignore-placement": true,
+    // Cỡ theo tốc độ gió, lớn dần khi phóng to (biểu thức zoom phải ở ngoài cùng)
+    "icon-size": ["interpolate", ["linear"], ["zoom"],
+      6, ["interpolate", ["linear"], ["get", "spd"], 0.5, 0.45, 5, 0.95],
+      9, ["interpolate", ["linear"], ["get", "spd"], 0.5, 0.65, 5, 1.4]]},
+    paint: {"icon-opacity": ["interpolate", ["linear"], ["get", "mag"], 0, 0.25, 0.6, 1]}});
+}
+function syncEnvLayers() {
+  // Bật, tắt và đổi bảng màu các lớp theo lớp đang chọn và chế độ 3D
+  if (!map?.getLayer("env-fill")) return;
+  const L = envLayer();
+  const show = (id, on) => map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+  show("env-fill", !!L);
+  show("env-cols", !!L && state.d3);
+  show("env-wind", L?.key === "wind");
+  if (L) {
+    map.setPaintProperty("env-fill", "fill-color", envColor(L));
+    map.setPaintProperty("env-cols", "fill-extrusion-color", envColor(L));
+    map.setPaintProperty("env-cols", "fill-extrusion-height", envHeight(L));
+  }
+}
+async function loadEnv() {
+  const env = await api("/api/env");
+  if (!env.layers?.length) { $("map-layers").hidden = true; return; }
+  if (env.ids.join() !== state.ids.join()) throw new Error("env.json không cùng thứ tự lưu vực với trang.");
+  state.env = env;
+  renderLayerOptions();
+}
+function renderLayerOptions() {
+  const box = $("env-layer");
+  if (!state.env) return;
+  const opt = L => el("option", {value: L.key}, t("env." + L.key));
+  const group = kind => el("optgroup", {label: t(kind === "daily" ? "layer.daily" : "layer.static")},
+    ...state.env.layers.filter(L => L.kind === kind).map(opt));
+  box.replaceChildren(el("option", {value: ""}, t("layer.none")), group("daily"), group("static"));
+  box.value = state.layer;
+}
+async function envValues(L, day) {
+  if (L.kind === "static") return {values: L.values};
+  const start = Math.floor(day / ENV_CHUNK) * ENV_CHUNK;
+  const chunk = await cached(envChunkUrl(L.key, start));
+  const j = day - start;
+  return {values: chunk.values[j], u: chunk.u?.[j], v: chunk.v?.[j]};
+}
+function prefetchEnv() {
+  // Khi chạy thời gian: còn dưới 20 ngày tới cuối khối thì nạp trước khối sau
+  const L = envLayer();
+  if (!L || L.kind === "static") return;
+  const next = (Math.floor(state.day / ENV_CHUNK) + 1) * ENV_CHUNK;
+  if (next < state.dates.length && state.day % ENV_CHUNK >= ENV_CHUNK - 20) cached(envChunkUrl(L.key, next)).catch(e => console.error(e));
+}
+async function refreshEnv() {
+  const L = envLayer();
+  if (!L) { state.envNow = null; return; }
+  if (!map?.getSource("cols")) return;
+  const day = state.day, key = L.key;
+  const data = await envValues(L, day);
+  if (key !== state.layer || day !== state.day) return;
+  state.envNow = data;
+  state.env.ids.forEach((id, i) => {
+    const v = data.values[i];
+    map.setFeatureState({source: "basins", id}, {v});
+    map.setFeatureState({source: "cols", id}, {v});
+  });
+  if (key === "wind") {
+    // Hướng gió thổi tới: góc so với hướng bắc, theo chiều kim đồng hồ, từ thành phần đông u và bắc v
+    map.getSource("wind").setData({type: "FeatureCollection", features: state.catalog.points.map((p, i) => {
+      const u = data.u[i], w = data.v[i];
+      if (u == null || w == null) return null;
+      return {type: "Feature", geometry: {type: "Point", coordinates: [p.lon, p.lat]},
+        properties: {dir: Math.atan2(u, w) * 180 / Math.PI, mag: Math.hypot(u, w), spd: data.values[i] ?? 0}};
+    }).filter(Boolean)});
+  }
+}
+function envPopupRows(id) {
+  const L = envLayer(), d = state.envNow;
+  if (!L || !d) return [];
+  const v = d.values[state.env.ids.indexOf(id)];
+  return [el("span", {}, t("env." + L.key)), el("span", {}, v == null ? "–" : `${fmt(v, Math.abs(v) < 10 ? 2 : Math.abs(v) < 100 ? 1 : 0)} ${envUnit(L.unit)}`)];
+}
+function envLegend() {
+  const L = envLayer();
+  if (!L) return [];
+  const ticks = L.stops.map(v => fmt(v, Math.abs(v) < 1 ? 2 : Math.abs(v) < 10 ? 1 : 0));
+  const ramp = `linear-gradient(to right, ${L.colors.map((c, i) => `${c} ${(i / (L.colors.length - 1) * 100).toFixed(1)}%`).join(", ")})`;
+  return [el("div", {class: "env-legend"},
+    el("b", {}, `${t("env." + L.key)} (${envUnit(L.unit)})`),
+    el("div", {class: "ramp", style: `background:${ramp}`}),
+    el("div", {class: "ticks"}, ...ticks.map(x => el("span", {}, x))),
+    el("p", {}, t("envd." + L.key)),
+    el("p", {class: "muted"}, L.kind === "daily" ? t("env.note", {src: L.source}) : t("env.noteStatic")),
+    ...(state.d3 ? [el("p", {class: "muted"}, t("env.cols"))] : []))];
+}
+function setEnvLayer(key) {
+  state.layer = key;
+  $("env-layer").value = key;
+  syncEnvLayers();
+  renderLegend();
+  run(refreshEnv);
+}
+function setRelief(on) {
+  state.relief = on;
+  $("relief-btn").setAttribute("aria-pressed", String(on));
+  if (map?.getLayer("hillshade")) map.setLayoutProperty("hillshade", "visibility", on ? "visible" : "none");
+}
+function set3D(on) {
+  state.d3 = on;
+  $("d3-btn").setAttribute("aria-pressed", String(on));
+  setRotate(map, on);
+  if (on) {
+    map.setTerrain({source: "dem", exaggeration: TERRAIN_EXAGGERATION});
+    map.setSky(SKY);
+    // Địa hình chỉ rõ khi nhìn gần: bay tới trạm đang chọn (cả vùng => giữ tâm), nghiêng 55°, xoay nhẹ
+    const p = isRegion() ? null : state.catalog.points.find(q => q.id === state.basin);
+    map.easeTo({center: p ? [p.lon, p.lat] : map.getCenter(), zoom: Math.max(map.getZoom(), p ? 8.6 : 7.2), pitch: 55, bearing: -20, duration: 1200});
+  } else {
+    map.setTerrain(null);
+    map.easeTo({pitch: 0, bearing: 0, duration: 600});
+  }
+  syncEnvLayers();
+  renderLegend();
 }
 
 // ---------- bước 1: nơi xem ----------
@@ -548,7 +761,8 @@ async function refreshChart({keepRange = false} = {}) {
   chartRange = range;
   const box = $("hydrograph");
   const layout = baseLayout({
-    margin: {l: 66, r: 16, t: 8, b: 8}, hovermode: "x unified", height: Math.max(260, box.clientHeight),
+    // Lề trên đủ chỗ cho thanh công cụ (phóng to, tải ảnh) để nó không che nhãn ngưỡng lũ trên cùng
+    margin: {l: 66, r: 16, t: 34, b: 8}, hovermode: "x unified", height: Math.max(260, box.clientHeight),
     xaxis: {type: "date", range, rangeslider: {visible: true, thickness: 0.08, bgcolor: css("--paper")}, gridcolor: css("--grid")},
     yaxis: {title: {text: region ? t("chart.yRegion") : t("chart.y")}, rangemode: "tozero", gridcolor: css("--grid")},
   });
@@ -651,6 +865,7 @@ async function playStep() {
   if (state.day >= state.dates.length - 1) return stopPlay();
   const started = performance.now();
   prefetchDays(CHUNK / 2);
+  prefetchEnv();
   // Ngày sau chưa nạp xong thì đợi (chạy chậm lại) thay vì nhảy cóc làm bản đồ giật
   const next = dayUrl(state.dates[state.day + 1]);
   if (!cache.has(next)) await prefetchDays(CHUNK);
@@ -1433,6 +1648,9 @@ async function start() {
   $("play").addEventListener("click", togglePlay);
   document.querySelectorAll("[data-speed]").forEach(b => b.addEventListener("click", () => setSpeed(Number(b.dataset.speed))));
   $("region-btn").addEventListener("click", toggleRegion);
+  $("env-layer").addEventListener("change", e => setEnvLayer(e.target.value));
+  $("relief-btn").addEventListener("click", () => setRelief(!state.relief));
+  $("d3-btn").addEventListener("click", () => set3D(!state.d3));
   document.addEventListener("keydown", e => {
     if (e.target.closest("input, select, textarea, button")) return;
     if (e.key === "ArrowLeft") setDay(state.day - 1);
@@ -1451,8 +1669,9 @@ async function start() {
     if (b.dataset.lang === getLang()) return;
     setLang(b.dataset.lang);
     renderTexts();
+    renderLayerOptions();
     relabelMap(map, MAIN_LAYERS);
-    map.once("idle", () => run(refreshDay));
+    map.once("idle", () => { syncEnvLayers(); run(refreshDay); });
     run(() => refreshChart({keepRange: true}));
     if (state.resultsReady) {
       relabelMap(nseMap, ["study-line", "nse"]);
