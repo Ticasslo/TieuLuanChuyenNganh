@@ -86,7 +86,7 @@ Tên không có chữ "lũ lụt": đầu ra là lưu lượng Q, không phải 
 | 7. Đánh giá | Bộ đánh giá Mục 6 | Bảng, hình, kiểm định | Xong: `01_Evaluation_LamaHCEExt` Version 13 chấm 56 run test/S0/hạn 1 (A2, DLinear, persistence, A4, B0–B3, C2), 24 run C2 qua 7 kịch bản S0–S4, 168 tệp dự báo H 7 hạn và 9 cặp D 730/365 ngày; phân tích theo lưu vực `02_Evaluation_LamaHCEExt_ByBasin` Version 3 (56 run, 105 phép so, 9 cặp D); validation S0–S4 bước B (`03_B_LamaHCEExt_Validation` Version 1) và kịch bản test C2 (`04_C2_LamaHCEExt_Scenarios` Version 1) (`Workspace/06_Evaluation/`) |
 | 8. Giải thích | Integrated Gradients, dò trạng thái ẩn | Hình mức ảnh hưởng | Xong: 15 run C2 và 24 run H theo hạn, dò trạng thái ẩn cho C2, deletion test đạt (`Workspace/08_XAI/01_G_C2_XAI/01_G_C2_XAI.md`; Mục 6.7) |
 | 9. Ngưỡng lũ | Gumbel L-moments trên qmax năm | Ngưỡng 1,5; 2; 5; 10 năm mỗi trạm | Xong: ngưỡng, ngày/đoạn vượt và cụm USWRC trên 451 lưu vực tính ở A1 (trận kỳ test 1869/1073/345/178 cụm ở 1,5/2/5/10 năm); bộ đánh giá ghép và chấm sự kiện lũ cho mọi run (Mục 6.2) |
-| 10. Demo | Một mục trong trang web nhiều mục của nhóm, chạy liên tục trên VPS Oracle Cloud miễn phí: bản đồ cảnh báo phát lại kỳ test, đường Q 7 ngày, mức ảnh hưởng của các nhóm nguồn theo lưu vực; mô hình chạy thật trên CPU cho lưu vực và ngày được chọn, có thử "nếu… thì…" với dự báo ECMWF HRES ngày t; huấn luyện trên GPU, demo chạy CPU, làm trên laptop trước rồi đưa lên VPS (Mục 9.6) | Ứng dụng | D1 (GPU), D2 (CPU) Version 2 và D3 trên laptop xong cho C2, H, D (`Workspace/07_Demo/`); D4 trên VPS là bước còn lại |
+| 10. Demo | Một mục trong trang web nhiều mục của nhóm, chạy liên tục trên VPS Oracle Cloud miễn phí: bản đồ cảnh báo phát lại kỳ test, đường Q 7 ngày, mức ảnh hưởng của các nhóm nguồn theo lưu vực; mô hình chạy thật trên CPU cho lưu vực và ngày được chọn, có thử "nếu… thì…" với dự báo ECMWF HRES ngày t; huấn luyện trên GPU, demo chạy CPU, làm trên laptop trước rồi đưa lên VPS (Mục 9.6) | Ứng dụng | D1 (GPU), D2 (CPU) Version 2 và D3 trên laptop xong cho C2, H, D (`Workspace/07_Demo/`); D4 chạy liên tục trên VPS tại `https://ticasslo.dev` (`Workspace/07_Demo/04_D4_Website/`) |
 
 ---
 
@@ -438,7 +438,7 @@ Thứ tự thực hiện, bước sau chỉ làm khi bước trước đạt:
 | D1 | Kaggle | GPU | Viết một hàm dự báo tách khỏi mã huấn luyện cho mọi run: nạp config, trọng số và thông số chuẩn hóa, nhận mã lưu vực, ngày t, ECMWF HRES ngày t (có thể đã đổi), trả qmax các hạn; chạy lại toàn kỳ test cho từng run đưa lên trang 1 (C2 trước, H và D khi có) | Mỗi run trùng tệp dự báo của bộ đánh giá (Mục 9.5), chỉ lệch ở mức làm tròn số thực; ngưỡng sai khác đặt khi viết mã |
 | D2 | Kaggle | CPU | Chạy cùng hàm trên CPU; Mamba dùng `mambapy` | Trùng kết quả D1; đo thời gian mỗi lần dự báo và bộ nhớ của từng lõi, từng độ dài chuỗi |
 | D3 | Laptop | CPU | Tải trọng số, thông số chuẩn hóa, dữ liệu đầu vào và tệp phát lại từ Kaggle; dựng giao diện 5 trang. Bản tối thiểu: trang 1 với 5 lõi C2 và trang 5; sau đó thêm H, D vào trang 1, trang 2, 3, 4 | Trùng kết quả D2; bản tối thiểu chạy được trước khi thêm trang |
-| D4 | VPS Oracle (CPU ARM) | CPU | Chép đúng mã D3 lên VPS, cài PyTorch bản CPU cho ARM, đóng gói Docker (Mục 8.2), đưa ra Internet | Trùng kết quả D3; có đường dẫn công khai |
+| D4 | VPS Oracle (CPU ARM) | CPU | Chép đúng mã D3 lên VPS, cài PyTorch bản CPU cho ARM; Docker Compose ba dịch vụ (máy chủ Flask phục vụ trang tĩnh MapLibre + Plotly và API, Caddy, Cloudflare Tunnel); ra Internet qua Cloudflare Tunnel với tên miền `ticasslo.dev`, VPS không mở cổng vào (`Workspace/07_Demo/04_D4_Website/deploy/DEPLOY.md`) | Trùng kết quả D3 (`deploy/check_site.py`: 7 mô hình "nếu… thì…" chạy trên ARM khớp tệp phát lại); có đường dẫn công khai |
 
 Bản trên laptop (D3) giữ làm dự phòng cho ngày bảo vệ. Nếu một lõi trên CPU không đạt ở D2 (lệch kết quả hoặc quá chậm, ví dụ Mamba qua `mambapy`), lõi đó chỉ phát lại, không chạy trực tiếp. Thiếu thời gian thì cắt theo thứ tự: (1) trang 4; (2) chạy trực tiếp các lõi chậm; (3) trang 3; (4) mô hình D trên trang 1. Trang 1 với 5 lõi C2, mô hình H và phần thử "nếu… thì…" cùng trang 5 giữ đến cùng.
 
@@ -532,7 +532,7 @@ Hướng công bố sau khóa luận: SOICT (mời mở rộng sang *Multimedia 
 
 | Việc | Ghi chú |
 |---|---|
-| Trang web và demo: công nghệ giao diện; cách đưa ra Internet (Cloudflare Tunnel cần tên miền quản lý trên Cloudflare; mở cổng và reverse proxy); chạy liên tục khi VPS Always Free có thể bị thu hồi lúc rảnh (Mục 8.2) | Tra và quyết khi có bản demo chạy thử; mã đề tài xuất dự báo theo định dạng ở Mục 9.5 và hàm dự báo theo các bước ở Mục 9.6 |
+| Không còn việc chưa chốt ở tiểu luận | Công nghệ trang web và cách đưa demo ra Internet ghi ở Mục 9.6 (bước D4) |
 
 ---
 
