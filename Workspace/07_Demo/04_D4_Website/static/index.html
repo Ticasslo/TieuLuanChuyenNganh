@@ -200,154 +200,200 @@
         <figcaption class="fig-title" data-i18n="how.fig">Hình 1.3. Kiến trúc chung của mọi mô hình học sâu trên trang</figcaption>
         <p class="swipe-hint" data-i18n="how.swipe">Vuốt ngang để xem hết hình.</p>
         <div class="arch-scroll">
-          <svg class="arch" viewBox="0 0 1120 690" role="img" aria-labelledby="arch-desc">
-            <desc id="arch-desc">Panel a: the original BiasCast Sequential Forecast LSTM. 32 past variables and 5 ECMWF HRES variables each pass one linear layer to 16 values, basin attributes pass a linear layer to 16 values per phase, 364 plus 1 days go through one LSTM layer of 128 units and a linear head to qmax of day t. Panel b: this study. Five past sources each have their own linear layer, combined by a masked mean, with random masking in training; observed discharge is qmean and qmax in mm per day; GEFSv12 forecasts are added in the 7-day task; the core is exchangeable between LSTM, GRU, Transformer, S4D and Mamba; the head outputs qmax of day t, or days t to t plus 6.</desc>
+          <svg class="arch" viewBox="0 0 1120 960" role="img" aria-labelledby="arch-desc">
+            <desc id="arch-desc">Panel a: the original BiasCast Sequential Forecast LSTM. The 31 reanalysis variables of ERA5-Land, E-OBS, MSWEP and GLEAM and the observed qmean in cubic metres per second are concatenated and pass one linear layer to 16 values; the 5 ECMWF HRES variables of day t pass a linear layer to 16 values; the 33 basin attributes pass a linear layer to 16 values per phase. 364 plus 1 days go through one LSTM layer of 128 units and a linear layer to one z-scored value, which is scaled back to qmax of day t in mm per day. Panel b: this study. Each of the five past sources has its own linear layer and the results are combined by a masked mean, with random masking in training; observed qmean and qmax are both in mm per day; the forecast phase has one group for ECMWF HRES and, in the 7-day task, seven GEFSv12 groups, one per lead time; the core is exchangeable between LSTM, GRU, Transformer, S4D and Mamba; the head outputs qmax of day t, or of days t to t plus 6.</desc>
             <defs>
               <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arr-head"/></marker>
             </defs>
 
             <!-- (a) BiasCast gốc -->
             <text class="h" x="0" y="16">(a) BiasCast · Sequential Forecast LSTM (original)</text>
+            <text class="h" x="0" y="44">Past days t−364 … t−1</text>
             <g class="src">
-              <rect x="0" y="30" width="230" height="46" rx="5"/><text x="12" y="50">Past t−364 … t−1 · 32</text><text class="m" x="12" y="68">31 reanalysis + qmean (m³/s)</text>
+              <rect x="0" y="54" width="210" height="30" rx="5"/><text x="12" y="74">ERA5-Land reanalysis · 21</text>
+              <rect x="0" y="90" width="210" height="30" rx="5"/><text x="12" y="110">E-OBS gridded obs. · 7</text>
+              <rect x="0" y="126" width="210" height="30" rx="5"/><text x="12" y="146">MSWEP precipitation · 1</text>
+              <rect x="0" y="162" width="210" height="30" rx="5"/><text x="12" y="182">GLEAM evaporation · 2</text>
+              <rect x="0" y="198" width="210" height="30" rx="5"/><text x="12" y="218">Observed qmean · 1 (m³/s)</text>
             </g>
-            <g class="src fc"><rect x="0" y="88" width="230" height="34" rx="5"/><text x="12" y="110">ECMWF HRES, day t · 5</text></g>
-            <g class="src st"><rect x="0" y="136" width="230" height="34" rx="5"/><text x="12" y="158">Basin attributes · 33</text></g>
+            <text class="h" x="0" y="252">Forecast day t</text>
+            <g class="src fc"><rect x="0" y="260" width="210" height="30" rx="5"/><text x="12" y="280">ECMWF HRES · 5</text></g>
+            <g class="src st"><rect x="0" y="306" width="210" height="30" rx="5"/><text x="12" y="326">Basin attributes · 33</text></g>
+            <g class="lines">
+              <path d="M210 69H224"/><path d="M210 105H224"/><path d="M210 141H224"/><path d="M210 177H224"/><path d="M210 213H224"/>
+              <path d="M224 69V213"/><path d="M224 141H238" marker-end="url(#arr)"/>
+              <path d="M210 275H238" marker-end="url(#arr)"/><path d="M210 321H238" marker-end="url(#arr)"/>
+            </g>
             <g class="box">
-              <rect x="262" y="30" width="170" height="46" rx="6"/><text x="347" y="58" text-anchor="middle">Linear 32 → 16</text>
-              <rect x="262" y="88" width="170" height="34" rx="6"/><text x="347" y="110" text-anchor="middle">Linear 5 → 16</text>
-              <rect x="262" y="136" width="170" height="34" rx="6"/><text x="347" y="158" text-anchor="middle">Linear 33 → 16 (×2)</text>
+              <rect x="240" y="101" width="160" height="80" rx="6"/>
+              <text x="320" y="124" text-anchor="middle" class="m">all 32 variables</text>
+              <text x="320" y="141" text-anchor="middle" class="m">concatenated</text>
+              <text x="320" y="164" text-anchor="middle" class="b">Linear 32 → 16</text>
+              <rect x="240" y="260" width="160" height="30" rx="6"/><text x="320" y="280" text-anchor="middle">Linear 5 → 16</text>
+              <rect x="240" y="306" width="160" height="30" rx="6"/><text x="320" y="326" text-anchor="middle">Linear 33 → 16 (×2)</text>
             </g>
             <g class="lines">
-              <path d="M230 53H260" marker-end="url(#arr)"/><path d="M230 105H260" marker-end="url(#arr)"/><path d="M230 153H260" marker-end="url(#arr)"/>
-              <path d="M432 53H460"/><path d="M432 105H460"/><path d="M432 153H460V53"/>
-              <path d="M460 53H498" marker-end="url(#arr)"/>
-              <path d="M460 105H578V93" marker-end="url(#arr)"/>
+              <path d="M400 141H450" marker-end="url(#arr)"/><path d="M400 275H420"/><path d="M400 321H420V141"/>
+              <path d="M420 275H530V188" marker-end="url(#arr)"/>
             </g>
-            <circle class="join" cx="460" cy="53" r="4"/><circle class="join" cx="460" cy="105" r="4"/>
+            <circle class="join" cx="420" cy="141" r="4"/><circle class="join" cx="420" cy="275" r="4"/>
             <g class="seq">
-              <rect x="500" y="30" width="12" height="60"/><rect x="514" y="30" width="12" height="60"/><rect x="528" y="30" width="12" height="60"/>
-              <rect x="542" y="30" width="12" height="60"/><rect x="556" y="30" width="12" height="60"/>
-              <rect class="f" x="572" y="30" width="12" height="60"/>
+              <rect x="452" y="96" width="12" height="90"/><rect x="466" y="96" width="12" height="90"/><rect x="480" y="96" width="12" height="90"/>
+              <rect x="494" y="96" width="12" height="90"/><rect x="508" y="96" width="12" height="90"/>
+              <rect class="f" x="524" y="96" width="12" height="90"/>
             </g>
-            <text class="m" x="500" y="142">364 + 1 days · 32 values per day</text>
-            <g class="lines"><path d="M584 60H638" marker-end="url(#arr)"/></g>
+            <g class="lines"><path d="M536 141H568" marker-end="url(#arr)"/></g>
             <g class="core">
-              <rect x="640" y="18" width="190" height="104" rx="8"/>
-              <text x="735" y="44" text-anchor="middle" class="b">LSTM</text>
-              <text x="735" y="66" text-anchor="middle">128 hidden · 1 layer</text>
-              <text x="735" y="88" text-anchor="middle" class="m">forget gate bias 3</text>
-              <text x="735" y="108" text-anchor="middle" class="m">≈ 85k parameters</text>
+              <rect x="570" y="76" width="170" height="130" rx="8"/>
+              <text x="655" y="104" text-anchor="middle" class="b">LSTM</text>
+              <text x="655" y="130" text-anchor="middle">128 hidden · 1 layer</text>
+              <text x="655" y="154" text-anchor="middle" class="m">forget gate bias 3</text>
+              <text x="655" y="176" text-anchor="middle" class="m">≈ 85k parameters</text>
             </g>
-            <g class="lines"><path d="M830 70H854" marker-end="url(#arr)"/></g>
-            <g class="box"><rect x="856" y="47" width="114" height="46" rx="6"/><text x="913" y="75" text-anchor="middle">Linear 128 → 1</text></g>
-            <g class="lines"><path d="M970 70H988" marker-end="url(#arr)"/></g>
+            <g class="lines"><path d="M740 141H754" marker-end="url(#arr)"/></g>
+            <g class="box">
+              <rect x="756" y="106" width="124" height="70" rx="6"/>
+              <text x="818" y="130" text-anchor="middle">Linear 128 → 1</text>
+              <text x="818" y="148" text-anchor="middle" class="m">dropout 0.3 first</text>
+              <text x="818" y="166" text-anchor="middle" class="m">z-scored output</text>
+            </g>
+            <g class="lines"><path d="M880 141H894" marker-end="url(#arr)"/></g>
+            <g class="box">
+              <rect x="896" y="111" width="100" height="60" rx="6"/>
+              <text x="946" y="137" text-anchor="middle">Undo z-score</text>
+              <text x="946" y="156" text-anchor="middle" class="m">× σ + μ</text>
+            </g>
+            <g class="lines"><path d="M996 141H1010" marker-end="url(#arr)"/></g>
             <g class="out">
-              <rect x="990" y="40" width="130" height="60" rx="6"/>
-              <text x="1055" y="66" text-anchor="middle" class="b">qmax, day t</text>
-              <text x="1055" y="86" text-anchor="middle" class="m">mm/day</text>
+              <rect x="1012" y="106" width="108" height="70" rx="6"/>
+              <text x="1066" y="134" text-anchor="middle" class="b">qmax, day t</text>
+              <text x="1066" y="156" text-anchor="middle" class="m">mm/day</text>
             </g>
-            <text class="m" x="500" y="162">1 seed per configuration · early stopping (patience 5) · loss NSE*</text>
+            <text class="m" x="570" y="240">364 + 1 days · 16 + 16 = 32 values per day</text>
+            <text class="m" x="570" y="260">1 seed per configuration · early stopping (patience 5) · loss NSE*</text>
 
-            <path class="sep" d="M0 204H1120"/>
+            <path class="sep" d="M0 364H1120"/>
 
             <!-- (b) Đề tài -->
-            <text class="h" x="0" y="236">(b) This study: same frame, changed blocks tagged with their step</text>
-            <g class="tag"><rect x="640" y="224" width="30" height="16" rx="8"/><text x="655" y="236" text-anchor="middle">B2</text></g>
-            <text class="m" x="678" y="237">changed in that step (Chapter 5)</text>
-            <g class="src"><rect x="910" y="224" width="26" height="16" rx="4"/></g>
-            <text class="m" x="944" y="237">kept from BiasCast</text>
+            <text class="h" x="0" y="396">(b) This study: same frame, changed blocks tagged with their step</text>
+            <g class="tag"><rect x="640" y="384" width="30" height="16" rx="8"/><text x="655" y="396" text-anchor="middle">B2</text></g>
+            <text class="m" x="678" y="397">changed in that step (Chapter 5)</text>
+            <g class="src"><rect x="910" y="384" width="26" height="16" rx="4"/></g>
+            <text class="m" x="944" y="397">kept from BiasCast</text>
 
-            <text class="h" x="0" y="268">Past days t−364 … t−1</text>
+            <text class="h" x="0" y="430">Past days t−364 … t−1</text>
             <g class="src">
-              <rect x="0" y="278" width="230" height="34" rx="5"/><text x="12" y="300">ERA5-Land reanalysis · 21</text>
-              <rect x="0" y="318" width="230" height="34" rx="5"/><text x="12" y="340">E-OBS gridded obs. · 7</text>
-              <rect x="0" y="358" width="230" height="34" rx="5"/><text x="12" y="380">MSWEP precipitation · 1</text>
-              <rect x="0" y="398" width="230" height="34" rx="5"/><text x="12" y="420">GLEAM evaporation · 2</text>
-              <rect class="chg" x="0" y="438" width="230" height="34" rx="5"/><text x="12" y="460">Observed qmean + qmax · 2</text>
+              <rect x="0" y="440" width="210" height="30" rx="5"/><text x="12" y="460">ERA5-Land reanalysis · 21</text>
+              <rect x="0" y="476" width="210" height="30" rx="5"/><text x="12" y="496">E-OBS gridded obs. · 7</text>
+              <rect x="0" y="512" width="210" height="30" rx="5"/><text x="12" y="532">MSWEP precipitation · 1</text>
+              <rect x="0" y="548" width="210" height="30" rx="5"/><text x="12" y="568">GLEAM evaporation · 2</text>
+              <rect class="chg" x="0" y="584" width="210" height="44" rx="5"/><text x="12" y="603">Observed qmean + qmax · 2</text><text class="m" x="12" y="620">both in mm/day</text>
             </g>
-            <g class="tag"><rect x="150" y="430" width="76" height="16" rx="8"/><text x="188" y="442" text-anchor="middle">B1a · B1b</text></g>
+            <g class="tag"><rect x="128" y="608" width="76" height="16" rx="8"/><text x="166" y="620" text-anchor="middle">B1a · B1b</text></g>
 
-            <text class="h" x="0" y="498">Forecast days t … t+6</text>
+            <text class="h" x="0" y="658">Forecast days t … t+6</text>
             <g class="src fc">
-              <rect x="0" y="508" width="230" height="34" rx="5"/><text x="12" y="530">ECMWF HRES, day t · 5</text>
-              <rect class="chg" x="0" y="548" width="230" height="34" rx="5"/><text x="12" y="570">GEFSv12, lead k · 5 per lead</text>
+              <rect x="0" y="666" width="210" height="26" rx="5"/><text x="12" y="684">ECMWF HRES, day t · 5</text>
+              <rect class="chg" x="0" y="698" width="210" height="20" rx="4"/><text class="s" x="12" y="712">GEFSv12 lead 1 · 5</text>
+              <rect class="chg" x="0" y="721" width="210" height="20" rx="4"/><text class="s" x="12" y="735">GEFSv12 lead 2 · 5</text>
+              <rect class="chg" x="0" y="744" width="210" height="20" rx="4"/><text class="s" x="12" y="758">GEFSv12 lead 3 · 5</text>
+              <rect class="chg" x="0" y="767" width="210" height="20" rx="4"/><text class="s" x="12" y="781">GEFSv12 lead 4 · 5</text>
+              <rect class="chg" x="0" y="790" width="210" height="20" rx="4"/><text class="s" x="12" y="804">GEFSv12 lead 5 · 5</text>
+              <rect class="chg" x="0" y="813" width="210" height="20" rx="4"/><text class="s" x="12" y="827">GEFSv12 lead 6 · 5</text>
+              <rect class="chg" x="0" y="836" width="210" height="20" rx="4"/><text class="s" x="12" y="850">GEFSv12 lead 7 · 5</text>
             </g>
-            <g class="tag"><rect x="200" y="540" width="26" height="16" rx="8"/><text x="213" y="552" text-anchor="middle">H</text></g>
-            <g class="src st"><rect x="0" y="602" width="230" height="34" rx="5"/><text x="12" y="624">Basin attributes · 33</text></g>
+            <g class="tag"><rect x="180" y="700" width="26" height="16" rx="8"/><text x="193" y="712" text-anchor="middle">H</text></g>
+            <g class="src st"><rect x="0" y="874" width="210" height="30" rx="5"/><text x="12" y="894">Basin attributes · 33</text></g>
 
             <g class="lines">
-              <path d="M230 295H246"/><path d="M230 335H246"/><path d="M230 375H246"/><path d="M230 415H246"/><path d="M230 455H246"/>
-              <path d="M246 295V455"/><path d="M246 375H260" marker-end="url(#arr)"/>
-              <path d="M230 525H246"/><path d="M230 565H246"/><path d="M246 525V565"/><path d="M246 545H260" marker-end="url(#arr)"/>
-              <path d="M230 619H260" marker-end="url(#arr)"/>
+              <path d="M210 455H224"/><path d="M210 491H224"/><path d="M210 527H224"/><path d="M210 563H224"/><path d="M210 606H224"/>
+              <path d="M224 455V606"/><path d="M224 530H238" marker-end="url(#arr)"/>
+              <path d="M210 679H224"/><path d="M210 708H224"/><path d="M210 731H224"/><path d="M210 754H224"/><path d="M210 777H224"/><path d="M210 800H224"/><path d="M210 823H224"/><path d="M210 846H224"/>
+              <path d="M224 679V846"/><path d="M224 762H238" marker-end="url(#arr)"/>
+              <path d="M210 889H238" marker-end="url(#arr)"/>
             </g>
             <g class="box">
-              <rect class="chg" x="262" y="315" width="170" height="120" rx="6"/>
-              <text x="347" y="340" text-anchor="middle">One linear layer</text>
-              <text x="347" y="358" text-anchor="middle">per source → 16</text>
-              <text x="347" y="384" text-anchor="middle" class="b">Masked mean</text>
-              <text x="347" y="402" text-anchor="middle" class="m">skips missing sources</text>
-              <text x="347" y="422" text-anchor="middle" class="m">random masking</text>
-              <rect x="262" y="522" width="170" height="46" rx="6"/>
-              <text x="347" y="541" text-anchor="middle">One linear layer</text>
-              <text x="347" y="559" text-anchor="middle">per group → 16</text>
-              <rect x="262" y="602" width="170" height="34" rx="6"/>
-              <text x="347" y="624" text-anchor="middle">Linear 33 → 16 (×2)</text>
+              <rect class="chg" x="240" y="470" width="160" height="120" rx="6"/>
+              <text x="320" y="494" text-anchor="middle">One linear layer</text>
+              <text x="320" y="512" text-anchor="middle">per source → 16</text>
+              <text x="320" y="538" text-anchor="middle" class="b">Masked mean</text>
+              <text x="320" y="556" text-anchor="middle" class="m">skips missing sources</text>
+              <text x="320" y="576" text-anchor="middle" class="m">random masking</text>
+              <rect class="chg" x="240" y="722" width="160" height="80" rx="6"/>
+              <text x="320" y="746" text-anchor="middle">One linear layer</text>
+              <text x="320" y="764" text-anchor="middle">per group → 16</text>
+              <text x="320" y="788" text-anchor="middle" class="b">Masked mean</text>
+              <rect x="240" y="874" width="160" height="30" rx="6"/>
+              <text x="320" y="894" text-anchor="middle">Linear 33 → 16 (×2)</text>
             </g>
-            <g class="tag"><rect x="398" y="307" width="30" height="16" rx="8"/><text x="413" y="319" text-anchor="middle">B2</text></g>
-            <g class="tag"><rect x="398" y="427" width="30" height="16" rx="8"/><text x="413" y="439" text-anchor="middle">B3</text></g>
+            <g class="tag"><rect x="366" y="462" width="30" height="16" rx="8"/><text x="381" y="474" text-anchor="middle">B2</text></g>
+            <g class="tag"><rect x="366" y="582" width="30" height="16" rx="8"/><text x="381" y="594" text-anchor="middle">B3</text></g>
+            <g class="tag"><rect x="370" y="714" width="26" height="16" rx="8"/><text x="383" y="726" text-anchor="middle">H</text></g>
 
             <g class="lines">
-              <path d="M432 375H460"/><path d="M432 545H460"/><path d="M432 619H460V375"/>
-              <path d="M460 375H498" marker-end="url(#arr)"/>
-              <path d="M460 545H578V423" marker-end="url(#arr)"/>
+              <path d="M400 530H450" marker-end="url(#arr)"/><path d="M400 762H420"/><path d="M400 889H420V530"/>
+              <path d="M420 762H530V577" marker-end="url(#arr)"/>
             </g>
-            <circle class="join" cx="460" cy="375" r="4"/><circle class="join" cx="460" cy="545" r="4"/>
-            <text class="m" x="470" y="612">static 16 appended to every day</text>
-            <text class="m" x="470" y="630">each day 16 + 16 = 32 (H: +1 lead counter)</text>
+            <circle class="join" cx="420" cy="530" r="4"/><circle class="join" cx="420" cy="762" r="4"/>
+            <text class="m" x="432" y="884">static 16 appended to every day</text>
+            <text class="m" x="432" y="902">each day 16 + 16 = 32 (H: + lead counter = 33)</text>
 
-            <text class="h" x="500" y="318">Input sequence</text>
+            <text class="h" x="452" y="472">Input sequence</text>
             <g class="seq">
-              <rect x="500" y="330" width="12" height="90"/><rect x="514" y="330" width="12" height="90"/><rect x="528" y="330" width="12" height="90"/>
-              <rect x="542" y="330" width="12" height="90"/><rect x="556" y="330" width="12" height="90"/>
-              <rect class="f" x="572" y="330" width="12" height="90"/>
+              <rect x="452" y="485" width="12" height="90"/><rect x="466" y="485" width="12" height="90"/><rect x="480" y="485" width="12" height="90"/>
+              <rect x="494" y="485" width="12" height="90"/><rect x="508" y="485" width="12" height="90"/>
+              <rect class="f" x="524" y="485" width="12" height="90"/>
             </g>
-            <g class="lines"><path d="M584 375H638" marker-end="url(#arr)"/></g>
+            <g class="lines"><path d="M536 530H568" marker-end="url(#arr)"/></g>
 
             <g class="core">
-              <rect x="640" y="296" width="210" height="204" rx="8"/>
-              <text x="745" y="324" text-anchor="middle" class="b">Exchangeable core</text>
-              <text x="745" y="352" text-anchor="middle">LSTM</text>
-              <text x="745" y="374" text-anchor="middle">GRU</text>
-              <text x="745" y="396" text-anchor="middle">Transformer</text>
-              <text x="745" y="418" text-anchor="middle">S4D</text>
-              <text x="745" y="440" text-anchor="middle">Mamba</text>
-              <text x="745" y="468" text-anchor="middle" class="m">causal: day k sees days ≤ k</text>
-              <text x="745" y="486" text-anchor="middle" class="m">≈ 85k or 254k parameters</text>
+              <rect x="570" y="436" width="170" height="194" rx="8"/>
+              <text x="655" y="462" text-anchor="middle" class="b">Exchangeable core</text>
+              <text x="655" y="488" text-anchor="middle">LSTM</text>
+              <text x="655" y="509" text-anchor="middle">GRU</text>
+              <text x="655" y="530" text-anchor="middle">Transformer</text>
+              <text x="655" y="551" text-anchor="middle">S4D</text>
+              <text x="655" y="572" text-anchor="middle">Mamba</text>
+              <text x="655" y="598" text-anchor="middle" class="m">causal: day k sees ≤ k</text>
+              <text x="655" y="616" text-anchor="middle" class="m">≈ 85k or 254k params</text>
             </g>
-            <g class="tag"><rect x="822" y="288" width="24" height="16" rx="8"/><text x="834" y="300" text-anchor="middle">C</text></g>
-            <text class="m" x="640" y="528">Next day (C): 364 + 1 days</text>
-            <text class="m" x="640" y="546">7 days (H, LSTM and Mamba): 364 + 7</text>
-            <text class="m" x="640" y="564">2-year lookback (D): 729 + 1</text>
+            <g class="tag"><rect x="712" y="428" width="24" height="16" rx="8"/><text x="724" y="440" text-anchor="middle">C</text></g>
 
-            <g class="lines"><path d="M850 398H874" marker-end="url(#arr)"/></g>
+            <g class="lines"><path d="M740 530H754" marker-end="url(#arr)"/></g>
             <g class="box">
-              <rect x="876" y="368" width="112" height="60" rx="6"/>
-              <text x="932" y="394" text-anchor="middle">Linear head</text>
-              <text x="932" y="412" text-anchor="middle" class="m">undo z-score</text>
+              <rect x="756" y="495" width="124" height="70" rx="6"/>
+              <text x="818" y="519" text-anchor="middle">Linear d → 1</text>
+              <text x="818" y="537" text-anchor="middle" class="m">d = core width</text>
+              <text x="818" y="555" text-anchor="middle" class="m">dropout 0.3 first</text>
             </g>
-            <g class="lines"><path d="M988 398H1004" marker-end="url(#arr)"/></g>
+            <g class="lines"><path d="M880 530H894" marker-end="url(#arr)"/></g>
+            <g class="box">
+              <rect x="896" y="500" width="100" height="60" rx="6"/>
+              <text x="946" y="526" text-anchor="middle">Undo z-score</text>
+              <text x="946" y="545" text-anchor="middle" class="m">× σ + μ</text>
+            </g>
+            <g class="lines"><path d="M996 530H1010" marker-end="url(#arr)"/></g>
             <g class="out">
-              <rect x="1006" y="358" width="114" height="80" rx="6"/>
-              <text x="1063" y="384" text-anchor="middle" class="b">qmax</text>
-              <text x="1063" y="404" text-anchor="middle" class="m">day t, mm/day</text>
-              <text x="1063" y="422" text-anchor="middle" class="m">H: days t … t+6</text>
+              <rect x="1012" y="485" width="108" height="90" rx="6"/>
+              <text x="1066" y="510" text-anchor="middle" class="b">qmax</text>
+              <text x="1066" y="530" text-anchor="middle" class="m">mm/day</text>
+              <text x="1066" y="550" text-anchor="middle" class="m">C, D: day t</text>
+              <text x="1066" y="568" text-anchor="middle" class="m">H: t … t+6</text>
             </g>
-            <g class="tag"><rect x="1092" y="350" width="24" height="16" rx="8"/><text x="1104" y="362" text-anchor="middle">H</text></g>
+            <g class="tag"><rect x="1092" y="477" width="24" height="16" rx="8"/><text x="1104" y="489" text-anchor="middle">H</text></g>
 
-            <g class="tag"><rect x="0" y="664" width="30" height="16" rx="8"/><text x="15" y="676" text-anchor="middle">B0</text></g>
-            <text class="m" x="38" y="677">3 seeds · 30 epochs, no early stopping · checkpoint = best validation epoch · loss NSE* · m³/s on this site is for display only</text>
+            <text class="m" x="570" y="660">Next day (C): 364 + 1 days</text>
+            <text class="m" x="570" y="678">7 days (H, LSTM and Mamba): 364 + 7, one output per forecast day</text>
+            <text class="m" x="570" y="696">2-year lookback (D): 729 + 1</text>
+            <text class="h" x="570" y="736">Forecast inputs in the 7-day task (H)</text>
+            <text class="m" x="570" y="756">past: none, only the lead counter</text>
+            <text class="m" x="570" y="774">hybrid: ECMWF HRES on day t, days t+1 … t+6 left empty</text>
+            <text class="m" x="570" y="792">gefs: hybrid + on day t+k−1 only GEFSv12 lead k</text>
+            <text class="m" x="570" y="810">perfect: reanalysis of days t … t+6 (upper bound)</text>
+            <text class="m" x="570" y="828">5 variables per group: t2m, d2m, ssrd, tp, e</text>
+
+            <g class="tag"><rect x="0" y="934" width="30" height="16" rx="8"/><text x="15" y="946" text-anchor="middle">B0</text></g>
+            <text class="m" x="38" y="947">3 seeds · 30 epochs, no early stopping · checkpoint = best validation epoch · loss NSE* · m³/s on this site is for display only</text>
           </svg>
         </div>
         <p class="foot wide" data-i18n="how.figNote"></p>

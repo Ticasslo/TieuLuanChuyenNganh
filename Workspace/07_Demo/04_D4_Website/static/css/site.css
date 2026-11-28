@@ -414,6 +414,7 @@ th.n { text-align: right; }
 .arch text.h { font-size: 13px; font-weight: 600; fill: var(--ink-2); }
 .arch text.m { font-size: 12.5px; fill: var(--muted); }
 .arch text.b { font-weight: 700; }
+.arch text.s { font-size: 12px; }
 .arch .src rect { fill: var(--sunk); stroke: var(--line); }
 .arch .src.fc rect { fill: var(--accent-soft); stroke: var(--accent); }
 .arch .src.st rect { fill: var(--surface); stroke: var(--line); stroke-dasharray: 4 3; }
