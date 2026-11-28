@@ -19,7 +19,7 @@ Ví dụ: để dự báo qmax ngày 15/06/2016, mô hình đọc dữ liệu kh
 
 ## 5.2. Khối giữ nguyên và khối thêm hoặc sửa
 
-Theo góp ý của GVHD (biên bản họp 27/9/2026), kiến trúc tách rõ phần lấy từ bài gốc và phần đề tài làm. Hình 5.1 đặt hai kiến trúc cạnh nhau; sơ đồ toàn đề tài ở `Diagrams/ProjectDiagram.drawio`, phần II.
+Theo góp ý của GVHD (biên bản họp 27/9/2026), kiến trúc tách rõ phần lấy từ bài gốc và phần đề tài làm. Hình 5.1 xếp hai kiến trúc trên dưới để so sánh: (a) mô hình gốc, (b) mô hình của đề tài; sơ đồ toàn đề tài ở `Diagrams/ProjectDiagram.drawio`, phần II.
 
 ![Kiến trúc BiasCast và kiến trúc của đề tài](../../Workspace/07_Demo/04_D4_Website/Figures/D4_Architecture.png)
 
