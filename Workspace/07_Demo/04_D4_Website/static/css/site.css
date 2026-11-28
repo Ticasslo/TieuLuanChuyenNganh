@@ -21,7 +21,8 @@
   --panel-ink: #e9f0f2;
   --panel-muted: #a3b6bd;
   /* lưu vực đang chọn: tím, khác hẳn dải màu mức nước (xanh, lục, vàng, cam, đỏ) */
-  --sel: #111b20;
+  --sel: #ffd60a;
+  --sel-edge: #10242b;
   --lv-low: #9cb6c7;
   --lv-medium: #4a9488;
   --lv-high: #e2a33c;
@@ -214,7 +215,7 @@ figure { margin: 0; min-width: 0; }
 .swatch { display: inline-flex; align-items: center; gap: 8px; }
 .swatch i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
 .swatch i.ring { border-radius: 2px; background: transparent !important; border: 2px solid var(--deep); }
-.swatch i.sel { border-radius: 2px; background: #fff !important; border: 2px solid var(--sel); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--line); }
+.swatch i.sel { border-radius: 2px; background: color-mix(in srgb, var(--sel) 30%, transparent) !important; border: 2px solid var(--sel); box-shadow: 0 0 0 1.5px var(--sel-edge); }
 .terrain-note { grid-column: 1 / -1; margin: 6px 0 0; padding-top: 7px; border-top: 1px solid var(--grid); font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 .minimap-box { position: absolute; right: 12px; top: 12px; width: 190px; overflow: hidden; font-size: 12.5px; color: var(--muted); pointer-events: none; }
 .minimap { height: 118px; }
