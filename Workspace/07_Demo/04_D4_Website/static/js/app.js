@@ -321,6 +321,10 @@ function updateBars() {
 }
 function initMainMap() {
   map = newMap("map", true);
+  // Đang kéo, xoay, phóng bản đồ => tạm dừng sông chảy, vòng lũ: bản đồ tự vẽ lại theo khung nhìn, đổi ảnh nét sông giữa
+  // chừng (nhất là ở 3D) làm khung hình nặng gấp đôi
+  map.on("movestart", () => { hydro.moving = true; });
+  map.on("moveend", () => { hydro.moving = false; syncAnimation(); });
   map.on("styleimagemissing", e => {
     if (e.id === "wind-arrow") { if (!map.hasImage(e.id)) map.addImage(e.id, arrowImage(), {pixelRatio: 2}); return; }
     if (e.id === "river-flow" || e.id === "river-fast") { if (!map.hasImage(e.id)) map.addImage(e.id, flowImage(0), {pixelRatio: FLOW_PR}); return; }
@@ -643,6 +647,8 @@ function set3D(on) {
   state.d3 = on;
   $("d3-btn").setAttribute("aria-pressed", String(on));
   setRotate(map, on);
+  // Màn mật độ cao: 3D vẽ ở tối đa 1,5 lần điểm ảnh (địa hình tốn GPU theo số điểm ảnh), 2D giữ độ nét gốc
+  map.setPixelRatio(on ? Math.min(devicePixelRatio || 1, 1.5) : devicePixelRatio || 1);
   if (on) {
     map.setTerrain({source: "dem", exaggeration: TERRAIN_EXAGGERATION});
     map.setSky(SKY);
@@ -689,7 +695,7 @@ const riverWidth = scale => ["interpolate", ["linear"], ["zoom"],
   6, ["*", scale, ["case", [">=", ["get", "u"], 200], ["interpolate", ["linear"], ["get", "q"], 2, 1.1, 50, 2, 500, 3.6], 0]],
   8, ["*", scale, ["interpolate", ["linear"], ["get", "q"], 0.5, 1.2, 20, 2.6, 200, 4.6, 1000, 6.5]],
   11, ["*", scale, ["interpolate", ["linear"], ["get", "q"], 0.5, 2.2, 20, 4.5, 200, 7.5, 1000, 10]]];
-const hydro = {high: [], flood: [], colorKey: "", hasRivers: false, timer: 0, frame: 0, last: 0, onScreen: true};
+const hydro = {high: [], flood: [], colorKey: "", hasRivers: false, timer: 0, frame: 0, last: 0, onScreen: true, moving: false};
 function riverColor(groups) {
   // Gom trạm theo mức => biểu thức "match" chỉ 6 nhánh dù 451 trạm
   const colors = [RIVER_NONE, RIVER_LOW, RIVER_MID, levelColor(2), levelColor(3), levelColor(4)];
@@ -763,16 +769,17 @@ function updateSnow() {
   if (state.relief && state.legendOpen) renderTerrainNote();
 }
 function animating() {
-  return !reduceMotion() && !document.hidden && hydro.onScreen && map && ((state.rivers && hydro.hasRivers) || hydro.flood.length > 0);
+  return !reduceMotion() && !document.hidden && hydro.onScreen && !hydro.moving && map && ((state.rivers && hydro.hasRivers) || hydro.flood.length > 0);
 }
 function syncAnimation() {
   if (animating() && !hydro.timer) hydro.timer = requestAnimationFrame(animTick);
 }
 function animTick(now) {
-  // Khoảng 12 bước/giây cho sông thường, 24 cho sông mức rất cao, lũ; vòng lũ lan ra trong 1,6 giây
+  // Khoảng 12 bước/giây cho sông thường, 24 cho sông mức rất cao, lũ; vòng lũ lan ra trong 1,6 giây. Ở 3D mỗi lần đổi
+  // ảnh nét sông bắt MapLibre vẽ lại lớp phủ địa hình của mọi ô => chỉ 10 lần/giây
   hydro.timer = 0;
   if (!animating()) return;
-  if (now - hydro.last >= 1000 / 24) {
+  if (now - hydro.last >= 1000 / (state.d3 ? 10 : 24)) {
     hydro.last = now;
     hydro.frame += 1;
     if (state.rivers && map.hasImage("river-flow") && map.hasImage("river-fast")) {
