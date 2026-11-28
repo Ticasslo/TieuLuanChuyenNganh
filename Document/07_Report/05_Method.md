@@ -19,7 +19,11 @@ Ví dụ: để dự báo qmax ngày 15/06/2016, mô hình đọc dữ liệu kh
 
 ## 5.2. Khối giữ nguyên và khối thêm hoặc sửa
 
-Theo góp ý của GVHD (biên bản họp 27/9/2026), kiến trúc tách rõ phần lấy từ bài gốc và phần đề tài làm. Sơ đồ đầy đủ ở `Diagrams/ProjectDiagram.drawio`, phần II: cột trái là khối của BiasCast đọc từ mã tác giả, cột phải là khối đề tài thay hoặc thêm, tô màu theo bước.
+Theo góp ý của GVHD (biên bản họp 27/9/2026), kiến trúc tách rõ phần lấy từ bài gốc và phần đề tài làm. Hình 5.1 đặt hai kiến trúc cạnh nhau; sơ đồ toàn đề tài ở `Diagrams/ProjectDiagram.drawio`, phần II.
+
+![Kiến trúc BiasCast và kiến trúc của đề tài](../../Workspace/07_Demo/04_D4_Website/Figures/D4_Architecture.png)
+
+*Hình 5.1. (a) Sequential Forecast LSTM của BiasCast, dựng theo mã và cấu hình của tác giả (`01_BasePaper.md` Mục 11.2): 31 biến tái phân tích và qmean theo m³/s chung một lớp nhúng tuyến tính 32 → 16; 5 biến ECMWF HRES qua lớp 5 → 16; 33 thuộc tính lưu vực qua lớp 33 → 16 riêng cho mỗi pha (×2) và được nối vào mọi ngày, nên mỗi ngày LSTM nhận 32 giá trị. (b) Mô hình của đề tài: khối viền đậm là khối thay đổi, nhãn ghi bước thay đổi (B1a, B1b: Q quá khứ là qmean và qmax theo mm/ngày; B2: mỗi nguồn một lớp nhúng, gộp bằng masked mean; B3: che ngẫu nhiên theo nguồn khi huấn luyện; C: lõi thay được; H: thêm dự báo GEFSv12 và 7 đầu ra; B0: giao thức huấn luyện). Lớp đầu ra cho qmax đã chuẩn hóa z-score; thư viện hoàn nguyên về mm/ngày khi chấm (`evaluation/tester.py`), mọi chỉ số tính theo mm/ngày. Chữ trong hình bằng tiếng Anh.*
 
 | Tầng | Giữ nguyên như BiasCast | Đề tài thêm hoặc sửa | Bước |
 |---|---|---|---|
