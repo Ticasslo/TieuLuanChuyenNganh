@@ -155,6 +155,20 @@ def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, w
             return jsonify(type="FeatureCollection", features=[])
         return send_file(path, mimetype="application/geo+json", max_age=0)
 
+    # Hình quá trình huấn luyện (build_figures.py): WebP trong thư mục figures/ của gói, chỉ nhận tên trong figures.json
+    fig_dir = bundle / "figures"
+    fig_meta = json.loads((fig_dir / "figures.json").read_text(encoding="utf-8")) if (fig_dir / "figures.json").is_file() else {}
+
+    @app.get("/api/figures")
+    def get_figures():
+        return jsonify({k: {"width": v["width"], "height": v["height"]} for k, v in fig_meta.items()})
+
+    @app.get("/figures/<name>.webp")
+    def get_figure(name):
+        if name not in fig_meta:
+            abort(404)
+        return send_file(fig_dir / f"{name}.webp", mimetype="image/webp", max_age=86400)
+
     @app.get("/api/basins-own")
     def get_basins_own():
         return optional_geojson("basins_own.geojson")

@@ -314,6 +314,7 @@
         <p data-i18n="part2.lede"></p>
       </header>
       <nav class="subnav" id="subnav" aria-label="Kết quả">
+        <a href="#training" data-i18n="sub.training">2.0 Quá trình huấn luyện</a>
         <a href="#compare" data-i18n="sub.compare">2.1 Xếp hạng</a>
         <a href="#leads" data-i18n="sub.leads">2.2 Theo số ngày dự báo trước</a>
         <a href="#memory" data-i18n="sub.memory">2.3 Nhìn lại 1 hay 2 năm</a>
@@ -321,6 +322,21 @@
         <a href="#levels" data-i18n="sub.levels">2.5 Bốn mức lưu lượng</a>
         <a href="#xai" data-i18n="sub.xai">2.6 Giải thích mô hình</a>
       </nav>
+
+      <section class="band" id="training">
+        <header class="band-head">
+          <h2 data-i18n="train.title">2.0 Quá trình huấn luyện</h2>
+          <p data-i18n="train.lede"></p>
+        </header>
+        <div class="toolbar"><div class="tabs light" id="train-tabs" role="group" aria-label="Bước"></div></div>
+        <p class="train-intro" id="train-intro"></p>
+        <div class="train-grid" id="train-figs"></div>
+        <dialog class="fig-view" id="fig-view" aria-labelledby="fig-view-cap">
+          <button type="button" class="fig-close" id="fig-close" data-i18n-aria="train.close" aria-label="Đóng">×</button>
+          <div class="fig-scroll"><img id="fig-view-img" alt=""></div>
+          <p class="foot wide" id="fig-view-cap"></p>
+        </dialog>
+      </section>
 
       <section class="band" id="compare">
         <header class="band-head">

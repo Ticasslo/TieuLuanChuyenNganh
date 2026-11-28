@@ -102,6 +102,12 @@ function baseLayout(extra = {}) {
     hoverlabel: {bgcolor: css("--surface"), bordercolor: css("--line"), font: {family: FONT, size: 14, color: css("--ink")}},
     ...extra};
 }
+// Màn cảm ứng (điện thoại, máy tính bảng): kéo một ngón trên hình, bản đồ phải cuộn trang chứ không phóng hay kéo hình
+// => hình Plotly tắt kéo (vẫn chạm để xem số, thanh trượt dưới biểu đồ vẫn phóng được), bản đồ cần hai ngón để kéo;
+// màn mật độ điểm ảnh 3 vẽ bản đồ ở mức 2 cho nhẹ GPU
+const TOUCH = matchMedia("(pointer: coarse)").matches;
+const mapDpr = () => Math.min(devicePixelRatio || 1, TOUCH ? 2 : 3);
+const plotReact = (box, data, layout, config) => Plotly.react(box, data, TOUCH ? {...layout, dragmode: false} : layout, config);
 const plotConfig = {responsive: true, displaylogo: false, displayModeBar: false};
 
 // ---------- tên mô hình dễ hiểu (kèm mã cấu hình) ----------
@@ -232,7 +238,8 @@ function gaugeGeoJSON(props) {
 }
 function newMap(container, main = false) {
   const m = new maplibregl.Map({container, style: baseStyle(true, main), bounds: studyBounds(), fitBoundsOptions: {padding: 30},
-    maxBounds: [[3, 44.5], [20, 52.5]], minZoom: 5, maxZoom: 14, maxPitch: 70, attributionControl: {compact: true}});
+    maxBounds: [[3, 44.5], [20, 52.5]], minZoom: 5, maxZoom: 14, maxPitch: 70, attributionControl: {compact: true},
+    cooperativeGestures: TOUCH, pixelRatio: mapDpr()});
   m.addControl(new maplibregl.NavigationControl({showCompass: main, visualizePitch: true}), "bottom-right");
   setRotate(m, false);
   return m;
@@ -648,7 +655,7 @@ function set3D(on) {
   $("d3-btn").setAttribute("aria-pressed", String(on));
   setRotate(map, on);
   // Màn mật độ cao: 3D vẽ ở tối đa 1,5 lần điểm ảnh (địa hình tốn GPU theo số điểm ảnh), 2D giữ độ nét gốc
-  map.setPixelRatio(on ? Math.min(devicePixelRatio || 1, 1.5) : devicePixelRatio || 1);
+  map.setPixelRatio(on ? Math.min(devicePixelRatio || 1, 1.5) : mapDpr());
   if (on) {
     map.setTerrain({source: "dem", exaggeration: TERRAIN_EXAGGERATION});
     map.setSky(SKY);
@@ -779,7 +786,7 @@ function animTick(now) {
   // ảnh nét sông bắt MapLibre vẽ lại lớp phủ địa hình của mọi ô => chỉ 10 lần/giây
   hydro.timer = 0;
   if (!animating()) return;
-  if (now - hydro.last >= 1000 / (state.d3 ? 10 : 24)) {
+  if (now - hydro.last >= 1000 / (state.d3 ? 10 : TOUCH ? 15 : 24)) {
     hydro.last = now;
     hydro.frame += 1;
     if (state.rivers && map.hasImage("river-flow") && map.hasImage("river-fast")) {
@@ -995,7 +1002,7 @@ async function refreshChart({keepRange = false} = {}) {
     xaxis: {type: "date", range, rangeslider: {visible: true, thickness: 0.08, bgcolor: css("--paper")}, gridcolor: css("--grid")},
     yaxis: {title: {text: region ? t("chart.yRegion") : t("chart.y")}, rangemode: "tozero", gridcolor: css("--grid")},
   });
-  await Plotly.react(box, traces, layout, {responsive: true, displaylogo: false, locale: getLang(),
+  await plotReact(box, traces, layout, {responsive: true, displaylogo: false, locale: getLang(),
     modeBarButtonsToRemove: ["select2d", "lasso2d", "autoScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestCartesian"],
     toImageButtonOptions: {filename: `discharge_${basin}`}});
   if (!box.dataset.bound) {
@@ -1463,7 +1470,7 @@ async function refreshLeads() {
       hovertemplate: `%{y:.3f}<extra>${name}</extra>`};
   });
   const low = Math.min(-0.2, ...rows.map(r => r.mean)) - 0.05;
-  await Plotly.react($("leads-chart"), traces, baseLayout({hovermode: "x unified",
+  await plotReact($("leads-chart"), traces, baseLayout({hovermode: "x unified",
     xaxis: {title: {text: t("leads.x")}, dtick: 1, gridcolor: css("--grid")},
     yaxis: {title: {text: t("leads.y")}, gridcolor: css("--grid"), zeroline: true, zerolinecolor: css("--muted"), range: [low, 0.8]},
     shapes: [{type: "rect", xref: "paper", x0: 0, x1: 1, y0: low, y1: 0, fillcolor: "rgba(161,29,31,0.06)", line: {width: 0}, layer: "below"}]}), plotConfig);
@@ -1486,7 +1493,7 @@ async function refreshMemory() {
   const y = rows.map(label);
   const connectors = {type: "scatter", mode: "lines", hoverinfo: "skip", showlegend: false, line: {color: css("--line"), width: 3},
     x: rows.flatMap(r => [r.median_365, r.median_730, null]), y: rows.flatMap(r => [label(r), label(r), null])};
-  await Plotly.react($("mem-chart"), [connectors,
+  await plotReact($("mem-chart"), [connectors,
     {type: "scatter", mode: "markers", x: rows.map(r => r.median_365), y, name: t("mem.d365"), marker: {size: 13, color: css("--c-persist")}, hovertemplate: `%{x:.4f}<extra>${t("mem.d365")}</extra>`},
     {type: "scatter", mode: "markers", x: rows.map(r => r.median_730), y, name: t("mem.d730"), marker: {size: 13, color: css("--accent"), symbol: "diamond"}, hovertemplate: `%{x:.4f}<extra>${t("mem.d730")}</extra>`}],
   baseLayout({margin: {l: 140, r: 16, t: 40, b: 52}, xaxis: {title: {text: t("mem.x")}, gridcolor: css("--grid")}, yaxis: {autorange: "reversed", ticksuffix: "  "},
@@ -1514,7 +1521,7 @@ async function refreshFloodAll() {
   $("flood-all-title").textContent = t("flood.all", {m: secName(sec)});
   const labels = data.rows.map(r => t("flood.period", {p: fmt(r.return_period_years, 1)}));
   const series = [["hit", "flood.hit", "--c-hit"], ["missed", "flood.missed", "--c-miss"], ["false_alarm", "flood.false", "--c-false"]];
-  await Plotly.react($("flood-chart"), series.map(([key, label, color]) => ({type: "bar", orientation: "h", y: labels, x: data.rows.map(r => r[key]),
+  await plotReact($("flood-chart"), series.map(([key, label, color]) => ({type: "bar", orientation: "h", y: labels, x: data.rows.map(r => r[key]),
     name: t(label), marker: {color: css(color)}, hovertemplate: "%{x}<extra>%{fullData.name}</extra>"})),
   baseLayout({barmode: "stack", margin: {l: 130, r: 16, t: 10, b: 52}, yaxis: {autorange: "reversed", ticksuffix: "  "},
     xaxis: {title: {text: t("flood.x")}, gridcolor: css("--grid")}}), plotConfig);
@@ -1581,7 +1588,7 @@ async function refreshLevels() {
   if (base?.matrix) traces.push({type: "bar", x, y: recall(base.matrix), name: shortName(model(ref)),
     marker: {color: css(ref === "SeqLSTM_Q" ? "--c-biascast" : "--c-persist")}, text: recall(base.matrix).map(v => pct(v)), textposition: "outside",
     hovertemplate: `%{y:.1%}<extra>${shortName(model(ref))}</extra>`});
-  await Plotly.react($("lvl-chart"), traces, baseLayout({barmode: "group", margin: {l: 64, r: 16, t: 40, b: 52},
+  await plotReact($("lvl-chart"), traces, baseLayout({barmode: "group", margin: {l: 64, r: 16, t: 40, b: 52},
     yaxis: {title: {text: t("lvl.recallY")}, range: [0, 1.15], tickformat: ".0%", gridcolor: css("--grid")},
     legend: {orientation: "h", x: 0, y: 1.12}, showlegend: true}), plotConfig);
   const vh = m[3], vhSum = rowSum[3];
@@ -1622,11 +1629,11 @@ async function refreshXai() {
     const tr1 = cores.flatMap(c => [["fore", "solid"], ["past", "dot"]].map(([ph, dash]) => ({type: "scatter", mode: "lines+markers", x: data.leads,
       y: data.cores[c].phase_by_lead[ph].map(v => (v == null ? null : v * 100)), name: `${CORE[c]} · ${t("xai." + ph)}`,
       line: {color: CORE_COLOR[c], dash, width: 2.4}, marker: {size: 7}})));
-    await Plotly.react($("xai-1"), tr1, xaiLayout({xaxis: {title: {text: t("xai.phaseX")}, dtick: 1},
+    await plotReact($("xai-1"), tr1, xaiLayout({xaxis: {title: {text: t("xai.phaseX")}, dtick: 1},
       yaxis: {title: {text: t("xai.share")}, rangemode: "tozero", gridcolor: css("--grid")}}), plotConfig);
     const groups = data.groups.filter(g => cores.some(c => (data.cores[c].group_share_lead[g] ?? 0) > 1e-3));
     const gname = g => t("g." + g.split(":").at(-1));
-    await Plotly.react($("xai-2"), cores.map(c => ({type: "bar", orientation: "h", y: groups.map(gname), x: groups.map(g => (data.cores[c].group_share_lead[g] ?? 0) * 100),
+    await plotReact($("xai-2"), cores.map(c => ({type: "bar", orientation: "h", y: groups.map(gname), x: groups.map(g => (data.cores[c].group_share_lead[g] ?? 0) * 100),
       name: CORE[c], marker: {color: CORE_COLOR[c]}})), xaiLayout({barmode: "group",
       margin: {l: 250, r: 16, t: 12, b: 56}, yaxis: {autorange: "reversed", ticksuffix: "  "}, xaxis: {title: {text: t("xai.share")}, gridcolor: css("--grid")}}), plotConfig);
   } else {
@@ -1635,12 +1642,12 @@ async function refreshXai() {
     $("xai-status").textContent = t("xai.c2status", {s: s.name, n}) + (task === "d" ? " " + t("xai.dnote") : "");
     $("xai-1-title").textContent = t("xai.groups");
     $("xai-2-title").textContent = t("xai.lag");
-    await Plotly.react($("xai-1"), order.map(c => ({type: "bar", orientation: "h", y: data.groups.map(g => t("g." + g)), x: data.groups.map(g => (data.group_share[c][g] ?? 0) * 100),
+    await plotReact($("xai-1"), order.map(c => ({type: "bar", orientation: "h", y: data.groups.map(g => t("g." + g)), x: data.groups.map(g => (data.group_share[c][g] ?? 0) * 100),
       name: CORE[c], marker: {color: CORE_COLOR[c]}, opacity: c === params.core ? 1 : 0.5})),
     xaiLayout({barmode: "group", margin: {l: 250, r: 16, t: 12, b: 56},
       yaxis: {autorange: "reversed", ticksuffix: "  "}, xaxis: {title: {text: t("xai.share")}, gridcolor: css("--grid")}}), plotConfig);
     const lags = Array.from({length: 61}, (_, i) => i);
-    await Plotly.react($("xai-2"), order.filter(c => data.lag_cum_60[c]).map(c => ({type: "scatter", mode: "lines", x: lags,
+    await plotReact($("xai-2"), order.filter(c => data.lag_cum_60[c]).map(c => ({type: "scatter", mode: "lines", x: lags,
       y: data.lag_cum_60[c].map(v => (v == null ? null : v * 100)), name: CORE[c], line: {color: CORE_COLOR[c], width: c === params.core ? 3.2 : 1.8}})),
     xaiLayout({xaxis: {title: {text: t("xai.lagX")}}, yaxis: {title: {text: t("xai.lagY")}, range: [0, 102], gridcolor: css("--grid")},
       shapes: [{type: "line", x0: 0, x1: 60, y0: 90, y1: 90, line: {color: css("--muted"), dash: "dash", width: 1}}]}), plotConfig);
@@ -1712,7 +1719,7 @@ function initWhatIf() {
           + t("wi.delta", {d: x[0], a: fmtQ(before[0]), b: fmtQ(after[0]), c: `${d >= 0 ? "+" : "−"}${fmtQ(Math.abs(d))}`, p: pct(before[0] ? d / before[0] : null)});
         const bar = (y, name, color) => ({type: "bar", x, y, name, marker: {color}, text: y.map(fmtQ), textposition: "outside", cliponaxis: false,
           hovertemplate: "%{y:.2f} m³/s<extra>%{fullData.name}</extra>"});
-        await Plotly.react($("wi-chart"), [bar(before, t("wi.base"), css("--c-persist")), bar(after, t("wi.changed"), css("--c-model"))],
+        await plotReact($("wi-chart"), [bar(before, t("wi.base"), css("--c-persist")), bar(after, t("wi.changed"), css("--c-model"))],
           baseLayout({barmode: "group", bargap: x.length === 1 ? 0.55 : 0.25, showlegend: true, legend: {orientation: "h", x: 0, y: 1.14}, margin: {l: 66, r: 16, t: 36, b: 52},
             xaxis: {type: "category", title: {text: t("wi.x")}}, yaxis: {title: {text: t("chart.y")}, rangemode: "tozero", gridcolor: css("--grid")}}), plotConfig);
         state.wiDone = true;
@@ -1763,6 +1770,50 @@ async function refreshResults() {
   run(refreshLevels);
 }
 function scrollToDash() { document.querySelector(".dash").scrollIntoView({behavior: "smooth"}); }
+// ---------- 2.0 quá trình huấn luyện: hình của các notebook so sánh (build_figures.py chép vào gói) ----------
+// Mỗi thẻ một bước của đề tài; ảnh WebP tải lười khi cuộn tới, bấm để xem cỡ lớn
+const TRAIN_STEPS = [
+  {key: "B", figs: ["B1_Steps", "B1_Curves", "B3_Seeds"]},
+  {key: "C2", figs: ["C2_Bstar_Validation", "C2_Curves_LSTM_GRU_Transformer", "C2_Curves_S4D_Mamba"]},
+  {key: "H", figs: ["H_Curves", "H_NSE_by_lead_test"]},
+  {key: "D", figs: ["D_Curves_365_vs_730"]},
+];
+async function initTraining() {
+  state.figures = await api("/api/figures");
+  state.trainStep = "B";
+  $("fig-close").addEventListener("click", () => $("fig-view").close());
+  $("fig-view").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+  renderTraining();
+}
+function openFigure(name) {
+  const box = $("fig-view"), img = $("fig-view-img");
+  img.src = `/figures/${name}.webp`;
+  img.alt = t("fig." + name);
+  $("fig-view-cap").textContent = t("figd." + name);
+  box.showModal();
+}
+function renderTraining() {
+  if (!state.figures) return;
+  const have = TRAIN_STEPS.map(s => ({...s, figs: s.figs.filter(f => state.figures[f])})).filter(s => s.figs.length);
+  $("training").hidden = !have.length;
+  if (!have.length) return;
+  if (!have.some(s => s.key === state.trainStep)) state.trainStep = have[0].key;
+  $("fig-close").setAttribute("aria-label", t("train.close"));
+  $("train-tabs").replaceChildren(...have.map(s => el("button", {type: "button", "aria-pressed": String(s.key === state.trainStep),
+    onclick: () => { state.trainStep = s.key; renderTraining(); }}, t("train.tab." + s.key))));
+  const step = have.find(s => s.key === state.trainStep);
+  $("train-intro").textContent = t("train.intro." + step.key);
+  $("train-figs").replaceChildren(...step.figs.map(name => {
+    const m = state.figures[name];
+    return el("figure", {class: "train-fig"},
+      el("figcaption", {class: "fig-title"}, t("fig." + name)),
+      el("button", {type: "button", class: "fig-open", "aria-label": t("train.zoom"), onclick: () => openFigure(name)},
+        el("img", {src: `/figures/${name}.webp`, alt: t("fig." + name), width: m.width, height: m.height, loading: "lazy", decoding: "async"})),
+      el("p", {class: "foot"}, t("figd." + name)));
+  }));
+}
+
+const whenCalm = fn => (hydro.scrolling ? setTimeout(() => whenCalm(fn), 250) : whenIdle(fn));
 const whenIdle = fn => (window.requestIdleCallback ? requestIdleCallback(fn, {timeout: 2000}) : setTimeout(fn, 150));
 function initResultsLazy() {
   // Phần 2 (bản đồ NSE, 6 hình) dựng sau khi trang đầu xong: dựng bản đồ WebGL thứ hai (biên dịch shader) và vẽ các hình
@@ -1772,10 +1823,9 @@ function initResultsLazy() {
     if (state.resultsReady) return;
     state.resultsReady = true;
     io.disconnect();
-    nseMap = newMap("nse-map");
     const steps = [refreshResults, refreshLeads, refreshMemory, refreshXai];
-    const next = () => { const f = steps.shift(); if (f) { run(f); whenIdle(next); } };
-    whenIdle(next);
+    const next = () => { const f = steps.shift(); if (f) { run(f); whenCalm(next); } };
+    whenCalm(() => { nseMap = newMap("nse-map"); whenCalm(next); });
   };
   const io = new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting)) build(); }, {rootMargin: "1200px 0px"});
   io.observe($("results"));
@@ -1810,12 +1860,12 @@ function initPanelWheel() {
 function initScrollSpy() {
   // Tô mục đang xem trên thanh mục lục Phần 2 và thanh trên cùng
   const links = [...document.querySelectorAll(".subnav a, .nav a")];
-  const ids = ["explore", "how", "results", "about", "compare", "leads", "memory", "flood", "levels", "xai"];
+  const ids = ["explore", "how", "results", "about", "training", "compare", "leads", "memory", "flood", "levels", "xai"];
   const seen = new Map();
   const io = new IntersectionObserver(entries => {
     for (const e of entries) seen.set(e.target.id, e.isIntersecting);
     const visible = id => seen.get(id);
-    const sub = ["xai", "levels", "flood", "memory", "leads", "compare"].find(visible);
+    const sub = ["xai", "levels", "flood", "memory", "leads", "compare", "training"].find(visible);
     const top = visible("about") ? "about" : visible("results") ? "results" : visible("how") ? "how" : "explore";
     for (const a of links) {
       const id = a.getAttribute("href").slice(1);
@@ -1842,6 +1892,7 @@ function renderTexts() {
   initWhatIf.fill?.();
   resetWhatIf();
   renderHighlights();
+  renderTraining();
   renderTour();
 }
 
@@ -1875,6 +1926,7 @@ async function start() {
   initMainMap();
   initMiniMap();
   initResultsLazy();
+  run(initTraining);
   initScrollSpy();
   initPanelWheel();
   initHighlights();

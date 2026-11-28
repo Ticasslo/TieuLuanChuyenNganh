@@ -467,3 +467,18 @@ th.n { text-align: right; }
 
 /* Đoạn ghi nguồn bắt buộc của giấy phép HydroSHEDS: chữ nhỏ, vẫn đọc được */
 .legal { display: block; margin-top: 4px; font-size: 12px; line-height: 1.45; opacity: 0.8; }
+
+/* 2.0 quá trình huấn luyện: lưới hình, xem cỡ lớn */
+.train-intro { max-width: 80ch; margin: 12px 0 18px; color: var(--ink-2); }
+.train-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 28px 32px; align-items: start; }
+.train-fig .fig-title { margin-bottom: 8px; }
+.fig-open { display: block; width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: #fff; cursor: zoom-in; overflow: hidden; }
+.fig-open:hover { border-color: var(--ink-2); }
+.fig-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fig-open img { display: block; width: 100%; height: auto; }
+.fig-view { width: min(96vw, 1500px); max-height: 94vh; padding: 16px 16px 12px; border: 0; border-radius: 8px; background: var(--surface); color: var(--ink); }
+.fig-view::backdrop { background: rgba(10, 20, 26, 0.72); }
+.fig-scroll { max-height: calc(94vh - 110px); overflow: auto; background: #fff; border-radius: 4px; }
+.fig-scroll img { display: block; width: 100%; height: auto; }
+.fig-close { position: sticky; float: right; top: 0; z-index: 1; width: 36px; height: 36px; margin: -6px -6px 6px 8px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); font-size: 22px; line-height: 1; cursor: pointer; color: var(--ink); }
+.fig-close:hover { background: var(--sunk); }
