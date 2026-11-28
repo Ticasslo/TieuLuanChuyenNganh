@@ -45,6 +45,7 @@ const TEXT = {
     <ul>
       <li>Dữ liệu và mã gốc: BiasCast, github.com/conestone/biascast; NeuralHydrology.</li>
       <li>Bản đồ nền © OpenStreetMap (ODbL), Protomaps; địa hình © Mapterhorn (mô hình độ cao mở của Áo, Thụy Sĩ, Đức, Séc và Copernicus, mapterhorn.com/attribution); thư viện MapLibre GL JS, Plotly.</li>
+      <li>Mạng sông HydroRIVERS v1.0 (Lehner, B., Verdin, K., Jarvis, A. (2008), Eos 89(10): 93-94; Lehner, B., Grill, G. (2013), Hydrological Processes 27(15): 2171-2186.) <span class="legal">This product (River discharge forecasting, ticasslo.dev) incorporates data from the HydroSHEDS version 1 database which is © World Wildlife Fund, Inc. (2006-2022) and has been used herein under license. WWF has not evaluated the data as altered and incorporated within River discharge forecasting, and therefore gives no warranty regarding its accuracy, completeness, currency or suitability for any particular purpose. Portions of the HydroSHEDS v1 database incorporate data which are the intellectual property rights of © USGS (2006-2008), NASA (2000-2005), ESRI (1992-1998), CIAT (2004-2006), UNEP-WCMC (1993), WWF (2004), Commonwealth of Australia (2007), and Her Royal Majesty and the British Crown and are used under license. The HydroSHEDS v1 database and more information are available at https://www.hydrosheds.org.</span></li>
       <li>Dữ liệu dùng cho mục đích học tập, phi thương mại (CC BY-NC 4.0).</li>
     </ul>
   </div>
@@ -94,6 +95,7 @@ const TEXT = {
     <ul>
       <li>Data and original code: BiasCast, github.com/conestone/biascast; NeuralHydrology.</li>
       <li>Basemap © OpenStreetMap (ODbL), Protomaps; terrain © Mapterhorn (open elevation models from Austria, Switzerland, Germany, Czechia and Copernicus, mapterhorn.com/attribution); MapLibre GL JS and Plotly libraries.</li>
+      <li>River network HydroRIVERS v1.0 (Lehner, B., Verdin, K., Jarvis, A. (2008), Eos 89(10): 93-94; Lehner, B., Grill, G. (2013), Hydrological Processes 27(15): 2171-2186.) <span class="legal">This product (River discharge forecasting, ticasslo.dev) incorporates data from the HydroSHEDS version 1 database which is © World Wildlife Fund, Inc. (2006-2022) and has been used herein under license. WWF has not evaluated the data as altered and incorporated within River discharge forecasting, and therefore gives no warranty regarding its accuracy, completeness, currency or suitability for any particular purpose. Portions of the HydroSHEDS v1 database incorporate data which are the intellectual property rights of © USGS (2006-2008), NASA (2000-2005), ESRI (1992-1998), CIAT (2004-2006), UNEP-WCMC (1993), WWF (2004), Commonwealth of Australia (2007), and Her Royal Majesty and the British Crown and are used under license. The HydroSHEDS v1 database and more information are available at https://www.hydrosheds.org.</span></li>
       <li>Data used for non-commercial, educational purposes (CC BY-NC 4.0).</li>
     </ul>
   </div>

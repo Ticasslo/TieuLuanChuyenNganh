@@ -30,7 +30,7 @@ const state = {
   legendOpen: (() => { try { const v = localStorage.getItem("legendOpen"); if (v) return v === "1"; } catch { /* bỏ qua */ } return window.innerWidth > 700; })(),
   task: "c2", main: {c2: null, h: null, d: null}, lead: 1,
   compare: {c2: ["SeqLSTM_Q"], h: ["Persistence_qmax"], d: ["SeqLSTM_Q"]}, ensemble: false,
-  colorBy: "observed", layer: "", relief: true, d3: false, env: null, cmpTask: "c2", cmpLead: 1, cmpRun: null, nseRef: "",
+  colorBy: "observed", layer: "", relief: true, rivers: true, d3: false, env: null, cmpTask: "c2", cmpLead: 1, cmpRun: null, nseRef: "",
   sec: {flood: {run: null, lead: 1}, levels: {run: null, lead: 1}},
   leaderboard: [], seeds: null, dayData: null, levelsNow: null, speed: 1, resultsReady: false, wiDone: false,
 };
@@ -53,11 +53,18 @@ async function cached(path) {
 }
 const qs = obj => "?" + new URLSearchParams(Object.entries(obj).flatMap(([k, v]) => [].concat(v).map(x => [k, x])));
 const locale = () => (getLang() === "vi" ? "vi-VN" : "en-GB");
-const fmtFixed = (v, d) => (v == null || !Number.isFinite(v) ? "–" : new Intl.NumberFormat(locale(), {minimumFractionDigits: d, maximumFractionDigits: d}).format(v));
-const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? "–" : new Intl.NumberFormat(locale(), {maximumFractionDigits: d, minimumFractionDigits: 0}).format(v));
+// Bộ định dạng Intl dựng một lần cho mỗi ngôn ngữ và kiểu (dựng mới ở mỗi lần gọi tốn thời gian khi chạy thời gian)
+const intlCache = new Map();
+function intl(kind, opts) {
+  const k = `${kind}|${locale()}|${JSON.stringify(opts)}`;
+  if (!intlCache.has(k)) intlCache.set(k, kind === "n" ? new Intl.NumberFormat(locale(), opts) : new Intl.DateTimeFormat(locale(), opts));
+  return intlCache.get(k);
+}
+const fmtFixed = (v, d) => (v == null || !Number.isFinite(v) ? "–" : intl("n", {minimumFractionDigits: d, maximumFractionDigits: d}).format(v));
+const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? "–" : intl("n", {maximumFractionDigits: d, minimumFractionDigits: 0}).format(v));
 const fmtQ = v => (v == null || !Number.isFinite(v) ? "–" : fmt(v, v < 10 ? 2 : v < 100 ? 1 : 0));
 const fmtSigned = (v, d = 3) => (v == null || !Number.isFinite(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fmtFixed(Math.abs(v), d));
-const fmtDate = (iso, long = false) => new Intl.DateTimeFormat(locale(), long ? {weekday: "short", day: "numeric", month: "short", year: "numeric"} : {day: "numeric", month: "short", year: "numeric"}).format(new Date(iso + "T00:00:00"));
+const fmtDate = (iso, long = false) => intl("d", long ? {weekday: "short", day: "numeric", month: "short", year: "numeric"} : {day: "numeric", month: "short", year: "numeric"}).format(new Date(iso + "T00:00:00"));
 const days = n => t(n === 1 ? "card.day1" : "card.days", {n});
 const pct = (v, d = 0) => (v == null || !Number.isFinite(v) ? "–" : new Intl.NumberFormat(locale(), {style: "percent", maximumFractionDigits: d}).format(v));
 const separators = () => (getLang() === "vi" ? ",." : ".,");
@@ -155,6 +162,16 @@ const TERRAIN_EXAGGERATION = 1.6;
 const SKY = {"sky-color": "#bcd3e6", "horizon-color": "#eef2f4", "fog-color": "#eef2f4", "sky-horizon-blend": 0.6, "horizon-fog-blend": 0.6, "fog-ground-blend": 0.3};
 const demSource = origin => ({type: "raster-dem", url: `pmtiles://${origin}/tiles/terrain.pmtiles`, encoding: "terrarium", tileSize: 512,
   attribution: '<a href="https://mapterhorn.com/attribution">© Mapterhorn</a>'});
+// Màu theo độ cao (đồng bằng xanh => núi nâu => đá xám => băng tuyết vĩnh cửu), phủ mờ lên nền để vẫn thấy rừng, đồng ruộng
+const RELIEF_RAMP = [0, "#b9d3a6", 400, "#d3dfae", 800, "#e6e0b8", 1400, "#dcc7a0", 2000, "#c9b08c", 2600, "#b9aea2", 3200, "#e9eaec", 4000, "#ffffff"];
+const reliefOpacity = () => (state.d3 ? 0.55 : 0.4);
+// Tuyết của ngày đang xem: trắng từ đường tuyết ước lượng (env.json, snowline) trở lên, mờ dần 250 m bên dưới
+const snowLine = () => state.env?.snowline?.values?.[state.day] ?? null;
+function snowColor(h) {
+  return ["interpolate", ["linear"], ["elevation"], h - 250, "rgba(255,255,255,0)", h + 50, "rgba(250,252,255,0.9)"];
+}
+const reliefVisible = () => (state.relief ? "visible" : "none");
+const snowVisible = () => (state.relief && snowLine() != null ? "visible" : "none");
 function baseStyle(withLabels = true, main = false) {
   const origin = location.origin;
   let layers = basemaps.layers("protomaps", basemaps.namedFlavor("light"), {lang: getLang()});
@@ -170,12 +187,19 @@ function baseStyle(withLabels = true, main = false) {
   if (!main) return style;
   style.sources.dem = demSource(origin);
   style.sources.hillshade = demSource(origin);
-  // Bóng núi nằm dưới đường, nhãn của nền => không làm mờ chữ
+  // Màu độ cao và tuyết nằm trên lớp phủ đất của nền, dưới hồ, sông; bóng núi dưới đường, nhãn => không làm mờ chữ
   const at = layers.findIndex(l => l.type === "line" || l.type === "symbol");
   const cut = at < 0 ? layers.length : at;
-  const shade = {id: "hillshade", type: "hillshade", source: "hillshade", layout: {visibility: state.relief ? "visible" : "none"},
+  const waterAt = layers.findIndex(l => l.id === "water");
+  const under = waterAt < 0 || waterAt > cut ? cut : waterAt;
+  const tint = {id: "relief-color", type: "color-relief", source: "hillshade", layout: {visibility: reliefVisible()},
+    paint: {"color-relief-color": ["interpolate", ["linear"], ["elevation"], ...RELIEF_RAMP], "color-relief-opacity": reliefOpacity()}};
+  const h = snowLine();
+  const snow = {id: "snow-cover", type: "color-relief", source: "hillshade", layout: {visibility: snowVisible()},
+    paint: {"color-relief-color": snowColor(h ?? 9000), "color-relief-opacity": 1}};
+  const shade = {id: "hillshade", type: "hillshade", source: "hillshade", layout: {visibility: reliefVisible()},
     paint: {"hillshade-exaggeration": 0.45, "hillshade-shadow-color": "#5b5446", "hillshade-highlight-color": "#ffffff", "hillshade-accent-color": "#6f6758"}};
-  style.layers = [...layers.slice(0, cut), shade, ...layers.slice(cut)];
+  style.layers = [...layers.slice(0, under), tint, snow, ...layers.slice(under, cut), shade, ...layers.slice(cut)];
   if (state.d3) {
     style.terrain = {source: "dem", exaggeration: TERRAIN_EXAGGERATION};
     style.sky = SKY;
@@ -245,24 +269,33 @@ function addMainLayers() {
   map.addLayer({id: "study-fill", type: "fill", source: "basins", paint: {"fill-color": css("--accent"), "fill-opacity": isRegion() ? 0.1 : 0.04}});
   addEnvFill();
   map.addLayer({id: "basin-all", type: "line", source: "basins", minzoom: 7, paint: {"line-color": css("--accent-ink"), "line-width": 0.5, "line-opacity": 0.35}});
-  map.addLayer({id: "basin-fill", type: "fill", source: "basins", filter: selFilter(), paint: {"fill-color": css("--sel"), "fill-opacity": 0.2}});
-  map.addLayer({id: "basin-line", type: "line", source: "basins", filter: selFilter(), paint: {"line-color": css("--sel"), "line-width": 3}});
+  addRivers();
+  // Lưu vực đang chọn: viền tối có quầng trắng (không tô màu riêng để không lẫn với dải màu của các lớp)
+  map.addLayer({id: "basin-fill", type: "fill", source: "basins", filter: selFilter(), paint: {"fill-color": css("--sel"), "fill-opacity": selFillOpacity()}});
+  map.addLayer({id: "basin-halo", type: "line", source: "basins", filter: selFilter(),
+    paint: {"line-color": "#ffffff", "line-width": 7, "line-opacity": 0.9, "line-blur": 0.5}});
+  map.addLayer({id: "basin-line", type: "line", source: "basins", filter: selFilter(), paint: {"line-color": css("--sel"), "line-width": 2.6}});
   addOutline(map);
   map.addSource("gauges", {type: "geojson", data: gaugeGeoJSON(() => ({})), promoteId: "id"});
   map.addSource("bars", {type: "geojson", data: {type: "FeatureCollection", features: []}, promoteId: "id", buffer: 256});
   map.addLayer({id: "gauges", type: "circle", source: "gauges", maxzoom: BAR_ZOOM, paint: {
     "circle-radius": dotRadius(dotKey()), "circle-color": levelMatch(dotKey()),
     "circle-stroke-color": "#ffffff", "circle-stroke-width": 1}});
+  map.addLayer({id: "gauge-sel-halo", type: "circle", source: "gauges", filter: selFilter(), paint: {
+    "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 10.5, 8.5, 12.5, 12, 15.5], "circle-color": "rgba(0,0,0,0)",
+    "circle-stroke-color": "#ffffff", "circle-stroke-width": 3}});
   map.addLayer({id: "gauge-sel", type: "circle", source: "gauges", filter: selFilter(), paint: {
     "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 9, 8.5, 11, 12, 14], "circle-color": "rgba(0,0,0,0)",
-    "circle-stroke-color": css("--sel"), "circle-stroke-width": 3}});
+    "circle-stroke-color": css("--sel"), "circle-stroke-width": 2.5}});
+  addPulse();
   map.addLayer({id: "bars", type: "symbol", source: "bars", minzoom: BAR_ZOOM, layout: {
     "icon-image": ["concat", "bar_", ["to-string", ["get", "lo"]], "_", ["to-string", ["get", "lp"]]],
     "icon-anchor": "bottom", "icon-overlap": "always", "icon-ignore-placement": true,
     "icon-size": ["interpolate", ["linear"], ["zoom"], BAR_ZOOM, 0.85, 12, 1.25]}});
   addEnvMarks();
 }
-const MAIN_LAYERS = ["study-fill", "env-fill", "basin-all", "basin-fill", "basin-line", "study-line", "gauges", "gauge-sel", "bars", "env-cols", "env-wind"];
+const MAIN_LAYERS = ["study-fill", "env-fill", "basin-all", "river-base", "river-flow", "river-fast", "basin-fill", "basin-halo", "basin-line",
+  "study-line", "gauge-pulse", "gauges", "gauge-sel-halo", "gauge-sel", "bars", "env-cols", "env-wind"];
 const barsVisible = () => map && map.getZoom() >= BAR_ZOOM - 0.3;
 function updateBars() {
   // Cột chỉ cần khi phóng to; xa thì để nguồn rỗng cho nhẹ
@@ -276,11 +309,16 @@ function initMainMap() {
   map = newMap("map", true);
   map.on("styleimagemissing", e => {
     if (e.id === "wind-arrow") { if (!map.hasImage(e.id)) map.addImage(e.id, arrowImage(), {pixelRatio: 2}); return; }
+    if (e.id === "river-flow" || e.id === "river-fast") { if (!map.hasImage(e.id)) map.addImage(e.id, flowImage(0), {pixelRatio: FLOW_PR}); return; }
     const m = /^bar_(-?\d)_(-?\d)$/.exec(e.id);
     if (m && !map.hasImage(e.id)) map.addImage(e.id, barImage(Number(m[1]), Number(m[2])), {pixelRatio: 2});
   });
   map.on("load", () => {
     addMainLayers();
+    // Màn hẹp: dòng ghi nguồn thu thành nút (i), không đè lên chú giải
+    if (matchMedia("(max-width: 700px)").matches) {
+      map.getContainer().querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
+    }
     run(loadEnv);
     run(refreshDay);
     updateMiniView();
@@ -326,7 +364,13 @@ function initMiniMap() {
     updateMiniView();
   });
 }
-function updateMiniView() { if (map?.loaded()) miniMap?.getSource("view")?.setData(viewBox()); }
+// Không dùng map.loaded(): khi sông, vòng lũ đang chạy bản đồ vẽ liên tục nên loaded(), "idle" không bao giờ tới
+function updateMiniView() { if (map) miniMap?.getSource("view")?.setData(viewBox()); }
+function onStyleReady(m, fn) {
+  // Chờ kiểu bản đồ mới sẵn sàng (sau setStyle); "data" tới cả khi kiểu nạp xong lẫn khi ô nguồn nạp xong
+  const go = () => (m.isStyleLoaded() ? fn() : m.once("data", go));
+  go();
+}
 function relabelMap(m, keepIds, withLabels = true) {
   // Đổi ngôn ngữ nhãn nền, giữ nguyên các lớp của trang (bản đồ chính giữ cả bóng núi, địa hình 3D)
   m.setStyle(baseStyle(withLabels, m === map), {transformStyle: (prev, next) => ({...next,
@@ -360,7 +404,7 @@ function renderLegend() {
     ...[4, 3, 2, 1, 0, -1].map(k => el("span", {class: "swatch"}, el("i", {style: `background:${levelColor(k)}`}), levelText(k))),
     el("span", {class: "swatch"}, el("i", {class: "sel"}), t("map.sel")),
     el("span", {class: "swatch"}, el("i", {class: "ring"}), t("map.outline")),
-    el("span", {class: "bars-note"}, barsIcon(), t(bars ? "map.barsOn" : "map.bars")), ...envLegend()] : []));
+    el("span", {class: "bars-note"}, barsIcon(), t(bars ? "map.barsOn" : "map.bars")), terrainNote(), ...envLegend()] : []));
   box.title = opened ? t("lv.note") : "";
 }
 const dayUrl = (date, runId = activeRun(), lead = activeLead()) => `/api/day${qs({date, run: runId, lead})}`;
@@ -400,15 +444,17 @@ async function refreshDay() {
   if (map?.getSource("gauges")) {
     for (const id of data.ids) map.setFeatureState({source: "gauges", id}, {lo: lo.get(id), lp: lp.get(id)});
     updateBars();
+    updateHydro();
   }
   renderStatus();
+  updateSnow();
   await refreshEnv();
 }
 
 // ---------- lớp bản đồ: khí tượng, đất, thực vật, đặc điểm lưu vực (env.json), địa hình ----------
-// Giá trị là trung bình cả lưu vực (Extended LamaH-CE), cùng các biến mô hình nhận làm đầu vào. Tô màu đa giác lưu vực
-// (lưu vực nhỏ vẽ đè lên lưu vực lớn chứa nó, thứ tự của basins.geojson); chế độ 3D thêm cột tại trạm cao theo giá trị;
-// lớp gió vẽ thêm mũi tên hướng gió tại trạm.
+// Giá trị là trung bình cả lưu vực (Extended LamaH-CE), cùng các biến mô hình nhận làm đầu vào. Tô màu "phần riêng" của
+// lưu vực (lưu vực trừ các lưu vực trạm thượng nguồn trong nó, basins_own.geojson) => mỗi chỗ một màu của lưu vực nhỏ
+// nhất chứa nó, không chồng màu; chế độ 3D thêm cột tại trạm cao theo giá trị; lớp gió vẽ thêm mũi tên hướng gió tại trạm.
 const ENV_CHUNK = 60;
 const COL_HALF_DEG = 0.03;
 // Cột 3D chỉ để so cả vùng; phóng gần hơn mức này thì tắt cột để thấy địa hình
@@ -449,9 +495,10 @@ function colGeo() {
   })};
 }
 function addEnvFill() {
-  map.addLayer({id: "env-fill", type: "fill", source: "basins", layout: {visibility: "none"},
-    paint: {"fill-color": "rgba(0,0,0,0)", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0.8, 9, 0.55],
-      "fill-outline-color": "rgba(255,255,255,0.35)"}});
+  map.addSource("own", {type: "geojson", data: "/api/basins-own", promoteId: "id"});
+  map.addLayer({id: "env-fill", type: "fill", source: "own", layout: {visibility: "none"},
+    paint: {"fill-color": "rgba(0,0,0,0)", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0.82, 9, 0.6],
+      "fill-outline-color": "rgba(255,255,255,0.5)"}});
 }
 function addEnvMarks() {
   map.addSource("cols", {type: "geojson", data: colGeo(), promoteId: "id"});
@@ -476,6 +523,7 @@ function syncEnvLayers() {
   show("env-fill", !!L);
   show("env-cols", !!L && state.d3);
   show("env-wind", L?.key === "wind");
+  if (map.getLayer("basin-fill")) map.setPaintProperty("basin-fill", "fill-opacity", selFillOpacity());
   if (L) {
     map.setPaintProperty("env-fill", "fill-color", envColor(L));
     map.setPaintProperty("env-cols", "fill-extrusion-color", envColor(L));
@@ -488,6 +536,7 @@ async function loadEnv() {
   if (env.ids.join() !== state.ids.join()) throw new Error("env.json không cùng thứ tự lưu vực với trang.");
   state.env = env;
   renderLayerOptions();
+  updateSnow();
 }
 function renderLayerOptions() {
   const box = $("env-layer");
@@ -522,7 +571,7 @@ async function refreshEnv() {
   state.envNow = data;
   state.env.ids.forEach((id, i) => {
     const v = data.values[i];
-    map.setFeatureState({source: "basins", id}, {v});
+    map.setFeatureState({source: "own", id}, {v});
     map.setFeatureState({source: "cols", id}, {v});
   });
   if (key === "wind") {
@@ -564,7 +613,12 @@ function setEnvLayer(key) {
 function setRelief(on) {
   state.relief = on;
   $("relief-btn").setAttribute("aria-pressed", String(on));
-  if (map?.getLayer("hillshade")) map.setLayoutProperty("hillshade", "visibility", on ? "visible" : "none");
+  if (map?.getLayer("hillshade")) {
+    map.setLayoutProperty("hillshade", "visibility", reliefVisible());
+    map.setLayoutProperty("relief-color", "visibility", reliefVisible());
+    map.setLayoutProperty("snow-cover", "visibility", snowVisible());
+  }
+  renderLegend();
 }
 function set3D(on) {
   state.d3 = on;
@@ -580,8 +634,157 @@ function set3D(on) {
     map.setTerrain(null);
     map.easeTo({pitch: 0, bearing: 0, duration: 600});
   }
+  if (map.getLayer("relief-color")) map.setPaintProperty("relief-color", "color-relief-opacity", reliefOpacity());
   syncEnvLayers();
   renderLegend();
+}
+
+// ---------- sông chảy, vòng báo lũ, tuyết trên địa hình ----------
+// Sông HydroRIVERS (Lehner & Grill 2013) trong vùng nghiên cứu, mỗi đoạn gắn trạm hạ lưu gần nhất (thuộc tính g); màu theo
+// mức lưu lượng của trạm đó ở ngày đang xem (thực đo hay dự báo theo nút "Màu chấm theo"), nét sáng chạy theo chiều vẽ
+// của đoạn = chiều nước chảy (kiểm khi dựng); ở mức rất cao, lũ nét chạy nhanh hơn. Người xem chọn giảm chuyển động thì
+// sông đứng yên, vòng lũ không nhấp nháy.
+const selFillOpacity = () => (state.layer ? 0 : 0.07);
+// Nét sáng là ảnh mẫu line-pattern dịch dần bằng updateImage (đổi line-dasharray mỗi khung làm MapLibre dựng lại ô
+// nguồn liên tục => bản đồ không bao giờ nạp xong, ký hiệu như cột trạm không hiện); mẫu đi theo chiều vẽ của đoạn
+const FLOW_W = 32, FLOW_H = 8, FLOW_DASH = 11, FLOW_PR = 2;
+function flowImage(offset) {
+  const w = FLOW_W * FLOW_PR, h = FLOW_H * FLOW_PR, data = new Uint8ClampedArray(w * h * 4);
+  for (let x = 0; x < w; x++) {
+    // Vị trí trong chu kỳ, đầu nét đậm, đuôi mờ dần => thấy rõ hướng chảy
+    const u = (((x / FLOW_PR - offset) % FLOW_W) + FLOW_W) % FLOW_W;
+    const a = u < FLOW_DASH ? Math.min(1, (FLOW_DASH - u) / 2) * (0.35 + 0.65 * u / FLOW_DASH) : 0;
+    for (let y = 0; y < h; y++) {
+      const c = 1 - Math.abs((y + 0.5) / h * 2 - 1);
+      const i = (y * w + x) * 4;
+      data[i] = data[i + 1] = data[i + 2] = 255;
+      data[i + 3] = Math.round(255 * a * Math.min(1, c * 2.2));
+    }
+  }
+  return {width: w, height: h, data};
+}
+// Mức thấp, trung bình là xanh nước đậm dần (đọc rõ trên nền núi xám); sông không gắn trạm (g rỗng) xanh nhạt hơn
+const RIVER_LOW = "#5d9ccf", RIVER_MID = "#2b6cb0", RIVER_NONE = "#8aa6ba", RIVER_FREE = "#3f86c6";
+// Nhìn cả vùng chỉ vẽ sông có diện tích thượng nguồn từ 200 km², phóng gần thì vẽ cả nhánh nhỏ; dày theo lưu lượng trung bình
+const riverWidth = scale => ["interpolate", ["linear"], ["zoom"],
+  6, ["*", scale, ["case", [">=", ["get", "u"], 200], ["interpolate", ["linear"], ["get", "q"], 2, 1.1, 50, 2, 500, 3.6], 0]],
+  8, ["*", scale, ["interpolate", ["linear"], ["get", "q"], 0.5, 1.2, 20, 2.6, 200, 4.6, 1000, 6.5]],
+  11, ["*", scale, ["interpolate", ["linear"], ["get", "q"], 0.5, 2.2, 20, 4.5, 200, 7.5, 1000, 10]]];
+const hydro = {high: [], flood: [], colorKey: "", hasRivers: false, timer: 0, frame: 0, last: 0};
+function riverColor(groups) {
+  // Gom trạm theo mức => biểu thức "match" chỉ 6 nhánh dù 451 trạm
+  const colors = [RIVER_NONE, RIVER_LOW, RIVER_MID, levelColor(2), levelColor(3), levelColor(4)];
+  const arms = groups.flatMap((ids, i) => (ids.length ? [ids, colors[i]] : []));
+  return ["match", ["get", "g"], "", RIVER_FREE, ...arms, RIVER_NONE];
+}
+// Độ mờ nét chạy: đoạn của trạm mức rất cao, lũ chỉ hiện ở lớp nhanh, các đoạn khác ở lớp thường (đổi thuộc tính vẽ,
+// không đổi bộ lọc => MapLibre không phải chia lại ô dữ liệu sông)
+const flowOpacity = (high, inHigh) => (high.length ? ["match", ["get", "g"], high, inHigh ? 0.8 : 0, inHigh ? 0 : 0.6] : inHigh ? 0 : 0.6);
+function addRivers() {
+  // Tự nạp dữ liệu để biết có sông hay không (gói cũ trả tập rỗng => ẩn nút Sông, không chạy hiệu ứng)
+  map.addSource("rivers", {type: "geojson", data: {type: "FeatureCollection", features: []},
+    attribution: '<a href="https://www.hydrosheds.org">HydroSHEDS</a>'});
+  api("/api/rivers").then(g => {
+    hydro.hasRivers = g.features.length > 0;
+    $("rivers-btn").hidden = !hydro.hasRivers;
+    map.getSource("rivers")?.setData(g);
+    syncAnimation();
+    renderLegend();
+  }).catch(e => console.error(e));
+  const vis = state.rivers ? "visible" : "none";
+  map.addLayer({id: "river-base", type: "line", source: "rivers", layout: {visibility: vis, "line-cap": "round", "line-join": "round"},
+    paint: {"line-color": ["match", ["get", "g"], "", RIVER_FREE, RIVER_NONE], "line-width": riverWidth(1), "line-opacity": 1}});
+  for (const id of ["river-flow", "river-fast"]) {
+    if (!map.hasImage(id)) map.addImage(id, flowImage(0), {pixelRatio: FLOW_PR});
+    map.addLayer({id, type: "line", source: "rivers", layout: {visibility: vis, "line-cap": "butt", "line-join": "round"},
+      paint: {"line-pattern": id, "line-opacity": flowOpacity(hydro.high, id === "river-fast"), "line-width": riverWidth(0.6)}});
+  }
+}
+function addPulse() {
+  map.addSource("pulse", {type: "geojson", data: {type: "FeatureCollection", features: []}});
+  map.addLayer({id: "gauge-pulse", type: "circle", source: "pulse", paint: {
+    "circle-radius": 10, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": css("--lv-flood"),
+    "circle-stroke-width": 2, "circle-stroke-opacity": 0.8}});
+}
+function updateHydro() {
+  // Màu sông và vòng lũ theo mức của ngày đang xem (thực đo hay dự báo)
+  const lv = state.levelsNow;
+  if (!lv || !map?.getLayer("river-base")) return;
+  const levels = dotKey() === "lo" ? lv.lo : lv.lp;
+  // Chỉ cập nhật bản đồ khi mức của ít nhất một trạm đổi (khi chạy thời gian, nhiều ngày liền không đổi)
+  const groups = [[], [], [], [], [], []];
+  for (const [id, k] of levels) groups[k + 1].push(id);
+  const key = groups.map(g => g.join()).join("|");
+  if (key === hydro.colorKey) return;
+  hydro.colorKey = key;
+  map.setPaintProperty("river-base", "line-color", riverColor(groups));
+  const high = [...groups[4], ...groups[5]];
+  if (high.join() !== hydro.high.join()) {
+    hydro.high = high;
+    map.setPaintProperty("river-flow", "line-opacity", flowOpacity(high, false));
+    map.setPaintProperty("river-fast", "line-opacity", flowOpacity(high, true));
+  }
+  const flood = groups[5];
+  if (flood.join() !== hydro.flood.join()) {
+    hydro.flood = flood;
+    const pts = new Map(state.catalog.points.map(p => [p.id, p]));
+    map.getSource("pulse").setData({type: "FeatureCollection", features: flood.map(id => pts.get(id)).filter(Boolean)
+      .map(p => ({type: "Feature", geometry: {type: "Point", coordinates: [p.lon, p.lat]}, properties: {}}))});
+  }
+  syncAnimation();
+}
+function updateSnow() {
+  if (!map?.getLayer("snow-cover")) return;
+  const h = snowLine();
+  map.setLayoutProperty("snow-cover", "visibility", snowVisible());
+  if (h != null && h !== updateSnow.last) {
+    map.setPaintProperty("snow-cover", "color-relief-color", snowColor(h));
+    updateSnow.last = h;
+  }
+  if (state.relief && state.legendOpen) renderTerrainNote();
+}
+function animating() {
+  return !reduceMotion() && !document.hidden && map && ((state.rivers && hydro.hasRivers) || hydro.flood.length > 0);
+}
+function syncAnimation() {
+  if (animating() && !hydro.timer) hydro.timer = requestAnimationFrame(animTick);
+}
+function animTick(now) {
+  // Khoảng 12 bước/giây cho sông thường, 24 cho sông mức rất cao, lũ; vòng lũ lan ra trong 1,6 giây
+  hydro.timer = 0;
+  if (!animating()) return;
+  if (now - hydro.last >= 1000 / 24) {
+    hydro.last = now;
+    hydro.frame += 1;
+    if (state.rivers && map.hasImage("river-flow") && map.hasImage("river-fast")) {
+      map.updateImage("river-flow", flowImage(hydro.frame * 0.5));
+      if (hydro.high.length) map.updateImage("river-fast", flowImage(hydro.frame * 1.25));
+    }
+    if (hydro.flood.length && map.getLayer("gauge-pulse")) {
+      const phase = (now % 1600) / 1600;
+      map.setPaintProperty("gauge-pulse", "circle-radius", 7 + 11 * phase);
+      map.setPaintProperty("gauge-pulse", "circle-stroke-opacity", 0.85 * (1 - phase));
+    }
+  }
+  hydro.timer = requestAnimationFrame(animTick);
+}
+function setRivers(on) {
+  state.rivers = on;
+  $("rivers-btn").setAttribute("aria-pressed", String(on));
+  for (const id of ["river-base", "river-flow", "river-fast"]) map?.getLayer(id) && map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+  syncAnimation();
+  renderLegend();
+}
+function renderTerrainNote() {
+  const box = document.querySelector("#map-legend .terrain-note");
+  if (box) box.replaceWith(terrainNote());
+}
+function terrainNote() {
+  // Ghi chú địa hình và sông trong chú giải
+  const h = snowLine(), parts = [];
+  if (state.relief) parts.push(h == null ? t("map.snowNone") : t("map.snowAt", {h: fmt(h, 0)}));
+  if (state.rivers && hydro.hasRivers) parts.push(t("map.riverNote"));
+  return el("p", {class: "terrain-note", title: t("map.terrainMore"), hidden: parts.length ? null : ""}, ...parts.flatMap((x, i) => (i ? [el("br"), x] : [x])));
 }
 
 // ---------- bước 1: nơi xem ----------
@@ -776,16 +979,23 @@ async function refreshChart({keepRange = false} = {}) {
       if (ev["xaxis.range[0]"] || ev["xaxis.range"] || ev["xaxis.autorange"]) {
         const r = box.layout.xaxis.range;
         chartRange = [String(r[0]).slice(0, 10), String(r[1]).slice(0, 10)];
+        // moveDayLine đã đổi cả trục Q trong cùng lần vẽ => bỏ lần co trục thứ hai
+        if (skipFit) { skipFit = false; return; }
         fitY();
       }
     });
   }
   fitY();
 }
+let skipFit = false;
 function fitY() {
+  const upd = yUpdate();
+  if (upd) Plotly.relayout($("hydrograph"), upd);
+}
+function yUpdate() {
   // Trục Q co theo số liệu trong khung đang xem; ngưỡng lũ chỉ vẽ khi gần khung, còn lại ghi chữ
   const box = $("hydrograph");
-  if (!box.data || !chartRange) return;
+  if (!box.data || !chartRange) return null;
   const [a, b] = chartRange;
   let top = 0;
   for (const tr of box.data) {
@@ -806,10 +1016,10 @@ function fitY() {
       bgcolor: "rgba(255,255,255,0.8)", borderpad: 1,
       text: `${t("chart.flood", {p: fmt(p, 1)})} · ${fmtQ(v)} m³/s`, font: {size: 12.5, color: css("--lv-flood")}});
   });
-  Plotly.relayout(box, {"yaxis.range": [0, top], "yaxis.autorange": false, shapes, annotations});
   $("chart-note").textContent = (hidden.length
     ? t("chart.thresholdsHidden", {list: hidden.map(([p, v]) => `${t("flood.years", {p: fmt(p, 1)})} ${fmtQ(v)} m³/s`).join(", ")}) + " "
     : "") + t("chart.help");
+  return {"yaxis.range": [0, top], "yaxis.autorange": false, shapes, annotations};
 }
 
 // ---------- thanh thời gian ----------
@@ -838,7 +1048,9 @@ function moveDayLine() {
   const day = state.dates[state.day];
   if (chartRange && (day < chartRange[0] || day > chartRange[1])) {
     chartRange = windowAround(state.day, playTimer ? 90 : 60);
-    Plotly.relayout(box, {"xaxis.range": chartRange});
+    // Dời trục thời gian và co trục Q trong một lần vẽ (hai lần liền làm khựng khoảng 0,3 giây khi chạy thời gian)
+    skipFit = true;
+    Plotly.relayout(box, {"xaxis.range": chartRange, ...yUpdate()});
   } else placeDayLine();
 }
 function setDay(idx, {fromSlider = false} = {}) {
@@ -892,7 +1104,7 @@ function setSpeed(k) {
 
 // ---------- chọn trạm hoặc cả vùng ----------
 function applySelection() {
-  for (const layer of ["basin-fill", "basin-line", "gauge-sel"]) map?.getLayer(layer) && map.setFilter(layer, selFilter());
+  for (const layer of ["basin-fill", "basin-halo", "basin-line", "gauge-sel-halo", "gauge-sel"]) map?.getLayer(layer) && map.setFilter(layer, selFilter());
   map?.getLayer("study-fill") && map.setPaintProperty("study-fill", "fill-opacity", isRegion() ? 0.1 : 0.04);
   renderStation();
   renderStatus();
@@ -1650,6 +1862,9 @@ async function start() {
   $("region-btn").addEventListener("click", toggleRegion);
   $("env-layer").addEventListener("change", e => setEnvLayer(e.target.value));
   $("relief-btn").addEventListener("click", () => setRelief(!state.relief));
+  $("rivers-btn").addEventListener("click", () => setRivers(!state.rivers));
+  document.addEventListener("visibilitychange", syncAnimation);
+  matchMedia("(prefers-reduced-motion: reduce)").addEventListener?.("change", syncAnimation);
   $("d3-btn").addEventListener("click", () => set3D(!state.d3));
   document.addEventListener("keydown", e => {
     if (e.target.closest("input, select, textarea, button")) return;
@@ -1663,6 +1878,7 @@ async function start() {
     if (map?.getLayer("gauges")) {
       map.setPaintProperty("gauges", "circle-color", levelMatch(dotKey()));
       map.setPaintProperty("gauges", "circle-radius", dotRadius(dotKey()));
+      updateHydro();
     }
   }));
   document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => {
@@ -1671,7 +1887,7 @@ async function start() {
     renderTexts();
     renderLayerOptions();
     relabelMap(map, MAIN_LAYERS);
-    map.once("idle", () => { syncEnvLayers(); run(refreshDay); });
+    onStyleReady(map, () => { syncEnvLayers(); run(refreshDay); });
     run(() => refreshChart({keepRange: true}));
     if (state.resultsReady) {
       relabelMap(nseMap, ["study-line", "nse"]);

@@ -141,9 +141,27 @@ def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, w
     def get_highlights():
         return jsonify(events=flood_highlights()[:8])
 
+    # Tệp dữ liệu bản đồ (geojson, env.json) đổi khi dựng lại gói => trình duyệt hỏi lại mỗi lần (ETag, không đổi trả 304)
+    # thay vì giữ bản cũ một ngày
     @app.get("/api/basins")
     def get_basins():
-        return send_file(bundle / "basins.geojson", mimetype="application/geo+json", max_age=86400)
+        return send_file(bundle / "basins.geojson", mimetype="application/geo+json", max_age=0)
+
+    # Phần riêng của lưu vực (tô lớp bản đồ không chồng màu) và mạng sông HydroRIVERS (build_map_layers.py);
+    # gói cũ chưa có thì trả tập rỗng để trang vẫn chạy
+    def optional_geojson(name):
+        path = bundle / name
+        if not path.is_file():
+            return jsonify(type="FeatureCollection", features=[])
+        return send_file(path, mimetype="application/geo+json", max_age=0)
+
+    @app.get("/api/basins-own")
+    def get_basins_own():
+        return optional_geojson("basins_own.geojson")
+
+    @app.get("/api/rivers")
+    def get_rivers():
+        return optional_geojson("rivers.geojson")
 
     @app.get("/tiles/basemap.pmtiles")
     def get_tiles():
@@ -171,7 +189,7 @@ def create_app(bundle, raw=None, h_python=None, pmtiles=None, what_if_slots=1, w
         # Danh sách lớp bản đồ (đơn vị, ngưỡng màu) và giá trị thuộc tính tĩnh của mọi lưu vực
         if env_meta is None:
             return jsonify(layers=[])
-        return send_file(env_path, mimetype="application/json", max_age=86400)
+        return send_file(env_path, mimetype="application/json", max_age=0)
 
     @app.get("/api/env-days")
     def get_env_days():

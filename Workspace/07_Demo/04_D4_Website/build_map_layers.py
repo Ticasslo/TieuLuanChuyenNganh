@@ -3,9 +3,15 @@
 # - env/<khóa>.npy: ma trận float32 [451 lưu vực, ngày kỳ test] cùng thứ tự với catalog.json, giá trị trung bình
 #   cả lưu vực từ A_basins_total_upstrm/2_timeseries/daily/ID_<id>.csv (ô trống => NaN);
 # - env.json: danh sách lớp, đơn vị (bảng A1, A2 của BiasCast), ngưỡng màu theo phân vị, giá trị thuộc tính tĩnh
-#   từ Catchment_attributes.csv.
-# Kiểm: đọc lại 40 ô ngẫu nhiên bằng mô-đun csv (không qua pandas), lệch thì dừng.
-# Chạy: python build_map_layers.py --raw <LamaH_extended> --bundle <gói website>
+#   từ Catchment_attributes.csv; đường tuyết ước lượng theo ngày (snowline) cho lớp tuyết trên địa hình 3D;
+# - basins_own.geojson: phần riêng của từng lưu vực (lưu vực toàn phần trừ các lưu vực trạm thượng nguồn nằm trong nó,
+#   tính ở EPSG:3035 trước khi làm gọn) => các mảnh không chồng nhau, mỗi chỗ tô một màu của lưu vực nhỏ nhất chứa nó.
+# - rivers.geojson (khi có --rivers): mạng sông HydroRIVERS v1.0 (Lehner & Grill 2013, giấy phép HydroSHEDS v1) trong
+#   vùng nghiên cứu, mỗi đoạn gắn trạm đo hạ lưu gần nhất (mảnh phần riêng chứa điểm giữa đoạn) để tô theo mức lưu lượng
+#   của trạm đó; đoạn vẽ theo chiều nước chảy (điểm cuối nối điểm đầu đoạn NEXT_DOWN, kiểm khi dựng).
+# Kiểm: đọc lại 40 ô ngẫu nhiên bằng mô-đun csv (không qua pandas), lệch thì dừng; các mảnh phủ đúng hợp các lưu vực
+# và không chồng nhau (sai lệch diện tích quá 0,5% thì dừng).
+# Chạy: python build_map_layers.py --raw <LamaH_extended> --bundle <gói website> [--rivers <HydroRIVERS_v10_eu.shp>]
 
 import argparse
 import csv
@@ -15,9 +21,27 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import shapefile
+from pyproj import Transformer
+from shapely import make_valid, union_all
+from shapely.geometry import MultiPolygon, Polygon, mapping, shape
+from shapely.ops import transform
+from shapely.strtree import STRtree
 
 DAILY = "A_basins_total_upstrm/2_timeseries/daily"
 ATTRS = "A_basins_total_upstrm/1_attributes/Catchment_attributes.csv"
+BASINS_SHP = "A_basins_total_upstrm/3_shapefiles/Basins_A.shp"
+SIMPLIFY_M = 100
+# Mảnh nhỏ hơn mức này (m²) sau khi trừ là vệt do ranh giới số hóa lệch nhau, bỏ đi
+SLIVER_M2 = 5e4
+# Lưu vực có lượng nước trong tuyết từ mức này (mm) tính là "có tuyết" khi ước lượng đường tuyết
+SNOW_MM = 5.0
+# Sông: chỉ giữ đoạn có diện tích thượng nguồn từ mức này (km²); làm gọn đường theo độ (khoảng 30 m)
+RIVER_UPLAND_KM2 = 20
+# Sông lớn ngoài lưu vực có trạm (Inn, Salzach, Danube, Rhine...) vẫn vẽ cho thấy mạng sông, không gắn trạm (g rỗng)
+RIVER_FREE_KM2 = 300
+RIVER_SIMPLIFY_DEG = 0.0003
+STUDY_BBOX = (7.5, 45.8, 17.8, 50.9)
 # Bảng màu một sắc độ (OKLCH, độ sáng giảm đều) và bảng hai phía quanh 0 °C (xám ở giữa)
 RAMPS = {
     "blue": ["#e1f0ff", "#b4cbea", "#88a8d1", "#5d85b8", "#32639f", "#004085"],
@@ -84,11 +108,125 @@ def stops(values, scale, n):
     return out
 
 
+def own_parts(raw, ids):
+    # Phần riêng của mỗi lưu vực: trừ các lưu vực nhỏ hơn nằm phần lớn (trên nửa diện tích) trong nó
+    geoms = {}
+    with shapefile.Reader(str(raw / BASINS_SHP), encoding="latin1") as reader:
+        for item in reader.iterShapeRecords():
+            bid = str(int(item.record["ID"]))
+            if bid in ids:
+                geoms[bid] = make_valid(shape(item.shape.__geo_interface__))
+    if set(geoms) != set(ids):
+        raise ValueError("Basins_A thiếu ranh giới của một số lưu vực.")
+    order = list(ids)
+    shapes = [geoms[b] for b in order]
+    areas = np.array([g.area for g in shapes])
+    tree = STRtree(shapes)
+    parts, children = {}, {}
+    for i, g in enumerate(shapes):
+        inner = [j for j in tree.query(g) if j != i and areas[j] < areas[i]
+                 and g.intersection(shapes[j]).area > 0.5 * areas[j]]
+        own = g.difference(union_all([shapes[j] for j in inner])) if inner else g
+        polys = [q for q in getattr(own, "geoms", [own]) if isinstance(q, Polygon) and q.area >= SLIVER_M2]
+        parts[order[i]] = MultiPolygon(polys) if len(polys) > 1 else (polys[0] if polys else None)
+        children[order[i]] = len(inner)
+    # Kiểm: các mảnh phủ hợp các lưu vực và không chồng nhau
+    kept = [g for g in parts.values() if g is not None]
+    whole, mosaic, summed = union_all(shapes).area, union_all(kept).area, sum(g.area for g in kept)
+    gap, overlap = (whole - mosaic) / whole, (summed - mosaic) / whole
+    if gap > 0.005 or overlap > 0.005:
+        raise ValueError(f"Mảnh lưu vực không khớp: hở {gap:.3%}, chồng {overlap:.3%}")
+    to_wgs84 = Transformer.from_crs(3035, 4326, always_xy=True).transform
+    features = []
+    for bid in order:
+        g = parts[bid]
+        if g is None:
+            continue
+        g = transform(to_wgs84, g.simplify(SIMPLIFY_M, preserve_topology=True))
+        features.append(dict(type="Feature", properties=dict(id=bid, own_km2=round(parts[bid].area / 1e6, 1)),
+                             geometry=json.loads(json.dumps(mapping(g)), parse_float=lambda v: round(float(v), 5))))
+    nested = sum(1 for n in children.values() if n)
+    print(f"basins_own: {len(features)} mảnh ({len(order) - len(features)} lưu vực không còn phần riêng), "
+          f"{nested} lưu vực có lưu vực con; hở {gap:.3%}, chồng {overlap:.3%}")
+    return features, parts
+
+
+def rivers(path, parts):
+    # Đoạn sông trong vùng nghiên cứu, gắn trạm của mảnh phần riêng chứa điểm giữa đoạn
+    from shapely.geometry import LineString, Point
+    ids = [b for b, g in parts.items() if g is not None]
+    tree = STRtree([parts[b] for b in ids])
+    to_3035 = Transformer.from_crs(4326, 3035, always_xy=True).transform
+    reaches = {}
+    with shapefile.Reader(str(path)) as reader:
+        for item in reader.iterShapeRecords(bbox=STUDY_BBOX):
+            rec = item.record.as_dict()
+            reaches[rec["HYRIV_ID"]] = (rec, item.shape.points)
+    # Kiểm chiều vẽ: điểm cuối đoạn trùng điểm đầu đoạn hạ lưu
+    linked = [(pts, reaches[r["NEXT_DOWN"]][1]) for r, pts in reaches.values() if r["NEXT_DOWN"] in reaches]
+    forward = sum(1 for a, b in linked if abs(a[-1][0] - b[0][0]) + abs(a[-1][1] - b[0][1]) < 1e-6)
+    if forward < 0.95 * len(linked):
+        raise ValueError(f"Đoạn sông không vẽ theo chiều nước chảy: {forward}/{len(linked)}")
+    features, per_gauge = [], {}
+    for rec, pts in reaches.values():
+        if rec["UPLAND_SKM"] < RIVER_UPLAND_KM2 or len(pts) < 2:
+            continue
+        line = LineString(pts)
+        mid = Point(to_3035(*line.interpolate(0.5, normalized=True).coords[0]))
+        hit = [ids[j] for j in tree.query(mid, predicate="within")]
+        if not hit:
+            if rec["UPLAND_SKM"] < RIVER_FREE_KM2:
+                continue
+            hit = [""]
+        g = line.simplify(RIVER_SIMPLIFY_DEG)
+        features.append(dict(type="Feature", properties=dict(g=hit[0], q=round(float(rec["DIS_AV_CMS"]), 2), u=round(float(rec["UPLAND_SKM"]))),
+                             geometry=dict(type="LineString", coordinates=[[round(x, 5), round(y, 5)] for x, y in g.coords])))
+        per_gauge[hit[0]] = per_gauge.get(hit[0], 0) + 1
+    free = per_gauge.pop("", 0)
+    print(f"rivers: {len(features)} đoạn (trong lưu vực có trạm từ {RIVER_UPLAND_KM2} km², ngoài lưu vực từ {RIVER_FREE_KM2} km²: "
+          f"{free} đoạn), chiều vẽ xuôi dòng {forward}/{len(linked)}, {len(per_gauge)}/{len(ids)} trạm có đoạn sông")
+    return features
+
+
+def snowline(swe, elev):
+    # Đường tuyết mỗi ngày: độ cao trung bình lưu vực tại đó xác suất "có tuyết" (>= SNOW_MM) là 50%,
+    # hồi quy logistic theo độ cao trên 451 lưu vực (IRLS). Không lưu vực nào có tuyết => None;
+    # đường tuyết nằm ngoài khoảng độ cao có dữ liệu => chặn ở biên (không ngoại suy)
+    lo, hi = float(np.nanmin(elev)), float(np.nanmax(elev))
+    z = (elev - elev.mean()) / elev.std()
+    out = []
+    for d in range(swe.shape[1]):
+        ok = np.isfinite(swe[:, d])
+        y, x = (swe[ok, d] >= SNOW_MM).astype(float), z[ok]
+        if y.sum() == 0:
+            out.append(None)
+            continue
+        if y.sum() == len(y):
+            out.append(round(lo))
+            continue
+        beta = np.zeros(2)
+        X = np.column_stack([np.ones_like(x), x])
+        for _ in range(50):
+            p = 1 / (1 + np.exp(-(X @ beta)))
+            w = np.clip(p * (1 - p), 1e-6, None)
+            step = np.linalg.solve(X.T @ (X * w[:, None]) + 1e-6 * np.eye(2), X.T @ (y - p))
+            beta += step
+            if np.abs(step).max() < 1e-8:
+                break
+        if beta[1] <= 0:
+            out.append(None)
+            continue
+        h = float(elev.mean() + elev.std() * (-beta[0] / beta[1]))
+        out.append(round(min(max(h, lo), hi)))
+    return out
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser()
     parser.add_argument("--raw", required=True, type=Path)
     parser.add_argument("--bundle", required=True, type=Path)
+    parser.add_argument("--rivers", type=Path, help="HydroRIVERS_v10_eu.shp (tùy chọn)")
     args = parser.parse_args()
     raw, bundle = args.raw.resolve(), args.bundle.resolve()
     catalog = json.loads((bundle / "catalog.json").read_text(encoding="utf-8"))
@@ -144,8 +282,25 @@ def main():
                            colors=ramp, values=[round(float(v), 3) if np.isfinite(v) else None for v in values]))
         print(f"{layer['key']:>8}: {layer['column']}, ngưỡng {layers[-1]['stops']}")
 
+    elev = attrs["elev_mean"].to_numpy(float)
+    line = snowline(cube["ERA5L_swe"], elev)
+    month = dates.month
+    for m in (1, 4, 7, 10):
+        vals = [v for v, mm in zip(line, month) if mm == m and v is not None]
+        print(f"Đường tuyết tháng {m}: trung vị {np.median(vals) if vals else float('nan'):.0f} m, {len(vals)} ngày có tuyết")
+    snow = dict(values=line, threshold_mm=SNOW_MM, elev_range=[round(float(elev.min())), round(float(elev.max()))],
+                method="logistic P(SWE >= threshold) vs basin mean elevation, 451 basins, per day")
+
+    own, parts = own_parts(raw, ids)
+    if args.rivers:
+        lines = rivers(args.rivers.resolve(), parts)
+        (bundle / "rivers.geojson").write_text(json.dumps(dict(type="FeatureCollection", features=lines), separators=(",", ":")),
+                                               encoding="utf-8")
+    (bundle / "basins_own.geojson").write_text(json.dumps(dict(type="FeatureCollection", features=own), separators=(",", ":")),
+                                               encoding="utf-8")
+
     meta = dict(schema=1, source="Extended LamaH-CE daily (Zenodo 17119635)", units_source="BiasCast (HESS 30:5067-5096) Table A1, A2",
-                ids=ids, start=catalog["dates"][0], days=len(dates), layers=layers)
+                ids=ids, start=catalog["dates"][0], days=len(dates), layers=layers, snowline=snow)
     (bundle / "env.json").write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
     size = sum(p.stat().st_size for p in out_dir.glob("*.npy")) / 1e6
     print(f"env.json: {len(layers)} lớp; env/: {len(list(out_dir.glob('*.npy')))} tệp, {size:.1f} MB")

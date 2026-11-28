@@ -14,7 +14,7 @@ import urllib.request
 from urllib.parse import urlencode
 
 READ_ONLY = ("/api/catalog", "/api/site", "/api/basins", "/api/highlights", "/api/leaderboard", "/api/by-lead",
-             "/api/c2-seeds", "/api/d-pairs", "/api/env")
+             "/api/c2-seeds", "/api/d-pairs", "/api/env", "/api/basins-own", "/api/rivers")
 
 
 def read_only_paths(catalog):
