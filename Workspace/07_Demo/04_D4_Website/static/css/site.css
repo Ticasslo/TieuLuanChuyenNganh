@@ -487,3 +487,28 @@ th.n { text-align: right; }
 .fig-scroll img { display: block; width: 100%; height: auto; }
 .fig-close { position: sticky; float: right; top: 0; z-index: 1; width: 36px; height: 36px; margin: -6px -6px 6px 8px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); font-size: 22px; line-height: 1; cursor: pointer; color: var(--ink); }
 .fig-close:hover { background: var(--sunk); }
+.cores { scroll-margin-top: 72px; }
+.cores-lede { margin: 0 0 12px; color: var(--ink-2); max-width: 80ch; }
+.core-tabs { margin-bottom: 14px; flex-wrap: wrap; }
+.tabs.light button[aria-selected="true"] { background: var(--ink); color: var(--surface); }
+.core-pane .arch-fig { margin-bottom: 12px; }
+.core-notes { display: grid; grid-template-columns: max-content minmax(0, 80ch); gap: 8px 24px; margin: 0; }
+.core-notes dt { font-weight: 700; }
+.core-notes dd { margin: 0; color: var(--ink-2); }
+.arch .gate rect { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.4; }
+.arch .op circle { fill: var(--surface); stroke: var(--ink-2); stroke-width: 1.4; }
+.arch .op text { font-size: 20px; font-weight: 700; text-anchor: middle; }
+.arch .rail { fill: none; stroke: var(--accent); stroke-width: 2.6; }
+.arch .zoom { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
+.arch .mask rect.on { fill: var(--accent); }
+.arch .mask rect.off { fill: var(--sunk); }
+.arch .axis { fill: none; stroke: var(--muted); stroke-width: 1; }
+.arch .kern { fill: none; stroke: var(--accent); stroke-width: 2; }
+.arch .core-link text { fill: var(--accent-ink); text-decoration: underline; cursor: pointer; }
+.arch .core-link:hover text, .arch .core-link:focus text { font-weight: 700; }
+@media (max-width: 720px) {
+  .core-notes { grid-template-columns: 1fr; gap: 2px; }
+  .core-notes dd { margin-bottom: 10px; }
+  .tabs.light.core-tabs { flex-wrap: nowrap; }
+  .tabs.light.core-tabs button { padding: 7px 6px; font-size: 13.5px; }
+}

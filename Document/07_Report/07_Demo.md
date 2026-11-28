@@ -39,7 +39,7 @@ Mọi run dùng chung một lớp dự báo vì cả năm lõi nằm trong cùng
 
 ## 7.3. Giao diện
 
-Trang gồm ba phần nối tiếp: xem dự báo, kết quả nghiên cứu và giới thiệu dự án. Cuối phần xem dự báo là mục "Mô hình dự báo thế nào?": sơ đồ so sánh kiến trúc BiasCast với kiến trúc của đề tài (cùng hình với Hình 5.1), cách chia dữ liệu theo thời gian và mô tả năm lõi. Trang có hai ngôn ngữ, tiếng Việt và tiếng Anh. Thanh trên cùng có bốn mục (Xem dự báo, Mô hình, Kết quả nghiên cứu, Về dự án) để chuyển nhanh giữa các phần, và nút "Hướng dẫn" dẫn người mới xem qua từng thành phần.
+Trang gồm ba phần nối tiếp: xem dự báo, kết quả nghiên cứu và giới thiệu dự án. Cuối phần xem dự báo là mục "Mô hình dự báo thế nào?": sơ đồ so sánh kiến trúc BiasCast với kiến trúc của đề tài (cùng hình với Hình 5.1), cách chia dữ liệu theo thời gian, và năm thẻ cho năm lõi: bấm tên một lõi trên sơ đồ kiến trúc hay bấm thẻ sẽ mở sơ đồ bên trong lõi đó (cùng các hình 2.1–2.5). Trang có hai ngôn ngữ, tiếng Việt và tiếng Anh. Thanh trên cùng có bốn mục (Xem dự báo, Mô hình, Kết quả nghiên cứu, Về dự án) để chuyển nhanh giữa các phần, và nút "Hướng dẫn" dẫn người mới xem qua từng thành phần.
 
 ![Phần xem dự báo](../../Workspace/07_Demo/04_D4_Website/Figures/D4_Forecast.png)
 

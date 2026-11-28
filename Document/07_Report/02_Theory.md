@@ -23,6 +23,10 @@ Mạng hồi quy (RNN) đọc chuỗi từng bước, mang theo một trạng th
 
 Ô nhớ được cập nhật bằng phép cộng, nên thông tin có thể đi qua nhiều bước mà không bị nhân dồn. Trong thủy văn, ô nhớ có thể giữ những trạng thái tích lũy chậm như lượng tuyết hay độ ẩm đất; Kratzert và cs. (HESS 22:6005, 2018) cho thấy một số ô nhớ của LSTM tương quan với lượng nước trong tuyết dù mô hình không được dạy điều đó. BiasCast đặt độ lệch (bias) của cổng quên ban đầu bằng 3 để σ(3) ≈ 0,95, tức mặc định gần như giữ nguyên trí nhớ. Một lớp LSTM có 4 khối cổng, mỗi khối một ma trận cho [h, x] và hai vectơ độ lệch (theo cách cài của PyTorch): 4 × (H × (H + X) + 2H) tham số, với H là số chiều ẩn, X số chiều đầu vào.
 
+![Lõi LSTM](../../Workspace/07_Demo/04_D4_Website/Figures/D4_Core_LSTM.png)
+
+*Hình 2.1. Lõi LSTM của đề tài. Bên trái: cùng một ô chạy lần lượt qua các ngày, mang theo ô nhớ c và trạng thái h. Bên phải: bên trong một ô, gồm cổng quên f, cổng nạp i, nội dung mới g và cổng ra o theo các công thức ở trên. Kích thước theo cấu hình C2 `lstm_L2_x1_lr1e-3`: 2 lớp, mỗi lớp 77 chiều, độ lệch cổng quên khởi tạo bằng 3 (`config.yml` của run). Mã: `torch.nn.LSTM` trong `RNNCore`, `neuralhydrology/modelzoo/sf_cores.py` của fork. Chữ trong hình bằng tiếng Anh.*
+
 ## 2.3. GRU
 
 GRU (Cho và cs., EMNLP 2014) rút LSTM còn hai cổng và bỏ ô nhớ riêng:
@@ -31,6 +35,10 @@ GRU (Cho và cs., EMNLP 2014) rút LSTM còn hai cổng và bỏ ô nhớ riêng
 - cổng cập nhật z_t = σ(W_z [h_{t−1}, x_t]) trộn cũ và mới: h_t = (1 − z_t) ⊙ h_{t−1} + z_t ⊙ h̃_t.
 
 GRU có 3 khối cổng so với 4 của LSTM, nên ở cùng số tham số GRU có số chiều ẩn lớn hơn (Chương 5 Mục 5.4: 150 so với 128 ở một lớp). Đề tài dùng GRU để tách lợi thế của cấu trúc cổng LSTM khỏi lợi thế chung của họ mạng hồi quy.
+
+![Lõi GRU](../../Workspace/07_Demo/04_D4_Website/Figures/D4_Core_GRU.png)
+
+*Hình 2.2. Lõi GRU của đề tài: chỉ một trạng thái h, cổng reset r tạo nội dung mới h̃, cổng cập nhật z trộn cũ và mới. Hình vẽ theo `torch.nn.GRU`, nhân r sau phép chiếu U h; PyTorch đặt z ở vế giữ trạng thái cũ, hình dùng quy ước của công thức ở trên, hai cách tương đương khi đổi z thành 1 − z. Kích thước theo cấu hình C2 `gru_L2_x1_lr1e-3`: 2 lớp, mỗi lớp 90 chiều. Chữ trong hình bằng tiếng Anh.*
 
 ## 2.4. Transformer
 
@@ -42,6 +50,10 @@ Chia cho √d_k (d_k là số chiều của khóa) giữ tích vô hướng khô
 
 Trong dự báo, **mặt nạ nhân quả** chặn bước i nhìn các bước sau nó. Ưu điểm của Transformer là bước cuối nhìn thẳng được bất kỳ ngày nào trong 365 ngày mà không phải truyền qua từng bước. Nhược điểm là chi phí tăng theo bình phương độ dài chuỗi, và không có thiên hướng sẵn về "gần thì quan trọng hơn" như mạng hồi quy.
 
+![Lõi Transformer](../../Workspace/07_Demo/04_D4_Website/Figures/D4_Core_Transformer.png)
+
+*Hình 2.3. Lõi Transformer của đề tài: chiếu 32 → 56, cộng mã hóa vị trí sin, cos, rồi 2 lớp mã hóa, mỗi lớp LayerNorm → attention nhân quả 4 đầu → cộng nối tắt → LayerNorm → tầng truyền thẳng 56 → 243 → 56 → cộng nối tắt, cuối cùng một LayerNorm. Lưới ô vuông bên trái minh họa mặt nạ nhân quả cho 6 ngày: ngày k chỉ được nhìn các ngày j ≤ k. Kích thước theo cấu hình C2 `transformer_L2_x1_lr1e-3` (dropout 0,1). Mã: `TransformerCore`, dùng `torch.nn.TransformerEncoderLayer` với `norm_first=True`. Chữ trong hình bằng tiếng Anh.*
+
 ## 2.5. Mô hình không gian trạng thái: S4D và Mamba
 
 **SSM liên tục.** Mô hình không gian trạng thái (state space model) mượn từ lý thuyết điều khiển: một trạng thái ẩn h(t) thay đổi theo h'(t) = A h(t) + B x(t), đầu ra y(t) = C h(t). Ví dụ trực giác là bồn nước: mực nước (trạng thái) tự rút dần (A âm) và tăng theo lượng bơm vào (B x). Trong mạng nơ-ron, h(t) không phải đại lượng vật lý đo được mà là vectơ mô hình tự học.
@@ -50,9 +62,17 @@ Trong dự báo, **mặt nạ nhân quả** chặn bước i nhìn các bước 
 
 **S4D.** S4 (Gu và cs., ICLR 2022) khởi tạo A theo lý thuyết HiPPO để trạng thái nén tốt lịch sử dài; S4D (Gu và cs., NeurIPS 2022) dùng A đường chéo, đơn giản hơn mà kết quả tương đương. Vì Ā, B̄, C không đổi theo thời gian, đầu ra là một tích chập của đầu vào với nhân K = (CB̄, CĀB̄, CĀ²B̄, …) dài bằng chuỗi, tính nhanh bằng biến đổi Fourier nhanh (FFT). Mỗi kênh có N trạng thái (đề tài dùng N = 64). Hạn chế: cùng một nhân áp cho mọi đầu vào. Mưa 1 mm hay 100 mm đều được "nhớ" theo cùng một cách.
 
+![Lõi S4D](../../Workspace/07_Demo/04_D4_Website/Figures/D4_Core_S4D.png)
+
+*Hình 2.4. Lõi S4D của đề tài. Trên: khung nối tắt dùng chung cho S4D và Mamba (chiếu 32 → 72, mỗi khối LayerNorm → khối → dropout → cộng nối tắt, LayerNorm cuối). Dưới: bên trong một khối S4D, mỗi kênh trong 72 kênh có một SSM đường chéo riêng, trạng thái N = 64; vì Ā, B̄, C không đổi theo ngày, cả chuỗi được tính một lần như tích chập với nhân K bằng FFT, rồi qua GELU và tích chập 1×1 với GLU. Đường cong K chỉ minh họa dạng giảm dần, không phải nhân đã học. Kích thước theo cấu hình C2 `s4d_L4_x1_lr1e-3`: 4 khối, dropout 0,1. Mã: `ResidualCore` và `S4DBlock` (chỉnh từ `models/s4/s4d.py` của `state-spaces/s4`). Chữ trong hình bằng tiếng Anh.*
+
 **Mamba.** Mamba (Gu & Dao, arXiv 2312.00752, 2023) làm B, C và Δ phụ thuộc đầu vào tại mỗi bước (cơ chế chọn lọc, selective SSM): B_t = Linear_B(x_t), C_t = Linear_C(x_t), Δ_t = softplus(Linear_Δ(x_t)). Khi một ngày quan trọng (ví dụ mưa lớn), mô hình có thể chọn Δ_t lớn để ghi mạnh thông tin đó vào trạng thái; ngày không quan trọng thì Δ_t nhỏ, trạng thái gần như giữ nguyên. Cơ chế này giống vai trò cổng của LSTM. Đổi lại, nhân tích chập không còn cố định nên không dùng FFT được. Mamba tính bằng thuật toán quét song song (parallel scan) cài thành nhân CUDA, chi phí tuyến tính theo độ dài chuỗi.
 
 Một khối Mamba gồm: chiếu đầu vào lên kích thước trong d_inner (mặc định gấp 2 lần d_model) thành hai nhánh; nhánh chính qua tích chập một chiều nhân quả (độ rộng `d_conv` = 4), hàm SiLU rồi SSM chọn lọc (trạng thái `d_state` = 16); nhánh kia qua SiLU làm cổng nhân vào nhánh chính; cuối cùng chiếu về d_model. Đề tài bọc mỗi khối bằng kết nối tắt và LayerNorm, và xếp 2 hoặc 4 khối.
+
+![Lõi Mamba](../../Workspace/07_Demo/04_D4_Website/Figures/D4_Core_Mamba.png)
+
+*Hình 2.5. Lõi Mamba của đề tài: cùng khung nối tắt với S4D, 2 khối. Bên trong một khối, đầu vào 72 chiều được chiếu thành hai nhánh 143 chiều; nhánh chính qua tích chập nhân quả rộng 4, SiLU rồi SSM chọn lọc (N = 16) với Δ, B, C tính từ dữ liệu từng ngày; nhánh cổng qua SiLU rồi nhân vào kết quả, cuối cùng chiếu 143 → 72. Kích thước theo cấu hình C2 `mamba_L2_x1_lr1e-3`. Mã: `ResidualCore` với `mamba_ssm.Mamba` 2.3.2.post1 khi huấn luyện trên GPU, `mambapy` 1.2.0 khi chạy trên CPU của demo. Chữ trong hình bằng tiếng Anh.*
 
 **So sánh.** LSTM, GRU nén lịch sử vào trạng thái kích thước cố định qua từng bước, tính tuần tự. Transformer giữ toàn bộ lịch sử và nhìn thẳng mọi bước, chi phí bình phương. S4D và Mamba cũng nén vào trạng thái cố định nhưng huấn luyện song song được; Mamba thêm khả năng chọn lọc như cổng của LSTM. Cái giá của việc nén là khó truy xuất chi tiết đơn lẻ ở xa (Jelassi và cs., ICML 2024). Dự báo lưu lượng chủ yếu cần trạng thái tích lũy (tuyết, độ ẩm đất) hơn là một ngày cụ thể ở xa, nên câu hỏi kiến trúc nào hợp hơn là câu hỏi thực nghiệm của đề tài.
 
