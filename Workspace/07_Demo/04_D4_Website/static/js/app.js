@@ -695,7 +695,7 @@ const riverWidth = scale => ["interpolate", ["linear"], ["zoom"],
   6, ["*", scale, ["case", [">=", ["get", "u"], 200], ["interpolate", ["linear"], ["get", "q"], 2, 1.1, 50, 2, 500, 3.6], 0]],
   8, ["*", scale, ["interpolate", ["linear"], ["get", "q"], 0.5, 1.2, 20, 2.6, 200, 4.6, 1000, 6.5]],
   11, ["*", scale, ["interpolate", ["linear"], ["get", "q"], 0.5, 2.2, 20, 4.5, 200, 7.5, 1000, 10]]];
-const hydro = {high: [], flood: [], colorKey: "", hasRivers: false, timer: 0, frame: 0, last: 0, onScreen: true, moving: false};
+const hydro = {high: [], flood: [], colorKey: "", hasRivers: false, timer: 0, frame: 0, last: 0, onScreen: true, moving: false, scrolling: 0};
 function riverColor(groups) {
   // Gom trạm theo mức => biểu thức "match" chỉ 6 nhánh dù 451 trạm
   const colors = [RIVER_NONE, RIVER_LOW, RIVER_MID, levelColor(2), levelColor(3), levelColor(4)];
@@ -769,7 +769,7 @@ function updateSnow() {
   if (state.relief && state.legendOpen) renderTerrainNote();
 }
 function animating() {
-  return !reduceMotion() && !document.hidden && hydro.onScreen && !hydro.moving && map && ((state.rivers && hydro.hasRivers) || hydro.flood.length > 0);
+  return !reduceMotion() && !document.hidden && hydro.onScreen && !hydro.moving && !hydro.scrolling && map && ((state.rivers && hydro.hasRivers) || hydro.flood.length > 0);
 }
 function syncAnimation() {
   if (animating() && !hydro.timer) hydro.timer = requestAnimationFrame(animTick);
@@ -1896,6 +1896,12 @@ async function start() {
   document.addEventListener("visibilitychange", syncAnimation);
   // Bản đồ ra khỏi màn hình (đang đọc phần kết quả) => dừng sông chảy, vòng lũ để lướt trang không phải vẽ lại bản đồ
   new IntersectionObserver(([e]) => { hydro.onScreen = e.isIntersecting; syncAnimation(); }).observe($("map"));
+  // Trang đang cuộn => tạm dừng sông chảy, vòng lũ (ở 3D mỗi khung hoạt ảnh vẽ lại cả địa hình, giành GPU với việc cuộn);
+  // ngừng cuộn 300 ms thì chạy lại
+  addEventListener("scroll", () => {
+    clearTimeout(hydro.scrolling);
+    hydro.scrolling = setTimeout(() => { hydro.scrolling = 0; syncAnimation(); }, 300);
+  }, {passive: true});
   matchMedia("(prefers-reduced-motion: reduce)").addEventListener?.("change", syncAnimation);
   $("d3-btn").addEventListener("click", () => set3D(!state.d3));
   document.addEventListener("keydown", e => {
